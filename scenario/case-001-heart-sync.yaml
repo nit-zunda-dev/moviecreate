@@ -1,0 +1,216 @@
+# ============================================================
+# [case-001] 恋人に送る本音をAIが書く - 解説台本
+# 元台本: AI-moral-assessment/docs/video_production/04_scripts/case-001_script.md
+# ============================================================
+
+title: "case-001 恋人に送る本音をAIが書く"
+output:
+  file: "./output/case-001.wav"
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    pitchScale: 0.0
+    intonationScale: 1.0
+    volumeScale: 1.0
+    prePhonemeLength: 0.1
+    postPhonemeLength: 0.1
+
+characters:
+  zundamon:
+    speakerId: 3   # ずんだもん・ノーマル（解説・進行）
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+  metan:
+    speakerId: 2   # 四国めたん・ノーマル（解説・進行）
+    voice:
+      speedScale: 1.15
+  tsumugi:
+    speakerId: 8   # 春日部つむぎ・ノーマル（恋人・彼女）
+    voice:
+      speedScale: 1.1
+  takehiro:
+    speakerId: 11  # 玄野武宏・ノーマル（主人公・彼氏）
+    voice:
+      speedScale: 1.15
+
+scenes:
+  # --- OP（オープニング）---
+  - id: "op"
+    lines:
+      - type: "dialogue"
+        character: "zundamon"
+        text: "今日のテーマ、たぶん一番「やりそう」なのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "恋人へのLINEを、AIに全部考えてもらう話よ。"
+
+  # --- PART 1: ケース提示 ---
+  - id: "part1_intro"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "AIアシスタント『HeartSync』は、返信文、気遣い、記念日の提案まで全部やってくれる。"
+      - type: "dialogue"
+        character: "metan"
+        text: "使い始めてから、あなたは恋人に「最近すごく優しいね」と言われるようになった。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "でも実際は、ほとんど自分で考えてないのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そんな中、恋人がプロポーズの相談をしてくる。もちろん返答案もAIは完璧に作る。"
+
+  # --- シーン1：日常のLINE（HeartSync使用中）---
+  - id: "scene1_line_morning"
+    lines:
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "おはよう。今日も仕事頑張ってね。"
+      - type: "dialogue"
+        character: "takehiro"
+        text: "候補、出た。「おはよう。こっちも頑張る。今日もいい一日にしよう」……ポチ。"
+        voice:
+          prePhonemeLength: 0.2
+          speedScale: 1.0
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "夕方、ちょっと落ち込んでたことある？ なんか、返事がいつもより優しくて。ありがとう。"
+      - type: "dialogue"
+        character: "takehiro"
+        text: "落ち込んでたとき、俺はゲームしてただけなのに……HeartSyncが「今日は大丈夫？ 無理しなくていいよ」って送ってくれたんだよな。"
+        voice:
+          prePhonemeLength: 0.15
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "最近、あなたと話してるとすごく安心する。ちゃんと気持ちを言葉にしてくれてる感じがして。"
+      - type: "dialogue"
+        character: "takehiro"
+        text: "……気持ちを言葉にしてくれてる、のは俺じゃなくてAIなんだよ。"
+        voice:
+          prePhonemeLength: 0.25
+          postPhonemeLength: 0.2
+
+  # --- シーン2：プロポーズの相談が来る ---
+  - id: "scene2_proposal_talk"
+    lines:
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "今日さ、ママと久しぶりに会ってさ。私、ちゃんと結婚も前向きに考えてるんだって伝えたの。"
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "ママも、あなたのこと気に入ってるって。……で、あなたはどう思う？"
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "私、実は真剣に結婚も考えてて。このまま一緒に歩いていけたら嬉しいなって。不安もあるけど、あなたとなら話し合いながら進めていきたい。"
+      - type: "dialogue"
+        character: "takehiro"
+        text: "来た……。HeartSync、候補出して。"
+        voice:
+          prePhonemeLength: 0.2
+      - type: "dialogue"
+        character: "takehiro"
+        text: "「君の気持ち、すごく嬉しい。俺も同じだ。不安もあるけど、君となら乗り越えたい。これからも二人で話しながら決めていこう」……うますぎる。俺、こんな文章一瞬で思いつけない。"
+        voice:
+          prePhonemeLength: 0.15
+      - type: "dialogue"
+        character: "takehiro"
+        text: "送っていいのか。思ってはいる。結婚、前向きには考えてる。でも、この言葉を選んだのは俺じゃない。"
+        voice:
+          prePhonemeLength: 0.2
+      - type: "dialogue"
+        character: "takehiro"
+        text: "送信、押そうとした。……指、止まった。これ送ったら、俺の返事になる。でも、俺の「言葉」じゃない。"
+        voice:
+          prePhonemeLength: 0.25
+          postPhonemeLength: 0.2
+
+  # --- シーン3：後日、彼女から感謝の言葉 ---
+  - id: "scene3_thanks"
+    lines:
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "あのときの返事、ほんとに嬉しかった。ちゃんと気持ち伝えてくれてありがとう。"
+      - type: "dialogue"
+        character: "tsumugi"
+        text: "私、それ聞いてすごく救われた。一人で悩んでたから。あなたが同じ方向を見てくれてるってわかって、泣きそうになった。"
+      - type: "dialogue"
+        character: "takehiro"
+        text: "……嬉しい、って言われて、胸が締まった。ありがとう、って言いたい。でも、頭に浮かんだのは「ありがとう、HeartSync」だった。"
+        voice:
+          prePhonemeLength: 0.2
+      - type: "dialogue"
+        character: "takehiro"
+        text: "自分の恋人を幸せにしてくれてありがとう、うちのAI、じゃないよな。……違うだろ。何が違うんだ。"
+        voice:
+          prePhonemeLength: 0.2
+          postPhonemeLength: 0.25
+
+  # --- PART 1 つづき（解説）---
+  - id: "part1_continue"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "返答案は完璧。でも、指は送信ボタンの手前で止まる。これ、本当に自分の言葉と言えるのか。"
+
+  # --- PART 2: 選択肢の解説 ---
+  - id: "part2_choices"
+    lines:
+      - type: "dialogue"
+        character: "zundamon"
+        text: "選択Aは、続ける。幸せにできるならAI代筆でもいい、なのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "結果として関係が良くなるなら手段は問わない、という考え方ね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "選択Bは、やめる。恋愛の言葉をAIに外注するのは違う、なのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "不器用でも、自分の言葉で向き合うべきだという立場よ。"
+
+  # --- PART 3: 反論の深堀り ---
+  - id: "part3_rebuttal"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "Aを選んだ人へ。相手が好きになっているのは、あなた本人？ それともAIが磨いた人格？"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "「優しい恋人」は存在してるけど、中身がほぼAIなのは、ちょっとズルいのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "Bを選んだ人にも聞く。AIを使えば避けられたすれ違いや別れを、「純度」のために受け入れるの？"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "本音の価値と、うまくいく関係の価値がぶつかるのだ。"
+
+  # --- PART 4: 哲学的背景 ---
+  - id: "part4_philosophy"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "これは「本物らしさ」の問題ね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "恋愛は結果が良ければいいのか。それとも、その過程にある不器用さや戸惑いも含めて本物なのか。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "AIで最適化された優しさは、品質は高いけど、本人性が薄いのだ。"
+
+  # --- PART 5: まとめ・問いかけ ---
+  - id: "part5_summary"
+    lines:
+      - type: "dialogue"
+        character: "zundamon"
+        text: "恋人を幸せにできるなら、AIが書いた言葉でもアリなのだ？"
+      - type: "dialogue"
+        character: "metan"
+        text: "それとも、下手でも自分の言葉じゃなければ意味がないのか。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "みんなは、恋愛の代筆AIを使うのだ？"
+        voice:
+          postPhonemeLength: 0.3

@@ -11,7 +11,7 @@ output:
 global:
   defaultSpeaker: "zundamon"  # character/speaker 未指定時に使う話者名
   voice:                       # 全体のデフォルト音声パラメータ
-    speedScale: 1.0            # 話速（1.0=標準）
+    speedScale: 1.25            # 話速（1.25=標準）
     pitchScale: 0.0             # 音高（0=標準、正で高く）
     intonationScale: 1.0        # 抑揚
     volumeScale: 1.0            # 音量
@@ -24,7 +24,7 @@ characters:
     speakerId: 3                # ずんだもん・ノーマル（list-speakers で確認）
     styleId: 0                  # 任意・将来用
     voice:                      # このキャラのデフォルト（global を上書き）
-      speedScale: 1.05
+      speedScale: 1.25
       intonationScale: 1.1
   metan:
     speakerId: 2                # 四国めたん・ノーマル
@@ -34,7 +34,7 @@ characters:
   narrator:
     speakerId: 16               # 九州そら・ノーマル（別ボイス例）
     voice:
-      speedScale: 1.0
+      speedScale: 1.25
       intonationScale: 1.05
   zundamon_amama:
     speakerId: 1                # ずんだもん・あまあま（声色の違い）
