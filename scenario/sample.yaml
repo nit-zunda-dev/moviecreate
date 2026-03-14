@@ -1,0 +1,30 @@
+title: "ずんだもんとめたんのサンプル会話"
+output:
+  file: "./output/zundamon-sample.wav"
+global:
+  defaultSpeaker: "zundamon"
+
+characters:
+  zundamon:
+    speakerId: 3
+    styleId: 0
+  metan:
+    speakerId: 2
+    styleId: 0
+
+scenes:
+  - id: "intro"
+    lines:
+      - type: "dialogue"
+        character: "zundamon"
+        text: "こんにちは、ずんだもんなのだ。VOICEVOXで自動生成された音声なのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "四国めたんです。シナリオを書くだけで会話が作れるのですよ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "キャラクター名とspeakerIdを変えれば、いろんな声色が試せるのだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ぜひ好きなキャラと台本で遊んでみてくださいね。"
+
