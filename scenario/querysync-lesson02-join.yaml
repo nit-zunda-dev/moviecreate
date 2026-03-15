@@ -1,0 +1,281 @@
+# ============================================================
+# QuerySync Lesson 2: JOIN（複数テーブルの結合）— 解説台本
+# 元台本: Movidrill/docs/video/scripts/querysync/lesson02_join.md
+# モジュール: QuerySync / レッスンID: qs-lesson-2
+# 想定尺: 約18〜22分 / 登場: めたん（講師）、ずんだもん（生徒）
+# ============================================================
+
+title: "エスキューエルのジョインが腹落ちする！複数テーブルをひとつにまとめる方法【めたん×ずんだもん】"
+output:
+  file: "./output/querysync-lesson02-join.wav"
+
+global:
+  defaultSpeaker: "metan"
+  voice:
+    speedScale: 1.25
+    pitchScale: 0.0
+    intonationScale: 1.0
+    volumeScale: 1.0
+    prePhonemeLength: 0.1
+    postPhonemeLength: 0.1
+
+characters:
+  metan:
+    speakerId: 2   # 四国めたん・ノーマル（講師）
+    voice:
+      speedScale: 1.25
+  zundamon:
+    speakerId: 3   # ずんだもん・ノーマル（生徒）
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+scenes:
+  # --- [00:00] イントロ（なぜジョインが必要か・今日のゴール） ---
+  - id: "intro"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "みんな、こんにちは。めたんだよ。前の動画ではセレクトでひとつのテーブルからデータを取るやり方をやったね。今日は複数のテーブルをひとつにまとめて見る、ジョインをやっていくよ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "じょいん？ テーブルをまとめるって、どういうこと？"
+      - type: "dialogue"
+        character: "metan"
+        text: "データベースではね、データを役割ごとに分けて持つことが多いの。例えば社員のテーブルと部署のテーブルが別々にあって、社員にはこの部署に所属っていう番号だけ入れておいて、部署の名前は部署のテーブルにだけ持っておく、みたいな感じ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そうすると、社員一覧に部署の名前も出したいっていうときに、2つのテーブルをつなげて見る必要が出てくる。そのつなげるがジョインなの。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "なるほど。別々の表を、うまくくっつけて見るんだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。今日はエンプロイーズとデパートメンツっていう2つのテーブルを例に、まずテーブルの関係を確認、インナージョインでつなぐ、レフトジョインで片方ぜんぶ残す、3つ以上のテーブルをつなぐまで、順番にやっていくね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "おけ、順番にいこう。"
+      - type: "dialogue"
+        character: "metan"
+        text: "じゃあ、最初に、どんなテーブルがあって、どこでつなぐかから見ていこう。"
+
+  # --- [02:30] Step 1: テーブル確認 — 2つのテーブルと鍵の関係 ---
+  - id: "step1_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "エンプロイーズテーブルには、社員のアイディー、名前、デパートメントアイディー、給与、入社日が入ってる。ここでデパートメントアイディーは、どの部署に属しているかの番号だけね。部署の名前は入ってない。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "名前は別のとこにあるってこと？"
+      - type: "dialogue"
+        character: "metan"
+        text: "うん。デパートメンツテーブルにはアイディーとネームがある。エンプロイーズのデパートメントアイディーと、デパートメンツのアイディーが同じ値になってる行同士を、同じ部署だねって対応させてつなぐの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "このつなぐときに使う列のことを鍵とかキーって呼ぶことが多いよ。デパートメントアイディーは外部キー、デパートメンツのアイディーは主キーって言うけど、まずはこの列とこの列が同じ値の行をペアにするって覚えておけばオーケー。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "同じ値の行をペアにする。それでつながるんだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。では、この2つのテーブルがあるとき、つなぐときに使う列はどれとどれか、一度自分で確認してみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で考えてみてね。エンプロイーズとデパートメンツをつなぐときに使う鍵になる列の組み合わせは、どれとどれか。答えはこのあとすぐ見せるから。"
+
+  # --- [05:30] Step 1 の答え・Step 2 へのつなぎ ---
+  - id: "step1_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解は、エンプロイーズのデパートメントアイディーと、デパートメンツのアイディーの組み合わせだよ。この2つの列の値が同じ行同士をペアにして、ひとつの結果にまとめていくのがジョインの基本。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "デパートメントアイディーとアイディーを同じにして、ペアにするんだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。次は、そのペアにするをエスキューエルで書くやり方。インナージョインっていうのを使うね。"
+
+  # --- [08:00] Step 2: INNER JOIN — 条件に合う行だけつなぐ ---
+  - id: "step2_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "インナージョインは、両方のテーブルに、つなぐ条件を満たす行があるときだけ、結果に含めるやり方。"
+      - type: "dialogue"
+        character: "metan"
+        text: "書き方は、フロム テーブル1のうしろに、インナージョイン テーブル2 オン 条件を付けるの。条件はふつう、テーブル1のこの列イコールテーブル2のこの列、って書く。"
+      - type: "dialogue"
+        character: "metan"
+        text: "例えば、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "フロム エンプロイーズ インナージョイン デパートメンツ オン エンプロイーズ ドット デパートメントアイディー イコール デパートメンツ ドット アイディー。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "zundamon"
+        text: "オンのうしろに、この列とこの列が同じ、って書くんだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。列名がどっちのテーブルか分かるように、テーブル名ドット列名で書くことが多いよ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "これで、デパートメントアイディーとデパートメンツのアイディーが同じ行同士がくっついて、社員の情報と部署名がひとつの結果になる。どちらか片方にしかない行は出てこないのがインナージョインのポイント。両方にペアがある行だけね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "両方にペアがある行だけ。だから中身だけつなぐ感じだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "その感覚で合ってる。では、社員の名前と部署名を、インナージョインで取得する文を考えてみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。エンプロイーズとデパートメンツをインナージョインして、社員のネームと部署のネームを取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [11:00] Step 2 の答え・Step 3 へのつなぎ ---
+  - id: "step2_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解の例はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト エンプロイーズ ドット ネーム カンマ デパートメンツ ドット ネーム フロム エンプロイーズ インナージョイン デパートメンツ オン エンプロイーズ ドット デパートメントアイディー イコール デパートメンツ ドット アイディー。"
+        voice:
+          speedScale: 1.0
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.25
+      - type: "dialogue"
+        character: "metan"
+        text: "社員名と部署名が、同じ行に並んで出てくるはず。列名が同じネームだから、どっちか分かるようにエンプロイーズドットネームとデパートメンツドットネームって書いてるね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "出た。社員と部署がくっついて見える。"
+      - type: "dialogue"
+        character: "metan"
+        text: "うん。でもね、左のテーブルにはあるけど、右のテーブルにペアがない行も、ときどき残したいことがあるの。例えば部署がまだ決まってない社員がいて、デパートメントアイディーが空っぽ、みたいなとき。インナージョインだとその行は結果に出てこない。左のテーブルの行はぜんぶ残して、右はあればつなぐのがレフトジョインだよ。"
+
+  # --- [13:00] Step 3: LEFT JOIN — 左は全部残す ---
+  - id: "step3_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "レフトジョインは、左に書いたテーブルの行は全部残す。右のテーブルは、条件が合えばつなげるけど、合わなければ右側は空っぽで出す、っていう意味。"
+      - type: "dialogue"
+        character: "metan"
+        text: "書き方はインナージョインとほとんど同じで、インナーの代わりにレフトを付けるだけ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "フロム エンプロイーズ レフトジョイン デパートメンツ オン エンプロイーズ ドット デパートメントアイディー イコール デパートメンツ ドット アイディー、と書くと、部署が決まってない社員も出てきて、その行の部署名のところはヌルになるの。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "zundamon"
+        text: "左はぜんぶ残して、右はあればくっつく。ないときはヌルだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。だから、必ずペアがあるときはインナー、左は全部出したいときはレフト、って使い分ける感じ。では、今度はレフトジョインで社員名と部署名を出してみて。部署がない社員も含まれるようにしてね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。エンプロイーズとデパートメンツをレフトジョインして、社員の名前と部署名を取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [16:00] Step 3 の答え・Step 4 へのつなぎ ---
+  - id: "step3_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解の例はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト エンプロイーズ ドット ネーム カンマ デパートメンツ ドット ネーム フロム エンプロイーズ レフトジョイン デパートメンツ オン エンプロイーズ ドット デパートメントアイディー イコール デパートメンツ ドット アイディー。"
+        voice:
+          speedScale: 1.0
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.25
+      - type: "dialogue"
+        character: "metan"
+        text: "インナーをレフトに変えただけ。デパートメントアイディーがヌルの社員がいれば、その行の部署名はヌルで出てくる。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "レフトに変えるだけで、全部残るんだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "うん。最後に、テーブルが3つ以上のときも、ジョインを続けて書けるよ。次のステップでちょっとだけ触れるね。"
+
+  # --- [17:30] Step 4: 複数テーブルの結合 — 3つ目を足す ---
+  - id: "step4_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "例えばプロジェクトっていうプロジェクトのテーブルがあって、これがデパートメントアイディーでデパートメンツとつながってるとするね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "社員、部署、その部署が持つプロジェクト名をいっぺんに出したかったら、エンプロイーズとデパートメンツをジョインした結果に、さらにプロジェクトをジョインすればいいの。ジョイン テーブル オン 条件を、必要なだけ並べる感じ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "ジョインを2回書くってこと？"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。まずエンプロイーズとデパートメンツをインナージョインでひとつ目をつないで、そのうしろに、インナージョイン プロジェクト オン デパートメンツ ドット アイディー イコール プロジェクト ドット デパートメントアイディー、みたいに2つ目を足す。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "metan"
+        text: "こうすると、3つのテーブルがひとつの結果にまとまるよ。実務でも、2つ、3つとジョインして必要な列だけ取る、っていうのがよくあるパターンだから、まずはオンでどの列とどの列を同じにするかを間違えないようにしよう。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "オンを間違えないようにする。分かった。"
+      - type: "dialogue"
+        character: "metan"
+        text: "では、3つのテーブル、エンプロイーズ、デパートメンツ、プロジェクトがあるとき、プロジェクトはデパートメントアイディーでデパートメンツと対応してるとして、社員名、部署名、プロジェクト名を出す文を考えてみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。上記の3テーブルをジョインして、社員名、部署名、プロジェクト名を取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [20:00] Step 4 の答え・まとめ ---
+  - id: "step4_answer_summary"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解の例はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト エンプロイーズ ドット ネーム カンマ デパートメンツ ドット ネーム カンマ プロジェクト ドット ネーム フロム エンプロイーズ インナージョイン デパートメンツ オン エンプロイーズ ドット デパートメントアイディー イコール デパートメンツ ドット アイディー インナージョイン プロジェクト オン デパートメンツ ドット アイディー イコール プロジェクト ドット デパートメントアイディー。"
+        voice:
+          speedScale: 0.98
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.3
+      - type: "dialogue"
+        character: "metan"
+        text: "2回インナージョインして、それぞれオンでつなぐ列を書いてるね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "2回ジョインで3つつながった。長いけど、パターンは同じだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "いいね。今日のまとめだよ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ジョインは、複数のテーブルを、ある列同士が同じ行でつなげて、ひとつの結果にすること。インナージョインは両方にペアがある行だけ、レフトジョインは左のテーブルは全部残して、右はあればつなぐ。テーブルが3つ以上なら、ジョインを続けて書けばいい。つなぐときは、オン 左の列イコール右の列を間違えないようにしよう。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "オンでどことどこをつなぐか、ちゃんと書く。覚えた。"
+      - type: "dialogue"
+        character: "metan"
+        text: "次はサブクエリとか、セレクトの結果を別のセレクトの中で使う話をやっていくから、楽しみにしててね。また次の動画で会おう。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "またねー。"

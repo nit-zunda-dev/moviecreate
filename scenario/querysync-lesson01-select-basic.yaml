@@ -1,0 +1,426 @@
+# ============================================================
+# QuerySync Lesson 1: セレクト文の基本 — 解説台本
+# 元台本: Movidrill/docs/video/scripts/querysync/lesson01_select-basic.md
+# モジュール: QuerySync / レッスンID: qs-lesson-1
+# 想定尺: 約18〜22分 / 登場: めたん（講師）、ずんだもん（生徒）
+# ============================================================
+
+title: "エスキューエル超入門！セレクトの考え方が腹落ちするまで【めたん×ずんだもん】"
+output:
+  file: "./output/querysync-lesson01-select-basic.wav"
+
+global:
+  defaultSpeaker: "metan"
+  voice:
+    speedScale: 1.25
+    pitchScale: 0.0
+    intonationScale: 1.0
+    volumeScale: 1.0
+    prePhonemeLength: 0.1
+    postPhonemeLength: 0.1
+
+characters:
+  metan:
+    speakerId: 2   # 四国めたん・ノーマル（講師）
+    voice:
+      speedScale: 1.25
+  zundamon:
+    speakerId: 3   # ずんだもん・ノーマル（生徒）
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+scenes:
+  # --- [00:00] イントロ（学習ゴール・セレクトとは）---
+  - id: "intro"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "みんな、こんにちは。めたんだよ。この動画では、エスキューエルのセレクトを、何をしているかがちゃんと腹落ちするまで解説していくね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ハンズオンで一緒に打つより、まずは考え方を押さえてもらうイメージだよ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "ずんだもんも一緒に聞くんだ。セレクトってデータ取るって聞くけど、なんか難しそうでちょっと怖いんだよね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "大丈夫。セレクトはね、どのテーブルの、どの列を、どういう条件で見るかを一文で書くだけなの。その一文のパーツをひとつずつ理解すれば、もう怖くないよ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "今日はエンプロイーズっていう社員テーブルを例に、全データを見る、欲しい列だけ、条件で絞る、並べ替える、集計するまで、順番にやっていくね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "お、順番にやればいいんだ。それならなんとなくイメージできた。"
+      - type: "dialogue"
+        character: "metan"
+        text: "じゃあ、最初の一歩からいこう。"
+
+  # --- [02:30] Step 1: 全データの取得 — セレクト アスタリスク FROM ---
+  - id: "step1_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "まずはテーブルの中身をぜんぶ見るところから。エスキューエルでは、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト アスタリスク フロム テーブル名。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクトは選んで取り出す、フロムはどこから。アスタリスクは全部の列を表す記号だと思っておいて。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "ほえー。アスタリスクがぜんぶってこと？"
+      - type: "dialogue"
+        character: "metan"
+        text: "つまり、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト アスタリスク フロム エンプロイーズ。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "エンプロイーズテーブルから、全部の列をぜんぶ取り出してね、という意味になるの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "テーブルって、エクセルの表みたいに行と列があるでしょ。アスタリスクを付けると、その列を全部持ってくる。行は条件を付けない限り全部だから、結果として表ごと見る感じになるね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "表ごと、って言われると分かりやすい。じゃあアスタリスクって覚えとけば、とりあえず中身は全部見られるんだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "うん。まずは中身を全部見たいときは、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト アスタリスク フロム テーブル名。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "これだけ覚えておけばオーケー。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。エンプロイーズテーブルの全カラム・全行を取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [05:30] Step 1 の答え・Step 2 へのつなぎ ---
+  - id: "step1_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト アスタリスク フロム エンプロイーズ。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "実行すると、アイディーとかネームとかデパートメントとか、全部の列が8人分ぜんぶ出てくる。"
+      - type: "dialogue"
+        character: "metan"
+        text: "これがデータを読むのいちばん基本の形ね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "出た。8人分、列もぜんぶ出てきた。アスタリスクで一発なんだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。でもね、本当は全部の列はあんまり使わないの。理由は、列が多くなると見づらいし、必要な情報だけ取りたいことが多いから。"
+      - type: "dialogue"
+        character: "metan"
+        text: "次はアスタリスクの代わりに、この列とこの列だけを指定するやり方をやるね。"
+
+  # --- [08:00] Step 2: カラム指定 — 欲しい列だけ ---
+  - id: "step2_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクトのうしろに、カラム名をカンマで並べると、その列だけ取り出せるの。アスタリスクは全部の列だったけど、ここにネームだけ書けば名前の列だけ、ネームとデパートメントを書けば名前と部署の列だけになるってわけ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "なんか、アスタリスクで全部取るより必要なとこだけの方が仕事っぽいね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "その感覚で合ってる。実務だと、画面に表示する項目とか、集計に使う列とか、本当に必要な列だけ指定することがほとんど。"
+      - type: "dialogue"
+        character: "metan"
+        text: "あと、列が少ないと結果も見やすいし、データ量が大きいときは無駄な列を送らない分だけちょっと軽くなるの。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "なるほど。じゃあ、セレクト ネーム カンマ デパートメント フロム エンプロイーズ、みたいに書けば、名前と部署だけ出るんだね。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "その通り。カンマで区切って、欲しい列を並べるだけ。順番は、出したい順に書けばオーケー。"
+      - type: "dialogue"
+        character: "metan"
+        text: "では、今度は名前と部署だけを自分で書いて試してみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。エンプロイーズテーブルからネームとデパートメントだけを取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [10:30] Step 2 の答え・Step 3 へのつなぎ ---
+  - id: "step2_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト ネーム カンマ デパートメント フロム エンプロイーズ。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "8行のままだけど、列は名前と部署の2つだけになってるはず。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "できた。すごい、必要なとこだけって感じ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "いいね。次は行を絞る話。今までのは列を選ぶだったけど、今度はこの条件に当てはまる行だけ取り出すんだ。それをするのがウェア句よ。"
+
+  # --- [13:00] Step 3: WHERE句 — 条件で行を絞る ---
+  - id: "step3_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "ウェアは、こんな行だけ取り出して、という条件を書くところ。ウェア 列名 イコール 値のように、この列がこの値のときだけ、って指定するの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "例えば、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ウェア デパートメント イコール シングルクォート 開発部 シングルクォート。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "こう書くと、部署が開発部の人だけになる。文字列はシングルクォートで囲むのを忘れないでね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "え、じゃあ8人じゃなくて、開発部の人だけになるってこと？"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。エンプロイーズの中には開発部の人も営業部の人もデザイン部の人もいるでしょ。その中から開発部の行だけを残すイメージ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクトでどの列を見るか、ウェアでどの行を残すかを決める感じだね。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "列はセレクト、行はウェアで決める。おけ、分かった。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そうそう。ウェアのあとにはイコールのほかに、より大きいやより小さいとかライクとかも使えるんだけど、まずはイコールでぴったりこの値で絞るのを押さえよう。"
+      - type: "dialogue"
+        character: "metan"
+        text: "では、開発部のメンバーだけ、全カラムで試してみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。開発部のメンバーだけを、全カラムで取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [15:30] Step 3 の答え・Step 4 へのつなぎ ---
+  - id: "step3_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト アスタリスク フロム エンプロイーズ ウェア デパートメント イコール シングルクォート 開発部 シングルクォート。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "metan"
+        text: "結果は3行になるはず。開発部の人だけ残ってるでしょ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "3人だけ出た。ウェア一個でガッと絞れるんだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "うん。次は並べ替え。オーダーバイを使うと、この列の値で昇順とか降順に並べて、って指定できるの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "例えば給与の高い順に並べたいときは、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "オーダーバイ サラリー デスク。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "デスクは降順、つまり大きい方から。昇順ならアスクね。"
+
+  # --- [17:00] Step 4: ORDER BY — 並べ替え ---
+  - id: "step4_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "オーダーバイ 列名で、この列の値で並べる。デスクで大きい順、アスクで小さい順だよ。省略するとアスクになることが多いね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "給与の高い順なら、セレクト文のいちばんうしろに、こう付けるの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "オーダーバイ サラリー デスク。"
+        voice:
+          speedScale: 1.08
+          prePhonemeLength: 0.15
+          postPhonemeLength: 0.15
+          pauseLengthScale: 1.15
+      - type: "dialogue"
+        character: "metan"
+        text: "そうすると、結果の行が給与の高い人から並び替わるの。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "表示の順番を変えるだけだから、行の数は増えたり減ったりしないんだね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。ウェアは行を減らす、オーダーバイは並びだけ変える、ってイメージでいいよ。だから全員のまま、8行だけど、順番が給与順になるってわけ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "なるほど。じゃあ全メンバー、給与高い順で書けばいいんだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "うん。全カラムで、オーダーバイ サラリー デスクを付けてみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。全メンバーを、給与の高い順に並べて取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [19:00] Step 4 の答え・Step 5 へのつなぎ ---
+  - id: "step4_answer"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト アスタリスク フロム エンプロイーズ オーダーバイ サラリー デスク。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "metan"
+        text: "一番上が一番給与が高い人になってるはず。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "並び替わった。便利。"
+      - type: "dialogue"
+        character: "metan"
+        text: "最後に集計をちょっとだけやるね。例えば部署ごとに平均給与が知りたい、みたいなとき、一行一行じゃなくてまとめた値を出したいでしょ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "それをやるのがグループバイとエーヴィージーみたいな集計関数なの。"
+
+  # --- [20:30] Step 5: 集計関数 — GROUP BY と AVG ---
+  - id: "step5_explain"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "エーヴィージー 列名は、その列の平均を計算する関数。でも全員の平均じゃなくて、部署ごとの平均にしたいから、グループバイ デパートメントで、部署でまとめて、って指定するの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そうすると、同じ部署の行がひとまとまりになって、そのまとまりごとにエーヴィージー サラリーが計算される。"
+      - type: "dialogue"
+        character: "metan"
+        text: "だから、こう書くの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト デパートメント カンマ エーヴィージー カッコ サラリー トジカッコ フロム エンプロイーズ グループバイ デパートメント。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "metan"
+        text: "こう書くと、部署名と、その部署の平均給与がセットで出てくるってわけ。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "ほえー。グループバイでまとまりを作って、そのまとまりごとに平均出すんだ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そう。セレクトに書く列はね、グループバイに書いた列か、それかエーヴィージーみたいな集計した結果だけにすることが多いの。"
+      - type: "dialogue"
+        character: "metan"
+        text: "そうしないと、どの行の値を使うの、ってエスキューエルが困っちゃうから。まずは部署でグループバイして、エーヴィージー サラリーを出す、の形を覚えておこう。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "部署ごと、でまとめて、平均出す。分かった、やってみる。"
+      - type: "dialogue"
+        character: "metan"
+        text: "では、部署ごとの平均給与を、デパートメントと平均給与の2列で出してみて。"
+      - type: "dialogue"
+        character: "metan"
+        text: "ここで一度止めて、自分で書いてみてね。部署ごとの平均給与を求めて、デパートメントと平均給与を出力する文を考えてみて。答えはこのあとすぐ見せるから。"
+
+  # --- [22:30] Step 5 の答え・まとめ ---
+  - id: "step5_answer_summary"
+    lines:
+      - type: "dialogue"
+        character: "metan"
+        text: "正解はこれ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクト デパートメント カンマ エーヴィージー カッコ サラリー トジカッコ フロム エンプロイーズ グループバイ デパートメント。"
+        voice:
+          speedScale: 1.05
+          prePhonemeLength: 0.18
+          postPhonemeLength: 0.18
+          pauseLengthScale: 1.2
+      - type: "dialogue"
+        character: "metan"
+        text: "部署が4つなら、4行出てきて、それぞれの平均給与が付いてるはず。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "出た。部署ごとに平均が出てる。グループバイとエーヴィージーの組み合わせ、覚えた。"
+      - type: "dialogue"
+        character: "metan"
+        text: "いいね。今日やったことをざっとまとめるね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "セレクトでどの列を、フロムでどのテーブルから、ウェアでどの行を残すか、オーダーバイでどう並べるか、グループバイと集計関数でどうまとめるかまで、全部一文で書けるのがエスキューエルのいいところ。"
+      - type: "dialogue"
+        character: "metan"
+        text: "最初は長く見えても、パーツごとに分けると、今日やったことの組み合わせでだいぶいろんなことができちゃうの。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "一文で書けるの、確かに便利だね。また次の動画でもっと難しいのやろうね。"
+      - type: "dialogue"
+        character: "metan"
+        text: "次はジョインとか、複数のテーブルを組み合わせる話をやっていくから、楽しみにしててね。また次の動画で会おう。"
+      - type: "dialogue"
+        character: "zundamon"
+        text: "またねー。"
