@@ -38,18 +38,27 @@ export const CharacterLayer: React.FC<Props> = ({ manifest }) => {
         const opacity = !activeCharacter || isActive ? 1 : 0.45;
 
         return (
-          <Img
+          <div
             key={charName}
-            src={staticFile(imageFile)}
             style={{
               position: "absolute",
               bottom: bottomOffset,
               height: charHeight,
-              objectFit: "contain",
               opacity,
+              filter: "drop-shadow(0 0 6px rgba(0,0,0,0.5)) drop-shadow(0 4px 12px rgba(0,0,0,0.4))",
               ...positionStyle(config.position),
             }}
-          />
+          >
+            <Img
+              src={staticFile(imageFile)}
+              style={{
+                width: "auto",
+                height: "100%",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          </div>
         );
       })}
     </>

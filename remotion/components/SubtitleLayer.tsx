@@ -39,20 +39,21 @@ export const SubtitleLayer: React.FC<Props> = ({ manifest }) => {
     >
       <div
         style={{
-          // 背景の黒い帯をなくし、文字のみ表示
-          backgroundColor: "transparent",
-          borderLeft: "none",
+          // くっきりした単色バーで可読性を確保（半透明だと動画でにじみやすいためやや濃いめ）
+          backgroundColor: "rgba(0, 0, 0, 0.75)",
           color: subtitleColor,
-          fontSize: 28,
+          fontSize: 26,
           fontFamily: "Noto Sans JP, Yu Gothic, Meiryo, sans-serif",
           fontWeight: "bold",
-          padding: 0,
-          borderRadius: 0,
-          // 横幅は維持しつつ、テキストだけを中央寄せで表示
+          padding: "10px 20px",
+          borderRadius: 8,
           maxWidth: width * 0.64,
           textAlign: "center",
-          lineHeight: 1.6,
-          textShadow: "0 1px 4px rgba(0,0,0,0.8)",
+          lineHeight: 1.5,
+          boxSizing: "border-box",
+          // 文字は軽いシャドウのみでエッジをきれいに
+          textShadow: "0 1px 2px rgba(0,0,0,0.8)",
+          WebkitFontSmoothing: "antialiased",
         }}
       >
         {activeLine.text}

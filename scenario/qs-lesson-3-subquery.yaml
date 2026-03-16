@@ -24,6 +24,7 @@ global:
   voice:
     speedScale: 1.25
     postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
 
 output:
   fps: 30
@@ -39,6 +40,11 @@ scenes:
         text: "みんな、こんにちは。めたんだよ。前までセレクトとジョインをやってきたね。今日はサブクエリをやっていくよ。"
         subtitle: "みんな、こんにちは。めたんだよ。前まで SELECT と JOIN をやってきたね。今日はサブクエリをやっていくよ。"
       - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "サブクエリって、セレクトのなかに、もうひとつセレクトを書くことなの。"
+        subtitle: "サブクエリって、SELECT のなかに、もうひとつ SELECT を書くことなの。"
+      - type: dialogue
         character: zundamon
         face: "困り"
         text: "セレクトのなかにセレクト？ 入れ子みたいな感じ？"
@@ -46,30 +52,44 @@ scenes:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "そう。例えば「平均給与より稼いでる人だけ出したい」ときに、平均を出すセレクトを中に書いて、その結果を条件に使う、みたいなイメージだよ。"
-        subtitle: "そう。例えば「平均給与より稼いでる人だけ出したい」ときに、平均を出す SELECT を中に書いて、その結果を条件に使う、みたいなイメージだよ。"
-      - type: dialogue
-        character: zundamon
-        face: "喜び"
-        text: "一回のクエリの答えを、もう一回のクエリで使うんだね。"
+        text: "そう。例えば「平均給与より稼いでる人だけ出したい」ってなったとき、平均はエーブイジー サラリーで出せるけど、その「平均」をいちいち自分で計算して数字を書くんじゃなくて、SQLのなかで「平均を出すセレクト」を書いて、その結果を条件に使う、みたいな感じ。"
+        subtitle: "そう。例えば「平均給与より稼いでる人だけ出したい」ってなったとき、平均は《AVG(salary)》で出せるけど、その「平均」をいちいち自分で計算して数字を書くんじゃなくて、SQL のなかで「平均を出す SELECT」を書いて、その結果を条件に使う、みたいな感じ。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "今日はサブクエリのイメージ → ウェアでひとつの値として使う → インで複数行を条件にする →フロムで表として使う、の4ステップで進めていくね。"
-        subtitle: "今日はサブクエリのイメージ → WHERE でひとつの値として使う → IN で複数行を条件にする → FROM で表として使う、の4ステップで進めていくね。"
+        text: "そういう「クエリの結果を、別のクエリの条件やテーブルとして使う」のがサブクエリだよ。"
+        subtitle: "そういう「クエリの結果を、別のクエリの条件やテーブルとして使う」のがサブクエリだよ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "なるほど。一回のクエリの答えを、もう一回のクエリで使うんだね。"
+        subtitle: "なるほど。一回のクエリの答えを、もう一回のクエリで使うんだね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。今日はサブクエリのイメージを押さえる → ウェアで「ひとつの値」として使う → ウェアで「複数行」をインで使う → フロムのうしろにセレクトを書いて「表として」使うまで、順番にやっていくね。"
+        subtitle: "そう。今日はサブクエリのイメージを押さえる → WHERE で「ひとつの値」として使う → WHERE で「複数行」を《IN》で使う → FROM のうしろに SELECT を書いて「表として」使うまで、順番にやっていくね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "おけ、順番にいこう。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "じゃあ、まず「サブクエリってどういう形か」から見ていこう。"
 
   - id: "step1-image"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "サブクエリは、かっこでくくったセレクト文を、ほかのセレクトの値が入る場所に書くものだよ。"
-        subtitle: "サブクエリは、かっこでくくった SELECT 文を、ほかの SELECT の値が入る場所に書くものだよ。"
+        text: "サブクエリは、かっこでくくったセレクト文を、ほかのセレクトの「値が入る場所」に書くの。例えばウェア サラリー グレーターザン カッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ みたいに。"
+        subtitle: "サブクエリは、かっこ《()》でくくった SELECT 文を、ほかの SELECT の「値が入る場所」に書くの。例えば《WHERE salary > (SELECT AVG(salary) FROM employees)》みたいに。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "例えば「セレクト アスタリスク フロム エンプロイーズ ウェア サラリー グレーターザン カッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ」なら、かっこの中のセレクトが先に実行されて、平均給与というひとつの値になるの。"
-        subtitle: "例えば「SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)」なら、かっこの中の SELECT が先に実行されて、平均給与というひとつの値になるの。"
+        text: "このとき、内側のカッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ が先に実行されて、平均給与がひとつの値になる。その値とサラリーを比較して、「平均より大きい行だけ」を外側のセレクトが取り出す、って流れね。"
+        subtitle: "このとき、内側の《(SELECT AVG(salary) FROM employees)》が先に実行されて、平均給与がひとつの値になる。その値と《salary》を比較して、「平均より大きい行だけ」を外側の SELECT が取り出す、って流れね。"
       - type: dialogue
         character: zundamon
         face: "驚き"
@@ -77,47 +97,69 @@ scenes:
       - type: dialogue
         character: metan
         face: "喜び"
-        text: "そう。内側のセレクトが返す結果がひとつの値なのか、複数行なのかで、ウェアで比較に使うか、インで使うか、フロムのうしろで表として使うかが決まってくるよ。"
-        subtitle: "そう。内側の SELECT が返す結果がひとつの値なのか、複数行なのかで、WHERE で比較に使うか、IN で使うか、FROM のうしろで表として使うかが決まってくるよ。"
+        text: "そう。だから「内側のセレクトが返す結果」が、外側から見ると「ひとつの値」だったり「複数行」だったりする。返す結果の形によって、ウェアでイコールやグレーターザンで使うか、インで使うか、あるいはフロムのうしろに「表」として書くか、が決まってくるよ。"
+        subtitle: "そう。だから「内側の SELECT が返す結果」が、外側から見ると「ひとつの値」だったり「複数行」だったりする。返す結果の形によって、WHERE で《=》や《>》で使うか、《IN》で使うか、あるいは FROM のうしろに「表」として書くか、が決まってくるよ。"
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "まずは「かっこでくくったセレクトが、外側のクエリのどこかで使われる」って形を頭に入れておこう。"
+        subtitle: "まずは「かっこでくくった SELECT が、外側のクエリのどこかで使われる」って形を頭に入れておこう。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "かっこでくくったセレクトが、外側で使われる。分かった。"
+        subtitle: "かっこでくくった SELECT が、外側で使われる。分かった。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "まずは「かっこでくくったセレクトが、外側のクエリのどこかで使われる」という形を覚えておこう。"
-        subtitle: "まずは「かっこでくくった SELECT が、外側のクエリのどこかで使われる」という形を覚えておこう。"
+        text: "では、「サブクエリ」がどこに書かれているか、次の文のなかで探してみて。セレクト アスタリスク フロム エンプロイーズ ウェア サラリー グレーターザン カッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ。"
+        subtitle: "では、「サブクエリ」がどこに書かれているか、次の文のなかで探してみて。《SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)》"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここで手を動かしてみましょう！ 一度止めて、自分で考えてみて。"
+        subtitle: "【演習キュー】ここで手を動かしてみましょう！ 一度止めて、自分で考えてみて。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "この文のなかで、サブクエリはどこか。かっこでくくられたセレクトがどれか、指さしてみて。答えはこのあとすぐ見せるから。"
+        subtitle: "この文のなかで、サブクエリはどこか。かっこでくくられた SELECT がどれか、指さしてみて。答えはこのあとすぐ見せるから。"
 
   - id: "step1-answer"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "さっきの文「セレクト アスタリスク フロム エンプロイーズ ウェア サラリー グレーターザン カッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ」のサブクエリは、かっこの中のセレクト エーブイジー カッコサラリー カッコトジ フロム エンプロイーズの部分だよ。"
-        subtitle: "さっきの文「SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)」のサブクエリは、かっこの中の SELECT AVG(salary) FROM employees の部分だよ。"
+        text: "正解は、カッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ の部分だよ。このかっこのなかのセレクトがサブクエリ。ここが先に実行されて「平均給与」がひとつの値になり、その値とサラリーを比較しているね。"
+        subtitle: "正解は、《(SELECT AVG(salary) FROM employees)》の部分だよ。このかっこのなかの SELECT がサブクエリ。ここが先に実行されて「平均給与」がひとつの値になり、その値と《salary》を比較しているね。"
       - type: dialogue
         character: zundamon
         face: "喜び"
-        text: "ウェアのうしろで、比べる「もう片方」がサブクエリになってるんだね。"
-        subtitle: "WHERE のうしろで、比べる「もう片方」がサブクエリになってるんだね。"
+        text: "ウェアのうしろで、比べる「もう片方」がサブクエリになってるんだ。"
+        subtitle: "WHERE のうしろで、比べる「もう片方」がサブクエリになってるんだ。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "うん。こういう、1行1列のひとつの値を返すサブクエリはスカラーサブクエリって呼ばれることがあるよ。"
+        text: "そう。こういう「ひとつの値、1行1列」を返すサブクエリのことを、スカラーサブクエリって呼ぶことがあるよ。グレーターザンやイコールで比較するときは、内側は必ず1行1列になるように書く。"
+        subtitle: "そう。こういう「ひとつの値（1行1列）」を返すサブクエリのことを、スカラーサブクエリって呼ぶことがあるよ。《>》や《=》で比較するときは、内側は必ず1行1列になるように書く。"
       - type: dialogue
         character: metan
-        face: "喜び"
-        text: "大事なのは、比較演算子で使うときは、内側が必ず1行1列になるように書くこと。ここを意識しながら、次は実際に平均より高い給与の社員を取るクエリを書いてみよう。"
+        face: "通常"
+        text: "次は、この「平均より高い給与の人」を実際に書く練習をしよう。"
+        subtitle: "次は、この「平均より高い給与の人」を実際に書く練習をしよう。"
 
   - id: "step2-where-scalar"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "ウェア句で使うサブクエリは「ウェア 列名 比較演算子 カッコ セレクト … カッコトジ」という形で書くよ。"
-        subtitle: "WHERE 句で使うサブクエリは「WHERE 列名 比較演算子 (SELECT …)」という形で書くよ。"
+        text: "ウェア 列名 比較演算子 カッコ セレクト … カッコトジ の形で、「その列の値が、サブクエリの結果と比較して真になる行だけ」を取り出すの。"
+        subtitle: "《WHERE 列名 比較演算子 (SELECT …)》の形で、「その列の値が、サブクエリの結果と比較して真になる行だけ」を取り出すの。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "セレクト エーブイジー カッコサラリー カッコトジ フロム エンプロイーズ は全社員の平均給与を1行1列で返すから、ウェア サラリー グレーターザン カッコ セレクト エーブイジー カッコサラリー カッコトジ フロム エンプロイーズ カッコトジ と書けば、平均より高い給与の社員だけが取れる。"
-        subtitle: "SELECT AVG(salary) FROM employees は全社員の平均給与を1行1列で返すから、WHERE salary > (SELECT AVG(salary) FROM employees) と書けば、平均より高い給与の社員だけが取れる。"
+        text: "セレクト エーブイジー カッコサラリー カッコトジ フロム エンプロイーズ は全社員の平均給与を1行1列で返すから、ウェア サラリー グレーターザン カッコ セレクト エーブイジー カッコサラリー カッコトジ フロム エンプロイーズ カッコトジ と書けば、「平均給与より高い社員」だけが取れるよ。"
+        subtitle: "《SELECT AVG(salary) FROM employees》は「全社員の平均給与」を1行1列で返すから、《WHERE salary > (SELECT AVG(salary) FROM employees)》と書けば、「平均給与より高い社員」だけが取れるよ。"
       - type: dialogue
         character: zundamon
         face: "喜び"
@@ -125,15 +167,31 @@ scenes:
       - type: dialogue
         character: metan
         face: "笑い"
-        text: "そう。データが変わっても、サブクエリの中で毎回計算してくれるから、常に最新の条件になるんだよ。"
+        text: "うん。条件に「いまのデータから出した値」を使いたいときに、サブクエリで書いておけば、データが変わっても自動でやり直してくれるの。"
+        subtitle: "うん。条件に「いまのデータから出した値」を使いたいときに、サブクエリで書いておけば、データが変わっても自動でやり直してくれるの。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "では、平均給与より高い給与をもらっている社員を、全カラムで取得する文を考えてみて。"
+        subtitle: "では、平均給与より高い給与をもらっている社員を、全カラムで取得する文を考えてみて。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここで手を動かしてみましょう！ 一度止めて、自分で書いてみて。"
+        subtitle: "【演習キュー】ここで手を動かしてみましょう！ 一度止めて、自分で書いてみて。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "平均給与より高い給与の社員を、全カラムで取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+        subtitle: "平均給与より高い給与の社員を、全カラムで取得する文を考えてみて。答えはこのあとすぐ見せるから。"
 
   - id: "step2-answer"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "平均給与より高い社員を全カラムで取得する例は「セレクト アスタリスク フロム エンプロイーズ ウェア サラリー グレーターザン カッコ セレクト エーブイジー カッコサラリー カッコトジ フロム エンプロイーズ カッコトジ」だよ。"
-        subtitle: "平均給与より高い社員を全カラムで取得する例は「SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)」だよ。"
+        text: "正解の例は、セレクト アスタリスク フロム エンプロイーズ ウェア サラリー グレーターザン カッコ セレクト エーブイジー サラリー フロム エンプロイーズ カッコトジ だよ。内側で平均が求まって、その値より大きいサラリーの行だけ出てくるはず。"
+        subtitle: "正解の例は《SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)》だよ。内側で平均が求まって、その値より大きい《salary》の行だけ出てくるはず。"
       - type: dialogue
         character: zundamon
         face: "笑い"
@@ -141,12 +199,13 @@ scenes:
       - type: dialogue
         character: metan
         face: "喜び"
-        text: "いい感じ。次は、ひとつの値ではなくて複数行を条件に使うパターンを見ていこう。"
+        text: "いいね。次は、「ひとつの値」じゃなくて「複数行」を条件に使うパターン。例えば「開発部と営業部に所属してる社員だけ」出したいとき、部署IDの一覧をサブクエリで出して、ウェア デパートメントID イン カッコその結果カッコトジ みたいに書くの。"
+        subtitle: "いいね。次は、「ひとつの値」じゃなくて「複数行」を条件に使うパターン。例えば「開発部と営業部に所属してる社員だけ」出したいとき、部署IDの一覧をサブクエリで出して、《WHERE department_id IN (その結果)》みたいに書くの。"
       - type: dialogue
         character: metan
-        face: "通常"
-        text: "例えば「開発部と営業部に所属している社員だけ出したい」とき、部署IDの一覧をサブクエリで出して、ウェア デパートメントID イン カッコその結果カッコトジ みたいに書くことができるんだ。"
-        subtitle: "例えば「開発部と営業部に所属している社員だけ出したい」とき、部署IDの一覧をサブクエリで出して、WHERE department_id IN (その結果) みたいに書くことができるんだ。"
+        face: "喜び"
+        text: "インは「この列の値が、かっこのなかのどれかと一致した行」を残すよ。"
+        subtitle: "《IN》は「この列の値が、かっこのなかのどれかと一致した行」を残すよ。"
 
   - id: "step3-in-multirow"
     lines:
@@ -172,45 +231,54 @@ scenes:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "そう。サブクエリが複数行1列を返すときは、= ではなく IN を使うのがポイント。"
+        text: "そう。サブクエリが複数行1列を返すときは、イコールじゃなくてインを使う。"
+        subtitle: "そう。サブクエリが複数行1列を返すときは、《=》じゃなくて《IN》を使う。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "では、部署名が『開発部』の社員を、全カラムで取得する文を考えてみて。デパートメンツから「開発部」のIDを取るサブクエリとインを使ってね。"
+        subtitle: "では、部署名が『開発部』の社員を、全カラムで取得する文を考えてみて。departments から「開発部」の id を取るサブクエリと《IN》を使ってね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここで手を動かしてみましょう！ 一度止めて、自分で書いてみて。部署名が『開発部』の社員を、エンプロイーズから全カラムで取得する文を考えてみて。答えはこのあとすぐ見せるから。"
+        subtitle: "【演習キュー】ここで手を動かしてみましょう！ 一度止めて、自分で書いてみて。部署名が『開発部』の社員を、employees から全カラムで取得する文を考えてみて。答えはこのあとすぐ見せるから。"
 
   - id: "step3-answer"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "部署名が「開発部」の社員を全カラムで取得する例は「セレクト アスタリスク フロム エンプロイーズ ウェア デパートメントID イン カッコ セレクト アイディー フロム デパートメンツ ウェア ネーム イコール '開発部' カッコトジ」だよ。"
-        subtitle: "部署名が「開発部」の社員を全カラムで取得する例は「SELECT * FROM employees WHERE department_id IN (SELECT id FROM departments WHERE name = '開発部')」だよ。"
+        text: "正解の例は、セレクト アスタリスク フロム エンプロイーズ ウェア デパートメントID イン カッコ セレクト アイディー フロム デパートメンツ ウェア ネーム イコール '開発部' カッコトジ だよ。"
+        subtitle: "正解の例は《SELECT * FROM employees WHERE department_id IN (SELECT id FROM departments WHERE name = '開発部')》だよ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "サブクエリで「開発部」のIDを取って、そのIDに一致するデパートメントIDの社員だけ残してるね。"
+        subtitle: "サブクエリで「開発部」の id を取って、その id に一致する《department_id》の社員だけ残してるね。"
       - type: dialogue
         character: zundamon
         face: "喜び"
-        text: "IN でサブクエリ、覚えた。"
+        text: "インでサブクエリ、覚えた。"
+        subtitle: "IN でサブクエリ、覚えた。"
       - type: dialogue
         character: metan
         face: "喜び"
-        text: "いいね。最後は FROM のうしろにサブクエリを書くパターン、いわゆる派生テーブルを見ていこう。"
+        text: "うん。最後に、フロムのうしろにサブクエリを書くパターン。セレクトの結果をひとつの表のように見なして、さらにその上でセレクトしたりジョインしたりするやり方だよ。"
+        subtitle: "うん。最後に、FROM のうしろにサブクエリを書くパターン。SELECT の結果をひとつの表のように見なして、さらにその上で SELECT したり JOIN したりするやり方だよ。"
 
   - id: "step4-from-derived"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "フロム カッコ セレクト … カッコトジ アズ 別名 と書くと、かっこの中のセレクトの結果をひとつのテーブルとして扱えるよ。これを派生テーブルと呼ぶことがある。"
-        subtitle: "FROM (SELECT …) AS 別名 と書くと、かっこの中の SELECT の結果をひとつのテーブルとして扱えるよ。これを派生テーブルと呼ぶことがある。"
+        text: "フロム カッコ セレクト … カッコトジ アズ 別名 と書くと、かっこのなかのセレクトの結果が、ひとつのテーブルとして扱われるの。これを派生テーブルって言うことがあるよ。別名アズは必ず付けることになってる。"
+        subtitle: "《FROM (SELECT …) AS 別名》と書くと、かっこのなかの SELECT の結果が、ひとつのテーブルとして扱われるの。これを派生テーブルって言うことがあるよ。別名《AS》は必ず付けることになってる。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "例えば「部署ごとの平均給与」を出した結果をさらに絞り込みたいとき、"
-      - type: dialogue
-        character: metan
-        face: "通常"
-        text: "フロム カッコ セレクト デパートメントID カンマ エーブイジー カッコサラリー カッコトジ アズ アブサル フロム エンプロイーズ グループバイ デパートメントID カッコトジ アズ デプトアブ のように書いて、"
-        subtitle: "FROM (SELECT department_id, AVG(salary) AS avg_sal FROM employees GROUP BY department_id) AS dept_avg のように書いて、"
-      - type: dialogue
-        character: metan
-        face: "通常"
-        text: "そのあとで ウェア アブサル グレーターザンイコール 500000 みたいに条件を付ければ、平均給与が50万以上の部署だけに絞り込めるんだ。"
-        subtitle: "そのあとで WHERE avg_sal >= 500000 みたいに条件を付ければ、平均給与が50万以上の部署だけに絞り込めるんだ。"
+        text: "例えば「部署ごとの平均給与」を出した結果を、さらに「その平均給与が50万以上の部署だけ」に絞りたいとき、フロム カッコ セレクト デパートメントID カンマ エーブイジー カッコサラリー カッコトジ アズ アブサル フロム エンプロイーズ グループバイ デパートメントID カッコトジ アズ デプトアブ みたいに書いて、そのうしろで ウェア アブサル グレーターザンイコール 500000 とかできるの。"
+        subtitle: "例えば「部署ごとの平均給与」を出した結果を、さらに「その平均給与が 50 万以上の部署だけ」に絞りたいとき、《FROM (SELECT department_id, AVG(salary) AS avg_sal FROM employees GROUP BY department_id) AS dept_avg》みたいに書いて、そのうしろで《WHERE avg_sal >= 500000》とかできるの。"
       - type: dialogue
         character: zundamon
         face: "驚き"
@@ -218,43 +286,66 @@ scenes:
       - type: dialogue
         character: metan
         face: "喜び"
-        text: "そう。「まずサブクエリで集計や絞り込みをした結果」を表に見立てて、外側でもう一度セレクトする、という形だよ。"
-        subtitle: "そう。「まずサブクエリで集計や絞り込みをした結果」を表に見立てて、外側でもう一度 SELECT する、という形だよ。"
+        text: "そう。「まずサブクエリで集計や絞り込みをした結果」を表に見立てて、外側でもう一度セレクトする、っていう形。"
+        subtitle: "そう。「まずサブクエリで集計や絞り込みをした結果」を表に見立てて、外側でもう一度 SELECT する、っていう形。"
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "では、エンプロイーズから「部署ごとの平均給与」を出すサブクエリをフロムに書いて、その結果にデプトアブって別名を付けるところまで、自分で書いてみて。"
+        subtitle: "では、《employees》から「部署ごとの平均給与」を出すサブクエリを FROM に書いて、その結果に《dept_avg》って別名を付けるところまで、自分で書いてみて。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここで手を動かしてみましょう！ 一度止めて、自分で書いてみて。"
+        subtitle: "【演習キュー】ここで手を動かしてみましょう！ 一度止めて、自分で書いてみて。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "フロムのうしろに「部署ごとの平均給与」を出すサブクエリを書き、アズ デプトアブ で別名を付けた文を考えてみて。外側のセレクトは セレクト アスタリスク フロム カッコ … カッコトジ アズ デプトアブ でいいよ。答えはこのあとすぐ見せるから。"
+        subtitle: "FROM のうしろに「部署ごとの平均給与」を出すサブクエリを書き、《AS dept_avg》で別名を付けた文を考えてみて。外側の SELECT は《SELECT * FROM (…) AS dept_avg》でいいよ。答えはこのあとすぐ見せるから。"
 
   - id: "step4-answer-summary"
     lines:
       - type: dialogue
         character: metan
         face: "通常"
-        text: "部署ごとの平均給与を出すサブクエリをフロムに書く例は「セレクト アスタリスク フロム カッコ セレクト デパートメントID カンマ エーブイジー カッコサラリー カッコトジ アズ アブサル フロム エンプロイーズ グループバイ デパートメントID カッコトジ アズ デプトアブ」だよ。"
-        subtitle: "部署ごとの平均給与を出すサブクエリを FROM に書く例は「SELECT * FROM (SELECT department_id, AVG(salary) AS avg_sal FROM employees GROUP BY department_id) AS dept_avg」だよ。"
+        text: "正解の例は、セレクト アスタリスク フロム カッコ セレクト デパートメントID カンマ エーブイジー カッコサラリー カッコトジ アズ アブサル フロム エンプロイーズ グループバイ デパートメントID カッコトジ アズ デプトアブ だよ。"
+        subtitle: "正解の例は《SELECT * FROM (SELECT department_id, AVG(salary) AS avg_sal FROM employees GROUP BY department_id) AS dept_avg》だよ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "フロムのうしろのかっこがサブクエリで、その結果がデプトアブという名前の表として扱われるね。"
+        subtitle: "FROM のうしろのかっこがサブクエリで、その結果が《dept_avg》という名前の表として扱われるね。"
       - type: dialogue
         character: zundamon
         face: "喜び"
-        text: "フロムにもサブクエリを書けるんだ。長いけど仕組みは分かったよ。"
-        subtitle: "FROM にもサブクエリを書けるんだ。長いけど仕組みは分かったよ。"
+        text: "フロムにもサブクエリを書けるんだ。長いけど仕組みは分かった。"
+        subtitle: "FROM にもサブクエリを書けるんだ。長いけど仕組みは分かった。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "最後に今日のまとめ。サブクエリは「セレクトのなかに、かっこでくくったもうひとつのセレクトを書く」こと。"
-        subtitle: "最後に今日のまとめ。サブクエリは「SELECT のなかに、かっこでくくったもうひとつの SELECT を書く」こと。"
+        text: "いいね。今日のまとめだよ。サブクエリは「セレクトのなかに、かっこでくくったもうひとつのセレクトを書く」こと。"
+        subtitle: "いいね。今日のまとめだよ。サブクエリは「SELECT のなかに、かっこでくくったもうひとつの SELECT を書く」こと。"
       - type: dialogue
         character: metan
         face: "通常"
-        text: "ウェアで使うときは1行1列なら比較演算子、複数行なら イン カッコ セレクト … カッコトジ でどれかと一致、フロムで使うときは フロム カッコ セレクト … カッコトジ アズ 別名 で表として扱う。"
-        subtitle: "WHERE で使うときは1行1列なら比較演算子、複数行なら IN (SELECT …) でどれかと一致、FROM で使うときは FROM (SELECT …) AS 別名 で表として扱う。"
+        text: "ウェアで使うときは1行1列ならグレーターザンやイコールで比較、複数行なら イン カッコ セレクト … カッコトジ で「どれかと一致」を書く。フロムで使うときは フロム カッコ セレクト … カッコトジ アズ 別名 で、結果を表のようにして外側のセレクトでさらに扱える。"
+        subtitle: "WHERE で使うときは1行1列なら《>》や《=》で比較、複数行なら《IN (SELECT …)》で「どれかと一致」を書く。FROM で使うときは《FROM (SELECT …) AS 別名》で、結果を表のようにして外側の SELECT でさらに扱える。"
       - type: dialogue
         character: metan
-        face: "喜び"
-        text: "そして内側が先に実行されて、その結果を外側が使うという流れを忘れないでね。"
+        face: "通常"
+        text: "内側が先に実行されて、その結果を外側が使うって流れを忘れないでね。"
+        subtitle: "内側が先に実行されて、その結果を外側が使うって流れを忘れないでね。"
       - type: dialogue
         character: zundamon
         face: "笑い"
-        text: "内側が先、外側がそれを使う。覚えたのだ。"
+        text: "内側が先、外側がそれを使う。覚えた。"
+        subtitle: "内側が先、外側がそれを使う。覚えた。"
       - type: dialogue
         character: metan
         face: "喜び"
-        text: "次は集計やウィンドウ関数など、もっと便利な集計のやり方をやっていくから、また次の動画で会おうね。"
+        text: "次は集計やウィンドウ関数とか、もっと便利な集計のやり方をやっていくから、楽しみにしててね。また次の動画で会おう。"
+        subtitle: "次は《集計やウィンドウ関数》とか、もっと便利な集計のやり方をやっていくから、楽しみにしててね。また次の動画で会おう。"
       - type: dialogue
         character: zundamon
         face: "笑い"

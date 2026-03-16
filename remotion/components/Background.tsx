@@ -19,6 +19,7 @@ export const Background: React.FC<Props> = ({ backgroundPath, width, height }) =
           width,
           height,
           objectFit: "cover",
+          imageRendering: "auto",
         }}
       />
     );
