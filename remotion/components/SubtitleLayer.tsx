@@ -22,11 +22,9 @@ export const SubtitleLayer: React.FC<Props> = ({ manifest }) => {
       ? manifest.characters[activeLine.character].subtitleColor
       : "#FFFFFF";
 
-  // 立ち絵の中央付近（上端から50%）に字幕を合わせる
-  // charHeight = height * 0.30, charBottom = 88
-  // 立ち絵中央 = charBottom + charHeight * 0.50
-  const charHeight = height * 0.30;
-  const subtitleBottom = Math.round(88 + charHeight * 0.50);
+  // 画面のより下側・中央寄せに字幕を配置して、立ち絵と重なりにくくする
+  // 立ち絵は bottom=88, 高さは 30% 程度なので、そのさらに下（例: 40px）に配置
+  const subtitleBottom = 40;
 
   return (
     <div
@@ -41,15 +39,17 @@ export const SubtitleLayer: React.FC<Props> = ({ manifest }) => {
     >
       <div
         style={{
-          backgroundColor: "rgba(0, 0, 0, 0.72)",
-          borderLeft: `4px solid ${subtitleColor}`,
+          // 背景の黒い帯をなくし、文字のみ表示
+          backgroundColor: "transparent",
+          borderLeft: "none",
           color: subtitleColor,
           fontSize: 28,
           fontFamily: "Noto Sans JP, Yu Gothic, Meiryo, sans-serif",
           fontWeight: "bold",
-          padding: "8px 20px",
-          borderRadius: "0 8px 8px 0",
-          maxWidth: width * 0.82,
+          padding: 0,
+          borderRadius: 0,
+          // 横幅は維持しつつ、テキストだけを中央寄せで表示
+          maxWidth: width * 0.64,
           textAlign: "center",
           lineHeight: 1.6,
           textShadow: "0 1px 4px rgba(0,0,0,0.8)",

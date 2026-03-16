@@ -57,13 +57,20 @@ export function buildVideoManifest(
   for (let i = 0; i < lineResults.length; i++) {
     const { result, line, sceneId, lineIndex } = lineResults[i];
     const character = line.character;
-    const imageFile = character ? characters[character]?.defaultImageFile : undefined;
+    const defaultImageFile = character ? characters[character]?.defaultImageFile : undefined;
+    // 行ごとの表情（face）があれば、キャラの画像と同じフォルダの face.png を使う
+    let imageFile: string | undefined = defaultImageFile;
+    if (line.face && defaultImageFile) {
+      const charDir = path.dirname(defaultImageFile);
+      imageFile = path.join(charDir, line.face + ".png");
+    }
 
     lines.push({
       globalIndex: i,
       sceneId,
       lineIndex,
-      text: line.text ?? line.subtitle ?? "",
+      // 音声用の text と、画面表示用の subtitle を分けている場合は subtitle を優先して字幕に使う
+      text: line.subtitle ?? line.text ?? "",
       character,
       imageFile,
       speakerId: result.speakerId,

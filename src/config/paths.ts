@@ -1,5 +1,12 @@
 import path from "path";
 
+/** Windows でファイル名に使えない文字を置換する（: は " - "、その他は _） */
+export function sanitizeFilenameForWindows(name: string): string {
+  return name
+    .replace(/:/g, " - ")
+    .replace(/[\\/*?"<>|]/g, "_");
+}
+
 export interface BasePaths {
   imageDir: string;
   musicDir: string;

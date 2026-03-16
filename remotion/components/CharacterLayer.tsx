@@ -22,21 +22,25 @@ export const CharacterLayer: React.FC<Props> = ({ manifest }) => {
   );
   const activeCharacter = activeLine?.character;
 
-  const charHeight = Math.round(height * 0.30);
+  // 立ち絵の高さを画面の 40% に拡大
+  const charHeight = Math.round(height * 0.40);
   // 字幕エリア（約80px）より上に立ち絵を配置
   const bottomOffset = 88;
 
   return (
     <>
       {Object.entries(manifest.characters).map(([charName, config]) => {
-        if (!config.defaultImageFile) return null;
+        const defaultImg = config.defaultImageFile;
+        if (!defaultImg) return null;
         const isActive = activeCharacter === charName;
+        // 発話中はその行の imageFile（表情）があれば使い、なければデフォルト
+        const imageFile = isActive && activeLine?.imageFile ? activeLine.imageFile : defaultImg;
         const opacity = !activeCharacter || isActive ? 1 : 0.45;
 
         return (
           <Img
             key={charName}
-            src={staticFile(config.defaultImageFile)}
+            src={staticFile(imageFile)}
             style={{
               position: "absolute",
               bottom: bottomOffset,

@@ -2,7 +2,7 @@
 import { Command } from "commander";
 import path from "path";
 import { loadScenario } from "./scenario/loader";
-import { getBasePaths, getManifestPath } from "./config/paths";
+import { getBasePaths, getManifestPath, sanitizeFilenameForWindows } from "./config/paths";
 import { synthesizeLine, synthesizeLineWithTiming } from "./voicevox/synthesizeLine";
 import { concatAudioFiles } from "./media/ffmpegWrapper";
 import { fetchSpeakers } from "./voicevox/client";
@@ -36,9 +36,10 @@ async function generateAudioCommand(
     }
   }
 
+  const safeTitle = sanitizeFilenameForWindows(scenario.title || "output");
   const outFile =
     options.out ||
-    (scenario.output?.file ? path.resolve(scenario.output.file) : path.join(outputDir, `${scenario.title || "output"}.wav`));
+    (scenario.output?.file ? path.resolve(scenario.output.file) : path.join(outputDir, `${safeTitle}.wav`));
 
   const finalAudio = await concatAudioFiles(lineAudioFiles, outFile);
   console.log("音声を出力しました:", finalAudio);
@@ -69,17 +70,18 @@ async function generateVideoCommand(
     }
   }
 
-  // [2] WAV 結合
-  const wavOut = path.join(outputDir, `${scenario.title}.wav`);
+  // [2] WAV 結合（タイトルに : 等が含まれると Windows でファイル作成に失敗するためサニタイズ）
+  const safeTitle = sanitizeFilenameForWindows(scenario.title);
+  const wavOut = path.join(outputDir, `${safeTitle}.wav`);
   const finalAudio = await concatAudioFiles(lineResults.map((r) => r.result.wavPath), wavOut);
 
   // [3] マニフェスト生成
   const manifest = buildVideoManifest(scenario, lineResults, finalAudio);
-  writeManifest(manifest, getManifestPath(scenario.title));
+  writeManifest(manifest, getManifestPath(safeTitle));
 
   // [4] Remotion レンダリング
   const ext = options.transparent ? ".mov" : ".mp4";
-  const videoOut = options.out || path.join(outputDir, `${scenario.title}${ext}`);
+  const videoOut = options.out || path.join(outputDir, `${safeTitle}${ext}`);
   await renderVideo(manifest, videoOut, { transparent: options.transparent });
   console.log("動画を出力しました:", videoOut);
 }
