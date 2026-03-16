@@ -16,6 +16,8 @@ export interface ManifestLine {
   character: string | undefined;
   /** face に対応する PNG のファイル名（publicDir 内の相対名） */
   imageFile: string | undefined;
+  /** このセリフ中に表示する背景画像のパス（未指定時は defaultBackground にフォールバック） */
+  backgroundFile: string | undefined;
   speakerId: number;
   wavFile: string;
   startMs: number;

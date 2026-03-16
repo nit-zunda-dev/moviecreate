@@ -65,7 +65,7 @@ async function generateVideoCommand(
       const line = scene.lines[i];
       const result = await synthesizeLineWithTiming(scenario, scene.id, i, line);
       if (result) {
-        lineResults.push({ result, line, sceneId: scene.id, lineIndex: i });
+        lineResults.push({ result, line, sceneId: scene.id, lineIndex: i, sceneBackground: scene.background });
       }
     }
   }

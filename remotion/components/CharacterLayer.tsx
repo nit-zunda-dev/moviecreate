@@ -35,7 +35,6 @@ export const CharacterLayer: React.FC<Props> = ({ manifest }) => {
         const isActive = activeCharacter === charName;
         // 発話中はその行の imageFile（表情）があれば使い、なければデフォルト
         const imageFile = isActive && activeLine?.imageFile ? activeLine.imageFile : defaultImg;
-        const opacity = !activeCharacter || isActive ? 1 : 0.45;
 
         return (
           <div
@@ -44,7 +43,6 @@ export const CharacterLayer: React.FC<Props> = ({ manifest }) => {
               position: "absolute",
               bottom: bottomOffset,
               height: charHeight,
-              opacity,
               filter: "drop-shadow(0 0 6px rgba(0,0,0,0.5)) drop-shadow(0 4px 12px rgba(0,0,0,0.4))",
               ...positionStyle(config.position),
             }}

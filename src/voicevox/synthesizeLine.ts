@@ -3,7 +3,7 @@ import { Line, Scenario, VoiceParam } from "../types/scenario";
 import { getBasePaths } from "../config/paths";
 import { synthesizeToFile } from "./client";
 import { getVoicevoxConfig, resolveSpeakerIdFromName } from "../config/voicevox";
-import { calcDurationFromQuery } from "../media/timingExtractor";
+import { getAudioDurationMs } from "../media/ffmpegWrapper";
 
 export function resolveSpeakerIdForLine(scenario: Scenario, line: Line): number {
   const config = getVoicevoxConfig();
@@ -99,17 +99,17 @@ export async function synthesizeLineWithTiming(
   const speakerId = resolveSpeakerIdForLine(scenario, line);
   const voiceParam = mergeVoiceParam(scenario, line);
 
-  const { absPath, finalQuery } = await synthesizeToFile({
+  const { absPath } = await synthesizeToFile({
     text: line.text,
     speakerId,
     outPath,
     voiceParam,
   });
 
-  const durationSec = calcDurationFromQuery(finalQuery);
+  const durationMs = await getAudioDurationMs(absPath);
   return {
     wavPath: absPath,
-    durationMs: Math.round(durationSec * 1000),
+    durationMs,
     speakerId,
   };
 }

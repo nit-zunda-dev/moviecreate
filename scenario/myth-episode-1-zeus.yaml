@@ -1,0 +1,463 @@
+title: "第1話 神様なのになぜか人間くさい――ゼウスを知るとギリシャ神話が100倍面白くなる"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.2
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/bg_greek_temple_1773641171319.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "op-hook"
+    background: "./image/background/bg_space_stars_1773641136109.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんなー！ずんだもんなのだ！今日から新シリーズ、「ゼウスとギリシャ神話」をはじめるのだ！"
+        subtitle: "みんなー！ずんだもんなのだ！今日から新シリーズ、「ゼウスとギリシャ神話」をはじめるのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんです。いきなりだけど、ひとつ質問させてね。"
+        subtitle: "四国めたんです。いきなりだけど、ひとつ質問させてね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「世界最強の神様」がいたとして、その神様がヤキモチを妬いたり、失敗を隠したり、子供に泣きつかれて悩んだりしていたら……面白くない？"
+        subtitle: "「世界最強の神様」がいたとして、その神様がヤキモチを妬いたり、失敗を隠したり、子供に泣きつかれて悩んだりしていたら……面白くない？"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "めっちゃ気になるのだ！"
+        subtitle: "めっちゃ気になるのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "それがゼウスなの。ギリシャ神話の主人公にして、最強なのに一番人間くさい神様よ。"
+        subtitle: "それがゼウスなの。ギリシャ神話の主人公にして、最強なのに一番人間くさい神様よ。"
+
+  - id: "what-is-zeus"
+    background: "./image/background/bg_olympus_palace_1773641201610.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず基本から。ゼウスは古代ギリシャの神様で、「空と雷の神」にして「神々の王」よ。"
+        subtitle: "まず基本から。ゼウスは古代ギリシャの神様で、「空と雷の神」にして「神々の王」よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ギリシャ神話には主要な神様が12柱いて、オリュンポスの十二神と呼ばれるんだけど、ゼウスはそのトップに立つ存在。"
+        subtitle: "ギリシャ神話には主要な神様が12柱いて、オリュンポスの十二神と呼ばれるんだけど、ゼウスはそのトップに立つ存在。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "じゃあ一番えらくて一番強い、完璧な神様なのだ？"
+        subtitle: "じゃあ一番えらくて一番強い、完璧な神様なのだ？"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "強さは本物。でも完璧かどうかは……それが今日の話のミソなの。"
+        subtitle: "強さは本物。でも完璧かどうかは……それが今日の話のミソなの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスの武器は雷霆（けらうのす）、つまり雷の矢。これを放てば神も怪物も一撃よ。"
+        subtitle: "ゼウスの武器は雷霆（けらうのす）、つまり雷の矢。これを放てば神も怪物も一撃よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "象徴は鷲と盾。法と秩序の守護者でもあって、ただの暴力装置じゃなく「世界のルールを決める存在」なの。"
+        subtitle: "象徴は鷲と盾。法と秩序の守護者でもあって、ただの暴力装置じゃなく「世界のルールを決める存在」なの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "すごいのだ……！ゲームで言ったら隠しボスレベルなのだ！"
+        subtitle: "すごいのだ……！ゲームで言ったら隠しボスレベルなのだ！"
+
+  - id: "origin-titans"
+    background: "./image/background/bg_ancient_sky_1773641215896.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "でもさ、ゼウスってどうやってそのトップになったのだ？最初から王様だったのだ？"
+        subtitle: "でもさ、ゼウスってどうやってそのトップになったのだ？最初から王様だったのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ぜんぜんちがうわ。ゼウスの誕生は、かなりドラマティックなの。"
+        subtitle: "ぜんぜんちがうわ。ゼウスの誕生は、かなりドラマティックなの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスが生まれる前の世界を支配していたのは、ティターン族という巨大な神様たちよ。そのリーダーがゼウスの父親、クロノス。"
+        subtitle: "ゼウスが生まれる前の世界を支配していたのは、ティターン族という巨大な神様たちよ。そのリーダーがゼウスの父親、クロノス。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "クロノスには予言が下されていたの。「お前は自分の子に倒される」って。"
+        subtitle: "クロノスには予言が下されていたの。「お前は自分の子に倒される」って。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "こわ！じゃあ子供に優しくしたり、しっかり育てたりすればよかったのだ！"
+        subtitle: "こわ！じゃあ子供に優しくしたり、しっかり育てたりすればよかったのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……クロノスが選んだのは、子供が生まれるたびに丸ごと飲み込む、という解決策だったの。"
+        subtitle: "……クロノスが選んだのは、子供が生まれるたびに丸ごと飲み込む、という解決策だったの。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "最悪のお父さんなのだ……。"
+        subtitle: "最悪のお父さんなのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスだけは、お母さんのレアーがとっさに機転を利かせて、赤ちゃんの代わりに石をおくるみに包んでクロノスに差し出したの。"
+        subtitle: "ゼウスだけは、お母さんのレアーがとっさに機転を利かせて、赤ちゃんの代わりに石をおくるみに包んでクロノスに差し出したの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "石を！？お父さん、気づかなかったのだ？"
+        subtitle: "石を！？お父さん、気づかなかったのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "気づかなかったの。そしてゼウスはクレタ島の洞窟でこっそり育てられたわ。"
+        subtitle: "気づかなかったの。そしてゼウスはクレタ島の洞窟でこっそり育てられたわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "成長したゼウスはクロノスに吐き出させる薬を飲ませて、飲み込まれていた兄姉たちを全員救い出したの。"
+        subtitle: "成長したゼウスはクロノスに吐き出させる薬を飲ませて、飲み込まれていた兄姉たちを全員救い出したの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そしてティターン族と10年間戦い続けた末に勝利して、世界の王になったの。これがティタノマキア、神々の大戦よ。"
+        subtitle: "そしてティターン族と10年間戦い続けた末に勝利して、世界の王になったの。これがティタノマキア、神々の大戦よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ゼウス、めちゃくちゃすごい経歴なのだ！お父さんに飲まれた兄たちを救い出すとか、少年漫画の主人公みたいなのだ！"
+        subtitle: "ゼウス、めちゃくちゃすごい経歴なのだ！お父さんに飲まれた兄たちを救い出すとか、少年漫画の主人公みたいなのだ！"
+
+  - id: "three-brothers"
+    background: "./image/background/bg_world_map_1773641156482.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ティタノマキアに勝ったあと、ゼウスは兄のポセイドンとハデスと三兄弟で世界を分け合ったの。"
+        subtitle: "ティタノマキアに勝ったあと、ゼウスは兄のポセイドンとハデスと三兄弟で世界を分け合ったの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "くじ引きで決めて、ゼウスが「空」、ポセイドンが「海」、ハデスが「冥界（死者の国）」を受け取ったのよ。"
+        subtitle: "くじ引きで決めて、ゼウスが「空」、ポセイドンが「海」、ハデスが「冥界（死者の国）」を受け取ったのよ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ハデスちょっとかわいそうなのだ。冥界は嫌なのだ……。"
+        subtitle: "ハデスちょっとかわいそうなのだ。冥界は嫌なのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ハデスはけっこう真面目に冥界を治めていて、ギリシャ神話の中では誠実な神様として描かれることも多いの。"
+        subtitle: "ハデスはけっこう真面目に冥界を治めていて、ギリシャ神話の中では誠実な神様として描かれることも多いの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "この三兄弟の関係を知っておくと、ギリシャ神話の世界観がすごくわかりやすくなるわ。"
+        subtitle: "この三兄弟の関係を知っておくと、ギリシャ神話の世界観がすごくわかりやすくなるわ。"
+
+  - id: "zeus-human-like"
+    background: "./image/background/bg_greek_temple_1773641171319.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "でもさ、世界の王なんだよね？なんでさっきめたんが「人間くさい」って言ってたのだ？"
+        subtitle: "でもさ、世界の王なんだよね？なんでさっきめたんが「人間くさい」って言ってたのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここがギリシャ神話の一番面白いところなの。"
+        subtitle: "ここがギリシャ神話の一番面白いところなの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "日本の神様やキリスト教の神様って、どちらかというと「人間を超えた完全な存在」として描かれることが多いわよね。"
+        subtitle: "日本の神様やキリスト教の神様って、どちらかというと「人間を超えた完全な存在」として描かれることが多いわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "うん、「人間には理解できない」みたいな感じなのだ。"
+        subtitle: "うん、「人間には理解できない」みたいな感じなのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "でもギリシャの神様は違うの。嫉妬する。怒る。失敗する。後悔する。誰かを好きになって傷つく。"
+        subtitle: "でもギリシャの神様は違うの。嫉妬する。怒る。失敗する。後悔する。誰かを好きになって傷つく。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスも、世界の王のくせに奥さんに怒られて困ったり、気に入った人間を助けるために他の神様と対立したりするの。"
+        subtitle: "ゼウスも、世界の王のくせに奥さんに怒られて困ったり、気に入った人間を助けるために他の神様と対立したりするの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "最強なのにそんなに悩んでるのだ！？"
+        subtitle: "最強なのにそんなに悩んでるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。だから面白い。神様の話なのに、なぜか「あるある」って共感できてしまうの。"
+        subtitle: "そう。だから面白い。神様の話なのに、なぜか「あるある」って共感できてしまうの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "古代ギリシャの人たちは、雷が落ちたらゼウスが怒ってる、嵐になったらポセイドンが機嫌悪い、と自然現象を神様の感情で説明したの。"
+        subtitle: "古代ギリシャの人たちは、雷が落ちたらゼウスが怒ってる、嵐になったらポセイドンが機嫌悪い、と自然現象を神様の感情で説明したの。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "神様が人間みたいだから、人間も神様の気持ちがわかる、ってことなのだ！"
+        subtitle: "神様が人間みたいだから、人間も神様の気持ちがわかる、ってことなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そういうことよ。これを「神人同形論（しんじんどうけいろん）」というの。ギリシャ神話が3000年たった今でも語り継がれている理由がここにあるわ。"
+        subtitle: "そういうことよ。これを「神人同形論」というの。ギリシャ神話が3000年たった今でも語り継がれている理由がここにあるわ。"
+
+  - id: "zeus-and-hera"
+    background: "./image/background/bg_olympus_palace_1773641201610.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ゼウスの奥さんのヘラって、どんな神様なのだ？"
+        subtitle: "ゼウスの奥さんのヘラって、どんな神様なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ヘラは神々の女王で、結婚と家庭の守護神よ。ゼウスの正妻。"
+        subtitle: "ヘラは神々の女王で、結婚と家庭の守護神よ。ゼウスの正妻。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスは他の女神や人間の女性と関係を持つことが多くて、そのたびにヘラは怒る。でもゼウスには怒れないから、相手の女性に矛先が向かうの。"
+        subtitle: "ゼウスは他の女神や人間の女性と関係を持つことが多くて、そのたびにヘラは怒る。でもゼウスには怒れないから、相手の女性に矛先が向かうの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "怒り方がどんなのだ？"
+        subtitle: "怒り方がどんなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "たとえば、ゼウスが好きになったイオという女性がいて、ゼウスはヘラに見つかりそうになったとき、イオを牛に変えて隠したの。"
+        subtitle: "たとえば、ゼウスが好きになったイオという女性がいて、ゼウスはヘラに見つかりそうになったとき、イオを牛に変えて隠したの。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "それ、イオがかわいそうすぎるのだ……！"
+        subtitle: "それ、イオがかわいそうすぎるのだ……！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ヘラはその牛をもらって、逃げられないよう監視の番人をつけたの。ゼウスとヘラのすれ違いに、イオが巻き込まれてしまったわ。"
+        subtitle: "ヘラはその牛をもらって、逃げられないよう監視の番人をつけたの。ゼウスとヘラのすれ違いに、イオが巻き込まれてしまったわ。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "でも……ヘラの気持ちもわかるのだ。結婚の守護神なのに、旦那が一番ルール破るの、つらいのだ。"
+        subtitle: "でも……ヘラの気持ちもわかるのだ。結婚の守護神なのに、旦那が一番ルール破るの、つらいのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。ヘラは「悪役」として描かれることが多いけど、実はヘラこそが一番の被害者という見方もできるの。ギリシャ神話って、誰が正しいか簡単には決められない話が多いわ。"
+        subtitle: "そう。ヘラは「悪役」として描かれることが多いけど、実はヘラこそが一番の被害者という見方もできるの。ギリシャ神話って、誰が正しいか簡単には決められない話が多いわ。"
+
+  - id: "zeus-and-humans"
+    background: "./image/background/bg_human_village_1773641230543.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ゼウスと人間の関係はどうなのだ？守ってくれる神様なのだ？それとも怖い神様なのだ？"
+        subtitle: "ゼウスと人間の関係はどうなのだ？守ってくれる神様なのだ？それとも怖い神様なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "両方ね。ゼウスは正義の守護者でもあるから、不正を犯した者には容赦なく罰を下す。"
+        subtitle: "両方ね。ゼウスは正義の守護者でもあるから、不正を犯した者には容赦なく罰を下す。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "でも一方で、人間を大切に思っていた神様・プロメテウスという存在がいるの。"
+        subtitle: "でも一方で、人間を大切に思っていた神様・プロメテウスという存在がいるの。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "プロメテウス？"
+        subtitle: "プロメテウス？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスが「人間には火を与えるな」と決めていたのに、プロメテウスは天界から火を盗み、人間に与えたの。"
+        subtitle: "ゼウスが「人間には火を与えるな」と決めていたのに、プロメテウスは天界から火を盗み、人間に与えたの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "人間のために反乱したのだ！なんで火を禁止してたのだ？"
+        subtitle: "人間のために反乱したのだ！なんで火を禁止してたのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "火を持った人間は文明を発展させて、いつか神を脅かす存在になるかもしれない、という恐れもあったと言われているわ。"
+        subtitle: "火を持った人間は文明を発展させて、いつか神を脅かす存在になるかもしれない、という恐れもあったと言われているわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "怒ったゼウスはプロメテウスを岩山に縛り付けて、毎日鷲に肝臓を食べさせる罰を与えたの。肝臓は夜に再生されるから、終わらない拷問よ。"
+        subtitle: "怒ったゼウスはプロメテウスを岩山に縛り付けて、毎日鷲に肝臓を食べさせる罰を与えたの。肝臓は夜に再生されるから、終わらない拷問よ。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "ひどいのだ……。でも、プロメテウスはなんで最後まで意地を張ったのだ？"
+        subtitle: "ひどいのだ……。でも、プロメテウスはなんで最後まで意地を張ったのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "プロメテウスはゼウスの未来を知っていたと言われているの。謝れば許してもらえたかもしれない。でも沈黙を守り続けた。"
+        subtitle: "プロメテウスはゼウスの未来を知っていたと言われているの。謝れば許してもらえたかもしれない。でも沈黙を守り続けた。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "これって、権力者に対して信念を曲げなかった人間の話と重なるの。古代ギリシャの人たちはこの話に、自分たちの姿を重ねていたと思うわ。"
+        subtitle: "これって、権力者に対して信念を曲げなかった人間の話と重なるの。古代ギリシャの人たちはこの話に、自分たちの姿を重ねていたと思うわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "神話なのに、すごくリアルな話なのだ。"
+        subtitle: "神話なのに、すごくリアルな話なのだ。"
+
+  - id: "zeus-as-father"
+    background: "./image/background/bg_olympus_palace_1773641201610.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ゼウスって子供も多いのだ？"
+        subtitle: "ゼウスって子供も多いのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "それがゼウスを知ることが大事な、もうひとつの理由なの。"
+        subtitle: "それがゼウスを知ることが大事な、もうひとつの理由なの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスの子供たちは、ギリシャ神話に登場するほぼすべての重要キャラクターにつながっているの。"
+        subtitle: "ゼウスの子供たちは、ギリシャ神話に登場するほぼすべての重要キャラクターにつながっているの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "知恵の神アテナ、太陽と芸術の神アポロン、英雄ヘラクレス、勝利の女神ニケ、美の女神アフロディテ……みんなゼウスの血縁よ。"
+        subtitle: "知恵の神アテナ、太陽と芸術の神アポロン、英雄ヘラクレス、勝利の女神ニケ、美の女神アフロディテ……みんなゼウスの血縁よ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "オリンピックのロゴのニケも！？ヘラクレスも！？ぜんぶゼウスの子なのだ！？"
+        subtitle: "オリンピックのロゴのニケも！？ヘラクレスも！？ぜんぶゼウスの子なのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスはギリシャ神話全体の「根っこ」なの。ゼウスを知らずにギリシャ神話を読むのは、登場人物が誰かわからないまま映画を観るようなものよ。"
+        subtitle: "ゼウスはギリシャ神話全体の「根っこ」なの。ゼウスを知らずにギリシャ神話を読むのは、登場人物が誰かわからないまま映画を観るようなものよ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "だからゼウスを最初に知っておくと、あとあと全部つながってくるのだ！"
+        subtitle: "だからゼウスを最初に知っておくと、あとあと全部つながってくるのだ！"
+
+  - id: "summary"
+    background: "./image/background/bg_greek_temple_1773641171319.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のまとめね。"
+        subtitle: "今日のまとめね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスはギリシャ神話の王であり、空と雷の神。10年間の大戦争を経て世界の王になった、実力と経歴を持つ存在よ。"
+        subtitle: "ゼウスはギリシャ神話の王であり、空と雷の神。10年間の大戦争を経て世界の王になった、実力と経歴を持つ存在よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そして最強なのに、嫉妬して、悩んで、失敗する。完璧じゃないからこそ、物語が生まれる。"
+        subtitle: "そして最強なのに、嫉妬して、悩んで、失敗する。完璧じゃないからこそ、物語が生まれる。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ギリシャ神話は「完璧な神様の教え」じゃなくて、「人間くさい神様たちのドラマ」。だから3000年経っても面白い。"
+        subtitle: "ギリシャ神話は「完璧な神様の教え」じゃなくて、「人間くさい神様たちのドラマ」。だから3000年経っても面白い。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ゼウスの話、最初は「すごい神様」くらいにしか思ってなかったけど、家族関係とか戦争とか全部わかると、めちゃくちゃ奥深いのだ！"
+        subtitle: "ゼウスの話、最初は「すごい神様」くらいにしか思ってなかったけど、家族関係とか戦争とか全部わかると、めちゃくちゃ奥深いのだ！"
+
+  - id: "ending"
+    background: "./image/background/bg_greek_temple_1773641171319.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回は、ゼウスの兄弟・ポセイドンとハデスの話をするわ。同じ兄弟なのに、こんなに性格が違うの？という話よ。"
+        subtitle: "次回は、ゼウスの兄弟・ポセイドンとハデスの話をするわ。同じ兄弟なのに、こんなに性格が違うの？という話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "兄弟で海・天・地下を分担してるの、ロマンがあるのだ！次回も絶対見るのだ！"
+        subtitle: "兄弟で海・天・地下を分担してるの、ロマンがあるのだ！次回も絶対見るのだ！"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価、ぜひよろしくなのだ！ずんだもんは今日もずんだもちが食べたいのだ！"
+        subtitle: "チャンネル登録と高評価、ぜひよろしくなのだ！ずんだもんは今日もずんだもちが食べたいのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "最後は自分の話ね。それじゃあ、またね！"
+        subtitle: "最後は自分の話ね。それじゃあ、またね！"

@@ -12,6 +12,21 @@ if (ffprobe && ffprobe.path) {
 }
 
 /**
+ * ffprobe で音声ファイルの実際の再生時間（ミリ秒）を取得する。
+ * AudioQuery から計算した推定値ではなく実測値を使うことで字幕タイミングのずれを防ぐ。
+ */
+export function getAudioDurationMs(filePath: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(path.resolve(filePath), (err, metadata) => {
+      if (err) return reject(err);
+      const durationSec = metadata?.format?.duration;
+      if (durationSec == null) return reject(new Error(`duration が取得できませんでした: ${filePath}`));
+      resolve(Math.round(durationSec * 1000));
+    });
+  });
+}
+
+/**
  * 複数の音声ファイルを時間順に単純連結し、1本の音声ファイルとして出力する。
  * すべて同じフォーマット（VOICEVOX生成WAV）である前提。
  */

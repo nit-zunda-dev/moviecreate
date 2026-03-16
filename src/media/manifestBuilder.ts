@@ -9,6 +9,7 @@ export interface LineResultWithContext {
   line: Line;
   sceneId: string;
   lineIndex: number;
+  sceneBackground?: string;
 }
 
 const DEFAULT_SUBTITLE_COLORS = [
@@ -55,7 +56,7 @@ export function buildVideoManifest(
   const lines: ManifestLine[] = [];
 
   for (let i = 0; i < lineResults.length; i++) {
-    const { result, line, sceneId, lineIndex } = lineResults[i];
+    const { result, line, sceneId, lineIndex, sceneBackground } = lineResults[i];
     const character = line.character;
     const defaultImageFile = character ? characters[character]?.defaultImageFile : undefined;
     // 行ごとの表情（face）があれば、キャラの画像と同じフォルダの face.png を使う
@@ -65,6 +66,10 @@ export function buildVideoManifest(
       imageFile = path.join(charDir, line.face + ".png");
     }
 
+    const backgroundFile = sceneBackground
+      ? path.resolve(sceneBackground)
+      : undefined;
+
     lines.push({
       globalIndex: i,
       sceneId,
@@ -73,6 +78,7 @@ export function buildVideoManifest(
       text: line.subtitle ?? line.text ?? "",
       character,
       imageFile,
+      backgroundFile,
       speakerId: result.speakerId,
       wavFile: result.wavPath,
       startMs: currentMs,

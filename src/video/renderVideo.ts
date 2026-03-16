@@ -28,8 +28,11 @@ function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoM
   const audioFile = copyAsset(manifest.audioFile);
 
   const lines = manifest.lines.map((line) => {
-    if (!line.imageFile) return line;
-    return { ...line, imageFile: copyAsset(line.imageFile) };
+    return {
+      ...line,
+      imageFile: line.imageFile ? copyAsset(line.imageFile) : undefined,
+      backgroundFile: line.backgroundFile ? copyAsset(line.backgroundFile) : undefined,
+    };
   });
 
   const characters: Record<string, CharacterDisplayConfig> = {};
