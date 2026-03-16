@@ -2,59 +2,74 @@ import path from "path";
 import fs from "fs";
 import { bundle } from "@remotion/bundler";
 import { renderMedia, selectComposition } from "@remotion/renderer";
-import { VideoManifest } from "../types/videoManifest";
+import { VideoManifest, CharacterDisplayConfig } from "../types/videoManifest";
 import { getBasePaths } from "../config/paths";
 
 /**
- * Remotion 用 publicDir にアセットをコピーして静的ファイルとして提供するためのパスに変換する。
- * Remotion (Chromium) は file:// アクセスをブロックするため、
- * すべての画像・音声を publicDir に配置して staticFile() 経由で参照する。
+ * Remotion の publicDir にアセットをコピーし、
+ * manifest 内のパスを publicDir 相対名に書き換えて返す。
+ * Remotion（Chromium）は file:// アクセスをブロックするため必須。
  */
 function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoManifest {
   fs.mkdirSync(publicDir, { recursive: true });
 
-  // キャッシュ: 元の絶対パス → publicDir 内のファイル名
+  let assetIndex = 0;
   const copied = new Map<string, string>();
 
-  function copyAsset(absPath: string, prefix: string): string {
+  function copyAsset(absPath: string): string {
     if (copied.has(absPath)) return copied.get(absPath)!;
     const ext = path.extname(absPath);
-    const base = path.basename(absPath, ext).replace(/\s+/g, "_");
-    const name = `${prefix}_${base}${ext}`;
-    const dest = path.join(publicDir, name);
-    if (!fs.existsSync(dest)) {
-      fs.copyFileSync(absPath, dest);
-    }
+    const name = `asset_${assetIndex++}${ext}`;
+    fs.copyFileSync(absPath, path.join(publicDir, name));
     copied.set(absPath, name);
     return name;
   }
 
-  const audioName = copyAsset(manifest.audioFile, "audio");
+  const audioFile = copyAsset(manifest.audioFile);
 
-  const lines = manifest.lines.map((line, i) => {
+  const lines = manifest.lines.map((line) => {
     if (!line.imageFile) return line;
-    const imgName = copyAsset(line.imageFile, `img${i}`);
-    return { ...line, imageFile: imgName };
+    return { ...line, imageFile: copyAsset(line.imageFile) };
   });
+
+  const characters: Record<string, CharacterDisplayConfig> = {};
+  for (const [charName, config] of Object.entries(manifest.characters)) {
+    characters[charName] = {
+      ...config,
+      defaultImageFile: config.defaultImageFile ? copyAsset(config.defaultImageFile) : undefined,
+    };
+  }
 
   let defaultBackground = manifest.defaultBackground;
   if (defaultBackground) {
-    defaultBackground = copyAsset(defaultBackground, "bg");
+    defaultBackground = copyAsset(defaultBackground);
   }
 
-  return { ...manifest, audioFile: audioName, lines, defaultBackground };
+  return { ...manifest, audioFile, lines, characters, defaultBackground };
+}
+
+export interface RenderVideoOptions {
+  /** 透過レンダリング（ProRes 4444 / .mov 出力） */
+  transparent?: boolean;
 }
 
 /**
- * Remotion を使って VideoManifest から MP4 を生成する。
+ * Remotion を使って VideoManifest から動画を生成する。
+ * 通常: H.264 MP4 / 透過モード: ProRes 4444 MOV
  */
-export async function renderVideo(manifest: VideoManifest, outPath: string): Promise<void> {
+export async function renderVideo(
+  manifest: VideoManifest,
+  outPath: string,
+  options: RenderVideoOptions = {},
+): Promise<void> {
   const remotionEntry = path.resolve(__dirname, "../../remotion/index.tsx");
   const { tempDir } = getBasePaths();
   const publicDir = path.join(tempDir, "remotion_public");
 
-  // アセットを publicDir にコピーしてパスを相対名に変換
-  const servedManifest = preparePublicAssets(manifest, publicDir);
+  const servedManifest: VideoManifest = {
+    ...preparePublicAssets(manifest, publicDir),
+    transparent: options.transparent ?? false,
+  };
 
   console.log("[Remotion] バンドル中... (初回は 30〜60 秒かかる場合があります)");
   const bundled = await bundle({
@@ -76,11 +91,13 @@ export async function renderVideo(manifest: VideoManifest, outPath: string): Pro
     inputProps: { manifest: servedManifest },
   });
 
-  console.log("[Remotion] レンダリング開始...");
+  const codec = options.transparent ? "prores" : "h264";
+  console.log(`[Remotion] レンダリング開始... (codec: ${codec})`);
+
   await renderMedia({
     composition,
     serveUrl: bundled,
-    codec: "h264",
+    codec,
     outputLocation: path.resolve(outPath),
     inputProps: { manifest: servedManifest },
     onProgress: ({ progress }) => {

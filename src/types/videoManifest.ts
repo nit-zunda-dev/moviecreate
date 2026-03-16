@@ -1,3 +1,12 @@
+export interface CharacterDisplayConfig {
+  /** 画面上の横位置 */
+  position: "left" | "right" | "center";
+  /** publicDir 内の画像ファイル名（相対） */
+  defaultImageFile: string | undefined;
+  /** 字幕テキストの色 */
+  subtitleColor: string;
+}
+
 export interface ManifestLine {
   globalIndex: number;
   sceneId: string;
@@ -5,7 +14,7 @@ export interface ManifestLine {
   /** 字幕テキスト */
   text: string;
   character: string | undefined;
-  /** face に対応する PNG の絶対パス（PSD から抽出済み） */
+  /** face に対応する PNG のファイル名（publicDir 内の相対名） */
   imageFile: string | undefined;
   speakerId: number;
   wavFile: string;
@@ -19,9 +28,13 @@ export interface VideoManifest {
   fps: number;
   width: number;
   height: number;
-  /** 結合済み WAV の絶対パス */
+  /** publicDir 内の結合済み WAV ファイル名（相対） */
   audioFile: string;
   defaultBackground: string | undefined;
+  /** キャラクター名 → 表示設定 */
+  characters: Record<string, CharacterDisplayConfig>;
   lines: ManifestLine[];
+  /** 透過レンダリングモード */
+  transparent?: boolean;
   generatedAt: string;
 }

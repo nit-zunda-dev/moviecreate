@@ -14,11 +14,14 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
 
   return (
     <div style={{ width, height, position: "relative", overflow: "hidden" }}>
-      <Background
-        backgroundPath={manifest.defaultBackground}
-        width={width}
-        height={height}
-      />
+      {/* 透過モードのとき背景を描画しない */}
+      {!manifest.transparent && (
+        <Background
+          backgroundPath={manifest.defaultBackground}
+          width={width}
+          height={height}
+        />
+      )}
       <CharacterLayer manifest={manifest} />
       <SubtitleLayer manifest={manifest} />
       <Audio src={staticFile(manifest.audioFile)} />

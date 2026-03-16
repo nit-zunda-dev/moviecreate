@@ -1,369 +1,484 @@
 # moviecreate
 
-VOICEVOXエンジン（localhost:50021）とシナリオ（YAML/JSON）を使って、複数キャラクターの音声を1本のWAVに自動生成するCLIツールです。
+VOICEVOX エンジンとシナリオ YAML から、キャラクター立ち絵・字幕・音声入りの **MP4 動画** を自動生成する CLI ツールです。
+
+```
+シナリオ YAML → 音声合成（VOICEVOX）→ WAV 結合 → マニフェスト生成 → Remotion で MP4 出力
+```
+
+---
 
 ## 必要な環境
 
-- Node.js（推奨: 18+）
-- [VOICEVOX エンジン](https://voicevox.hiroshiba.jp/) を起動し、`http://localhost:50021` で待ち受けていること
-- （音声連結のみ）ffmpeg / ffprobe が利用可能であること（`@ffprobe-installer/ffprobe` で自動取得も可）
+| ソフトウェア | 用途 |
+|------------|------|
+| Node.js 18 以上 | 実行環境 |
+| [VOICEVOX](https://voicevox.hiroshiba.jp/) エンジン | 音声合成 API（`http://localhost:50021` で起動） |
+
+> **初回のみ**: `generate-video` 実行時に Remotion が Chrome Headless Shell を自動ダウンロードします（約 110 MB）。
+
+---
+
+## インストール・ビルド
+
+```bash
+git clone <repo>
+cd moviecreate
+npm install
+npm run build
+```
+
+---
 
 ## クイックスタート
 
+### 音声だけ生成する
+
 ```bash
-npm install
-npm run build
-node dist/cli.js generate-audio ./scenario/sample.yaml
+# VOICEVOX エンジンを起動してから
+node dist/cli.js generate-audio scenario/sample.yaml
+# → output/sample-all-features.wav
 ```
 
-出力: `output/` 配下にシナリオの `output.file` または `output/{title}.wav` で保存されます。
+### 動画（MP4）を生成する
+
+```bash
+node dist/cli.js generate-video scenario/test-video.yaml
+# → output/テスト動画.mp4
+```
+
+### 透過動画（ProRes 4444）を生成する
+
+```bash
+node dist/cli.js generate-video scenario/test-video.yaml --transparent
+# → output/テスト動画.mov  ← アルファチャンネル付き、動画編集ソフトで重ねて使える
+```
 
 ---
 
-## キャラクターのバリエーション
+## シナリオ YAML の書き方
 
-### 利用可能な話者・スタイルの確認
+シナリオは 1 つの YAML ファイルで完結します。最小構成から順に説明します。
 
-接続中のVOICEVOXエンジンで利用できる**話者名**と**スタイルID**は、次のコマンドで一覧できます。
+### 最小構成
 
-```bash
-node dist/cli.js list-speakers
+```yaml
+title: "はじめての動画"
+
+characters:
+  zundamon:
+    speakerId: 3                        # ずんだもん・ノーマル
+    image: "./image/zundamon.png"       # 立ち絵 PNG（透過推奨）
+
+scenes:
+  - id: "scene1"
+    lines:
+      - type: dialogue
+        character: zundamon
+        text: "こんにちは！ずんだもんなのだ！"
 ```
 
-出力例（エンジンによって異なります）:
+実行すると以下が生成されます。
 
 ```
-0	四国めたん	ノーマル
-1	四国めたん	あまあま
-2	四国めたん	ツンデレ
-3	ずんだもん	ノーマル
-4	ずんだもん	あまあま
-5	ずんだもん	ツンデレ
-...
+output/はじめての動画.wav   ← 音声のみ（generate-audio）
+output/はじめての動画.mp4   ← 動画（generate-video）
 ```
 
-左から **スタイルID**・**話者名**・**スタイル名** です。シナリオではこの **スタイルID** を `characters.*.speakerId` に指定します。
+---
 
-### シナリオでのキャラクター定義
-
-シナリオ内の `characters` で、**任意のキャラ名** と **VOICEVOXのスタイルID** を対応づけます。キャラ名は英語・日本語どちらでも構いません。
+### キャラクターの設定（characters）
 
 ```yaml
 characters:
-  zundamon:
-    speakerId: 3    # ずんだもん・ノーマル（エンジンにより異なる）
-    styleId: 0     # 将来の拡張用。現状は speakerId がスタイルを表す
   metan:
-    speakerId: 2   # 四国めたん・ツンデレ の例
-  zundamon_amama:
-    speakerId: 4   # ずんだもん・あまあま の例
-  narrator:
-    speakerId: 0   # 四国めたん・ノーマル をナレーションに
+    speakerId: 2          # VOICEVOX のスタイルID（list-speakers で確認）
+    image: "./image/metan.png"
+    position: left        # 画面上の位置: left / right / center
+    subtitleColor: "#FF88BB"  # 字幕の色（CSS カラー）
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon.png"
+    position: right
+    subtitleColor: "#88DD44"
+    voice:                # このキャラのデフォルト音声パラメータ
+      speedScale: 1.1
+      intonationScale: 1.2
 ```
 
-- **speakerId**（必須）: `list-speakers` で表示される **スタイルID**。話者＋声色を指定します。
-- **styleId**（任意）: 将来の拡張用。現行実装では未使用です。
+| フィールド | 必須 | 説明 |
+|-----------|------|------|
+| `speakerId` | ✅ | VOICEVOX のスタイルID。`list-speakers` コマンドで確認できる |
+| `image` | | 立ち絵の PNG ファイルパス（透過 PNG 推奨） |
+| `position` | | 画面内の位置。`left` / `right` / `center`。省略時は登録順に左→右と自動割り当て |
+| `subtitleColor` | | 字幕テキストの色。省略時はデフォルトパレット（1番目: ピンク, 2番目: 緑）から自動割り当て |
+| `voice` | | このキャラ共通の音声パラメータ（後述） |
 
-### スピーカー・スタイルID一覧（VOICEVOX 0.16.0 相当）
+#### 用意済みキャラクター画像
 
-シナリオの `characters.*.speakerId` には、以下の **スタイルID** を指定します。エンジン・バージョンで変わる場合は `list-speakers` で確認してください。
+`image/zundamon/` と `image/metan/` に表情別の透過 PNG が収録されています。
 
-| 話者名 | スタイル名 | speakerId |
-|--------|------------|-----------|
-| 四国めたん | あまあま | 0 |
-| 四国めたん | ノーマル | 2 |
-| 四国めたん | セクシー | 4 |
-| 四国めたん | ツンツン | 6 |
-| 四国めたん | ささやき | 36 |
-| 四国めたん | ヒソヒソ | 37 |
-| ずんだもん | あまあま | 1 |
-| ずんだもん | ノーマル | 3 |
-| ずんだもん | セクシー | 5 |
-| ずんだもん | ツンツン | 7 |
-| ずんだもん | ささやき | 22 |
-| ずんだもん | ヒソヒソ | 38 |
-| ずんだもん | ヘロヘロ | 75 |
-| ずんだもん | なみだめ | 76 |
-| 春日部つむぎ | ノーマル | 8 |
-| 波音リツ | ノーマル | 9 |
-| 雨晴はう | ノーマル | 10 |
-| 玄野武宏 | ノーマル | 11 |
-| 玄野武宏 | 喜び | 39 |
-| 玄野武宏 | ツンギレ | 40 |
-| 玄野武宏 | 悲しみ | 41 |
-| 白上虎太郎 | ふつう | 12 |
-| 白上虎太郎 | わーい | 32 |
-| 白上虎太郎 | びくびく | 33 |
-| 白上虎太郎 | おこ | 34 |
-| 白上虎太郎 | びえーん | 35 |
-| 青山龍星 | ノーマル | 13 |
-| 青山龍星 | 熱血 | 81 |
-| 青山龍星 | 不機嫌 | 82 |
-| 青山龍星 | 喜び | 83 |
-| 青山龍星 | しっとり | 84 |
-| 青山龍星 | かなしみ | 85 |
-| 青山龍星 | 囁き | 86 |
-| 冥鳴ひまり | ノーマル | 14 |
-| 九州そら | あまあま | 15 |
-| 九州そら | ノーマル | 16 |
-| 九州そら | セクシー | 17 |
-| 九州そら | ツンツン | 18 |
-| 九州そら | ささやき | 19 |
-| もち子さん | ノーマル | 20 |
-| もち子さん | セクシー／あん子 | 66 |
-| もち子さん | 泣き | 77 |
-| もち子さん | 怒り | 78 |
-| もち子さん | 喜び | 79 |
-| もち子さん | のんびり | 80 |
-| 剣崎雌雄 | ノーマル | 21 |
-| WhiteCUL | ノーマル | 23 |
-| WhiteCUL | たのしい | 24 |
-| WhiteCUL | かなしい | 25 |
-| WhiteCUL | びえーん | 26 |
-| 後鬼 | 人間ver. | 27 |
-| 後鬼 | ぬいぐるみver. | 28 |
-| 後鬼 | 人間（怒り）ver. | 87 |
-| 後鬼 | 鬼ver. | 88 |
-| No.7 | ノーマル | 29 |
-| No.7 | アナウンス | 30 |
-| No.7 | 読み聞かせ | 31 |
-| ちび式じい | ノーマル | 42 |
-| 櫻歌ミコ | ノーマル | 43 |
-| 櫻歌ミコ | 第二形態 | 44 |
-| 櫻歌ミコ | ロリ | 45 |
-| 小夜/SAYO | ノーマル | 46 |
-| ナースロボ＿タイプＴ | ノーマル | 47 |
-| ナースロボ＿タイプＴ | 楽々 | 48 |
-| ナースロボ＿タイプＴ | 恐怖 | 49 |
-| ナースロボ＿タイプＴ | 内緒話 | 50 |
-| †聖騎士 紅桜† | ノーマル | 51 |
-| 雀松朱司 | ノーマル | 52 |
-| 麒ヶ島宗麟 | ノーマル | 53 |
-| 春歌ナナ | ノーマル | 54 |
-| 猫使アル | ノーマル | 55 |
-| 猫使アル | おちつき | 56 |
-| 猫使アル | うきうき | 57 |
-| 猫使アル | つよつよ | 110 |
-| 猫使アル | へろへろ | 111 |
-| 猫使ビィ | ノーマル | 58 |
-| 猫使ビィ | おちつき | 59 |
-| 猫使ビィ | 人見知り | 60 |
-| 猫使ビィ | つよつよ | 112 |
-| 中国うさぎ | ノーマル | 61 |
-| 中国うさぎ | おどろき | 62 |
-| 中国うさぎ | こわがり | 63 |
-| 中国うさぎ | へろへろ | 64 |
-| 波音リツ | クイーン | 65 |
-| 栗田まろん | ノーマル | 67 |
-| あいえるたん | ノーマル | 68 |
-| 満別花丸 | ノーマル | 69 |
-| 満別花丸 | 元気 | 70 |
-| 満別花丸 | ささやき | 71 |
-| 満別花丸 | ぶりっ子 | 72 |
-| 満別花丸 | ボーイ | 73 |
-| 琴詠ニア | ノーマル | 74 |
-| Voidoll | ノーマル | 89 |
-| ぞん子 | ノーマル | 90 |
-| ぞん子 | 低血圧 | 91 |
-| ぞん子 | 覚醒 | 92 |
-| ぞん子 | 実況風 | 93 |
-| 中部つるぎ | ノーマル | 94 |
-| 中部つるぎ | 怒り | 95 |
-| 中部つるぎ | ヒソヒソ | 96 |
-| 中部つるぎ | おどおど | 97 |
-| 中部つるぎ | 絶望と敗北 | 98 |
-| 離途 | ノーマル | 99 |
-| 黒沢冴白 | ノーマル | 100 |
-| 離途 | シリアス | 101 |
-| ユーレイちゃん | ノーマル | 102 |
-| ユーレイちゃん | 甘々 | 103 |
-| ユーレイちゃん | 哀しみ | 104 |
-| ユーレイちゃん | ささやき | 105 |
-| ユーレイちゃん | ツクモちゃん | 106 |
-| 東北ずん子 | ノーマル | 107 |
-| 東北きりたん | ノーマル | 108 |
-| 東北イタコ | ノーマル | 109 |
+| 表情名 | 説明 |
+|--------|------|
+| `通常` | デフォルト表情 |
+| `喜び` | にっこり・嬉しそう |
+| `笑い` | 目を閉じて笑う |
+| `怒り` | ジト目・ムスッとした表情 |
+| `悲しみ` | 困り眉・下向き目 |
+| `驚き` | 目を見開いて驚く |
+| `照れ` | 頬を赤らめた表情 |
+| `困り` | 眉を寄せて困惑 |
 
-※ エンジンやVOICEVOXのバージョンでIDが変わる場合があるため、不明なときは `node dist/cli.js list-speakers` で表示される一覧を参照してください。
-
-### セリフごとにキャラを指定する
-
-各セリフ（`lines[]`）では、`character` または `speaker` で誰の声で読むかを指定します。
-
-```yaml
-lines:
-  - type: dialogue
-    character: "zundamon"   # characters で定義した名前 → speakerId に変換される
-    text: "こんにちはなのだ。"
-  - type: dialogue
-    character: "metan"
-    text: "四国めたんですよ。"
-  - type: dialogue
-    speaker: "zundamon"     # character が無い場合は config の nameToSpeakerId を参照
-    text: "speaker でも指定できるのだ。"
-```
-
-- **character**: シナリオの `characters` に定義した名前。優先して使われます。
-- **speaker**: `src/config/voicevox.ts` の `nameToSpeakerId` に登録した名前（未指定時は `global.defaultSpeaker` → デフォルト話者）。
-
----
-
-## 音声パラメータ（話速・音高・抑揚・音量・無音など）
-
-VOICEVOX の「話速」「音高」「抑揚」「音量」「間の長さ」「開始無音」「終了無音」を、シナリオから指定できます。  
-`global.voice`（全体のデフォルト）→ `characters.*.voice`（キャラごと）→ `lines[].voice`（行ごと）の順でマージされ、後の指定が優先されます。
-
-### 指定できる項目（voice）
-
-| キー | 型 | 説明 | 目安の既定値 |
-|------|-----|------|----------------|
-| `speedScale` | number | 話速（1.0 が標準、大きくすると速く） | 1.0 |
-| `pitchScale` | number | 音高（0.0 が標準、正で高く） | 0.0 |
-| `intonationScale` | number | 抑揚（1.0 が標準） | 1.0 |
-| `volumeScale` | number | 音量（1.0 が標準） | 1.0 |
-| `pauseLengthScale` | number | 間の長さの倍率（1.0 が標準） | 1.0 |
-| `prePhonemeLength` | number | 開始無音（秒） | 0.1 |
-| `postPhonemeLength` | number | 終了無音（秒） | 0.1 |
-
-### 指定例
-
-**全体で少しゆっくり・抑揚強め**
-
-```yaml
-global:
-  defaultSpeaker: "zundamon"
-  voice:
-    speedScale: 0.95
-    intonationScale: 1.1
-```
-
-**キャラごとに差をつける**
+**使用例:**
 
 ```yaml
 characters:
   zundamon:
     speakerId: 3
-    voice:
-      speedScale: 1.05
+    image: "./image/zundamon/通常.png"
+    position: right
+    subtitleColor: "#88DD44"
   metan:
     speakerId: 2
-    voice:
-      pitchScale: 0.05
-      volumeScale: 0.9
+    image: "./image/metan/通常.png"
+    position: left
+    subtitleColor: "#FF88BB"
 ```
 
-**特定のセリフだけ開始・終了無音を長くする**
+> **表情の再生成**: `python extract_expressions.py` を実行すると PSD から全表情を再生成できます。
+
+#### position の並び
+
+2 キャラの場合：`left`（左） と `right`（右）に自動配置されます。立ち絵は**常に両方表示**され、発話中のキャラがフルの明るさ、非発話のキャラは少し暗くなります。
+
+```
+┌────────────────────────────────────┐
+│  [metan]               [zundamon]  │  ← 常に両者表示
+│   left                   right    │
+│          [字幕テキスト]            │  ← 発話キャラの色で表示
+└────────────────────────────────────┘
+```
+
+---
+
+### 全体設定（global）
+
+```yaml
+global:
+  defaultSpeaker: "zundamon"  # character/speaker 未指定時のデフォルト話者
+  defaultBackground: "./image/bg.png"  # 背景画像（省略時は単色 #1a1a2e）
+  voice:
+    speedScale: 1.1           # 全キャラ共通のデフォルト話速
+    intonationScale: 1.0
+```
+
+---
+
+### 出力設定（output）
+
+```yaml
+output:
+  file: "./output/my-video.wav"   # generate-audio の出力先（省略時は title から自動決定）
+  width: 1280                     # 解像度（既定: 1280×720）
+  height: 720
+  fps: 30                         # フレームレート（既定: 30）
+```
+
+---
+
+### シーン（scenes）
+
+シナリオは複数のシーンで構成されます。シーンごとに背景やセリフを変えられます。
+
+```yaml
+scenes:
+  - id: "scene1"                  # 必須。一時ファイルの名前にも使われる
+    lines:
+      - type: dialogue
+        character: metan
+        text: "最初のセリフよ。"
+      - type: dialogue
+        character: zundamon
+        text: "次のセリフなのだ！"
+
+  - id: "scene2"
+    lines:
+      - type: dialogue
+        character: metan
+        text: "シーン2に入ったわ。"
+```
+
+---
+
+### セリフ（lines）
 
 ```yaml
 lines:
-  - character: "zundamon"
-    text: "こんにちはなのだ。"
-  - character: "metan"
-    text: "重要な一言。"
-    voice:
+  - type: dialogue          # dialogue / narration / subtitle_only
+    character: zundamon     # characters で定義したキャラ名
+    text: "読み上げるテキスト"
+    subtitle: "字幕として表示するテキスト（省略時は text と同じ）"
+    voice:                  # この行だけ音声パラメータを上書き
+      speedScale: 0.9
       prePhonemeLength: 0.3
-      postPhonemeLength: 0.5
+```
+
+| フィールド | 説明 |
+|-----------|------|
+| `type` | `dialogue`：通常の発話。`narration`：ナレーション（音声は dialogue と同じ）。`subtitle_only`：音声なし（字幕だけ、text 不要） |
+| `character` | `characters` に定義したキャラ名。そのキャラの speakerId と立ち絵を使う |
+| `text` | 読み上げるテキスト。空欄の行は音声出力されない |
+| `voice` | この行だけに適用する音声パラメータ（後述） |
+
+---
+
+### 音声パラメータ（voice）
+
+`global.voice` → `characters.*.voice` → `lines[].voice` の順で上書きされます（後ろが優先）。
+
+```yaml
+voice:
+  speedScale: 1.0        # 話速（標準: 1.0）大きいほど速い
+  pitchScale: 0.0        # 音高（標準: 0.0）正で高く、負で低く
+  intonationScale: 1.0   # 抑揚（標準: 1.0）大きいほど抑揚が強い
+  volumeScale: 1.0       # 音量（標準: 1.0）
+  pauseLengthScale: 1.0  # 間の長さの倍率（標準: 1.0）
+  prePhonemeLength: 0.1  # 音声前の無音（秒）
+  postPhonemeLength: 0.1 # 音声後の無音（秒）
+```
+
+**会話のテンポを速くしたい場合:**
+
+```yaml
+global:
+  voice:
+    speedScale: 1.3
+    postPhonemeLength: 0.05  # セリフ間の間を短く
+```
+
+**特定のセリフを強調したい場合:**
+
+```yaml
+- type: dialogue
+  character: metan
+  text: "これが重要なポイントよ！"
+  voice:
+    intonationScale: 1.5    # 抑揚を強める
+    speedScale: 0.9         # 少しゆっくり
+    prePhonemeLength: 0.4   # 前に間を置く
 ```
 
 ---
 
-## パラメーターのバリエーション
+### 完成形サンプル（2 キャラ会話）
 
-### シナリオトップレベル
+```yaml
+title: "ずんだもんとめたんの会話"
 
-| キー          | 型     | 説明 |
-|---------------|--------|------|
-| `title`       | string | 必須。動画タイトル。出力ファイル名の既定値にも利用。 |
-| `output`      | object | 出力先・解像度など（音声のみのため主に `file` のみ利用）。 |
-| `output.file` | string | 出力WAVパス（例: `./output/my.wav`）。省略時は `output/{title}.wav`。 |
-| `global`      | object | 全体のデフォルト。 |
-| `global.defaultSpeaker` | string | セリフで character/speaker 未指定時に使う話者名。 |
-| `global.voice` | object | 全体のデフォルト [音声パラメータ](#音声パラメータ話速音高抑揚音量無音など)（`speedScale` など）。 |
-| `characters`  | object | キャラ名 → `{ speakerId, styleId?, voice? }` の対応。 |
-| `scenes`      | array  | 必須。シーン配列。 |
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan.png"
+    position: left
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.0
+      pitchScale: 0.02
 
-### シーン（scenes[]）
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon.png"
+    position: right
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.1
+      intonationScale: 1.2
 
-| キー         | 型     | 説明 |
-|--------------|--------|------|
-| `id`         | string | 必須。シーン識別子（ログ・一時ファイル名に使用）。 |
-| `background` | string | 未使用（音声専用のため）。 |
-| `bgm`        | string | 未使用。 |
-| `duration`   | number | 未使用。 |
-| `lines`      | array  | 必須。セリフ・ナレーションの配列。 |
+global:
+  defaultBackground: "./image/background.png"
+  voice:
+    postPhonemeLength: 0.08   # セリフ間の間を短めに
 
-### セリフ（lines[]）
+output:
+  fps: 30
+  width: 1280
+  height: 720
 
-| キー         | 型     | 説明 |
-|--------------|--------|------|
-| `type`       | string | `dialogue` / `narration` / `subtitle_only`。音声生成は `dialogue` と `narration` で同じ扱い。 |
-| `text`       | string | 読み上げるテキスト。空や省略時はその行は音声出力されない。 |
-| `subtitle`   | string | テロップ用（音声ツールでは未使用。将来用）。 |
-| `character`  | string | キャラ名。`characters` のキーと一致させるとその speakerId で合成。 |
-| `speaker`    | string | 話者名。character 未指定時に config の nameToSpeakerId から speakerId を解決。 |
-| `voice`      | object | この行だけ [音声パラメータ](#音声パラメータ話速音高抑揚音量無音など) を上書き。 |
-| `voiceStyle` | string | 将来用。現状は未使用。 |
-| `start`      | number | 将来用（無音挿入など）。現状は行の並び順で連結。 |
-| `offset`     | number | 同上。 |
-| `face`       | string | 未使用。 |
-| `effects`    | object | 将来用（音量・フェード等）。現状は未使用。 |
-
-### キャラクター定義（characters.*）
-
-| キー         | 型     | 説明 |
-|--------------|--------|------|
-| `speakerId`  | number | 必須。VOICEVOXのスタイルID（`list-speakers` の左列）。 |
-| `styleId`    | number | 任意。将来の拡張用。 |
-| `voice`      | object | 任意。このキャラのデフォルト [音声パラメータ](#音声パラメータ話速音高抑揚音量無音など)。 |
-
-### 環境変数
-
-| 変数名             | 説明 |
-|--------------------|------|
-| `VOICEVOX_BASE_URL` | エンジンのURL。未設定時は `http://localhost:50021`。 |
-
-### CLIコマンド・オプション
-
-| コマンド | 説明 |
-|----------|------|
-| `generate-audio <scenario>` | シナリオから1本のWAVを生成。 |
-| `generate <scenario>`       | 上記のエイリアス。 |
-| `list-speakers`            | 利用可能な話者・スタイルID一覧を表示。 |
-
-**generate-audio / generate のオプション**
-
-| オプション        | 説明 |
-|-------------------|------|
-| `--out <path>`    | 出力WAVパス。シナリオの `output.file` より優先。 |
-| `--per-line-dir <path>` | 各セリフの個別WAVを保存するディレクトリ（指定時のみ）。 |
-| `--dry-run`       | シナリオの読み込みと内容表示のみ。音声は生成しない。 |
+scenes:
+  - id: "intro"
+    lines:
+      - type: dialogue
+        character: metan
+        text: "ねえ、ずんだもん。今日は何の話をするの？"
+      - type: dialogue
+        character: zundamon
+        text: "今日はずんだもちの作り方を解説するのだ！"
+      - type: dialogue
+        character: metan
+        text: "それは楽しみね。"
+      - type: dialogue
+        character: zundamon
+        text: "まず、えだまめを茹でるのだ！"
+```
 
 ---
 
-## サンプルシナリオ
+## 動画のレイアウト
 
-- `scenario/sample.yaml` — ずんだもんと四国めたんの短い会話
-- `scenario/case-001-heart-sync.yaml` — 解説台本の長めの例
+```
+1280 × 720 px（既定）
+
+┌─────────────────────────────────────────────────┐ 720px
+│  背景画像または単色（#1a1a2e）                      │
+│                                                  │
+│                                                  │
+│                                                  │
+│  ┌──────┐                       ┌──────┐         │ ← 立ち絵上端
+│  │metan │                       │zunda │         │   高さ: 30%（216px）
+│  │      │   ┌─────────────┐    │      │         │ ← 立ち絵中央（字幕位置）
+│  │      │   │ 字幕テキスト │    │      │         │
+│  └──────┘   └─────────────┘    └──────┘         │ ← 立ち絵下端（bottom: 88px）
+└─────────────────────────────────────────────────┘   0px
+```
+
+- 発話中のキャラ: opacity 100%
+- 非発話のキャラ: opacity 45%（少し暗くなる）
+- 字幕の位置: 立ち絵の中央付近（立ち絵下端 + 立ち絵高さ × 50%）
+- 字幕の色: キャラごとの `subtitleColor` で指定した色
+
+---
+
+## CLI コマンド一覧
+
+### generate-video（動画生成）
 
 ```bash
-node dist/cli.js generate-audio ./scenario/sample.yaml
-node dist/cli.js generate-audio ./scenario/case-001-heart-sync.yaml --out ./output/case-001.wav
+node dist/cli.js generate-video <scenario.yaml> [options]
+```
+
+| オプション | 説明 |
+|-----------|------|
+| `--out <path>` | 出力ファイルパス。省略時は `output/{title}.mp4`（透過時は `.mov`） |
+| `--transparent` | 透過レンダリング。ProRes 4444 形式の `.mov` を出力。動画編集ソフトで背景なしのオーバーレイとして使える |
+| `--dry-run` | 音声生成・レンダリングは行わず、シナリオ読み込みのみ確認する |
+
+### generate-audio（音声のみ）
+
+```bash
+node dist/cli.js generate-audio <scenario.yaml> [options]
+```
+
+| オプション | 説明 |
+|-----------|------|
+| `--out <path>` | 出力 WAV ファイルパス |
+| `--dry-run` | シナリオの読み込みのみ（音声生成なし） |
+
+### list-speakers（話者一覧）
+
+```bash
+node dist/cli.js list-speakers
+```
+
+接続中の VOICEVOX エンジンで利用できる話者とスタイルID を表示します。
+
+```
+0    四国めたん    ノーマル
+1    ずんだもん    あまあま
+2    四国めたん    ツンデレ
+3    ずんだもん    ノーマル
+...
+```
+
+左端の番号が `speakerId` です。
+
+---
+
+## シナリオ作成から動画完成までの手順
+
+```
+1. VOICEVOX エンジンを起動する
+   → http://localhost:50021 で待ち受け
+
+2. 話者IDを確認する（初回のみ）
+   node dist/cli.js list-speakers
+
+3. 立ち絵の PNG を用意する
+   → 透過PNG（.png）を image/ フォルダに配置
+   例: image/metan.png, image/zundamon.png
+
+4. シナリオ YAML を書く
+   → scenario/ フォルダに .yaml ファイルを作成
+   → characters で立ち絵・位置・字幕色を設定
+   → scenes.lines でセリフを記述
+
+5. 動画を生成する
+   node dist/cli.js generate-video scenario/your-scenario.yaml
+
+6. 出力を確認する
+   → output/{title}.mp4 が生成される
+
+（透過で出力したい場合）
+   node dist/cli.js generate-video scenario/your-scenario.yaml --transparent
+   → output/{title}.mov（ProRes 4444 アルファ付き）
 ```
 
 ---
 
-## プロジェクト構成
+## ファイル構成
 
 ```
-src/
-  config/     voicevox（URL・デフォルト話者）、paths
-  types/      scenario の型定義
-  scenario/   loader, resolver
-  voicevox/   client（API）, synthesizeLine（キャラ→speakerId 解決）
-  media/      ffmpegWrapper（音声連結のみ）
-  cli.ts      generate-audio, generate, list-speakers
-scenario/     YAML/JSON シナリオ
-output/       生成WAVの出力先（既定）
-temp/         一時WAV（voices/）
+moviecreate/
+├── scenario/               シナリオ YAML ファイル
+│   ├── sample.yaml
+│   └── test-video.yaml
+├── image/                  立ち絵・背景画像（PNG）
+├── output/                 生成された動画・音声（.mp4 / .wav）
+├── temp/                   一時ファイル（音声・マニフェスト）
+│   ├── voices/             セリフごとの WAV
+│   └── remotion_public/    Remotion バンドル用アセット
+├── src/                    TypeScript ソース
+│   ├── cli.ts              CLI エントリポイント
+│   ├── config/             パス設定・VOICEVOX 設定
+│   ├── media/              音声結合・マニフェスト生成
+│   ├── scenario/           YAML ローダー
+│   ├── types/              型定義
+│   ├── video/              Remotion レンダリング
+│   └── voicevox/           VOICEVOX API クライアント
+└── remotion/               Remotion React コンポーネント
+    ├── index.tsx
+    ├── Root.tsx
+    ├── VideoComposition.tsx
+    └── components/
+        ├── Background.tsx
+        ├── CharacterLayer.tsx
+        └── SubtitleLayer.tsx
 ```
 
+---
+
+## 環境変数
+
+| 変数名 | 説明 | 既定値 |
+|--------|------|--------|
+| `VOICEVOX_BASE_URL` | VOICEVOX エンジンの URL | `http://localhost:50021` |
+
+---
+
+## よくある主要キャラのスタイルID（VOICEVOX 0.25 相当）
+
+| 話者名 | スタイル名 | speakerId |
+|--------|-----------|-----------|
+| 四国めたん | ノーマル | 2 |
+| 四国めたん | あまあま | 0 |
+| 四国めたん | ツンデレ | 6 |
+| 四国めたん | ささやき | 36 |
+| ずんだもん | ノーマル | 3 |
+| ずんだもん | あまあま | 1 |
+| ずんだもん | ツンツン | 7 |
+| ずんだもん | ヘロヘロ | 75 |
+| 春日部つむぎ | ノーマル | 8 |
+| 波音リツ | ノーマル | 9 |
+| 雨晴はう | ノーマル | 10 |
+
+全話者は `node dist/cli.js list-speakers` で確認できます。

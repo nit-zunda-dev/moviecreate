@@ -1,24 +1,29 @@
 title: "テスト動画"
 
 characters:
-  zundamon:
-    speakerId: 3
-    psd: "./image/ずんだもん立ち絵素材2.3.psd"
-    defaultFace: "通常"
   metan:
     speakerId: 2
-    psd: "./image/四国めたん立ち絵素材2.1.psd"
-    defaultFace: "通常"
+    image: "./image/metan/通常.png"
+    position: left
+    subtitleColor: "#FF88BB"
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: right
+    subtitleColor: "#88DD44"
 
 scenes:
   - id: "scene1"
     lines:
       - type: dialogue
+        character: metan
+        text: "こんにちは！テスト動画よ！"
+      - type: dialogue
         character: zundamon
-        text: "こんにちは！テスト動画なのだ！"
+        text: "動画生成のテストなのだ！うまくいくといいのだ。"
       - type: dialogue
         character: metan
-        text: "動画生成のテストよ。うまくいくかしら。"
+        text: "Remotionで動画を作っているわ。"
       - type: dialogue
         character: zundamon
-        text: "Remotionで動画を作るのだ！"
+        text: "ずんだもちを食べながら見てほしいのだ！"

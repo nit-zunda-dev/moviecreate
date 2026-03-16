@@ -24,9 +24,3 @@ export function getManifestPath(title: string): string {
   const { tempDir } = getBasePaths();
   return path.join(tempDir, `${title}_video_manifest.json`);
 }
-
-/** キャラクターのレイヤー PNG を保存するディレクトリを返す */
-export function getLayersDir(characterName: string): string {
-  const { tempDir } = getBasePaths();
-  return path.join(tempDir, "layers", characterName);
-}

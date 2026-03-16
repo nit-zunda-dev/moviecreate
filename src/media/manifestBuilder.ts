@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Scenario, Line } from "../types/scenario";
-import { VideoManifest, ManifestLine } from "../types/videoManifest";
+import { VideoManifest, ManifestLine, CharacterDisplayConfig } from "../types/videoManifest";
 import { LineTimingResult } from "../voicevox/synthesizeLine";
 
 export interface LineResultWithContext {
@@ -11,42 +11,53 @@ export interface LineResultWithContext {
   lineIndex: number;
 }
 
-/**
- * タイミング情報を集約して VideoManifest を構築する。
- */
+const DEFAULT_SUBTITLE_COLORS = [
+  "#FF88BB", // 0: ピンク
+  "#88DD44", // 1: 緑
+  "#66CCFF", // 2: 水色
+  "#FFB347", // 3: オレンジ
+  "#CCAAFF", // 4: 薄紫
+  "#FFFFFF", // 5+: 白
+];
+
+const DEFAULT_POSITIONS: ("left" | "right" | "center")[] = [
+  "left",
+  "right",
+  "center",
+  "center",
+];
+
 export function buildVideoManifest(
   scenario: Scenario,
   lineResults: LineResultWithContext[],
   audioFile: string,
-  characterLayerMaps: Record<string, Record<string, string>>,
 ): VideoManifest {
   const fps = scenario.output?.fps ?? scenario.global?.defaultFps ?? 30;
   const width = scenario.output?.width ?? 1280;
   const height = scenario.output?.height ?? 720;
+
+  // キャラクター表示設定を構築
+  const characterEntries = Object.entries(scenario.characters ?? {});
+  const characters: Record<string, CharacterDisplayConfig> = {};
+
+  for (let i = 0; i < characterEntries.length; i++) {
+    const [charName, charSettings] = characterEntries[i];
+    const defaultImageFile = charSettings.image ? path.resolve(charSettings.image) : undefined;
+
+    characters[charName] = {
+      position: charSettings.position ?? DEFAULT_POSITIONS[i] ?? "center",
+      defaultImageFile,
+      subtitleColor: charSettings.subtitleColor ?? DEFAULT_SUBTITLE_COLORS[i] ?? "#FFFFFF",
+    };
+  }
 
   let currentMs = 0;
   const lines: ManifestLine[] = [];
 
   for (let i = 0; i < lineResults.length; i++) {
     const { result, line, sceneId, lineIndex } = lineResults[i];
-
     const character = line.character;
-    let imageFile: string | undefined;
-
-    if (character) {
-      const layerMap = characterLayerMaps[character];
-      if (layerMap) {
-        const charSettings = scenario.characters?.[character];
-        const faceName = line.face ?? charSettings?.defaultFace;
-        if (faceName && layerMap[faceName]) {
-          imageFile = layerMap[faceName];
-        } else {
-          // フォールバック：最初のレイヤー
-          const firstKey = Object.keys(layerMap)[0];
-          if (firstKey) imageFile = layerMap[firstKey];
-        }
-      }
-    }
+    const imageFile = character ? characters[character]?.defaultImageFile : undefined;
 
     lines.push({
       globalIndex: i,
@@ -76,12 +87,12 @@ export function buildVideoManifest(
     height,
     audioFile: path.resolve(audioFile),
     defaultBackground,
+    characters,
     lines,
     generatedAt: new Date().toISOString(),
   };
 }
 
-/** VideoManifest を JSON ファイルとして書き出す */
 export function writeManifest(manifest: VideoManifest, manifestPath: string): void {
   const absPath = path.resolve(manifestPath);
   fs.mkdirSync(path.dirname(absPath), { recursive: true });

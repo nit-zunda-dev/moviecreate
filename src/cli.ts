@@ -2,12 +2,10 @@
 import { Command } from "commander";
 import path from "path";
 import { loadScenario } from "./scenario/loader";
-import { getBasePaths, getManifestPath, getLayersDir } from "./config/paths";
+import { getBasePaths, getManifestPath } from "./config/paths";
 import { synthesizeLine, synthesizeLineWithTiming } from "./voicevox/synthesizeLine";
 import { concatAudioFiles } from "./media/ffmpegWrapper";
-import { Scenario } from "./types/scenario";
 import { fetchSpeakers } from "./voicevox/client";
-import { extractPsdLayers } from "./media/psdExtractor";
 import { buildVideoManifest, writeManifest, LineResultWithContext } from "./media/manifestBuilder";
 import { renderVideo } from "./video/renderVideo";
 
@@ -18,7 +16,7 @@ async function generateAudioCommand(
   options: { out?: string; dryRun?: boolean; perLineDir?: string },
 ) {
   const scenario = loadScenario(scenarioPath);
-  const { tempDir, outputDir } = getBasePaths();
+  const { outputDir } = getBasePaths();
 
   if (options.dryRun) {
     console.log("シナリオ読み込み成功:", JSON.stringify(scenario, null, 2));
@@ -48,43 +46,17 @@ async function generateAudioCommand(
 
 async function generateVideoCommand(
   scenarioPath: string,
-  options: { out?: string; dryRun?: boolean },
+  options: { out?: string; dryRun?: boolean; transparent?: boolean },
 ) {
   const scenario = loadScenario(scenarioPath);
   const { outputDir } = getBasePaths();
 
-  // [1] PSD → レイヤー PNG 変換
-  // シナリオ内で使われている face 名を収集（defaultFace + 各行の face）
-  const faceNamesPerChar: Record<string, Set<string>> = {};
-  for (const [charName, charSettings] of Object.entries(scenario.characters ?? {})) {
-    const names = new Set<string>();
-    if (charSettings.defaultFace) names.add(charSettings.defaultFace);
-    faceNamesPerChar[charName] = names;
-  }
-  for (const scene of scenario.scenes) {
-    for (const line of scene.lines) {
-      if (line.character && line.face) {
-        faceNamesPerChar[line.character]?.add(line.face);
-      }
-    }
-  }
-
-  const characterLayerMaps: Record<string, Record<string, string>> = {};
-  for (const [charName, charSettings] of Object.entries(scenario.characters ?? {})) {
-    if (charSettings.psd) {
-      const layersDir = getLayersDir(charName);
-      console.log(`[PSD] ${charName} の立ち絵を変換中...`);
-      const faceNames = Array.from(faceNamesPerChar[charName] ?? ["通常"]);
-      characterLayerMaps[charName] = await extractPsdLayers(charSettings.psd, charName, layersDir, faceNames);
-    }
-  }
-
   if (options.dryRun) {
-    console.log("--dry-run: PSD 変換のみ実行しました。キャラクターレイヤー:", JSON.stringify(characterLayerMaps, null, 2));
+    console.log("--dry-run: シナリオを読み込みました:", JSON.stringify(scenario, null, 2));
     return;
   }
 
-  // [2] 音声合成 + タイミング取得
+  // [1] 音声合成 + タイミング取得
   const lineResults: LineResultWithContext[] = [];
 
   for (const scene of scenario.scenes) {
@@ -97,19 +69,19 @@ async function generateVideoCommand(
     }
   }
 
-  // [3] WAV 結合
+  // [2] WAV 結合
   const wavOut = path.join(outputDir, `${scenario.title}.wav`);
   const finalAudio = await concatAudioFiles(lineResults.map((r) => r.result.wavPath), wavOut);
 
-  // [4] マニフェスト生成
-  const manifest = buildVideoManifest(scenario, lineResults, finalAudio, characterLayerMaps);
-  const manifestPath = getManifestPath(scenario.title);
-  writeManifest(manifest, manifestPath);
+  // [3] マニフェスト生成
+  const manifest = buildVideoManifest(scenario, lineResults, finalAudio);
+  writeManifest(manifest, getManifestPath(scenario.title));
 
-  // [5] Remotion レンダリング
-  const mp4Out = options.out || path.join(outputDir, `${scenario.title}.mp4`);
-  await renderVideo(manifest, mp4Out);
-  console.log("動画を出力しました:", mp4Out);
+  // [4] Remotion レンダリング
+  const ext = options.transparent ? ".mov" : ".mp4";
+  const videoOut = options.out || path.join(outputDir, `${scenario.title}${ext}`);
+  await renderVideo(manifest, videoOut, { transparent: options.transparent });
+  console.log("動画を出力しました:", videoOut);
 }
 
 program
@@ -132,10 +104,11 @@ program
 
 program
   .command("generate-video")
-  .description("シナリオから MP4 動画を生成する（VOICEVOX + Remotion）")
+  .description("シナリオから動画を生成する（VOICEVOX + Remotion）")
   .argument("<scenario>", "シナリオYAML/JSONファイルパス")
-  .option("--out <path>", "出力MP4ファイルパス（既定: output/{title}.mp4）")
-  .option("--dry-run", "PSD変換のみ行いマニフェストを確認する", false)
+  .option("--out <path>", "出力動画ファイルパス（既定: output/{title}.mp4 / .mov）")
+  .option("--transparent", "透過レンダリング（ProRes 4444 .mov 出力）", false)
+  .option("--dry-run", "シナリオ読み込みのみ行う", false)
   .action((scenarioPath, opts) => {
     generateVideoCommand(scenarioPath, opts).catch((err) => {
       console.error("動画生成中にエラーが発生しました:", err);
