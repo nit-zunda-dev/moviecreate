@@ -23,11 +23,15 @@ characters:
   zundamon:
     speakerId: 3                # ずんだもん・ノーマル（list-speakers で確認）
     styleId: 0                  # 任意・将来用
+    psd: "./image/ずんだもん立ち絵素材2.3.psd"  # 立ち絵 PSD（generate-video 使用時）
+    defaultFace: "通常"          # デフォルト表情（PSD レイヤー名）
     voice:                      # このキャラのデフォルト（global を上書き）
       speedScale: 1.25
       intonationScale: 1.1
   metan:
     speakerId: 2                # 四国めたん・ノーマル
+    psd: "./image/四国めたん立ち絵素材2.1.psd"
+    defaultFace: "通常"
     voice:
       speedScale: 0.98
       pitchScale: 0.02

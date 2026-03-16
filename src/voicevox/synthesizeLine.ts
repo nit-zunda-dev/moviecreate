@@ -3,6 +3,7 @@ import { Line, Scenario, VoiceParam } from "../types/scenario";
 import { getBasePaths } from "../config/paths";
 import { synthesizeToFile } from "./client";
 import { getVoicevoxConfig, resolveSpeakerIdFromName } from "../config/voicevox";
+import { calcDurationFromQuery } from "../media/timingExtractor";
 
 export function resolveSpeakerIdForLine(scenario: Scenario, line: Line): number {
   const config = getVoicevoxConfig();
@@ -62,13 +63,53 @@ export async function synthesizeLine(
   const speakerId = resolveSpeakerIdForLine(scenario, line);
   const voiceParam = mergeVoiceParam(scenario, line);
 
-  const abs = await synthesizeToFile({
+  const { absPath } = await synthesizeToFile({
     text: line.text,
     speakerId,
     outPath,
     voiceParam,
   });
 
-  return abs;
+  return absPath;
 }
 
+export interface LineTimingResult {
+  wavPath: string;
+  durationMs: number;
+  speakerId: number;
+}
+
+/**
+ * 音声合成を行い、WAVパス・所要時間（ms）・speakerIdを返す。
+ * subtitle_only / text なしの行は null を返す。
+ */
+export async function synthesizeLineWithTiming(
+  scenario: Scenario,
+  sceneId: string,
+  index: number,
+  line: Line,
+): Promise<LineTimingResult | null> {
+  if (!line.text) {
+    return null;
+  }
+  const { tempDir } = getBasePaths();
+  const filename = `scene_${sceneId}_line_${index}.wav`;
+  const outPath = path.join(tempDir, "voices", filename);
+
+  const speakerId = resolveSpeakerIdForLine(scenario, line);
+  const voiceParam = mergeVoiceParam(scenario, line);
+
+  const { absPath, finalQuery } = await synthesizeToFile({
+    text: line.text,
+    speakerId,
+    outPath,
+    voiceParam,
+  });
+
+  const durationSec = calcDurationFromQuery(finalQuery);
+  return {
+    wavPath: absPath,
+    durationMs: Math.round(durationSec * 1000),
+    speakerId,
+  };
+}

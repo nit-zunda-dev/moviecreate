@@ -112,6 +112,12 @@ export interface CharacterSettings {
   styleId?: number;
   /** このキャラのデフォルト音声パラメータ */
   voice?: VoiceParam;
+  /** キャラクターの PSD ファイルパス */
+  psd?: string;
+  /** PSD を使わず直接指定する画像ファイルパス */
+  image?: string;
+  /** デフォルト表情（PSD レイヤー名） */
+  defaultFace?: string;
 }
 
 export interface Scenario {

@@ -1,0 +1,24 @@
+title: "テスト動画"
+
+characters:
+  zundamon:
+    speakerId: 3
+    psd: "./image/ずんだもん立ち絵素材2.3.psd"
+    defaultFace: "通常"
+  metan:
+    speakerId: 2
+    psd: "./image/四国めたん立ち絵素材2.1.psd"
+    defaultFace: "通常"
+
+scenes:
+  - id: "scene1"
+    lines:
+      - type: dialogue
+        character: zundamon
+        text: "こんにちは！テスト動画なのだ！"
+      - type: dialogue
+        character: metan
+        text: "動画生成のテストよ。うまくいくかしら。"
+      - type: dialogue
+        character: zundamon
+        text: "Remotionで動画を作るのだ！"

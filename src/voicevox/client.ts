@@ -9,6 +9,16 @@ export interface AudioQueryOptions {
   speakerId: number;
 }
 
+export interface Mora {
+  consonant_length: number | null;
+  vowel_length: number;
+}
+
+export interface AccentPhrase {
+  moras: Mora[];
+  pause_mora: Mora | null;
+}
+
 /** VOICEVOX の audio_query が返すクエリオブジェクトに含まれる音声パラメータの型 */
 export interface VoicevoxAudioQuery {
   speedScale?: number;
@@ -18,6 +28,7 @@ export interface VoicevoxAudioQuery {
   pauseLengthScale?: number;
   prePhonemeLength?: number;
   postPhonemeLength?: number;
+  accent_phrases?: AccentPhrase[];
   [key: string]: unknown;
 }
 
@@ -64,7 +75,12 @@ export interface SynthesisOptions extends AudioQueryOptions {
   voiceParam?: VoiceParam;
 }
 
-export async function synthesizeToFile(options: SynthesisOptions): Promise<string> {
+export interface SynthesisResult {
+  absPath: string;
+  finalQuery: VoicevoxAudioQuery;
+}
+
+export async function synthesizeToFile(options: SynthesisOptions): Promise<SynthesisResult> {
   const config = getVoicevoxConfig();
 
   let query = await createAudioQuery({ text: options.text, speakerId: options.speakerId });
@@ -84,7 +100,7 @@ export async function synthesizeToFile(options: SynthesisOptions): Promise<strin
   const absOut = path.resolve(options.outPath);
   fs.mkdirSync(path.dirname(absOut), { recursive: true });
   fs.writeFileSync(absOut, Buffer.from(res.data));
-  return absOut;
+  return { absPath: absOut, finalQuery: query };
 }
 
 export interface VoicevoxStyleInfo {
