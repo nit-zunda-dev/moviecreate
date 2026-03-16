@@ -1,0 +1,420 @@
+title: "【第1話】ずんだもん、天地創造に口をはさむのだ！ ――ギリシャ神話の世界へようこそ"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.2
+      intonationScale: 1.1
+
+  narrator:
+    speakerId: 8
+    position: center
+    subtitleColor: "#FFFFFF"
+    voice:
+      speedScale: 1.0
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/bg_used_bookstore_glowing_book.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # 1. 導入：本の発見と転移
+  # ============================================================
+  - id: "intro-book"
+    background: "./image/background/bg_used_bookstore_glowing_book.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "めたーん！古本屋でめちゃくちゃ面白そうな本を見つけたのだ！"
+        subtitle: "めたーん！古本屋でめちゃくちゃ面白そうな本を見つけたのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "どんな本？表紙も文字も読めないんだけど……これ、何語かしら。"
+        subtitle: "どんな本？表紙も文字も読めないんだけど……これ、何語かしら。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "わからないのだ。でもなんか光ってるし、ためしに開いてみるのだ！"
+        subtitle: "わからないのだ。でもなんか光ってるし、ためしに開いてみるのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "待って、怪しいものは開かないほうが——"
+        subtitle: "待って、怪しいものは開かないほうが——"
+
+  - id: "intro-warp"
+    background: "./image/background/bg_light_tunnel.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "うわあああーーー光ったのだーーー！？"
+        subtitle: "うわあああーーー光ったのだーーー！？"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "だから言ったでしょ！！引っ張られてる！どこかに飛ばされ——"
+        subtitle: "だから言ったでしょ！！引っ張られてる！どこかに飛ばされ——"
+      - type: narration
+        character: narrator
+        text: "ふたりは眩い光に包まれ、どこか遠い世界へと吸い込まれていった……。"
+        subtitle: "ふたりは眩い光に包まれ、どこか遠い世界へと吸い込まれていった……。"
+
+  - id: "intro-chaos-world"
+    background: "./image/background/bg_myth_chaos.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "……ここ、どこなのだ？何もないのだ。真っ暗で、静かで……気持ち悪いのだ。"
+        subtitle: "……ここ、どこなのだ？何もないのだ。真っ暗で、静かで……気持ち悪いのだ。"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "落ち着いて。この本に文字が浮かんできた……「この世界の神話を最後まで見届けよ。さすれば帰還の道が開かれる」。"
+        subtitle: "落ち着いて。この本に文字が浮かんできた……「この世界の神話を最後まで見届けよ。さすれば帰還の道が開かれる」。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "神話！？ずんだもんたち神話の世界に来ちゃったのだ！？"
+        subtitle: "神話！？ずんだもんたち神話の世界に来ちゃったのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "この光景……天地創造のはじまり。ここはギリシャ神話の「カオス」、世界が生まれる前の状態よ。"
+        subtitle: "この光景……天地創造のはじまり。ここはギリシャ神話の「カオス」、世界が生まれる前の状態よ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "カオス？なんかもうカオスな状況なのだ……。"
+        subtitle: "カオス？なんかもうカオスな状況なのだ……。"
+
+  # ============================================================
+  # 2. 神話解説パート：天地創造
+  # ============================================================
+  - id: "myth-explanation-chaos"
+    background: "./image/background/bg_myth_chaos.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ギリシャ神話によると、世界のはじまりは「カオス」、つまり何もない混沌の状態だったの。"
+        subtitle: "ギリシャ神話によると、世界のはじまりは「カオス」、つまり何もない混沌の状態だったの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこから最初の神様たちが自然に生まれた。大地の女神ガイア、愛の神エロス、闇の神エレボス、夜の女神ニュクス。"
+        subtitle: "そこから最初の神様たちが自然に生まれた。大地の女神ガイア、愛の神エロス、闇の神エレボス、夜の女神ニュクス。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ガイア、エロス、エレボス、ニュクス……なんか全員かっこいい名前なのだ。"
+        subtitle: "ガイア、エロス、エレボス、ニュクス……なんか全員かっこいい名前なのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そしてガイアは自分だけで息子のウラノス（空）を生んで、ウラノスとガイアの間にティターン族という巨大な神々が生まれた。これが世界の原型ね。"
+        subtitle: "そしてガイアは自分だけで息子のウラノス（空）を生んで、ウラノスとガイアの間にティターン族という巨大な神々が生まれた。これが世界の原型ね。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ガイア、ひとりで子供を産んだのだ！？"
+        subtitle: "ガイア、ひとりで子供を産んだのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "大地の女神だから。神話ではよくあることよ。大事なのはこの後——ウラノスがティターンたちを嫌って、ガイアのお腹の中に押し込めてしまうの。"
+        subtitle: "大地の女神だから。神話ではよくあることよ。大事なのはこの後——ウラノスがティターンたちを嫌って、ガイアのお腹の中に押し込めてしまうの。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "自分の子供を閉じ込めるの！？お父さんたちはひどいのだ……。"
+        subtitle: "自分の子供を閉じ込めるの！？お父さんたちはひどいのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "苦しんだガイアは末息子のクロノスに鎌を渡して、ウラノスを倒すよう頼む。クロノスはそれを実行して、ティターン族の時代が始まるの。"
+        subtitle: "苦しんだガイアは末息子のクロノスに鎌を渡して、ウラノスを倒すよう頼む。クロノスはそれを実行して、ティターン族の時代が始まるの。"
+
+  # ============================================================
+  # 3. 事件発生パート：ずんだもんが介入する
+  # ============================================================
+  - id: "incident-chaos-talk"
+    background: "./image/background/bg_myth_chaos.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ねえ、カオスさんいるのだ？"
+        subtitle: "ねえ、カオスさんいるのだ？"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "話しかけないで！カオスは存在であって人格じゃないから——"
+        subtitle: "話しかけないで！カオスは存在であって人格じゃないから——"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "あ、いたのだ！ずんだもんはずんだもんなのだ、よろしくなのだ！世界ってどうやって作るのだ？参考に聞いておきたいのだ！"
+        subtitle: "あ、いたのだ！ずんだもんはずんだもんなのだ、よろしくなのだ！世界ってどうやって作るのだ？参考に聞いておきたいのだ！"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "参考って何に使うの！？そしてカオスに話しかけるな！！"
+        subtitle: "参考って何に使うの！？そしてカオスに話しかけるな！！"
+
+  - id: "incident-gaia-appears"
+    background: "./image/background/bg_gaia_earth_zunda.png"
+    lines:
+      - type: narration
+        character: narrator
+        text: "その時、大地の女神・ガイアが生まれた。あたり一面に草と土が広がり始める。"
+        subtitle: "その時、大地の女神・ガイアが生まれた。あたり一面に草と土が広がり始める。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "あっ、大地が生まれたのだ！すごいのだ！ガイアさん、ずんだもんなのだ、よろしくなのだ！"
+        subtitle: "あっ、大地が生まれたのだ！すごいのだ！ガイアさん、ずんだもんなのだ、よろしくなのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "しゃべりかけないで！！神話の流れを乱すわよ！！"
+        subtitle: "しゃべりかけないで！！神話の流れを乱すわよ！！"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ガイアさん、せっかく大地を作るなら、ずんだもちの畑も作るのだ！ずんだ豆があれば食料は万全なのだ！"
+        subtitle: "ガイアさん、せっかく大地を作るなら、ずんだもちの畑も作るのだ！ずんだ豆があれば食料は万全なのだ！"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "世界の設計に枝豆畑を追加しようとしないで！！"
+        subtitle: "世界の設計に枝豆畑を追加しようとしないで！！"
+      - type: narration
+        character: narrator
+        text: "……なぜかガイアの生み出した大地の一角に、ずんだ豆によく似た謎の植物が生い茂った。"
+        subtitle: "……なぜかガイアの生み出した大地の一角に、ずんだ豆によく似た謎の植物が生い茂った。"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……ちょっと待って。神話の大地にずんだ豆が生えてる。"
+        subtitle: "……ちょっと待って。神話の大地にずんだ豆が生えてる。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "神話農業、スタートなのだ！"
+        subtitle: "神話農業、スタートなのだ！"
+
+  - id: "incident-uranus-advice"
+    background: "./image/background/bg_uranus_sky.png"
+    lines:
+      - type: narration
+        character: narrator
+        text: "次にウラノス（天空）が生まれ、ガイアの上に広がっていく。"
+        subtitle: "次にウラノス（天空）が生まれ、ガイアの上に広がっていく。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ウラノスさん！あのさ、ずんだもんに聞いてほしいことがあるのだ！"
+        subtitle: "ウラノスさん！あのさ、ずんだもんに聞いてほしいことがあるのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "やめて。"
+        subtitle: "やめて。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "これから子供たち生まれるじゃないですか。ティターン族。閉じ込めちゃだめなのだ！かわいそうなのだ！ちゃんと育ててほしいのだ！"
+        subtitle: "これから子供たち生まれるじゃないですか。ティターン族。閉じ込めちゃだめなのだ！かわいそうなのだ！ちゃんと育ててほしいのだ！"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "ネタバレを神様にするな！！未来のことを教えちゃったら神話の流れが変わる！！"
+        subtitle: "ネタバレを神様にするな！！未来のことを教えちゃったら神話の流れが変わる！！"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "だってかわいそうじゃないのだ！！ずんだもんはティターンたちの味方なのだ！！"
+        subtitle: "だってかわいそうじゃないのだ！！ずんだもんはティターンたちの味方なのだ！！"
+
+  # ============================================================
+  # 4. 混乱クライマックス
+  # ============================================================
+  - id: "climax-titan-chaos"
+    background: "./image/background/bg_uranus_sky.png"
+    lines:
+      - type: narration
+        character: narrator
+        text: "ずんだもんのアドバイスを聞いたウラノスは……なぜかティターン族を閉じ込めるのをやめた。"
+        subtitle: "ずんだもんのアドバイスを聞いたウラノスは……なぜかティターン族を閉じ込めるのをやめた。"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "神話が変わってる！！ウラノスがティターンを閉じ込めないから、ガイアが怒らない、クロノスが反乱しない……！"
+        subtitle: "神話が変わってる！！ウラノスがティターンを閉じ込めないから、ガイアが怒らない、クロノスが反乱しない……！"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "やったのだ！みんな仲良しになったのだ！ハッピーエンドなのだ！"
+        subtitle: "やったのだ！みんな仲良しになったのだ！ハッピーエンドなのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "ハッピーエンドじゃないのよ！！クロノスがゼウスの父親になって、ゼウスが生まれなかったら、ギリシャ神話が全部消えるのよ！！"
+        subtitle: "ハッピーエンドじゃないのよ！！クロノスがゼウスの父親になって、ゼウスが生まれなかったら、ギリシャ神話が全部消えるのよ！！"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "え、じゃあずんだもんはギリシャ神話を滅ぼしかけたのだ！？"
+        subtitle: "え、じゃあずんだもんはギリシャ神話を滅ぼしかけたのだ！？"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "そういうことよ！！早くウラノスを止めて元に戻して！！"
+        subtitle: "そういうことよ！！早くウラノスを止めて元に戻して！！"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ウラノスさん！！ずんだもんの言ったこと全部なかったことにしてほしいのだ！！子供は閉じ込めてほしいのだ！！"
+        subtitle: "ウラノスさん！！ずんだもんの言ったこと全部なかったことにしてほしいのだ！！子供は閉じ込めてほしいのだ！！"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "閉じ込めてほしいって言ってる人間……はじめて見た。"
+        subtitle: "閉じ込めてほしいって言ってる人間……はじめて見た。"
+      - type: narration
+        text: "ウラノスは混乱しつつも、元の予定通り行動を再開した。神話の流れが、なんとか元に戻った。"
+        subtitle: "ウラノスは混乱しつつも、元の予定通り行動を再開した。神話の流れが、なんとか元に戻った。"
+
+  - id: "climax-kronos-rebel"
+    background: "./image/background/bg_gaia_earth_zunda.png"
+    lines:
+      - type: narration
+        character: narrator
+        text: "苦しんだガイアはクロノスに鎌を渡し、クロノスはウラノスを倒して世界の支配者となった。"
+        subtitle: "苦しんだガイアはクロノスに鎌を渡し、クロノスはウラノスを倒して世界の支配者となった。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "よかった、なんとか神話が進んだ。でもずんだもんが余計なことをしたせいで……あの角のずんだ豆畑だけ残ってる。"
+        subtitle: "よかった、なんとか神話が進んだ。でもずんだもんが余計なことをしたせいで……あの角のずんだ豆畑だけ残ってる。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "やった！神話の世界にずんだもんの痕跡が残ったのだ！！"
+        subtitle: "やった！神話の世界にずんだもんの痕跡が残ったのだ！！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "それは痕跡じゃなくて汚点よ……。"
+        subtitle: "それは痕跡じゃなくて汚点よ……。"
+      - type: narration
+        character: narrator
+        text: "こうして、ギリシャ神話の天地創造は、少しだけ余分なずんだ豆畑を抱えながら、なんとか無事に完了した。"
+        subtitle: "こうして、ギリシャ神話の天地創造は、少しだけ余分なずんだ豆畑を抱えながら、なんとか無事に完了した。"
+
+  # ============================================================
+  # 5. オチ＆次回予告
+  # ============================================================
+  - id: "ending-return"
+    background: "./image/background/bg_space_intermediate.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "本に光が灯ったわ。「見届け完了」って書いてある。よかった、次の世界に行けそう。"
+        subtitle: "本に光が灯ったわ。「見届け完了」って書いてある。よかった、次の世界に行けそう。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ちなみに、あのずんだ豆畑、古代ギリシャの人たちはなんて呼んだのだろうのだ……。"
+        subtitle: "ちなみに、あのずんだ豆畑、古代ギリシャの人たちはなんて呼んだのだろうのだ……。"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "呼ばなくていい。歴史書に残さないで。"
+        subtitle: "呼ばなくていい。歴史書に残さないで。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "あ、めたん。今日って何がわかったのだ？ちゃんとまとめてほしいのだ。"
+        subtitle: "あ、めたん。今日って何がわかったのだ？ちゃんとまとめてほしいのだ。"
+
+  - id: "ending-summary"
+    background: "./image/background/bg_greek_temple_summary.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ギリシャ神話の世界は、カオス（混沌）から始まったの。そこからガイア・ウラノスが生まれ、ティターン族の時代が幕を開けた。"
+        subtitle: "ギリシャ神話の世界は、カオス（混沌）から始まったの。そこからガイア・ウラノスが生まれ、ティターン族の時代が幕を開けた。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "これはゼウスたちオリュンポスの神様が生まれるずっと前のお話。世界がどうやって形作られたか、その大本の話よ。"
+        subtitle: "これはゼウスたちオリュンポスの神様が生まれるずっと前のお話。世界がどうやって形作られたか、その大本の話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "でもずんだもんが行ったせいで、そこにずんだ豆畑ができたのだ！つまりずんだもんも神話に参加したのだ！！"
+        subtitle: "でもずんだもんが行ったせいで、そこにずんだ豆畑ができたのだ！つまりずんだもんも神話に参加したのだ！！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……参加じゃなくて乱入よ。"
+        subtitle: "……参加じゃなくて乱入よ。"
+
+  - id: "ending-next-preview"
+    background: "./image/background/bg_greek_temple_summary.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回はティターン族の王・クロノスのもとに生まれた息子ゼウスが、どうやってお父さんに立ち向かうかのお話よ。"
+        subtitle: "次回はティターン族の王・クロノスのもとに生まれた息子ゼウスが、どうやってお父さんに立ち向かうかのお話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "また父親に立ち向かう話なのだ！ギリシャ神話ってお父さんが大変な目に遭いがちなのだ！"
+        subtitle: "また父親に立ち向かう話なのだ！ギリシャ神話ってお父さんが大変な目に遭いがちなのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。そしてずんだもんが次も何かやらかす予感しかしないわ。"
+        subtitle: "そう。そしてずんだもんが次も何かやらかす予感しかしないわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "やらかさないのだ！……たぶん。チャンネル登録と高評価よろしくなのだ！次もよろしくなのだ！"
+        subtitle: "やらかさないのだ！……たぶん。チャンネル登録と高評価よろしくなのだ！次もよろしくなのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "「たぶん」って言ったわね。また来週！"
+        subtitle: "「たぶん」って言ったわね。また来週！"
