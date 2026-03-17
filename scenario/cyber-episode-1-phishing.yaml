@@ -1,0 +1,370 @@
+title: "第1話 消えた10万円――フィッシング詐欺の罠"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#00CCFF"
+    voice:
+      speedScale: 1.1
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.2
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/bg_cyber_office_night.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "op-hook"
+    background: "./image/background/bg_cyber_city_rain.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ここは、デジタルの闇を照らす探偵事務所。ずんだもん＆めたんサイバー探偵事務所なのだ！"
+        subtitle: "ここは、デジタルの闇を照らす探偵事務所。ずんだもん＆めたんサイバー探偵事務所なのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "……ずんだもん、看板の文字、間違えてるわよ。「ずんだもん＆」じゃなくて「めたん＆ずんだもん」。"
+        subtitle: "……ずんだもん、看板の文字、間違えてるわよ。「ずんだもん＆」じゃなくて「めたん＆ずんだもん」。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "細かいことはいいのだ！それより今日も依頼が来てるのだ！"
+        subtitle: "細かいことはいいのだ！それより今日も依頼が来てるのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "……はぁ。毎回こうなのよ。"
+        subtitle: "……はぁ。毎回こうなのよ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ネット上で起きる事件を、わたしたちが解決するのだ！今日の事件は——口座から突然、10万円が消えた、という話なのだ！"
+        subtitle: "ネット上で起きる事件を、わたしたちが解決するのだ！今日の事件は——口座から突然、10万円が消えた、という話なのだ！"
+
+  - id: "client-arrival"
+    background: "./image/background/bg_cyber_office_night.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "依頼人は大学3年生のユイさん。昨日、銀行口座から10万円が引き出されていることに気づいて、相談に来たの。"
+        subtitle: "依頼人は大学3年生のユイさん。昨日、銀行口座から10万円が引き出されていることに気づいて、相談に来たの。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "10万円……！ゆいさん、心当たりはないのだ？ATMで引き出したとか？"
+        subtitle: "10万円……！ゆいさん、心当たりはないのだ？ATMで引き出したとか？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "本人は身に覚えがないと言っているわ。でも、3日前に銀行からメールが届いて、リンクをクリックしてログインしたそうよ。"
+        subtitle: "本人は身に覚えがないと言っているわ。でも、3日前に銀行からメールが届いて、リンクをクリックしてログインしたそうよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "銀行からのメール？それの何が問題なのだ？"
+        subtitle: "銀行からのメール？それの何が問題なのだ？"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……それが問題なの。そのメールを見せてもらえる？"
+        subtitle: "……それが問題なの。そのメールを見せてもらえる？"
+
+  - id: "email-investigation"
+    background: "./image/background/bg_hacker_screen_blue.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "メールを解析するわ。ずんだもん、画面を見てて。"
+        subtitle: "メールを解析するわ。ずんだもん、画面を見てて。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "うん……なんか普通のメールに見えるのだ。「ご利用のアカウントに不正アクセスの疑いがあります。24時間以内にご確認ください」って書いてあるのだ。"
+        subtitle: "うん……なんか普通のメールに見えるのだ。「ご利用のアカウントに不正アクセスの疑いがあります。24時間以内にご確認ください」って書いてあるのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "見た目はね。でもメールには、表示されている部分以外に「ヘッダー」という隠れた情報があるの。そこを見れば、本当の送信元がわかる。"
+        subtitle: "見た目はね。でもメールには、表示されている部分以外に「ヘッダー」という隠れた情報があるの。そこを見れば、本当の送信元がわかる。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "隠れた情報があるのだ！？"
+        subtitle: "隠れた情報があるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ヘッダーを展開すると……送信元IPアドレスが海外のサーバーになってるわ。正規の銀行から送られていない。"
+        subtitle: "ヘッダーを展開すると……送信元IPアドレスが海外のサーバーになってるわ。正規の銀行から送られていない。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "じゃあこのメール、本物の銀行じゃない人が送ったのだ……？"
+        subtitle: "じゃあこのメール、本物の銀行じゃない人が送ったのだ……？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。これがフィッシングメール。本物そっくりのメールを送って、偽サイトに誘導する攻撃よ。"
+        subtitle: "そう。これがフィッシングメール。本物そっくりのメールを送って、偽サイトに誘導する攻撃よ。"
+
+  - id: "domain-spoofing"
+    background: "./image/background/bg_hacker_screen_blue.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に、メールに貼られていたリンクのURLを調べるわ。"
+        subtitle: "次に、メールに貼られていたリンクのURLを調べるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "URLって……「https://」で始まってれば安全なのだ？"
+        subtitle: "URLって……「https://」で始まってれば安全なのだ？"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "それが大きな誤解なの。httpsは「通信が暗号化されている」という意味だけ。偽サイトでも普通にhttpsは使えるのよ。"
+        subtitle: "それが大きな誤解なの。httpsは「通信が暗号化されている」という意味だけ。偽サイトでも普通にhttpsは使えるのよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ！鍵マークがついてても危ないのだ！？"
+        subtitle: "えっ！鍵マークがついてても危ないのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。それより重要なのはドメイン名よ。このURLを見て。「mufg-bank-secure.com」……本物はどこかわかる？"
+        subtitle: "そう。それより重要なのはドメイン名よ。このURLを見て。「mufg-bank-secure.com」……本物はどこかわかる？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "「mufg」って入ってるから本物っぽいのだ……でも何かが違う気がするのだ。"
+        subtitle: "「mufg」って入ってるから本物っぽいのだ……でも何かが違う気がするのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。本物のドメインは「bk.mufg.jp」。でもこの偽ドメインは「.com」で終わっていて、しかも「mufg」の前後にダミーの文字が入っている。"
+        subtitle: "正解。本物のドメインは「bk.mufg.jp」。でもこの偽ドメインは「.com」で終わっていて、しかも「mufg」の前後にダミーの文字が入っている。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "これがドメインスプーフィング。本物に似せた偽ドメインを作る手口よ。急いでいたり、確認が甘かったりすると気づけないの。"
+        subtitle: "これがドメインスプーフィング。本物に似せた偽ドメインを作る手口よ。急いでいたり、確認が甘かったりすると気づけないの。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "ゆいさんも、「24時間以内に」って書いてあって焦ってたって言ってたのだ……。"
+        subtitle: "ゆいさんも、「24時間以内に」って書いてあって焦ってたって言ってたのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこなの。焦りを引き起こすのが、フィッシングの重要な手口なのよ。"
+        subtitle: "そこなの。焦りを引き起こすのが、フィッシングの重要な手口なのよ。"
+
+  - id: "zundamon-intuition"
+    background: "./image/background/bg_cyber_office_night.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ねえ、めたん。さっきゆいさんが言ってたんだけど……ログインしたあと、「いつもと違って操作がもたついた」って言ってたのだ。"
+        subtitle: "ねえ、めたん。さっきゆいさんが言ってたんだけど……ログインしたあと、「いつもと違って操作がもたついた」って言ってたのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "……それ、重要な証言かもしれないわ。どんな動作だったか聞いた？"
+        subtitle: "……それ、重要な証言かもしれないわ。どんな動作だったか聞いた？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "「ログインしたら一瞬待たされて、それから本物のページに飛んだ」って。最初はエラーかと思ったって。"
+        subtitle: "「ログインしたら一瞬待たされて、それから本物のページに飛んだ」って。最初はエラーかと思ったって。"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "……それよ。完璧に裏付けられたわ。"
+        subtitle: "……それよ。完璧に裏付けられたわ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "どういうことなのだ？"
+        subtitle: "どういうことなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "偽サイトにIDとパスワードを入力した瞬間、攻撃者がそれを本物のサイトに自動で使って、本物のセッションを乗っ取っていたの。"
+        subtitle: "偽サイトにIDとパスワードを入力した瞬間、攻撃者がそれを本物のサイトに自動で使って、本物のセッションを乗っ取っていたの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「一瞬待たされた」のは、その中継処理が走っていた時間よ。ユイさんは本物のページに誘導されたから、本物だと信じたまま終わった。"
+        subtitle: "「一瞬待たされた」のは、その中継処理が走っていた時間よ。ユイさんは本物のページに誘導されたから、本物だと信じたまま終わった。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "偽サイトが中継役になって、本物と通信してたのだ……！？"
+        subtitle: "偽サイトが中継役になって、本物と通信してたのだ……！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。これをリアルタイムフィッシング、またはMITM——中間者攻撃と呼ぶわ。2段階認証すら突破できる高度な手口よ。"
+        subtitle: "そう。これをリアルタイムフィッシング、またはMITM——中間者攻撃と呼ぶわ。2段階認証すら突破できる高度な手口よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ずんだもんの「なんか変だった」って気づきが、決め手になったのだ！"
+        subtitle: "ずんだもんの「なんか変だった」って気づきが、決め手になったのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "……今回は、あなたの直感が役立ったわね。認めるわ。"
+        subtitle: "……今回は、あなたの直感が役立ったわね。認めるわ。"
+
+  - id: "resolution"
+    background: "./image/background/bg_cyber_office_night.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "攻撃者は偽ドメインのサーバーを特定できたわ。IPアドレスをたどると、海外の有料VPNサービスを経由していた。"
+        subtitle: "攻撃者は偽ドメインのサーバーを特定できたわ。IPアドレスをたどると、海外の有料VPNサービスを経由していた。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "犯人は捕まらないのだ？"
+        subtitle: "犯人は捕まらないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "個人で追うのは難しい。でも証拠を固めて警察のサイバー犯罪相談窓口に提出することはできる。そこから先は捜査機関の仕事よ。"
+        subtitle: "個人で追うのは難しい。でも証拠を固めて警察のサイバー犯罪相談窓口に提出することはできる。そこから先は捜査機関の仕事よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ユイさんには今すぐ銀行に被害報告して、パスワードを変更し、不正引き出しの補償申請をするよう伝えたわ。"
+        subtitle: "ユイさんには今すぐ銀行に被害報告して、パスワードを変更し、不正引き出しの補償申請をするよう伝えたわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "補償があるのだ！？よかったのだ！"
+        subtitle: "補償があるのだ！？よかったのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "多くの銀行では、フィッシング被害に対して補償制度があるの。でも気づかず放置すると手続きが難しくなるから、すぐに動くことが大事よ。"
+        subtitle: "多くの銀行では、フィッシング被害に対して補償制度があるの。でも気づかず放置すると手続きが難しくなるから、すぐに動くことが大事よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "今回の事件、解決なのだ！"
+        subtitle: "今回の事件、解決なのだ！"
+
+  - id: "security-lecture"
+    background: "./image/background/bg_lecture_board_cyber.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここで「めたんのセキュリティ講座」のコーナーよ。今回の事件をふまえて、フィッシング詐欺から身を守る方法を教えるわ。"
+        subtitle: "ここで「めたんのセキュリティ講座」のコーナーよ。今回の事件をふまえて、フィッシング詐欺から身を守る方法を教えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんなも気をつけてほしいのだ！"
+        subtitle: "みんなも気をつけてほしいのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず一つ目。メールのリンクは絶対にクリックしないこと。銀行や公的機関からのメールでも、リンクは踏まずに、自分でブラウザからURLを打ち込むか、公式アプリを使ってね。"
+        subtitle: "まず一つ目。メールのリンクは絶対にクリックしないこと。銀行や公的機関からのメールでも、リンクは踏まずに、自分でブラウザからURLを打ち込むか、公式アプリを使ってね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "二つ目。「24時間以内に」「緊急」「アカウント停止」などの言葉は要注意。焦りを利用するのがフィッシングの常套手段よ。焦ったときこそ、一度立ち止まって。"
+        subtitle: "二つ目。「24時間以内に」「緊急」「アカウント停止」などの言葉は要注意。焦りを利用するのがフィッシングの常套手段よ。焦ったときこそ、一度立ち止まって。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三つ目。URLのドメイン名を必ず確認。「https://」や鍵マークだけでは安全の証明にはならない。重要なのはドメイン名の本体部分よ。"
+        subtitle: "三つ目。URLのドメイン名を必ず確認。「https://」や鍵マークだけでは安全の証明にはならない。重要なのはドメイン名の本体部分よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四つ目。パスキーや物理セキュリティキーを使った認証を導入すること。MITMフィッシングは2段階認証でも突破されるケースがあるけど、パスキーはURLを検証するから偽サイトには機能しないの。"
+        subtitle: "四つ目。パスキーや物理セキュリティキーを使った認証を導入すること。MITMフィッシングは2段階認証でも突破されるケースがあるけど、パスキーはURLを検証するから偽サイトには機能しないの。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "まとめると、「リンクを踏まない」「焦らない」「ドメインを確認する」「パスキーを使う」の4つなのだ！"
+        subtitle: "まとめると、「リンクを踏まない」「焦らない」「ドメインを確認する」「パスキーを使う」の4つなのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "ちゃんとまとめられたじゃない。"
+        subtitle: "ちゃんとまとめられたじゃない。"
+
+  - id: "ending"
+    background: "./image/background/bg_cyber_city_rain.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "でも、ずんだもんは思うのだ。ゆいさんは悪くないのだ。あれだけ本物そっくりのメールが来たら、誰でも引っかかるのだ。"
+        subtitle: "でも、ずんだもんは思うのだ。ゆいさんは悪くないのだ。あれだけ本物そっくりのメールが来たら、誰でも引っかかるのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そうよ。フィッシングは「騙される人が悪い」じゃなくて、「騙す仕組みを知って防ぐ」問題なの。知識が、最大の防御よ。"
+        subtitle: "そうよ。フィッシングは「騙される人が悪い」じゃなくて、「騙す仕組みを知って防ぐ」問題なの。知識が、最大の防御よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "だから、わたしたちが毎回事件を解き明かして、みんなに伝えるのだ！"
+        subtitle: "だから、わたしたちが毎回事件を解き明かして、みんなに伝えるのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回は、「パスワードが盗まれた」事件を扱うわ。実は世界中で毎秒起きているパスワードリスト攻撃の話よ。"
+        subtitle: "次回は、「パスワードが盗まれた」事件を扱うわ。実は世界中で毎秒起きているパスワードリスト攻撃の話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "毎秒！？パスワード、見直した方がいい気がしてきたのだ……。"
+        subtitle: "毎秒！？パスワード、見直した方がいい気がしてきたのだ……。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう感じてくれたなら、今日の動画を見た意味があったわね。"
+        subtitle: "そう感じてくれたなら、今日の動画を見た意味があったわね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価、よろしくなのだ！ずんだもんはずんだもちで英気を養って、次の事件に備えるのだ！"
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！ずんだもんはずんだもちで英気を養って、次の事件に備えるのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "探偵がずんだもちで英気を養うのはどうかと思うけど……またね！"
+        subtitle: "探偵がずんだもちで英気を養うのはどうかと思うけど……またね！"

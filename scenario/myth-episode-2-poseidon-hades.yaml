@@ -1,0 +1,501 @@
+title: "第2話 ポセイドンとハデス――同じ兄弟なのに、なぜこんなに違うの？"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.2
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/bg_greek_temple_1773641171319.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "op-hook"
+    background: "./image/background/bg_space_stars_1773641136109.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんなー！ずんだもんなのだ！今日もギリシャ神話、いくのだ！"
+        subtitle: "みんなー！ずんだもんなのだ！今日もギリシャ神話、いくのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんです。前回はゼウスについて話したわね。"
+        subtitle: "四国めたんです。前回はゼウスについて話したわね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "最強なのに人間くさい神様だったのだ！"
+        subtitle: "最強なのに人間くさい神様だったのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日はゼウスの兄弟、ポセイドンとハデスを紹介するわ。"
+        subtitle: "今日はゼウスの兄弟、ポセイドンとハデスを紹介するわ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "同じ兄弟なのに、性格が真逆なの。しかもどちらもめちゃくちゃ個性的で面白いのよ。"
+        subtitle: "同じ兄弟なのに、性格が真逆なの。しかもどちらもめちゃくちゃ個性的で面白いのよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "どっちが好きになるか楽しみなのだ！"
+        subtitle: "どっちが好きになるか楽しみなのだ！"
+
+  - id: "world-divided"
+    background: "./image/background/bg_world_map_1773641156482.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "前回、ゼウスたち三兄弟がティターン族を倒したあと、くじ引きで世界を分け合ったという話をしたわね。"
+        subtitle: "前回、ゼウスたち三兄弟がティターン族を倒したあと、くじ引きで世界を分け合ったという話をしたわね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ゼウスが空、ポセイドンが海、ハデスが冥界だったのだ。"
+        subtitle: "ゼウスが空、ポセイドンが海、ハデスが冥界だったのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。大地と山はどの神も使えるけど、それ以外の領域は完全に分かれているの。"
+        subtitle: "そう。大地と山はどの神も使えるけど、それ以外の領域は完全に分かれているの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "当時の古代ギリシャ人にとって、世界は「天・海・地下」の三層構造で成り立っていたの。この分け方がそのままギリシャ神話の世界観になっているわ。"
+        subtitle: "当時の古代ギリシャ人にとって、世界は「天・海・地下」の三層構造で成り立っていたの。この分け方がそのままギリシャ神話の世界観になっているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "じゃあ今日は、海の神ポセイドンと地下の神ハデスを詳しく教えてほしいのだ！"
+        subtitle: "じゃあ今日は、海の神ポセイドンと地下の神ハデスを詳しく教えてほしいのだ！"
+
+  - id: "poseidon-intro"
+    background: "./image/background/bg_poseidon_sea_1773746729041.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まずはポセイドン。海・嵐・地震を司る神様よ。"
+        subtitle: "まずはポセイドン。海・嵐・地震を司る神様よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "地震も担当してるのだ！？海だけじゃないのだ？"
+        subtitle: "地震も担当してるのだ！？海だけじゃないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "古代ギリシャでは、地震は海の底からくるものと考えられていたの。だからポセイドンの別名は「大地を揺るがす者」。"
+        subtitle: "古代ギリシャでは、地震は海の底からくるものと考えられていたの。だからポセイドンの別名は「大地を揺るがす者」。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "武器は三叉槍（トリアイナ）。これを地面に打ちつければ大地震が起き、海に投げれば大嵐が起きるとされているわ。"
+        subtitle: "武器は三叉槍（トリアイナ）。これを地面に打ちつければ大地震が起き、海に投げれば大嵐が起きるとされているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ゼウスの雷に負けない強さなのだ！"
+        subtitle: "ゼウスの雷に負けない強さなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そうね。実際、ポセイドンはゼウスと何度も張り合っているの。基本的に気性が荒くて、プライドが高い神様よ。"
+        subtitle: "そうね。実際、ポセイドンはゼウスと何度も張り合っているの。基本的に気性が荒くて、プライドが高い神様よ。"
+
+  - id: "poseidon-personality"
+    background: "./image/background/bg_poseidon_sea_1773746729041.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "気性が荒いって、どんなエピソードがあるのだ？"
+        subtitle: "気性が荒いって、どんなエピソードがあるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "有名なのがオデュッセウスとの話ね。トロイア戦争で活躍した英雄オデュッセウスが、帰り道に嵐に遭い続けて故郷まで10年かかった話を聞いたことある？"
+        subtitle: "有名なのがオデュッセウスとの話ね。トロイア戦争で活躍した英雄オデュッセウスが、帰り道に嵐に遭い続けて故郷まで10年かかった話を聞いたことある？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "なんとなく聞いたことあるのだ。なんで10年もかかるのだ？"
+        subtitle: "なんとなく聞いたことあるのだ。なんで10年もかかるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "オデュッセウスがポセイドンの息子・キュクロプスの目を潰したから、ポセイドンが怒り続けて、帰り道をずっと邪魔し続けたの。"
+        subtitle: "オデュッセウスがポセイドンの息子・キュクロプスの目を潰したから、ポセイドンが怒り続けて、帰り道をずっと邪魔し続けたの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "10年もずっと根に持ってるのだ！？"
+        subtitle: "10年もずっと根に持ってるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ポセイドンは怒ったら徹底的。でもその分、味方についてもらえたら心強いの。海の恵みも嵐も、全部ポセイドンの機嫌次第だから、船乗りたちは必死にポセイドンを祀っていたわ。"
+        subtitle: "ポセイドンは怒ったら徹底的。でもその分、味方についてもらえたら心強いの。海の恵みも嵐も、全部ポセイドンの機嫌次第だから、船乗りたちは必死にポセイドンを祀っていたわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "古代ギリシャって海の民だから、ポセイドンは超重要な神様なのだ！"
+        subtitle: "古代ギリシャって海の民だから、ポセイドンは超重要な神様なのだ！"
+
+  - id: "poseidon-athens"
+    background: "./image/background/bg_greek_temple_1773641171319.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ポセイドンには、有名な「負けた話」もあるの。アテナイ（今のアテネ）という都市を巡るポセイドンと女神アテナの争いよ。"
+        subtitle: "ポセイドンには、有名な「負けた話」もあるの。アテナイ（今のアテネ）という都市を巡るポセイドンと女神アテナの争いよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "都市を巡って神様同士で戦ったのだ？"
+        subtitle: "都市を巡って神様同士で戦ったのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "戦争じゃなくて、どちらが都市の守護神になるか、「より良い贈り物をした方が勝ち」という勝負ね。"
+        subtitle: "戦争じゃなくて、どちらが都市の守護神になるか、「より良い贈り物をした方が勝ち」という勝負ね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ポセイドンは三叉槍で岩を割り、海水の泉を出現させたの。アテナは地面に槍を刺し、オリーブの木を生えさせた。"
+        subtitle: "ポセイドンは三叉槍で岩を割り、海水の泉を出現させたの。アテナは地面に槍を刺し、オリーブの木を生えさせた。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "海水の泉って……飲めないのだ。オリーブの木の方が絶対役立つのだ。"
+        subtitle: "海水の泉って……飲めないのだ。オリーブの木の方が絶対役立つのだ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう！市民もそう判断して、アテナが勝利したの。ポセイドンはかなり悔しがったって言われているわ。"
+        subtitle: "そう！市民もそう判断して、アテナが勝利したの。ポセイドンはかなり悔しがったって言われているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "強さ自慢はできても、実用性では負けたのだ。なんか親近感わくのだ。"
+        subtitle: "強さ自慢はできても、実用性では負けたのだ。なんか親近感わくのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "こういうところがギリシャ神話の面白さよね。最強に近い神様でも、勝てない相手や場面がある。"
+        subtitle: "こういうところがギリシャ神話の面白さよね。最強に近い神様でも、勝てない相手や場面がある。"
+
+  - id: "hades-intro"
+    background: "./image/background/bg_hades_underworld_1773746751726.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "じゃあ次はハデスなのだ。冥界の神って、怖そうなのだ……。"
+        subtitle: "じゃあ次はハデスなのだ。冥界の神って、怖そうなのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう思われがちなんだけど、実はハデスはギリシャ神話の中で誠実さで知られた神様なの。"
+        subtitle: "そう思われがちなんだけど、実はハデスはギリシャ神話の中で誠実さで知られた神様なの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "冥界の王なのに誠実なのだ！？"
+        subtitle: "冥界の王なのに誠実なのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ハデスは死者の魂を公平に裁き、秩序ある冥界を管理しているの。気まぐれに人を呪ったり、理不尽に罰したりしない。むしろ「ルールを守る者」よ。"
+        subtitle: "ハデスは死者の魂を公平に裁き、秩序ある冥界を管理しているの。気まぐれに人を呪ったり、理不尽に罰したりしない。むしろ「ルールを守る者」よ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "でも怖いイメージはなんでついたのだ？"
+        subtitle: "でも怖いイメージはなんでついたのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ハデスは「死の神」ではなく「死後の世界の支配者」なの。でも古代ギリシャ人は死そのものを恐れていたから、冥界の王=怖い、というイメージが定着したのよ。"
+        subtitle: "ハデスは「死の神」ではなく「死後の世界の支配者」なの。でも古代ギリシャ人は死そのものを恐れていたから、冥界の王=怖い、というイメージが定着したのよ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "実際、古代ギリシャ人はハデスの名前を直接口にするのを嫌って、「富める者」を意味するプルートンという呼び名をよく使っていたわ。"
+        subtitle: "実際、古代ギリシャ人はハデスの名前を直接口にするのを嫌って、「富める者」を意味するプルートンという呼び名をよく使っていたわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "プルートン……あ！冥王星のプルートはここからきてるのだ！"
+        subtitle: "プルートン……あ！冥王星のプルートはここからきてるのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう！よく知ってたわね。ローマ神話ではハデスはプルートとして知られていて、太陽系の惑星の名前もここからついているの。"
+        subtitle: "そう！よく知ってたわね。ローマ神話ではハデスはプルートとして知られていて、太陽系の惑星の名前もここからついているの。"
+
+  - id: "hades-underworld"
+    background: "./image/background/bg_hades_underworld_1773746751726.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "冥界ってどんな場所なのだ？"
+        subtitle: "冥界ってどんな場所なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "地下深くにある死者の世界ね。入り口には番犬ケルベロスが立っていて、死者が逃げないよう見張っているの。"
+        subtitle: "地下深くにある死者の世界ね。入り口には番犬ケルベロスが立っていて、死者が逃げないよう見張っているの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ケルベロス！頭が三つある犬なのだ！？"
+        subtitle: "ケルベロス！頭が三つある犬なのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。冥界には「スティクス川」が流れていて、死者はカローンという渡し守に硬貨を渡して川を渡るの。だから古代ギリシャでは、死者の口やまぶたに硬貨を乗せて埋葬していたわ。"
+        subtitle: "そう。冥界には「スティクス川」が流れていて、死者はカローンという渡し守に硬貨を渡して川を渡るの。だから古代ギリシャでは、死者の口やまぶたに硬貨を乗せて埋葬していたわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ちゃんと「料金」があるのだ！システム的なのだ。"
+        subtitle: "ちゃんと「料金」があるのだ！システム的なのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "冥界には三人の裁判官がいて、生前の行いに応じて行き先が決まるの。善人は楽園「エリュシオン」へ、悪人は罰の場所「タルタロス」へ。"
+        subtitle: "冥界には三人の裁判官がいて、生前の行いに応じて行き先が決まるの。善人は楽園「エリュシオン」へ、悪人は罰の場所「タルタロス」へ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "天国と地獄みたいなのだ！"
+        subtitle: "天国と地獄みたいなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "現代の天国・地獄の概念のルーツのひとつが、ギリシャ神話の冥界ともいわれているわ。"
+        subtitle: "現代の天国・地獄の概念のルーツのひとつが、ギリシャ神話の冥界ともいわれているわ。"
+
+  - id: "hades-persephone"
+    background: "./image/background/bg_persephone_field_1773746767551.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ハデスって、ずっと冥界にひとりでいるのだ？なんか孤独なのだ……。"
+        subtitle: "ハデスって、ずっと冥界にひとりでいるのだ？なんか孤独なのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "実はハデスには、ペルセポネーという奥さんがいるの。これがギリシャ神話の中でも特に有名な話よ。"
+        subtitle: "実はハデスには、ペルセポネーという奥さんがいるの。これがギリシャ神話の中でも特に有名な話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "どんな話なのだ！？"
+        subtitle: "どんな話なのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ペルセポネーは豊穣の女神デメテルの娘で、地上で花を摘んでいたところ、ハデスが地面を割って現れて冥界へ連れ去ってしまったの。"
+        subtitle: "ペルセポネーは豊穣の女神デメテルの娘で、地上で花を摘んでいたところ、ハデスが地面を割って現れて冥界へ連れ去ってしまったの。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "突然すぎるのだ……！"
+        subtitle: "突然すぎるのだ……！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "母のデメテルは娘を探し続けて、悲しみのあまり作物を育てるのをやめてしまったの。地上は冬になり、人間も飢えていったわ。"
+        subtitle: "母のデメテルは娘を探し続けて、悲しみのあまり作物を育てるのをやめてしまったの。地上は冬になり、人間も飢えていったわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "お母さんのストライキで冬が起きたのだ！"
+        subtitle: "お母さんのストライキで冬が起きたのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスが仲介して、ペルセポネーを地上に戻す約束が取り付けられたの。でもペルセポネーが冥界でザクロを6粒食べてしまっていた。"
+        subtitle: "ゼウスが仲介して、ペルセポネーを地上に戻す約束が取り付けられたの。でもペルセポネーが冥界でザクロを6粒食べてしまっていた。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "なんでザクロを食べたらダメなのだ？"
+        subtitle: "なんでザクロを食べたらダメなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "冥界の食べ物を口にした者は、冥界に縛られる、というルールがあるの。だから1年のうち6ヶ月は地上に戻れるけど、残りの6ヶ月はハデスのもとに戻らなければならなくなったの。"
+        subtitle: "冥界の食べ物を口にした者は、冥界に縛られる、というルールがあるの。だから1年のうち6ヶ月は地上に戻れるけど、残りの6ヶ月はハデスのもとに戻らなければならなくなったの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "デメテルはペルセポネーが冥界にいる6ヶ月だけ悲しんで作物を育てなくなる。これが「冬」の起源の神話よ。"
+        subtitle: "デメテルはペルセポネーが冥界にいる6ヶ月だけ悲しんで作物を育てなくなる。これが「冬」の起源の神話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "季節の説明が神様の家族ドラマと結びついてるのだ！すごい発想なのだ！"
+        subtitle: "季節の説明が神様の家族ドラマと結びついてるのだ！すごい発想なのだ！"
+
+  - id: "hades-true-nature"
+    background: "./image/background/bg_hades_underworld_1773746751726.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "でも……ペルセポネーを連れ去ったのはひどいのだ。ハデスって本当に誠実な神様なのだ？"
+        subtitle: "でも……ペルセポネーを連れ去ったのはひどいのだ。ハデスって本当に誠実な神様なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "現代の感覚では確かに問題よね。でも古代ギリシャの文脈で見ると、ハデスは一度も浮気をしなかった珍しい神様なの。"
+        subtitle: "現代の感覚では確かに問題よね。でも古代ギリシャの文脈で見ると、ハデスは一度も浮気をしなかった珍しい神様なの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ゼウスもポセイドンも浮気ばっかりなのに、ハデスだけ一途なのだ！"
+        subtitle: "ゼウスもポセイドンも浮気ばっかりなのに、ハデスだけ一途なのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。ペルセポネーを冥界に来てほしかったけど、一人では心細くて……という解釈もできるの。"
+        subtitle: "そう。ペルセポネーを冥界に来てほしかったけど、一人では心細くて……という解釈もできるの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "しかも冥界に来てからは、ペルセポネーを女王として丁重に扱い、二人で冥界を治めたと言われているわ。"
+        subtitle: "しかも冥界に来てからは、ペルセポネーを女王として丁重に扱い、二人で冥界を治めたと言われているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "不器用な愛情表現の神様なのだ。ギリシャ神話って、誰が正しいかわからない話が多いのだ。"
+        subtitle: "不器用な愛情表現の神様なのだ。ギリシャ神話って、誰が正しいかわからない話が多いのだ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "前回も言ったけど、それこそがギリシャ神話の魅力なの。"
+        subtitle: "前回も言ったけど、それこそがギリシャ神話の魅力なの。"
+
+  - id: "three-brothers-comparison"
+    background: "./image/background/bg_olympus_palace_1773641201610.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ゼウス・ポセイドン・ハデスって、同じ兄弟なのにぜんぜん違うのだ。"
+        subtitle: "ゼウス・ポセイドン・ハデスって、同じ兄弟なのにぜんぜん違うのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "整理してみると面白いわよ。ゼウスは「政治家タイプ」。実力もあるけど、人間関係が複雑で悩んでいる。"
+        subtitle: "整理してみると面白いわよ。ゼウスは「政治家タイプ」。実力もあるけど、人間関係が複雑で悩んでいる。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ポセイドンは「熱血タイプ」。感情的で根に持つけど、仲間には頼りになる。"
+        subtitle: "ポセイドンは「熱血タイプ」。感情的で根に持つけど、仲間には頼りになる。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ハデスは「職人タイプ」。黙々と冥界を管理して、不平を言わない。一途だけど不器用。"
+        subtitle: "ハデスは「職人タイプ」。黙々と冥界を管理して、不平を言わない。一途だけど不器用。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "三者三様なのだ！誰かに親近感を持ちそうなのだ！"
+        subtitle: "三者三様なのだ！誰かに親近感を持ちそうなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ギリシャ神話が3000年も語り継がれているのは、こういうキャラクターが人間の様々な側面を体現しているからだと思うわ。"
+        subtitle: "ギリシャ神話が3000年も語り継がれているのは、こういうキャラクターが人間の様々な側面を体現しているからだと思うわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "「自分はゼウス派かな」「ハデスに共感するな」ってなるのだ！"
+        subtitle: "「自分はゼウス派かな」「ハデスに共感するな」ってなるのだ！"
+
+  - id: "summary"
+    background: "./image/background/bg_greek_temple_summary.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のまとめね。"
+        subtitle: "今日のまとめね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ポセイドンは海・嵐・地震の神。気性が荒くプライドが高いけど、感情が豊かで本物の力を持つ神様。"
+        subtitle: "ポセイドンは海・嵐・地震の神。気性が荒くプライドが高いけど、感情が豊かで本物の力を持つ神様。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ハデスは冥界の王。怖いイメージがあるけど、実は公平で誠実、そして一途な神様。ペルセポネーとの神話は「季節」の起源にもなっているわ。"
+        subtitle: "ハデスは冥界の王。怖いイメージがあるけど、実は公平で誠実、そして一途な神様。ペルセポネーとの神話は「季節」の起源にもなっているわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三兄弟を知るだけで、ギリシャ神話の世界がぐっと広がるわ。ゼウスが「空」、ポセイドンが「海」、ハデスが「地下」を治める。この構造がギリシャ人の世界観の骨格なの。"
+        subtitle: "三兄弟を知るだけで、ギリシャ神話の世界がぐっと広がるわ。ゼウスが「空」、ポセイドンが「海」、ハデスが「地下」を治める。この構造がギリシャ人の世界観の骨格なの。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "冥界って怖いだけじゃなくて、ちゃんとしたシステムがあって、家族の物語もあるのだ。イメージ変わったのだ！"
+        subtitle: "冥界って怖いだけじゃなくて、ちゃんとしたシステムがあって、家族の物語もあるのだ。イメージ変わったのだ！"
+
+  - id: "ending"
+    background: "./image/background/bg_greek_temple_summary.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回は、知恵の神アテナの話をするわ。ゼウスの頭から生まれた、という誕生のエピソードから、なぜアテナが「知恵」の神なのかまでを解説するわよ。"
+        subtitle: "次回は、知恵の神アテナの話をするわ。ゼウスの頭から生まれた、という誕生のエピソードから、なぜアテナが「知恵」の神なのかまでを解説するわよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "頭から生まれるのだ！？どういうことなのだ！？続きが気になりすぎるのだ！"
+        subtitle: "頭から生まれるのだ！？どういうことなのだ！？続きが気になりすぎるのだ！"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価、ぜひよろしくなのだ！ずんだもんは今日もずんだもちが食べたいのだ！"
+        subtitle: "チャンネル登録と高評価、ぜひよろしくなのだ！ずんだもんは今日もずんだもちが食べたいのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "毎回そこは変わらないのね。それじゃあ、またね！"
+        subtitle: "毎回そこは変わらないのね。それじゃあ、またね！"
