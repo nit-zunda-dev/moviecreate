@@ -1,0 +1,547 @@
+title: "第3話 ゼウスの頭から生まれた知恵の神――アテナはなぜギリシャ神話最強の「知」の女神なのか"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.2
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/bg_greek_temple_1773641171319.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "op-hook"
+    background: "./image/background/bg_space_stars_1773641136109.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんなー！ずんだもんなのだ！今日もギリシャ神話いくのだ！"
+        subtitle: "みんなー！ずんだもんなのだ！今日もギリシャ神話いくのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんです。前回、ポセイドンとハデスを紹介したわね。"
+        subtitle: "四国めたんです。前回、ポセイドンとハデスを紹介したわね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "熱血ポセイドンと、一途で不器用なハデスなのだ！"
+        subtitle: "熱血ポセイドンと、一途で不器用なハデスなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日は、ゼウスの娘・アテナの話をするわ。"
+        subtitle: "今日は、ゼウスの娘・アテナの話をするわ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "突然だけど、ひとつ聞いていい？お父さんの「頭」から生まれた神様って、どんな神様だと思う？"
+        subtitle: "突然だけど、ひとつ聞いていい？お父さんの「頭」から生まれた神様って、どんな神様だと思う？"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "頭から！？どういうことなのだ！？"
+        subtitle: "頭から！？どういうことなのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "それがアテナなの。そしてその「おかしすぎる誕生の秘密」に、アテナが知恵の神である理由が隠されているのよ。"
+        subtitle: "それがアテナなの。そしてその「おかしすぎる誕生の秘密」に、アテナが知恵の神である理由が隠されているのよ。"
+
+  - id: "athena-birth"
+    background: "./image/background/bg_olympus_palace_1773641201610.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナの誕生の話をするには、まずゼウスのある「秘密」から話さないといけないの。"
+        subtitle: "アテナの誕生の話をするには、まずゼウスのある「秘密」から話さないといけないの。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ゼウスの秘密なのだ？"
+        subtitle: "ゼウスの秘密なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゼウスには「自分の子に倒される」という予言がクロノスと同じように下されていたの。しかもその子を産む女性は、メティスという知恵の女神とされていた。"
+        subtitle: "ゼウスには「自分の子に倒される」という予言がクロノスと同じように下されていたの。しかもその子を産む女性は、メティスという知恵の女神とされていた。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "お父さんのクロノスと同じパターンなのだ！"
+        subtitle: "お父さんのクロノスと同じパターンなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "クロノスは子供たちを丸飲みにしたわよね。ゼウスが選んだ解決策は……メティスが妊娠中に、メティスごと飲み込む、というものだったの。"
+        subtitle: "クロノスは子供たちを丸飲みにしたわよね。ゼウスが選んだ解決策は……メティスが妊娠中に、メティスごと飲み込む、というものだったの。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "お父さんと同じことしてるのだ……！"
+        subtitle: "お父さんと同じことしてるのだ……！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "そうなの。でも、飲み込まれたメティスはゼウスのお腹の中で子供を産んで、生まれた子供に鎧と兜を作り続けたの。"
+        subtitle: "そうなの。でも、飲み込まれたメティスはゼウスのお腹の中で子供を産んで、生まれた子供に鎧と兜を作り続けたの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "お腹の中で鎧を作ってるのだ！？"
+        subtitle: "お腹の中で鎧を作ってるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そしてある日、ゼウスが激しい頭痛に襲われたの。もう我慢できないほどの痛みで、神様の鍛冶師ヘファイストスに頼んで、頭を斧で割ってもらったの。"
+        subtitle: "そしてある日、ゼウスが激しい頭痛に襲われたの。もう我慢できないほどの痛みで、神様の鍛冶師ヘファイストスに頼んで、頭を斧で割ってもらったの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "頭を斧で！？ゼウス死なないのだ！？"
+        subtitle: "頭を斧で！？ゼウス死なないのだ！？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "神様だから死なないの。そして割れたゼウスの頭から、完全武装した成人の女神が飛び出してきた。それがアテナよ。"
+        subtitle: "神様だから死なないの。そして割れたゼウスの頭から、完全武装した成人の女神が飛び出してきた。それがアテナよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "生まれた瞬間から鎧を着て出てきたのだ！しかも大人の姿で！？"
+        subtitle: "生まれた瞬間から鎧を着て出てきたのだ！しかも大人の姿で！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "お腹の中でお母さんが鎧を作り続けてたからね。そしてアテナが生まれた瞬間、オリュンポスは轟音に包まれ、大地が揺れ、海が逆巻いたと言われているわ。"
+        subtitle: "お腹の中でお母さんが鎧を作り続けてたからね。そしてアテナが生まれた瞬間、オリュンポスは轟音に包まれ、大地が揺れ、海が逆巻いたと言われているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "誕生した瞬間から存在感がすごいのだ！"
+        subtitle: "誕生した瞬間から存在感がすごいのだ！"
+
+  - id: "why-wisdom"
+    background: "./image/background/bg_ancient_sky_1773641215896.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "でもなんで「知恵の神」なのだ？頭から生まれたから？"
+        subtitle: "でもなんで「知恵の神」なのだ？頭から生まれたから？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "それもあるけど、もっと深い意味があるの。アテナのお母さんのメティスは「知恵と思慮」を司る女神だったのよ。"
+        subtitle: "それもあるけど、もっと深い意味があるの。アテナのお母さんのメティスは「知恵と思慮」を司る女神だったのよ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "つまりアテナは、お母さんからメティスの知恵を受け継いで、さらにゼウスの「頭」＝理性・判断力の象徴から生まれた存在なの。"
+        subtitle: "つまりアテナは、お母さんからメティスの知恵を受け継いで、さらにゼウスの「頭」＝理性・判断力の象徴から生まれた存在なの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "生まれた場所そのものが「知恵の象徴」なのだ！神話ってちゃんと意味があるのだ！"
+        subtitle: "生まれた場所そのものが「知恵の象徴」なのだ！神話ってちゃんと意味があるのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そしてアテナが司る知恵は、ただの「頭の良さ」じゃないの。戦略・技術・工芸・法律・都市の設計、つまり「文明を作る知恵」よ。"
+        subtitle: "そしてアテナが司る知恵は、ただの「頭の良さ」じゃないの。戦略・技術・工芸・法律・都市の設計、つまり「文明を作る知恵」よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "人間が社会を作るために必要な知恵、ってことなのだ。"
+        subtitle: "人間が社会を作るために必要な知恵、ってことなのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。だからアテナは古代ギリシャで最も尊敬された神様のひとりよ。力だけじゃなく、知と技で世界を豊かにする女神として。"
+        subtitle: "そう。だからアテナは古代ギリシャで最も尊敬された神様のひとりよ。力だけじゃなく、知と技で世界を豊かにする女神として。"
+
+  - id: "athena-vs-ares"
+    background: "./image/background/bg_greek_temple_1773641171319.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "アテナって戦争の神様でもあるんだよね？でも知恵の神様でもある。どっちなのだ？"
+        subtitle: "アテナって戦争の神様でもあるんだよね？でも知恵の神様でもある。どっちなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "両方ね。でもここに面白い対比があるの。ギリシャ神話には戦いの神様がふたりいるの。アテナとアレスよ。"
+        subtitle: "両方ね。でもここに面白い対比があるの。ギリシャ神話には戦いの神様がふたりいるの。アテナとアレスよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "戦争の神様が二人いるのだ！？"
+        subtitle: "戦争の神様が二人いるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アレスは「戦争の混乱と暴力」を象徴する神様。戦場での勇猛さ、恐怖、血の興奮を好む感情的な戦いの神よ。"
+        subtitle: "アレスは「戦争の混乱と暴力」を象徴する神様。戦場での勇猛さ、恐怖、血の興奮を好む感情的な戦いの神よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナは「戦争の知恵と戦略」を司る神様。作戦を立て、味方を守り、最小限の犠牲で勝利を掴む理性的な戦いの神よ。"
+        subtitle: "アテナは「戦争の知恵と戦略」を司る神様。作戦を立て、味方を守り、最小限の犠牲で勝利を掴む理性的な戦いの神よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "アレスが「猛突撃タイプ」で、アテナが「司令官タイプ」なのだ！"
+        subtitle: "アレスが「猛突撃タイプ」で、アテナが「司令官タイプ」なのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "いい例えね。実際、神話の中でアレスとアテナが対決すると、アテナが勝つことが多いの。"
+        subtitle: "いい例えね。実際、神話の中でアレスとアテナが対決すると、アテナが勝つことが多いの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "戦争の神なのに負けるのだ！？"
+        subtitle: "戦争の神なのに負けるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこが古代ギリシャ人のメッセージなの。「力だけでは勝てない、知恵こそが最強の武器だ」という考え方が、神話にも込められているのよ。"
+        subtitle: "そこが古代ギリシャ人のメッセージなの。「力だけでは勝てない、知恵こそが最強の武器だ」という考え方が、神話にも込められているのよ。"
+
+  - id: "athena-athens"
+    background: "./image/background/bg_world_map_1773641156482.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "前回、アテナとポセイドンがアテネを賭けて戦ったって話があったのだ！あれ詳しく聞きたいのだ！"
+        subtitle: "前回、アテナとポセイドンがアテネを賭けて戦ったって話があったのだ！あれ詳しく聞きたいのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナとポセイドンが、アテナイという都市の守護神の座を賭けて、「より良い贈り物をした方が勝ち」という勝負をしたのよ。"
+        subtitle: "アテナとポセイドンが、アテナイという都市の守護神の座を賭けて、「より良い贈り物をした方が勝ち」という勝負をしたのよ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ポセイドンは三叉槍で岩を打ち、海水の泉を作り出した。力強さの象徴よ。"
+        subtitle: "ポセイドンは三叉槍で岩を打ち、海水の泉を作り出した。力強さの象徴よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナは地面に槍を刺し、オリーブの木を生えさせたの。"
+        subtitle: "アテナは地面に槍を刺し、オリーブの木を生えさせたの。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "泉の方が迫力があるのに、なんでオリーブの木が勝ったのだ？"
+        subtitle: "泉の方が迫力があるのに、なんでオリーブの木が勝ったのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "オリーブは食料にも、灯りの油にも、薬にもなるの。海水の泉は見た目は壮大でも、飲めないし使い道が限られるわ。"
+        subtitle: "オリーブは食料にも、灯りの油にも、薬にもなるの。海水の泉は見た目は壮大でも、飲めないし使い道が限られるわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "市民たちはオリーブの木を選んだ。「派手さより実用性」という判断ね。"
+        subtitle: "市民たちはオリーブの木を選んだ。「派手さより実用性」という判断ね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "知恵の神らしい、実益のある贈り物だったのだ！"
+        subtitle: "知恵の神らしい、実益のある贈り物だったのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "こうして都市の名前はアテナイ、今のアテネになったの。ギリシャの首都の名前には、アテナの名前が今も残っているわ。"
+        subtitle: "こうして都市の名前はアテナイ、今のアテネになったの。ギリシャの首都の名前には、アテナの名前が今も残っているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "アテネって、アテナからきてたのだ！神話が今の地名に残ってるのだ！"
+        subtitle: "アテネって、アテナからきてたのだ！神話が今の地名に残ってるのだ！"
+
+  - id: "athena-helps-heroes"
+    background: "./image/background/bg_human_village_1773641230543.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "アテナって英雄たちも助けてたんだよね？"
+        subtitle: "アテナって英雄たちも助けてたんだよね？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。アテナはギリシャ神話の英雄たちの「知恵のサポーター」として登場することが多いの。"
+        subtitle: "そう。アテナはギリシャ神話の英雄たちの「知恵のサポーター」として登場することが多いの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "たとえばペルセウス。彼はメデューサという、目を合わせた者を石に変える怪物を倒す任務を課されたの。"
+        subtitle: "たとえばペルセウス。彼はメデューサという、目を合わせた者を石に変える怪物を倒す任務を課されたの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "目を合わせたら石になるのだ！？どうやって倒すのだ！？"
+        subtitle: "目を合わせたら石になるのだ！？どうやって倒すのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナがペルセウスに磨き上げた盾を与えたの。それを鏡代わりにしてメデューサの姿を映しながら進めば、直接目を合わせずに済むって教えたのよ。"
+        subtitle: "アテナがペルセウスに磨き上げた盾を与えたの。それを鏡代わりにしてメデューサの姿を映しながら進めば、直接目を合わせずに済むって教えたのよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "盾を鏡にするって発想がすごいのだ！力じゃなくて知恵で弱点を突いたのだ！"
+        subtitle: "盾を鏡にするって発想がすごいのだ！力じゃなくて知恵で弱点を突いたのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そうよ。アテナが助ける英雄たちは、力まかせで戦うんじゃなく、知恵と工夫で勝つの。それがアテナらしさよ。"
+        subtitle: "そうよ。アテナが助ける英雄たちは、力まかせで戦うんじゃなく、知恵と工夫で勝つの。それがアテナらしさよ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "オデュッセウスが10年かけて帰り道を辿った話でも、アテナはオデュッセウスの守護神として何度も助けに入っているわ。"
+        subtitle: "オデュッセウスが10年かけて帰り道を辿った話でも、アテナはオデュッセウスの守護神として何度も助けに入っているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ポセイドンが邪魔して、アテナが助ける、の繰り返しなのだ！"
+        subtitle: "ポセイドンが邪魔して、アテナが助ける、の繰り返しなのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "アテネを争った二人が、ずっとオデュッセウスをめぐって攻防してる、という見方もできるわね。"
+        subtitle: "アテネを争った二人が、ずっとオデュッセウスをめぐって攻防してる、という見方もできるわね。"
+
+  - id: "arachne"
+    background: "./image/background/bg_human_village_1773641230543.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "アテナって怒ることもあるのだ？"
+        subtitle: "アテナって怒ることもあるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "あるわよ。有名なのがアラクネーとの話ね。アラクネーというリディア出身の人間の少女が、とても優れた織物師だったの。"
+        subtitle: "あるわよ。有名なのがアラクネーとの話ね。アラクネーというリディア出身の人間の少女が、とても優れた織物師だったの。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "織物が上手な人間なのだ？"
+        subtitle: "織物が上手な人間なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "問題は、アラクネーが「自分の腕はアテナより上だ」と豪語していたことよ。技術の神アテナに対して、人間が勝負を挑んだの。"
+        subtitle: "問題は、アラクネーが「自分の腕はアテナより上だ」と豪語していたことよ。技術の神アテナに対して、人間が勝負を挑んだの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "神様に挑戦するのだ！強気すぎるのだ！"
+        subtitle: "神様に挑戦するのだ！強気すぎるのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナははじめ老婆に変装してアラクネーを諭そうとしたの。でもアラクネーは聞かなかった。それで本来の姿に戻り、正式に勝負したわ。"
+        subtitle: "アテナははじめ老婆に変装してアラクネーを諭そうとしたの。でもアラクネーは聞かなかった。それで本来の姿に戻り、正式に勝負したわ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "どっちが勝ったのだ？"
+        subtitle: "どっちが勝ったのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アラクネーの布は、驚くほど見事な出来だったの。でもその布には神様たちの失態や情けない姿が描かれていたわ。"
+        subtitle: "アラクネーの布は、驚くほど見事な出来だったの。でもその布には神様たちの失態や情けない姿が描かれていたわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "神様への冒涜なのだ！"
+        subtitle: "神様への冒涜なのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナは怒り、アラクネーを蜘蛛に変えてしまったの。でも技術そのものは奪わなかった。蜘蛛になったアラクネーは今も糸を紡ぎ続けているといわれているわ。"
+        subtitle: "アテナは怒り、アラクネーを蜘蛛に変えてしまったの。でも技術そのものは奪わなかった。蜘蛛になったアラクネーは今も糸を紡ぎ続けているといわれているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "蜘蛛のことをアラクニドって言うのだ！アラクネーからきてたのだ！"
+        subtitle: "蜘蛛のことをアラクニドって言うのだ！アラクネーからきてたのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。アラクノフォビア（蜘蛛恐怖症）の語源もアラクネーよ。ギリシャ神話の登場人物の名前が、今の言葉にもたくさん残っているの。"
+        subtitle: "そう。アラクノフォビア（蜘蛛恐怖症）の語源もアラクネーよ。ギリシャ神話の登場人物の名前が、今の言葉にもたくさん残っているの。"
+
+  - id: "athena-symbols"
+    background: "./image/background/bg_greek_temple_1773641171319.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "アテナのシンボルって何があるのだ？"
+        subtitle: "アテナのシンボルって何があるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず「フクロウ」。フクロウは夜でも目が見えて、物事を見通す力があるとされていたから、知恵の象徴とされているの。"
+        subtitle: "まず「フクロウ」。フクロウは夜でも目が見えて、物事を見通す力があるとされていたから、知恵の象徴とされているの。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "フクロウが賢そうなイメージ、アテナから来てたのだ！"
+        subtitle: "フクロウが賢そうなイメージ、アテナから来てたのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に「オリーブの木」。さっきのアテネの勝負でも登場したわね。平和と知恵、そして豊かさを象徴しているの。"
+        subtitle: "次に「オリーブの木」。さっきのアテネの勝負でも登場したわね。平和と知恵、そして豊かさを象徴しているの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そして「アイギス」という盾。ゼウスが持つ盾を模したもので、アテナはこれを携えて英雄たちを守っていたの。"
+        subtitle: "そして「アイギス」という盾。ゼウスが持つ盾を模したもので、アテナはこれを携えて英雄たちを守っていたの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "アイギス！イージスシステムってここからなのだ！？"
+        subtitle: "アイギス！イージスシステムってここからなのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。海上自衛隊のイージス艦の「イージス」は、アテナの盾の名前から取られているの。守るという意味を持つ最強の盾ね。"
+        subtitle: "そう。海上自衛隊のイージス艦の「イージス」は、アテナの盾の名前から取られているの。守るという意味を持つ最強の盾ね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ギリシャ神話が現代の軍事技術の名前にもなってるのだ！すごすぎるのだ！"
+        subtitle: "ギリシャ神話が現代の軍事技術の名前にもなってるのだ！すごすぎるのだ！"
+
+  - id: "athena-modern"
+    background: "./image/background/bg_olympus_palace_1773641201610.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "アテナって今の時代に影響を与えてることって他にもあるのだ？"
+        subtitle: "アテナって今の時代に影響を与えてることって他にもあるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "たくさんあるわよ。アメリカの首都ナッシュビルには「パルテノン神殿」の完全な複製があって、中にアテナ像が立っているの。"
+        subtitle: "たくさんあるわよ。アメリカの首都ナッシュビルには「パルテノン神殿」の完全な複製があって、中にアテナ像が立っているの。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "アメリカにギリシャ神殿の複製があるのだ！？"
+        subtitle: "アメリカにギリシャ神殿の複製があるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ギリシャのパルテノン神殿はアテナに捧げられた神殿で、民主主義の発祥地アテネの象徴よ。民主主義を大切にするアメリカがそれを模倣したの。"
+        subtitle: "ギリシャのパルテノン神殿はアテナに捧げられた神殿で、民主主義の発祥地アテネの象徴よ。民主主義を大切にするアメリカがそれを模倣したの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "また、多くの大学や図書館の紋章にフクロウが使われているのも、アテナの影響よ。知識と学問の守護者としてのイメージが今も生きているの。"
+        subtitle: "また、多くの大学や図書館の紋章にフクロウが使われているのも、アテナの影響よ。知識と学問の守護者としてのイメージが今も生きているの。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "アテナって、「知を大切にする」という価値観そのものを象徴してる神様なのだ！"
+        subtitle: "アテナって、「知を大切にする」という価値観そのものを象徴してる神様なのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そうよ。古代ギリシャ人にとって、知恵を持つことは神に最も近づくことだったの。アテナはその理想を体現した存在ね。"
+        subtitle: "そうよ。古代ギリシャ人にとって、知恵を持つことは神に最も近づくことだったの。アテナはその理想を体現した存在ね。"
+
+  - id: "summary"
+    background: "./image/background/bg_greek_temple_summary.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のまとめね。"
+        subtitle: "今日のまとめね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテナはゼウスの頭から生まれた知恵の女神。誕生の仕方そのものに「知恵は理性から生まれる」というメッセージが込められているわ。"
+        subtitle: "アテナはゼウスの頭から生まれた知恵の女神。誕生の仕方そのものに「知恵は理性から生まれる」というメッセージが込められているわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "彼女が司るのは「文明を作る知恵」。戦略・技術・工芸・法律。力ではなく知で世界を豊かにする神様よ。"
+        subtitle: "彼女が司るのは「文明を作る知恵」。戦略・技術・工芸・法律。力ではなく知で世界を豊かにする神様よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アテネの名前、フクロウの知恵のイメージ、イージスシステム、アラクノフォビア……アテナの影響は今も私たちの言葉と文化に生きているわ。"
+        subtitle: "アテネの名前、フクロウの知恵のイメージ、イージスシステム、アラクノフォビア……アテナの影響は今も私たちの言葉と文化に生きているわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "神話って古い話だと思ってたけど、今の世界のあちこちに残ってるのだ！ギリシャ神話を知ると、日常の見え方が変わるのだ！"
+        subtitle: "神話って古い話だと思ってたけど、今の世界のあちこちに残ってるのだ！ギリシャ神話を知ると、日常の見え方が変わるのだ！"
+
+  - id: "ending"
+    background: "./image/background/bg_greek_temple_summary.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回は、太陽と芸術の神アポロンの話をするわ。アポロンはアテナと並んで「文明の神」として重要な位置を占める存在なの。"
+        subtitle: "次回は、太陽と芸術の神アポロンの話をするわ。アポロンはアテナと並んで「文明の神」として重要な位置を占める存在なの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「太陽神なのになぜ芸術も担当するの？」という疑問の答えが、ギリシャ神話の奥深さを教えてくれるわよ。"
+        subtitle: "「太陽神なのになぜ芸術も担当するの？」という疑問の答えが、ギリシャ神話の奥深さを教えてくれるわよ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "太陽神が芸術も？なんで一緒になるのだ！？気になるのだ！"
+        subtitle: "太陽神が芸術も？なんで一緒になるのだ！？気になるのだ！"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価、ぜひよろしくなのだ！ずんだもんは今日もずんだもちが食べたいのだ！"
+        subtitle: "チャンネル登録と高評価、ぜひよろしくなのだ！ずんだもんは今日もずんだもちが食べたいのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "毎回ずんだもちなのね。それじゃあ、またね！"
+        subtitle: "毎回ずんだもちなのね。それじゃあ、またね！"
