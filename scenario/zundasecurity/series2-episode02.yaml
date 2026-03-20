@@ -1,0 +1,669 @@
+title: "【第2話】マルウェア感染！？ランサムウェアからPCを救え！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+  tsumugi:
+    speakerId: 8
+    position: center
+    subtitleColor: "#FFDD88"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.0
+
+  narrator:
+    speakerId: 16
+    position: center
+    subtitleColor: "#FFFFFF"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/bg_detective_office_interior.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # 1. 導入：前回の振り返り＆新たな依頼
+  # ============================================================
+  - id: "intro-recap"
+    background: "./image/background/bg_detective_office_interior.png"
+    lines:
+      - type: narration
+        character: narrator
+        text: "ずんだもんとめたんのサイバーセキュリティ探偵事務所——開業二日目。初日に解決したフィッシング詐欺の評判がネットで広がっていた。"
+        subtitle: "ずんだもんとめたんのサイバーセキュリティ探偵事務所——開業二日目。初日に解決したフィッシング詐欺の評判がネットで広がっていた。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "昨日の事件、解決できてよかったのだ！ずんだもんはすっかりサイバー探偵なのだ！"
+        subtitle: "昨日の事件、解決できてよかったのだ！ずんだもんはすっかりサイバー探偵なのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "助手でしょ。……あ、また来た。つむぎさんね。"
+        subtitle: "助手でしょ。……あ、また来た。つむぎさんね。"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "ごめん、また来ちゃった～。実は今度は私自身の問題で……。"
+        subtitle: "ごめん、また来ちゃった～。実は今度は私自身の問題で……。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "またなのだ！？どんな事件なのだ？"
+        subtitle: "またなのだ！？どんな事件なのだ？"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "私のパソコン……なんかおかしくなっちゃって。画面に変なメッセージが出てて、ファイルが全部開けなくなったんだけど。"
+        subtitle: "私のパソコン……なんかおかしくなっちゃって。画面に変なメッセージが出てて、ファイルが全部開けなくなったんだけど。"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "……ファイルが全部開けない？そのメッセージ、スクリーンショットある？"
+        subtitle: "……ファイルが全部開けない？そのメッセージ、スクリーンショットある？"
+
+  - id: "intro-ransom-screen"
+    background: "./image/background/bg_ransomware_screen.png"
+    lines:
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "これ。「Your files have been encrypted. Pay 0.5 Bitcoin to recover them.」って英語で書いてあって……"
+        subtitle: "これ。「Your files have been encrypted. Pay 0.5 Bitcoin to recover them.」って英語で書いてあって……"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "英語！？なんて書いてあるのだ？"
+        subtitle: "英語！？なんて書いてあるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「あなたのファイルは暗号化されました。復元するには0.5ビットコインを払え」——ランサムウェアね。"
+        subtitle: "「あなたのファイルは暗号化されました。復元するには0.5ビットコインを払え」——ランサムウェアね。"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "ランサムウェア……。お金払ったらファイル戻ってくるの？"
+        subtitle: "ランサムウェア……。お金払ったらファイル戻ってくるの？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "払ってはダメ。まず状況を整理するわ。つむぎさん、今そのパソコンはネットにつながってる？"
+        subtitle: "払ってはダメ。まず状況を整理するわ。つむぎさん、今そのパソコンはネットにつながってる？"
+      - type: dialogue
+        character: tsumugi
+        face: "通常"
+        text: "家に置いてきたけど……Wi-Fiにはつながってると思う。"
+        subtitle: "家に置いてきたけど……Wi-Fiにはつながってると思う。"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "今すぐ家に連絡してネットを切断してもらって！ルーターのケーブルを抜くか、Wi-Fiをオフにして！"
+        subtitle: "今すぐ家に連絡してネットを切断してもらって！ルーターのケーブルを抜くか、Wi-Fiをオフにして！"
+      - type: dialogue
+        character: tsumugi
+        face: "驚き"
+        text: "わかった、今すぐお母さんに電話する！"
+        subtitle: "わかった、今すぐお母さんに電話する！"
+
+  # ============================================================
+  # 2. めたんの初動対応指示
+  # ============================================================
+  - id: "first-response"
+    background: "./image/background/bg_detective_whiteboard.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "なんでネット切断が最初なのだ？早くファイルを取り戻したほうがいいんじゃないのだ？"
+        subtitle: "なんでネット切断が最初なのだ？早くファイルを取り戻したほうがいいんじゃないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ランサムウェアはネットを通じて他のPCにも広がる場合がある。被害を最小限に食い止めるために、まずネットワークから切り離す——これがインシデント対応の鉄則よ。"
+        subtitle: "ランサムウェアはネットを通じて他のPCにも広がる場合がある。被害を最小限に食い止めるために、まずネットワークから切り離す——これがインシデント対応の鉄則よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "火事みたいなものなのだ。火を消す前にまず延焼を止めるのだ！"
+        subtitle: "火事みたいなものなのだ。火を消す前にまず延焼を止めるのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "いい例えね。サイバーインシデントも「封じ込め→根絶→復旧」の順番で対応する。"
+        subtitle: "いい例えね。サイバーインシデントも「封じ込め→根絶→復旧」の順番で対応する。"
+      - type: dialogue
+        character: tsumugi
+        face: "通常"
+        text: "お母さんに電話したら、もうケーブル抜いてくれた！"
+        subtitle: "お母さんに電話したら、もうケーブル抜いてくれた！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "よかった。次に感染経路を特定する。つむぎさん、ここ数日でパソコンに何か変わったことをした？"
+        subtitle: "よかった。次に感染経路を特定する。つむぎさん、ここ数日でパソコンに何か変わったことをした？"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "えっと……学校からメールで来た課題ファイルを開いたのと……なんかフリーのゲームをダウンロードしたくらい……かな。"
+        subtitle: "えっと……学校からメールで来た課題ファイルを開いたのと……なんかフリーのゲームをダウンロードしたくらい……かな。"
+      - type: dialogue
+        character: metan
+        face: "驚き"
+        text: "そのゲーム、どこからダウンロードしたの？"
+        subtitle: "そのゲーム、どこからダウンロードしたの？"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "なんか検索して出てきたサイト……公式かどうかはよくわからなかった。"
+        subtitle: "なんか検索して出てきたサイト……公式かどうかはよくわからなかったかな。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "おそらくそれね。「トロイの木馬」型のマルウェアが仕込まれたゲームをインストールしたと見ていい。"
+        subtitle: "おそらくそれね。「トロイの木馬」型のマルウェアが仕込まれたゲームをインストールしたと見ていい。"
+
+  # ============================================================
+  # 3. マルウェアの種類解説
+  # ============================================================
+  - id: "malware-types-intro"
+    background: "./image/background/bg_malware_diagram.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "トロイの木馬！？あのギリシャ神話のやつなのだ？"
+        subtitle: "トロイの木馬！？あのギリシャ神話のやつなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう、まさにその由来ね。無害なゲームや便利ツールに見せかけて、中にマルウェアを隠して届ける手法——木馬の中に兵士を隠したのと同じ発想よ。"
+        subtitle: "そう、まさにその由来ね。無害なゲームや便利ツールに見せかけて、中にマルウェアを隠して届ける手法——木馬の中に兵士を隠したのと同じ発想よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "マルウェアって、コンピュータウイルスとは違うのだ？"
+        subtitle: "マルウェアって、コンピュータウイルスとは違うのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「マルウェア」はMalicious Software——悪意あるソフトウェア全体の総称よ。ウイルスはその中の一種。"
+        subtitle: "「マルウェア」はMalicious Software——悪意あるソフトウェア全体の総称よ。ウイルスはその中の一種。"
+      - type: narration
+        character: narrator
+        text: "めたんはホワイトボードにマルウェアの分類図を書き始めた。"
+        subtitle: "めたんはホワイトボードにマルウェアの分類図を書き始めた。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "主なマルウェアの種類を整理するわ。一つ目——ウイルス。他のプログラムに寄生して自己複製し、ファイルを破壊したり動作を妨害する。人間のウイルスと同じで、宿主（ファイル）が必要よ。"
+        subtitle: "主なマルウェアの種類を整理するわ。一つ目——ウイルス。他のプログラムに寄生して自己複製し、ファイルを破壊したり動作を妨害する。人間のウイルスと同じで、宿主（ファイル）が必要よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "宿主が必要なのだ……！ウイルスファイルを開かなければ感染しないのだ？"
+        subtitle: "宿主が必要なのだ……！ウイルスファイルを開かなければ感染しないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "基本的にはそうよ。二つ目——ワーム。ウイルスと違って宿主が不要で、単体で自己複製してネットワークを通じて広がる。"
+        subtitle: "基本的にはそうよ。二つ目——ワーム。ウイルスと違って宿主が不要で、単体で自己複製してネットワークを通じて広がる。"
+      - type: dialogue
+        character: tsumugi
+        face: "驚き"
+        text: "ウイルスとワームって違うんだ。どっちも「感染」するイメージだったけど。"
+        subtitle: "ウイルスとワームって違うんだ。どっちも「感染」するイメージだったけど。"
+
+  - id: "malware-types-detail"
+    background: "./image/background/bg_malware_diagram.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三つ目——トロイの木馬。今回の犯人ね。正規ソフトに偽装して侵入し、バックドアを作ったりランサムウェアを仕込んだりする。自己複製はしない点がウイルスと違う。"
+        subtitle: "三つ目——トロイの木馬。今回の犯人ね。正規ソフトに偽装して侵入し、バックドアを作ったりランサムウェアを仕込んだりする。自己複製はしない点がウイルスと違う。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四つ目——スパイウェア。ユーザーが気づかない間にパスワードや閲覧履歴を盗み出す。五つ目——アドウェア。大量の広告を表示させてPCの動作を遅くしたり、スパイウェアと組み合わされたりする。"
+        subtitle: "四つ目——スパイウェア。ユーザーが気づかない間にパスワードや閲覧履歴を盗み出す。五つ目——アドウェア。大量の広告を表示させてPCの動作を遅くしたり、スパイウェアと組み合わされたりする。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "いろんな種類があるのだ！で、今回の「ランサムウェア」はどれなのだ？"
+        subtitle: "いろんな種類があるのだ！で、今回の「ランサムウェア」はどれなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ランサムウェアはマルウェアの一種で、ファイルを暗号化して身代金（Ransom）を要求するもの。トロイの木馬によって侵入し、ランサムウェアが実行されたというのが今回の流れね。"
+        subtitle: "ランサムウェアはマルウェアの一種で、ファイルを暗号化して身代金（Ransom）を要求するもの。トロイの木馬によって侵入し、ランサムウェアが実行されたというのが今回の流れね。"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "じゃあ私のファイルは……取り戻せないの？"
+        subtitle: "じゃあ私のファイルは……取り戻せないの？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "バックアップがあれば取り戻せる。つむぎさん、外付けHDDとかクラウドにデータを保存してた？"
+        subtitle: "バックアップがあれば取り戻せる。つむぎさん、外付けHDDとかクラウドにデータを保存してた？"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "……してなかった。全部パソコンの中だけだった。"
+        subtitle: "……してなかった。全部パソコンの中だけだった。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "バックアップが大事なのだ……ずんだもんも今日からやろうと思うのだ。"
+        subtitle: "バックアップが大事なのだ……ずんだもんも今日からやろうと思うのだ。"
+
+  # ============================================================
+  # 4. ランサムウェアの仕組みと攻撃フロー
+  # ============================================================
+  - id: "ransomware-mechanism"
+    background: "./image/background/bg_detective_whiteboard.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回の攻撃の全体像を追うわ。まずつむぎさんが不正サイトから偽のゲームをダウンロードして実行した。"
+        subtitle: "今回の攻撃の全体像を追うわ。まずつむぎさんが不正サイトから偽のゲームをダウンロードして実行した。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゲームとして動いているように見せながら、裏でトロイの木馬がランサムウェアをダウンロードしてインストール。そしてCドライブのファイルを片っ端から暗号化した。"
+        subtitle: "ゲームとして動いているように見せながら、裏でトロイの木馬がランサムウェアをダウンロードしてインストール。そしてCドライブのファイルを片っ端から暗号化した。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "暗号化って鍵がないと開けないあれなのだ？"
+        subtitle: "暗号化って鍵がないと開けないあれなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。攻撃者だけが復号鍵を持っていて、「身代金を払えば鍵を渡す」と脅す仕組みよ。"
+        subtitle: "そう。攻撃者だけが復号鍵を持っていて、「身代金を払えば鍵を渡す」と脅す仕組みよ。"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "じゃあ払えば鍵をもらえるの？"
+        subtitle: "じゃあ払えば鍵をもらえるの？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "払っても鍵が来ない場合が多い。攻撃者は犯罪者だから約束を守る義務はない。しかも払うことで「この人は払う」とマークされて、再び狙われるリスクもある。"
+        subtitle: "払っても鍵が来ない場合が多い。攻撃者は犯罪者だから約束を守る義務はない。しかも払うことで「この人は払う」とマークされて、再び狙われるリスクもある。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "絶対払ったらダメなのだ！悪循環なのだ！"
+        subtitle: "絶対払ったらダメなのだ！悪循環なのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "日本政府もFBIも「身代金は払うな」と勧告している。身代金を払うことで攻撃者の活動資金になり、さらに多くの被害者を生む悪循環につながる。"
+        subtitle: "日本政府もFBIも「身代金は払うな」と勧告している。身代金を払うことで攻撃者の活動資金になり、さらに多くの被害者を生む悪循環につながる。"
+
+  - id: "infection-routes"
+    background: "./image/background/bg_malware_diagram.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "マルウェアってどんな経路で入ってくるのだ？"
+        subtitle: "マルウェアってどんな経路で入ってくるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感染経路は主に四つ。一つ目——メールの添付ファイル。Word・Excelにマクロを仕込んだものや、実行形式のファイルが多い。"
+        subtitle: "感染経路は主に四つ。一つ目——メールの添付ファイル。Word・Excelにマクロを仕込んだものや、実行形式のファイルが多い。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "二つ目——不正サイトや改ざんサイトへのアクセス。ブラウザの脆弱性を突いて、閲覧しただけで感染する「ドライブバイダウンロード」という手法もある。"
+        subtitle: "二つ目——不正サイトや改ざんサイトへのアクセス。ブラウザの脆弱性を突いて、閲覧しただけで感染する「ドライブバイダウンロード」という手法もある。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "見るだけで感染するのだ！？それは怖いのだ！"
+        subtitle: "見るだけで感染するのだ！？それは怖いのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三つ目——USBメモリなどの外部メディア。知らないUSBを差し込まないことが原則よ。四つ目——ソフトウェアの脆弱性。OSやアプリのアップデートをしていないと、既知の穴を突かれる。"
+        subtitle: "三つ目——USBメモリなどの外部メディア。知らないUSBを差し込まないことが原則よ。四つ目——ソフトウェアの脆弱性。OSやアプリのアップデートをしていないと、既知の穴を突かれる。"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "私の場合は……不正サイトからのダウンロードだよね。"
+        subtitle: "私の場合は……不正サイトからのダウンロードだよね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。フリーゲームや映像・音楽の「無料ダウンロード」を謳うサイトは特に危険。本来有料のものを無料で配布している場合、マルウェアが仕込まれているケースが非常に多い。"
+        subtitle: "そう。フリーゲームや映像・音楽の「無料ダウンロード」を謳うサイトは特に危険。本来有料のものを無料で配布している場合、マルウェアが仕込まれているケースが非常に多い。"
+
+  # ============================================================
+  # 5. 対応方針の決定と復旧
+  # ============================================================
+  - id: "incident-response"
+    background: "./image/background/bg_detective_office_interior.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のインシデント対応の方針をまとめるわ。封じ込めはネットワーク切断で完了。次は根絶——PCを完全に初期化してマルウェアを除去する。"
+        subtitle: "今回のインシデント対応の方針をまとめるわ。封じ込めはネットワーク切断で完了。次は根絶——PCを完全に初期化してマルウェアを除去する。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "初期化！？全部消えちゃうのだ？"
+        subtitle: "初期化！？全部消えちゃうのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ランサムウェア感染後のPCは、セキュリティソフトでスキャンしても完全に除去できないことがある。OSを再インストールして完全にクリーンな状態に戻すのが最も確実な方法よ。"
+        subtitle: "ランサムウェア感染後のPCは、セキュリティソフトでスキャンしても完全に除去できないことがある。OSを再インストールして完全にクリーンな状態に戻すのが最も確実な方法よ。"
+      - type: dialogue
+        character: tsumugi
+        face: "困り"
+        text: "じゃあファイルは……もう戻ってこない？"
+        subtitle: "じゃあファイルは……もう戻ってこない？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「No More Ransom」というサイトに、一部のランサムウェアの無料復号ツールが公開されている。まずそこで確認する価値はある。ただ今回のマルウェアに対応したツールがない場合は……正直厳しい。"
+        subtitle: "「No More Ransom」というサイトに、一部のランサムウェアの無料復号ツールが公開されている。まずそこで確認する価値はある。ただ今回のマルウェアに対応したツールがない場合は……正直厳しい。"
+      - type: dialogue
+        character: tsumugi
+        face: "悲しみ"
+        text: "そっか……。授業のレポートとか、写真とか、いっぱいあったのに。"
+        subtitle: "そっか……。授業のレポートとか、写真とか、いっぱいあったのに。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "……ずんだもん、今日からバックアップ絶対するのだ。"
+        subtitle: "……ずんだもん、今日からバックアップ絶対するのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "この経験を次に活かすしかない。あとは警察のサイバー犯罪相談窓口と、IPAにも報告しておくといい。情報が集まることで今後の対策につながるから。"
+        subtitle: "この経験を次に活かすしかない。あとは警察のサイバー犯罪相談窓口と、IPAにも報告しておくといい。情報が集まることで今後の対策につながるから。"
+
+  # ============================================================
+  # 6. 再発防止策の設計
+  # ============================================================
+  - id: "prevention-strategy"
+    background: "./image/background/bg_detective_whiteboard.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "最後に再発防止策をまとめる。マルウェア感染を防ぐポイントは五つ。"
+        subtitle: "最後に再発防止策をまとめる。マルウェア感染を防ぐポイントは五つ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "一つ目——OSとソフトウェアを常に最新の状態に保つ。アップデートには脆弱性の修正が含まれている。「アップデートが面倒」と放置するのが一番危険。"
+        subtitle: "一つ目——OSとソフトウェアを常に最新の状態に保つ。アップデートには脆弱性の修正が含まれている。「アップデートが面倒」と放置するのが一番危険。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "二つ目——セキュリティソフト（ウイルス対策ソフト）を導入して、常時スキャンを有効にする。定義ファイルの更新も自動にしておくこと。"
+        subtitle: "二つ目——セキュリティソフト（ウイルス対策ソフト）を導入して、常時スキャンを有効にする。定義ファイルの更新も自動にしておくこと。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三つ目——信頼できるサイトからしかダウンロードしない。公式サイト・公式ストアを使い、「無料で入手できます」という誘い文句には疑いを持つ。"
+        subtitle: "三つ目——信頼できるサイトからしかダウンロードしない。公式サイト・公式ストアを使い、「無料で入手できます」という誘い文句には疑いを持つ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四つ目——メールの添付ファイルや不審なリンクを不用意に開かない。前回も言ったフィッシングと組み合わさることが多い。"
+        subtitle: "四つ目——メールの添付ファイルや不審なリンクを不用意に開かない。前回も言ったフィッシングと組み合わさることが多い。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "五つ目——バックアップを定期的に取る。3-2-1ルールが理想よ。3つのコピー、2種類の媒体、1つはオフサイト保管——つまりクラウドに保存ね。"
+        subtitle: "五つ目——バックアップを定期的に取る。3-2-1ルールが理想よ。3つのコピー、2種類の媒体、1つはオフサイト保管——つまりクラウドに保存ね。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "3-2-1ルール！かっこいいのだ！三つコピー、二種類の媒体、一つはクラウドなのだ！"
+        subtitle: "3-2-1ルール！かっこいいのだ！三つコピー、二種類の媒体、一つはクラウドなのだ！"
+      - type: dialogue
+        character: tsumugi
+        face: "通常"
+        text: "今後はちゃんとバックアップする……絶対にする。"
+        subtitle: "今後はちゃんとバックアップする……絶対にする。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "あとランサムウェアの場合、感染したPCをネットワークにつないだまま放置すると、社内LAN全体や家族のPCにも広がる可能性がある。今回のように早期に切断できたのは正解よ。"
+        subtitle: "あとランサムウェアの場合、感染したPCをネットワークにつないだまま放置すると、社内LAN全体や家族のPCにも広がる可能性がある。今回のように早期に切断できたのは正解よ。"
+
+  # ============================================================
+  # 7. エンディング・次回予告
+  # ============================================================
+  - id: "ending-resolution"
+    background: "./image/background/bg_detective_office_interior.png"
+    lines:
+      - type: narration
+        character: narrator
+        text: "つむぎは対応方針を手帳にメモし、感謝を伝えて帰っていった。失ったファイルは戻らないかもしれないが、今日の教訓は確実に彼女の心に刻まれた。"
+        subtitle: "つむぎは対応方針を手帳にメモし、感謝を伝えて帰っていった。失ったファイルは戻らないかもしれないが、今日の教訓は確実に彼女の心に刻まれた。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ランサムウェア……怖いのだ。ずんだもんも今すぐクラウドにバックアップするのだ。"
+        subtitle: "ランサムウェア……怖いのだ。ずんだもんも今すぐクラウドにバックアップするのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日の事件、あなたが一番多くことを学んだんじゃないかしら。"
+        subtitle: "今日の事件、あなたが一番多くことを学んだんじゃないかしら。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "褒め言葉として受け取るのだ！でもめたん、ランサムウェアって最近すごく増えてるって聞くのだ。"
+        subtitle: "褒め言葉として受け取るのだ！でもめたん、ランサムウェアって最近すごく増えてるって聞くのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "急増しているわ。個人だけじゃなく、病院や学校、インフラ企業も標的になっている。サービスが止まって患者に影響が出た病院の事例もある。"
+        subtitle: "急増しているわ。個人だけじゃなく、病院や学校、インフラ企業も標的になっている。サービスが止まって患者に影響が出た病院の事例もある。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "病院まで！？それは命に関わるのだ！！"
+        subtitle: "病院まで！？それは命に関わるのだ！！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だからサイバーセキュリティは他人事じゃない。知識を持つこと、対策を実践すること——一人一人の行動が大きな被害を防ぐ。"
+        subtitle: "だからサイバーセキュリティは他人事じゃない。知識を持つこと、対策を実践すること——一人一人の行動が大きな被害を防ぐ。"
+
+  - id: "ending-next-preview"
+    background: "./image/background/bg_detective_office_interior.png"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "次はどんな事件が来るのだ？"
+        subtitle: "次はどんな事件が来るのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回は不正アクセスと脆弱性ね。Webサイトへの攻撃——SQLインジェクションやXSSがどう動くか、開発者の視点から解説するわ。"
+        subtitle: "次回は不正アクセスと脆弱性ね。Webサイトへの攻撃——SQLインジェクションやXSSがどう動くか、開発者の視点から解説するわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "エスキューエルインジェクション！？なんか強そうな名前なのだ！"
+        subtitle: "エスキューエルインジェクション！？なんか強そうな名前なのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "強力な攻撃よ。次回も楽しみにしていて。チャンネル登録と高評価もよろしく！"
+        subtitle: "強力な攻撃よ。次回も楽しみにしていて。チャンネル登録と高評価もよろしく！"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "マルウェアには気をつけるのだ！バックアップも忘れずにするのだ！ずんだもんとめたんのサイバーセキュリティ探偵事務所でした！次もよろしくなのだ！"
+        subtitle: "マルウェアには気をつけるのだ！バックアップも忘れずにするのだ！ずんだもんとめたんのサイバーセキュリティ探偵事務所でした！次もよろしくなのだ！"
+
+  # ============================================================
+  # 8. めたんのセキュリティ講座（解説コーナー）
+  # ============================================================
+  - id: "lecture-intro"
+    background: "./image/background/bg_security_lesson.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "はい、「めたんのセキュリティ講座」よ。今日のマルウェアを試験対策の視点で深掘りするわ。支援士試験を目指している人は特に注目してね。"
+        subtitle: "はい、「めたんのセキュリティ講座」よ。今日のマルウェアを試験対策の視点で深掘りするわ。支援士試験を目指している人は特に注目してね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "今日はマルウェアの種類がいっぱい出てきたのだ。整理するのだ！"
+        subtitle: "今日はマルウェアの種類がいっぱい出てきたのだ。整理するのだ！"
+
+  - id: "lecture-malware-classification"
+    background: "./image/background/bg_security_lesson.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "マルウェアの分類を試験向けにまとめるわ。ウイルス——他のファイルに寄生して自己複製。感染させたファイルを開かれることで拡散する。"
+        subtitle: "マルウェアの分類を試験向けにまとめるわ。ウイルス——他のファイルに寄生して自己複製。感染させたファイルを開かれることで拡散する。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ワーム——宿主不要で単体で自己複製・拡散。ネットワークを通じて急速に広がる。トロイの木馬——正規ソフトに偽装して侵入。自己複製はしないが他のマルウェアを呼び込む。"
+        subtitle: "ワーム——宿主不要で単体で自己複製・拡散。ネットワークを通じて急速に広がる。トロイの木馬——正規ソフトに偽装して侵入。自己複製はしないが他のマルウェアを呼び込む。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ランサムウェア——ファイルを暗号化して身代金を要求。スパイウェア——秘密裏に情報を収集・送信。ボット——攻撃者の命令を受けてDDoS攻撃などに加担する。"
+        subtitle: "ランサムウェア——ファイルを暗号化して身代金を要求。スパイウェア——秘密裏に情報を収集・送信。ボット——攻撃者の命令を受けてDDoS攻撃などに加担する。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ボット！？自分のPCが攻撃に使われるのだ！？"
+        subtitle: "ボット！？自分のPCが攻撃に使われるのだ！？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ボットに感染したPCの集合体を「ボットネット」と言う。感染に気づかないまま踏み台にされるケースもある。これも試験頻出よ。"
+        subtitle: "ボットに感染したPCの集合体を「ボットネット」と言う。感染に気づかないまま踏み台にされるケースもある。これも試験頻出よ。"
+
+  - id: "lecture-vulnerability"
+    background: "./image/background/bg_security_lesson.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に重要な概念——脆弱性とパッチ管理。脆弱性（ぜいじゃくせい）とはソフトウェアのセキュリティ上の欠陥のこと。CVE（Common Vulnerabilities and Exposures）という番号で管理される。"
+        subtitle: "次に重要な概念——脆弱性とパッチ管理。脆弱性（ぜいじゃくせい）とはソフトウェアのセキュリティ上の欠陥のこと。CVE（Common Vulnerabilities and Exposures）という番号で管理される。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "シーブイイー！？何それなのだ？"
+        subtitle: "シーブイイー！？何それなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "脆弱性ごとに「CVE-2024-12345」のような一意の番号が付く。この番号で世界中のセキュリティ担当者が同じ脆弱性について話せるようになっているの。"
+        subtitle: "脆弱性ごとに「CVE-2024-12345」のような一意の番号が付く。この番号で世界中のセキュリティ担当者が同じ脆弱性について話せるようになっているの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "「ゼロデイ脆弱性」も重要用語よ。発見されたけどまだパッチ（修正プログラム）が存在しない——つまり対策がゼロの日から悪用されている脆弱性のこと。"
+        subtitle: "「ゼロデイ脆弱性」も重要用語よ。発見されたけどまだパッチ（修正プログラム）が存在しない——つまり対策がゼロの日から悪用されている脆弱性のこと。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ゼロデイは対策がないから怖いのだ！"
+        subtitle: "ゼロデイは対策がないから怖いのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。だからベンダーがパッチをリリースしたら速やかに適用する——これがパッチ管理の基本。既知の脆弱性への攻撃は、アップデートで防げることが多い。"
+        subtitle: "そう。だからベンダーがパッチをリリースしたら速やかに適用する——これがパッチ管理の基本。既知の脆弱性への攻撃は、アップデートで防げることが多い。"
+
+  - id: "lecture-incident-response"
+    background: "./image/background/bg_security_lesson.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一つ試験頻出の「インシデント対応」フロー。NIST（米国国立標準技術研究所）の定義では、準備→検知・分析→封じ込め→根絶→復旧→事後対応の流れが基本とされている。"
+        subtitle: "もう一つ試験頻出の「インシデント対応」フロー。NIST（米国国立標準技術研究所）の定義では、準備→検知・分析→封じ込め→根絶→復旧→事後対応の流れが基本とされている。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "今回の事件は……まずネット切断で「封じ込め」、PCを初期化して「根絶」、バックアップから「復旧」——の順番なのだ！"
+        subtitle: "今回の事件は……まずネット切断で「封じ込め」、PCを初期化して「根絶」、バックアップから「復旧」——の順番なのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "完璧よ。このフローは試験でも、実務でも大切。慌てないために、事前に手順を決めておくことが「準備」の段階ね。"
+        subtitle: "完璧よ。このフローは試験でも、実務でも大切。慌てないために、事前に手順を決めておくことが「準備」の段階ね。"
+
+  - id: "lecture-closing"
+    background: "./image/background/bg_security_lesson.png"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のまとめ。マルウェアの種類：ウイルス・ワーム・トロイの木馬・ランサムウェア・スパイウェア・ボット。感染経路：添付ファイル・不正サイト・USB・脆弱性。"
+        subtitle: "今日のまとめ。マルウェアの種類：ウイルス・ワーム・トロイの木馬・ランサムウェア・スパイウェア・ボット。感染経路：添付ファイル・不正サイト・USB・脆弱性。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "対策：OS・ソフトの更新、セキュリティソフト導入、信頼できるサイトのみ利用、バックアップ（3-2-1ルール）。インシデント対応：封じ込め→根絶→復旧。身代金は払わない。"
+        subtitle: "対策：OS・ソフトの更新、セキュリティソフト導入、信頼できるサイトのみ利用、バックアップ（3-2-1ルール）。インシデント対応：封じ込め→根絶→復旧。身代金は払わない。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験キーワード：マルウェア、ランサムウェア、トロイの木馬、ワーム、スパイウェア、ボットネット、脆弱性、ゼロデイ、CVE、パッチ管理、インシデント対応。"
+        subtitle: "試験キーワード：マルウェア、ランサムウェア、トロイの木馬、ワーム、スパイウェア、ボットネット、脆弱性、ゼロデイ、CVE、パッチ管理、インシデント対応。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "全部覚えたのだ！次回はSQLインジェクション回なのだ！楽しみなのだ！"
+        subtitle: "全部覚えたのだ！次回はSQLインジェクション回なのだ！楽しみなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回も一緒に学びましょう。ではまた！"
+        subtitle: "次回も一緒に学びましょう。ではまた！"
