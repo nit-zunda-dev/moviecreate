@@ -1,0 +1,638 @@
+title: "【クラウドアーキテクチャパズル】基本的なWebサイトの流れをゼロから理解するのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # 1. オープニング：ずんだもち屋のWebサイト作りたい！
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "今日はクラウドアーキテクチャパズルの「基本的なWebサイト」チャレンジを解説するのだ！"
+
+        subtitle: "今日はクラウドアーキテクチャパズルの「基本的なWebサイト」チャレンジを解説するのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。ずんだもん、ずんだもち屋のWebサイトを作りたいって言ってたわね。"
+
+        subtitle: "四国めたんです。ずんだもん、ずんだもち屋のWebサイトを作りたいって言ってたわね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "そうなのだ！お客さんがブラウザでアクセスしたら、ずんだもちの写真とかメニューが見られるようにしたいのだ！"
+
+        subtitle: "そうなのだ！お客さんがブラウザでアクセスしたら、ずんだもちの写真とかメニューが見られるようにしたいのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "でも、その「届く仕組み」がよく分からないのだ……。"
+
+        subtitle: "でも、その「届く仕組み」がよく分からないのだ……。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "それ、まさに「基本的なWebサイト」のアーキテクチャよ。今日はその流れを一緒に紐解いていこう。"
+
+        subtitle: "それ、まさに「基本的なWebサイト」のアーキテクチャよ。今日はその流れを一緒に紐解いていこう。"
+
+
+
+  # ============================================================
+
+  # 2. まず「入口」：クライアントとDNS
+
+  # ============================================================
+
+  - id: "client-and-dns"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "まず、ユーザーが「ずんだもち屋.com」にアクセスするとき、最初に動くのは誰だと思う？"
+
+        subtitle: "まず、ユーザーが「ずんだもち屋.com」にアクセスするとき、最初に動くのは誰だと思う？"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "うーん……ブラウザが……サーバーに聞きに行く……のだ？"
+
+        subtitle: "うーん……ブラウザが……サーバーに聞きに行く……のだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "半分正解。でもその前に、大事な一歩があるの。ブラウザは「ずんだもち屋.com」という名前しか知らない。"
+
+        subtitle: "半分正解。でもその前に、大事な一歩があるの。ブラウザは「ずんだもち屋.com」という名前しか知らない。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "サーバーは「123.45.67.89」みたいなIPアドレスでしか場所が分からないの。"
+
+        subtitle: "サーバーは「123.45.67.89」みたいなIPアドレスでしか場所が分からないの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "名前と住所が別々なのだ！じゃあ誰が翻訳してくれるのだ？"
+
+        subtitle: "名前と住所が別々なのだ！じゃあ誰が翻訳してくれるのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "それがDNSよ。ドメインネームシステム。電話帳みたいに、「ずんだもち屋.com」→「このIPアドレス」って教えてくれるの。"
+
+        subtitle: "それがDNSよ。ドメインネームシステム。電話帳みたいに、「ずんだもち屋.com」→「このIPアドレス」って教えてくれるの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "だから最初の接続は、クライアントからDNSへ。「この名前、どこのIP？」って聞く流れになる。"
+
+        subtitle: "だから最初の接続は、クライアントからDNSへ。「この名前、どこのIP？」って聞く流れになる。"
+
+
+
+  # ============================================================
+
+  # 3. CDN：最寄りでコンテンツをもらう賢い仕組み
+
+  # ============================================================
+
+  - id: "cdn-explanation"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "分かったのだ。じゃあDNSが教えてくれたIPに、直接聞きに行けばいいのだ？"
+
+        subtitle: "分かったのだ。じゃあDNSが教えてくれたIPに、直接聞きに行けばいいのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "理論上はそう。でも毎回「本店」のサーバーに直接行くと、北海道の人も沖縄の人も、"
+
+        subtitle: "理論上はそう。でも毎回「本店」のサーバーに直接行くと、北海道の人も沖縄の人も、"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ずんだもち屋が東京にあれば東京まで取りに行くことになる。"
+
+        subtitle: "ずんだもち屋が東京にあれば東京まで取りに行くことになる。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "遅いし、本店がパンクするわ。"
+
+        subtitle: "遅いし、本店がパンクするわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "それ、無駄が多すぎるのだ！ずんだもちも冷めちゃうのだ！"
+
+        subtitle: "それ、無駄が多すぎるのだ！ずんだもちも冷めちゃうのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "だからCDN、コンテンツデリバリーネットワークを使うの。世界中に「キャッシュ用のサーバー」を置いて、"
+
+        subtitle: "だからCDN、コンテンツデリバリーネットワークを使うの。世界中に「キャッシュ用のサーバー」を置いて、"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "よく使うコンテンツをその近くに置いておく。"
+
+        subtitle: "よく使うコンテンツをその近くに置いておく。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "イメージは「最寄りのコンビニでずんだもちを配達してもらう」感じ。"
+
+        subtitle: "イメージは「最寄りのコンビニでずんだもちを配達してもらう」感じ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "CDNが最寄りにあって、そこからHTMLや画像をもらうのだ！"
+
+        subtitle: "CDNが最寄りにあって、そこからHTMLや画像をもらうのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "だから速いのだ！"
+
+        subtitle: "だから速いのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "その通り。DNSの次はCDN。"
+
+        subtitle: "その通り。DNSの次はCDN。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "つまり、DNSからCDNへ「このサイトのコンテンツはこっちで配って」"
+
+        subtitle: "つまり、DNSからCDNへ「このサイトのコンテンツはこっちで配って」"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "という流れになる。"
+
+        subtitle: "という流れになる。"
+
+
+
+  # ============================================================
+
+  # 4. Webサーバー：元ネタはここにある
+
+  # ============================================================
+
+  - id: "web-server"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "でも待つのだ。CDNは「コピー」を持ってるだけなのだよね？"
+
+        subtitle: "でも待つのだ。CDNは「コピー」を持ってるだけなのだよね？"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "初めて誰かがアクセスしたときは、本物はどこにあるのだ？"
+
+        subtitle: "初めて誰かがアクセスしたときは、本物はどこにあるのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "いい質問。元ネタを置いてるのがWebサーバーよ。HTMLやCSS、画像ファイルを置いて、"
+
+        subtitle: "いい質問。元ネタを置いてるのがWebサーバーよ。HTMLやCSS、画像ファイルを置いて、"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "CDNが「このファイルちょうだい」って言ったときに渡す。"
+
+        subtitle: "CDNが「このファイルちょうだい」って言ったときに渡す。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "これを「オリジンサーバー」とか「オリジン」って呼ぶことが多い。"
+
+        subtitle: "これを「オリジンサーバー」とか「オリジン」って呼ぶことが多い。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "キャッシュミスしたときは、CDNがWebサーバーに取りに行くのだ！"
+
+        subtitle: "キャッシュミスしたときは、CDNがWebサーバーに取りに行くのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "だからCDNからWebサーバーへ、接続が必要なのだ！"
+
+        subtitle: "だからCDNからWebサーバーへ、接続が必要なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "完璧。流れを整理すると、クライアント→DNS→CDN→Webサーバー。"
+
+        subtitle: "完璧。流れを整理すると、クライアント→DNS→CDN→Webサーバー。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "この四つと、この三本の接続が、「基本的なWebサイト」の正解の形よ。"
+
+        subtitle: "この四つと、この三本の接続が、「基本的なWebサイト」の正解の形よ。"
+
+
+
+  # ============================================================
+
+  # 5. パズルの答えと実践のヒント
+
+  # ============================================================
+
+  - id: "puzzle-answer"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "パズルで使うコンポーネントは、クライアント、DNS、CDN、Webサーバー。"
+
+        subtitle: "パズルで使うコンポーネントは、クライアント、DNS、CDN、Webサーバー。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "接続は、クライアント→DNS、DNS→CDN、CDN→Webサーバーの三本。"
+
+        subtitle: "接続は、クライアント→DNS、DNS→CDN、CDN→Webサーバーの三本。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "これをキャンバスに置いて線でつなげば、初級チャレンジクリアよ。"
+
+        subtitle: "これをキャンバスに置いて線でつなげば、初級チャレンジクリアよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "なるほどなのだ！AWSだと、DNSはルート53、CDNはクラウドフロント、"
+
+        subtitle: "なるほどなのだ！AWSだと、DNSはルート53、CDNはクラウドフロント、"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "WebサーバーはS3の静的ホスティングとか使えるのだよね？"
+
+        subtitle: "WebサーバーはS3の静的ホスティングとか使えるのだよね？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "そう。クラウドだと、それぞれのサービスがパズルのピースになる。"
+
+        subtitle: "そう。クラウドだと、それぞれのサービスがパズルのピースになる。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "まずはこの基本形を頭に入れて、パズルで手を動かしてみてね。"
+
+        subtitle: "まずはこの基本形を頭に入れて、パズルで手を動かしてみてね。"
+
+
+
+  # ============================================================
+
+  # 6. まとめとエンディング
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "今日のまとめ。ユーザーのリクエストは、まずDNSで名前解決され、CDNがキャッシュされたコンテンツを配信する。"
+
+        subtitle: "今日のまとめ。ユーザーのリクエストは、まずDNSで名前解決され、CDNがキャッシュされたコンテンツを配信する。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "キャッシュミス時はWebサーバーからコンテンツを取得する。この流れが基本的なWebサイトのアーキテクチャよ。"
+
+        subtitle: "キャッシュミス時はWebサーバーからコンテンツを取得する。この流れが基本的なWebサイトのアーキテクチャよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもち屋のWebサイト、この構成で作ってみるのだ！"
+
+        subtitle: "ずんだもち屋のWebサイト、この構成で作ってみるのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "クラウドアーキテクチャパズル、みんなも挑戦してみてほしいのだ！"
+
+        subtitle: "クラウドアーキテクチャパズル、みんなも挑戦してみてほしいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "次のチャレンジはECサイトや動画配信とか、もっと複雑になっていくから楽しみにしててね。"
+
+        subtitle: "次のチャレンジはECサイトや動画配信とか、もっと複雑になっていくから楽しみにしててね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "また次の動画で会いましょう。"
+
+        subtitle: "また次の動画で会いましょう。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+        subtitle: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！"
+

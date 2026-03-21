@@ -42,14 +42,16 @@ export const SubtitleLayer: React.FC<Props> = ({ manifest }) => {
           // くっきりした単色バーで可読性を確保（半透明だと動画でにじみやすいためやや濃いめ）
           backgroundColor: "rgba(0, 0, 0, 0.75)",
           color: subtitleColor,
-          fontSize: 40,
+          fontSize: 38,
           fontFamily: "Noto Sans JP, Yu Gothic, Meiryo, sans-serif",
           fontWeight: "bold",
           padding: "10px 20px",
           borderRadius: 8,
-          maxWidth: width * 0.64,
+          // 狭いと日本語が縦に積みやすいので幅を確保（2行以内を目安にシナリオ側でも分割する）
+          maxWidth: width * 0.82,
           textAlign: "center",
-          lineHeight: 1.5,
+          lineHeight: 1.45,
+          whiteSpace: "pre-line",
           boxSizing: "border-box",
           // 文字は軽いシャドウのみでエッジをきれいに
           textShadow: "0 1px 2px rgba(0,0,0,0.8)",
