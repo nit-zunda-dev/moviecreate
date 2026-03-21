@@ -1,0 +1,641 @@
+title: "【クラウドアーキテクチャパズル】動的Webアプリの基本構成をゼロから理解するのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # 1. オープニング：静的サイトの次は動的Webアプリ
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "前回は「基本的なWebサイト」チャレンジだったのだ！DNSとCDNとWebサーバー、覚えてるのだ？"
+
+        subtitle: "前回は「基本的なWebサイト」チャレンジだったのだ！DNSとCDNとWebサーバー、覚えてるのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。今回はその次、中級の「動的Webアプリの基本構成」チャレンジを解説するわ。"
+
+        subtitle: "四国めたんです。今回はその次、中級の「動的Webアプリの基本構成」チャレンジを解説するわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもち屋の予約状況を、ログインして一覧で見たいのだ！誰が何時に取ったか、ちゃんと残るやつ！"
+
+        subtitle: "ずんだもち屋の予約状況を、ログインして一覧で見たいのだ！誰が何時に取ったか、ちゃんと残るやつ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "でも前回の「静的サイト」のままだと、人ごとに違う画面は無理なのだ……。"
+
+        subtitle: "でも前回の「静的サイト」のままだと、人ごとに違う画面は無理なのだ……。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "その通り。HTMLを配るだけだと、ログイン状態やデータの中身までは扱えない。"
+
+        subtitle: "その通り。HTMLを配るだけだと、ログイン状態やデータの中身までは扱えない。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "だから「誰が認証して、誰が計算して、どこに保存するか」を足した構成が、今回のパズルの正解の形よ。"
+
+        subtitle: "だから「誰が認証して、誰が計算して、どこに保存するか」を足した構成が、今回のパズルの正解の形よ。"
+
+
+
+  # ============================================================
+
+  # 2. 静的サイトとの違い：APIとデータが要る
+
+  # ============================================================
+
+  - id: "why-api-and-data"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "静的サイトは、HTMLを配るだけだったのだ。動的Webアプリは何が増えるのだ？"
+
+        subtitle: "静的サイトは、HTMLを配るだけだったのだ。動的Webアプリは何が増えるのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "まずAPIサーバー。予約の登録や一覧の取得みたいな「アプリのルール」を動かすのが役目。"
+
+        subtitle: "まずAPIサーバー。予約の登録や一覧の取得みたいな「アプリのルール」を動かすのが役目。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ログインは、OAuthやOIDCでブラウザが認証サービス、IdPへリダイレクトされるのが定番。同意したあと、コールバックURLでアプリに戻ってトークンを受け取る流れよ。"
+
+        subtitle: "ログインは、OAuthやOIDCでブラウザが認証サービス、IdPへリダイレクトされるのが定番。同意したあと、コールバックURLでアプリに戻ってトークンを受け取る流れよ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIを呼ぶときは、そのトークンを検証したり、JWKSを取りに行ったりするために、APIからも認証サービスへ線が伸びるわ。ログイン用と検証用で、認証への線が二本になるイメージね。"
+
+        subtitle: "APIを呼ぶときは、そのトークンを検証したり、JWKSを取りに行ったりするために、APIからも認証サービスへ線が伸びるわ。ログイン用と検証用で、認証への線が二本になるイメージね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "そしてRDB、リレーショナルデータベース。アカウントや予約をちゃんと残すために、ディスク上に永続化するわ。"
+
+        subtitle: "そしてRDB、リレーショナルデータベース。アカウントや予約をちゃんと残すために、ディスク上に永続化するわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "Webサーバーだけだと、誰の予約か区別できないのだ？"
+
+        subtitle: "Webサーバーだけだと、誰の予約か区別できないのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "静的ファイルだけだとそうなりがち。画面はWeb、処理はAPI、身元確認は認証サービス、データの置き場はDB、と分けるのが定番よ。"
+
+        subtitle: "静的ファイルだけだとそうなりがち。画面はWeb、処理はAPI、身元確認は認証サービス、データの置き場はDB、と分けるのが定番よ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "さらに、よく読まれるデータはキャッシュに載せて、DBへの負荷を下げる。Redisみたいなインメモリキャッシュが代表例ね。"
+
+        subtitle: "さらに、よく読まれるデータはキャッシュに載せて、DBへの負荷を下げる。Redisみたいなインメモリキャッシュが代表例ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "Webが見た目、APIが頭脳、認証が入館ゲート、DBが台帳、キャッシュがメモ帳みたいなのだ！"
+
+        subtitle: "Webが見た目、APIが頭脳、認証が入館ゲート、DBが台帳、キャッシュがメモ帳みたいなのだ！"
+
+
+
+  # ============================================================
+
+  # 3. 入口：DNSからロードバランサーへ
+
+  # ============================================================
+
+  - id: "dns-and-lb"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "前回はDNSの次がCDNだったのだ。今回は？"
+
+        subtitle: "前回はDNSの次がCDNだったのだ。今回は？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "動的Webアプリの定番形では、DNSの次はロードバランサー、LBを置くことが多いわ。"
+
+        subtitle: "動的Webアプリの定番形では、DNSの次はロードバランサー、LBを置くことが多いわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "アクセスが増えたとき、WebもAPIも一台だけだとすぐ限界。LBが手前で複数台に振り分けて、Web用とAPI用の両方を支えるイメージね。"
+
+        subtitle: "アクセスが増えたとき、WebもAPIも一台だけだとすぐ限界。LBが手前で複数台に振り分けて、Web用とAPI用の両方を支えるイメージね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "お昼の予約ラッシュでもサーバーがパンクしにくいのだ！"
+
+        subtitle: "お昼の予約ラッシュでもサーバーがパンクしにくいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "パズルではシンプルに、クライアント→DNS→LBの一本道で考えるわ。名前解決のあと、まずLBが受け止めるイメージね。"
+
+        subtitle: "パズルではシンプルに、クライアント→DNS→LBの一本道で考えるわ。名前解決のあと、まずLBが受け止めるイメージね。"
+
+
+
+  # ============================================================
+
+  # 4. LBからWebとAPIへ（実務に近い分岐）
+
+  # ============================================================
+
+  - id: "lb-routing"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "LBの次は、Webサーバーなのだ？CDNはどこいったのだ？"
+
+        subtitle: "LBの次は、Webサーバーなのだ？CDNはどこいったのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "本番ではCDNを前に置くことも多いけれど、このチャレンジではLBの振り分けにフォーカスするわ。"
+
+        subtitle: "本番ではCDNを前に置くことも多いけれど、このチャレンジではLBの振り分けにフォーカスするわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "SPAなら、LBの先にWebサーバーでHTMLやJSを返し、別ルートでAPIサーバーにJSONリクエストを流す。だからパズルでは、LBからWebへ、LBからAPIへ、の二本ね。"
+
+        subtitle: "SPAなら、LBの先にWebサーバーでHTMLやJSを返し、別ルートでAPIサーバーにJSONリクエストを流す。だからパズルでは、LBからWebへ、LBからAPIへ、の二本ね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "ブラウザはDNS経由でLBに着いて、パスやホストでWebとAPIに分かれる。実務でよくあるLB→API直結の形よ。"
+
+        subtitle: "ブラウザはDNS経由でLBに着いて、パスやホストでWebとAPIに分かれる。実務でよくあるLB→API直結の形よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "画面の配信と、APIの処理が、LBで別レーンになるのだ！"
+
+        subtitle: "画面の配信と、APIの処理が、LBで別レーンになるのだ！"
+
+
+
+  # ============================================================
+
+  # 5. IdPリダイレクト（クライアント→認証）
+
+  # ============================================================
+
+  - id: "oauth-idp"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "ログインのとき、ブラウザがぱっと別ドメインに飛ぶのだ。あれも線で出すのだ？"
+
+        subtitle: "ログインのとき、ブラウザがぱっと別ドメインに飛ぶのだ。あれも線で出すのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "出すわ。クライアントから認証サービスへ、一本。ユーザーがIdPの画面でログインして同意する流れを表すの。"
+
+        subtitle: "出すわ。クライアントから認証サービスへ、一本。ユーザーがIdPの画面でログインして同意する流れを表すの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "リダイレクトで戻ったあと、フロントがトークンを持ってAPIを呼ぶ。往復で矢印が増えるけれど、パズルではクライアントと認証サービスの一本で、IdPへのリダイレクトとログイン画面でのやり取りまでをまとめて表すの。"
+
+        subtitle: "リダイレクトで戻ったあと、フロントがトークンを持ってAPIを呼ぶ。往復で矢印が増えるけれど、パズルではクライアントと認証サービスの一本で、IdPへのリダイレクトとログイン画面でのやり取りまでをまとめて表すの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ログインはクライアント→認証、APIの検証はAPI→認証、と役割が分かれるのだ！"
+
+        subtitle: "ログインはクライアント→認証、APIの検証はAPI→認証、と役割が分かれるのだ！"
+
+
+
+  # ============================================================
+
+  # 6. APIの奥：RDBとキャッシュ
+
+  # ============================================================
+
+  - id: "api-db-cache"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIサーバーは、アカウントや予約、マスタデータをRDBに読み書きする。ここがシステムのいちばん大事なデータの置き場。"
+
+        subtitle: "APIサーバーは、アカウントや予約、マスタデータをRDBに読み書きする。ここがシステムのいちばん大事なデータの置き場。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "同じ一覧を秒間何千回もDBに聞きに行くと遅いから、一度取った結果をキャッシュに載せる。"
+
+        subtitle: "同じ一覧を秒間何千回もDBに聞きに行くと遅いから、一度取った結果をキャッシュに載せる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "クライアントから認証へも、APIから認証へも線があるのだ。キャッシュとDBもAPIからなのだ？"
+
+        subtitle: "クライアントから認証へも、APIから認証へも線があるのだ。キャッシュとDBもAPIからなのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "その通り。認証まわりはクライアント→認証とAPI→認証の二本。APIからはさらにRDBとキャッシュへ、計三本の矢印が伸びるわ。キャッシュは「速くするための脇役」よ。"
+
+        subtitle: "その通り。認証まわりはクライアント→認証とAPI→認証の二本。APIからはさらにRDBとキャッシュへ、計三本の矢印が伸びるわ。キャッシュは「速くするための脇役」よ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "キャッシュが古い内容を返すと、画面とDBでズレるから、更新タイミングは設計でちゃんと決めるのよ。"
+
+        subtitle: "キャッシュが古い内容を返すと、画面とDBでズレるから、更新タイミングは設計でちゃんと決めるのよ。"
+
+
+
+  # ============================================================
+
+  # 7. パズルの答え（チャレンジ2と一致）
+
+  # ============================================================
+
+  - id: "puzzle-answer"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "コンポーネントは八つ。クライアント、DNS、ロードバランサー、Webサーバー、APIサーバー、認証サービス、RDB、キャッシュ。"
+
+        subtitle: "コンポーネントは八つ。クライアント、DNS、ロードバランサー、Webサーバー、APIサーバー、認証サービス、RDB、キャッシュ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "接続は八本。クライアント→DNS、DNS→LB、LB→Web、LB→API、クライアント→認証、API→認証、API→DB、API→キャッシュ。"
+
+        subtitle: "接続は八本。クライアント→DNS、DNS→LB、LB→Web、LB→API、クライアント→認証、API→認証、API→DB、API→キャッシュ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "クラウドアーキテクチャパズルのアプリ上でも、この通りに置いて線を引けば「動的Webアプリの基本構成」クリアよ。"
+
+        subtitle: "クラウドアーキテクチャパズルのアプリ上でも、この通りに置いて線を引けば「動的Webアプリの基本構成」クリアよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "AWSなら、LBはALBとか、DBはRDS、キャッシュはElastiCache、認証はCognitoみたいなの……役割ごとにサービス名が変わるだけなのだ！"
+
+        subtitle: "AWSなら、LBはALBとか、DBはRDS、キャッシュはElastiCache、認証はCognitoみたいなの……役割ごとにサービス名が変わるだけなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "そう。ピースの名前はベンダーで違っても、役割の並びは覚えやすいわ。"
+
+        subtitle: "そう。ピースの名前はベンダーで違っても、役割の並びは覚えやすいわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "買い物や決済まで図に入れたいときは、上級の「EC決済フルスタック」チャレンジを見てね。"
+
+        subtitle: "買い物や決済まで図に入れたいときは、上級の「EC決済フルスタック」チャレンジを見てね。"
+
+
+
+  # ============================================================
+
+  # 8. まとめとエンディング
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "まとめ。DNSで名前を解決し、LBがWebとAPIに振り分け、クライアントはIdPへリダイレクトしてログインし、APIはトークン検証で認証と連携する。"
+
+        subtitle: "まとめ。DNSで名前を解決し、LBがWebとAPIに振り分け、クライアントはIdPへリダイレクトしてログインし、APIはトークン検証で認証と連携する。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "データはRDBに永続化、キャッシュで読み取りを高速化。この八ピース八接続が、中級チャレンジの答えよ。"
+
+        subtitle: "データはRDBに永続化、キャッシュで読み取りを高速化。この八ピース八接続が、中級チャレンジの答えよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "社内ツールも会員サイトも、この並びが土台なのだ！ECの本格版は別チャレンジなのだ！"
+
+        subtitle: "社内ツールも会員サイトも、この並びが土台なのだ！ECの本格版は別チャレンジなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "次は動画配信プラットフォームチャレンジで、キューとワーカーとストレージが出てくるのだ。楽しみなのだ！"
+
+        subtitle: "次は動画配信プラットフォームチャレンジで、キューとワーカーとストレージが出てくるのだ。楽しみなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "また次の動画で会いましょう。"
+
+        subtitle: "また次の動画で会いましょう。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+        subtitle: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！"
