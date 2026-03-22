@@ -1,0 +1,725 @@
+title: "【クラウドアーキテクチャパズル】リアルタイムチャットアプリの仕組みをゼロから理解するのだ！"
+
+# YouTube: https://youtu.be/CvTgJkdWcfA
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # 1. オープニング：動画の次は「今この瞬間」の会話
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "前回は「動画配信プラットフォーム」チャレンジだったのだ！オブジェクトストレージ、キュー、CDN、大変だったのだ！"
+
+        subtitle: "前回は「動画配信プラットフォーム」チャレンジだったのだ！オブジェクトストレージ、キュー、CDN、大変だったのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。今回はチャレンジ4、「リアルタイムチャットアプリ」よ。"
+
+        subtitle: "四国めたんです。今回はチャレンジ4、「リアルタイムチャットアプリ」よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "視聴者とずんだもち屋が、配信中にコメントで盛り上がりたいのだ！送信したらすぐ相手の画面に出る、あのやつなのだ！"
+
+        subtitle: "視聴者とずんだもち屋が、配信中にコメントで盛り上がりたいのだ！送信したらすぐ相手の画面に出る、あのやつなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "でもチャレンジ2の「HTTPでAPIを叩く」だけだと、サーバーが新着を教えてくれるまで画面が動かないのだ……。"
+
+        subtitle: "でもチャレンジ2の「HTTPでAPIを叩く」だけだと、サーバーが新着を教えてくれるまで画面が動かないのだ……。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "今回のテーマは三つ。「すぐ届ける」「誰がオンラインか」「アプリを閉じてても知らせる」。そのためにWebSocketとプッシュ通知が出てくるわ。"
+
+        subtitle: "今回のテーマは三つ。「すぐ届ける」「誰がオンラインか」「アプリを閉じてても知らせる」。そのためにWebSocketとプッシュ通知が出てくるわ。"
+
+
+
+  # ============================================================
+
+  # 2. HTTPだけの限界：ポーリングとレイテンシ
+
+  # ============================================================
+
+  - id: "http-limit"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "新着メッセージを知るために、一秒ごとにAPIに「何か来た？」って聞き続けるのだ？それ、大変じゃないのだ？"
+
+        subtitle: "新着メッセージを知るために、一秒ごとにAPIに「何か来た？」って聞き続けるのだ？それ、大変じゃないのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "それをポーリングというわ。間隔を短くすれば体感は速いけど、来てないときもリクエストが雪だるま式に増える。"
+
+        subtitle: "それをポーリングというわ。間隔を短くすれば体感は速いけど、来てないときもリクエストが雪だるま式に増える。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "チャットみたいに「届いた瞬間に相手に見せたい」なら、サーバーからクライアントへ能動的に送れる仕組みが欲しいの。そこでWebSocketよ。"
+
+        subtitle: "チャットみたいに「届いた瞬間に相手に見せたい」なら、サーバーからクライアントへ能動的に送れる仕組みが欲しいの。そこでWebSocketよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "HTTPは基本、聞いたら答える一方通行なのだ。双方向でつなぎっぱなしにするのがWebSocketなのだ！"
+
+        subtitle: "HTTPは基本、聞いたら答える一方通行なのだ。双方向でつなぎっぱなしにするのがWebSocketなのだ！"
+
+
+
+  # ============================================================
+
+  # 3. WebSocket：長い接続でリアルタイム
+
+  # ============================================================
+
+  - id: "websocket-intro"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "WebSocketは、一度TCP接続を張ったあと、HTTPのように毎回ヘッダーを付け直さずに、軽いフレームで行き来できる。"
+
+        subtitle: "WebSocketは、一度TCP接続を張ったあと、HTTPのように毎回ヘッダーを付け直さずに、軽いフレームで行き来できる。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "サーバーからクライアントへ、メッセージが来たタイミングですぐプッシュできる。だからチャットやライブのコメントに向いてるの。"
+
+        subtitle: "サーバーからクライアントへ、メッセージが来たタイミングですぐプッシュできる。だからチャットやライブのコメントに向いてるの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "WebSocketサーバーって、チャレンジ2のAPIサーバーと同じなのだ？"
+
+        subtitle: "WebSocketサーバーって、チャレンジ2のAPIサーバーと同じなのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "役割が違うわ。APIはプロフィール更新や履歴取得みたいなHTTPリクエストを処理し、WebSocketサーバーは接続を張ったユーザ同士のメッセージ配信を担当するイメージ。"
+
+        subtitle: "役割が違うわ。APIはプロフィール更新や履歴取得みたいなHTTPリクエストを処理し、WebSocketサーバーは接続を張ったユーザ同士のメッセージ配信を担当するイメージ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "実装では同一プロセスのことも多いけど、パズルでは「WebSocketサーバー」ピースが双方向通信の窓口よ。"
+
+        subtitle: "実装では同一プロセスのことも多いけど、パズルでは「WebSocketサーバー」ピースが双方向通信の窓口よ。"
+
+
+
+  # ============================================================
+
+  # 4. ロードバランサー：HTTPとWebSocketの振り分け
+
+  # ============================================================
+
+  - id: "lb-routing"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "クライアントはまずDNSで名前を調べて、前と同じくロードバランサーに着くのだ？"
+
+        subtitle: "クライアントはまずDNSで名前を調べて、前と同じくロードバランサーに着くのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "そう。クライアント→DNS、DNS→ロードバランサー、という入口はこれまでと同じね。"
+
+        subtitle: "そう。クライアント→DNS、DNS→ロードバランサー、という入口はこれまでと同じね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ロードバランサーが、通常のREST API向けのトラフィックと、WebSocket向けのトラフィックを別のバックエンドに振り分ける。だからLBからAPIとLBからWebSocketの二本が伸びるの。"
+
+        subtitle: "ロードバランサーが、通常のREST API向けのトラフィックと、WebSocket向けのトラフィックを別のバックエンドに振り分ける。だからLBからAPIとLBからWebSocketの二本が伸びるの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "Web用のHTML配信ピースは無くて、LBがAPIとWebSocketに直接振るのだ。チャット画面はSPAでAPIとWebSocketの両方を使うイメージなのだ！"
+
+        subtitle: "Web用のHTML配信ピースは無くて、LBがAPIとWebSocketに直接振るのだ。チャット画面はSPAでAPIとWebSocketの両方を使うイメージなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "本番ではWebサーバーやCDNを前に置く構成もあるけれど、このチャレンジでは「双方向」と「REST」の二本柱にフォーカスするわ。"
+
+        subtitle: "本番ではWebサーバーやCDNを前に置く構成もあるけれど、このチャレンジでは「双方向」と「REST」の二本柱にフォーカスするわ。"
+
+
+
+  # ============================================================
+
+  # 5. WebSocketとAPIの連携：認証と永続化
+
+  # ============================================================
+
+  - id: "websocket-and-api"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "メッセージを誰に送るか、過去の履歴はどこに残すのだ？WebSocketだけだと足りないのだ？"
+
+        subtitle: "メッセージを誰に送るか、過去の履歴はどこに残すのだ？WebSocketだけだと足りないのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "WebSocketサーバーは、接続のルーティングやブロードキャストが得意。でもトークンの検証や、部屋の作成、通報処理みたいな業務ロジックはAPIに任せることが多いわ。"
+
+        subtitle: "WebSocketサーバーは、接続のルーティングやブロードキャストが得意。でもトークンの検証や、部屋の作成、通報処理みたいな業務ロジックはAPIに任せることが多いわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "パズルでは、WebSocketサーバーからAPIサーバーへ一本つないで、「認証の確認やメッセージの保存をAPIに頼む」関係を表すの。"
+
+        subtitle: "パズルでは、WebSocketサーバーからAPIサーバーへ一本つないで、「認証の確認やメッセージの保存をAPIに頼む」関係を表すの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIから認証サービスへは、トークン検証のための矢印。チャレンジ2と同じく、API→認証の一本よ。"
+
+        subtitle: "APIから認証サービスへは、トークン検証のための矢印。チャレンジ2と同じく、API→認証の一本よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "クライアントから認証サービスへの線は無いのだ？ログインはどうするのだ？"
+
+        subtitle: "クライアントから認証サービスへの線は無いのだ？ログインはどうするのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "パズルではシンプルにまとめていて、OAuthのリダイレクトは省略されていることもあるわ。アプリの実装では、初回ログインはブラウザでIdPへ行くから、別チャレンジと同様にクライアント→認証を足す考え方もあるの。"
+
+        subtitle: "パズルではシンプルにまとめていて、OAuthのリダイレクトは省略されていることもあるわ。アプリの実装では、初回ログインはブラウザでIdPへ行くから、別チャレンジと同様にクライアント→認証を足す考え方もあるの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "今回の模範解答は、APIが認証の中心で、WebSocketはAPIと手を組む形。覚えやすいわ。"
+
+        subtitle: "今回の模範解答は、APIが認証の中心で、WebSocketはAPIと手を組む形。覚えやすいわ。"
+
+
+
+  # ============================================================
+
+  # 6. NoSQL：メッセージ履歴の置き場
+
+  # ============================================================
+
+  - id: "nosql"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "チャレンジ2ではRDBだったのだ。チャットの履歴も全部リレーショナルなのだ？"
+
+        subtitle: "チャレンジ2ではRDBだったのだ。チャットの履歴も全部リレーショナルなのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "チャットのメッセージは、部屋IDと時系列でどんどん増えるから、スキーマが柔らかく水平に伸ばしやすいNoSQLを選ぶことが多いわ。"
+
+        subtitle: "チャットのメッセージは、部屋IDと時系列でどんどん増えるから、スキーマが柔らかく水平に伸ばしやすいNoSQLを選ぶことが多いわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "パズルのピースは「NoSQL」。DynamoDBやFirestoreみたいなドキュメントやキー値ストアをイメージしてね。"
+
+        subtitle: "パズルのピースは「NoSQL」。DynamoDBやFirestoreみたいなドキュメントやキー値ストアをイメージしてね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "永続化の経路は、メッセージを受け取ったWebSocketがAPIを呼び、APIがNoSQLに書き込む、という整理で一本。API→NoSQLの矢印よ。"
+
+        subtitle: "永続化の経路は、メッセージを受け取ったWebSocketがAPIを呼び、APIがNoSQLに書き込む、という整理で一本。API→NoSQLの矢印よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "読み込みで過去ログを引くときも、クライアントはHTTPでAPIを叩くから、同じAPI→NoSQLの流れで説明できるのだ！"
+
+        subtitle: "読み込みで過去ログを引くときも、クライアントはHTTPでAPIを叩くから、同じAPI→NoSQLの流れで説明できるのだ！"
+
+
+
+  # ============================================================
+
+  # 7. キャッシュとプッシュ通知：オンラインとオフライン
+
+  # ============================================================
+
+  - id: "cache-and-push"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "「今ログインしてる？」を毎回DBに聞くのは遅いのだ？"
+
+        subtitle: "「今ログインしてる？」を毎回DBに聞くのは遅いのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "オンライン状態や最終接続時刻は、更新が激しくて読み取りも多いから、インメモリのキャッシュに載せることが多いわ。"
+
+        subtitle: "オンライン状態や最終接続時刻は、更新が激しくて読み取りも多いから、インメモリのキャッシュに載せることが多いわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIがキャッシュを読み書きする、という一本で表す。チャレンジ2のキャッシュと同じ役割だけど、中身は「誰が今いるか」寄りね。"
+
+        subtitle: "APIがキャッシュを読み書きする、という一本で表す。チャレンジ2のキャッシュと同じ役割だけど、中身は「誰が今いるか」寄りね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "アプリを閉じてたり、スマホの画面が消えてたりしたら、WebSocketは切れるのだ。そしたらメッセージは届かないのだ？"
+
+        subtitle: "アプリを閉じてたり、スマホの画面が消えてたりしたら、WebSocketは切れるのだ。そしたらメッセージは届かないのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "そこでプッシュ通知サービス。APNsやFCMみたいに、各OSの通知チャネルを経由してバッジや通知を送る。"
+
+        subtitle: "そこでプッシュ通知サービス。APNsやFCMみたいに、各OSの通知チャネルを経由してバッジや通知を送る。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIが「このユーザーに知らせたい」と判断したら、プッシュ通知へ依頼する。パズルではAPI→プッシュ通知の一本よ。"
+
+        subtitle: "APIが「このユーザーに知らせたい」と判断したら、プッシュ通知へ依頼する。パズルではAPI→プッシュ通知の一本よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "オンラインはWebSocketとキャッシュ、オフラインはプッシュ、って役割分担なのだ！"
+
+        subtitle: "オンラインはWebSocketとキャッシュ、オフラインはプッシュ、って役割分担なのだ！"
+
+
+
+  # ============================================================
+
+  # 8. パズルの答え（チャレンジ4と一致）
+
+  # ============================================================
+
+  - id: "puzzle-answer"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "では今回のパズルの答えをまとめるわ。コンポーネントは九つ。"
+
+        subtitle: "では今回のパズルの答えをまとめるわ。コンポーネントは九つ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "クライアント、DNS、ロードバランサー、APIサーバー、WebSocketサーバー、認証サービス、NoSQL、キャッシュ、プッシュ通知。"
+
+        subtitle: "クライアント、DNS、ロードバランサー、APIサーバー、WebSocketサーバー、認証サービス、NoSQL、キャッシュ、プッシュ通知。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "接続は九本。クライアント→DNS、DNS→LB、LB→API、LB→WebSocket、WebSocket→APIの五本が、名前解決から双方向通信まで。"
+
+        subtitle: "接続は九本。クライアント→DNS、DNS→LB、LB→API、LB→WebSocket、WebSocket→APIの五本が、名前解決から双方向通信まで。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "あとはAPIから認証、NoSQL、キャッシュ、プッシュ通知への四本。メッセージの保存、オンライン状態、オフラインへの知らせをまとめて担うわ。"
+
+        subtitle: "あとはAPIから認証、NoSQL、キャッシュ、プッシュ通知への四本。メッセージの保存、オンライン状態、オフラインへの知らせをまとめて担うわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "五＋四で九本、九ピース九接続なのだ！"
+
+        subtitle: "五＋四で九本、九ピース九接続なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "パズルのキャンバスにこの九個を置いて、九本の線でつなげば「リアルタイムチャットアプリ」チャレンジクリアよ。"
+
+        subtitle: "パズルのキャンバスにこの九個を置いて、九本の線でつなげば「リアルタイムチャットアプリ」チャレンジクリアよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "AWSなら、APIはLambdaやECS、WebSocketはAPI GatewayのWebSocketとか、NoSQLはDynamoDB、キャッシュはElastiCache、プッシュはSNSとモバイル連携なのだ！"
+
+        subtitle: "AWSなら、APIはLambdaやECS、WebSocketはAPI GatewayのWebSocketとか、NoSQLはDynamoDB、キャッシュはElastiCache、プッシュはSNSとモバイル連携なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "チャレンジ2の「APIと認証とキャッシュ」の考え方に、WebSocketとNoSQLとプッシュが乗った形ね。"
+
+        subtitle: "チャレンジ2の「APIと認証とキャッシュ」の考え方に、WebSocketとNoSQLとプッシュが乗った形ね。"
+
+
+
+  # ============================================================
+
+  # 9. まとめとエンディング
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "今日のまとめ。DNSで名前を解決し、ロードバランサーがREST用のAPIと、リアルタイム用のWebSocketに振り分ける。"
+
+        subtitle: "今日のまとめ。DNSで名前を解決し、ロードバランサーがREST用のAPIと、リアルタイム用のWebSocketに振り分ける。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "WebSocketサーバーはAPIと連携して認証や永続化を行い、メッセージはNoSQLへ。オンライン状態はキャッシュ、接続が無い相手にはプッシュ通知で知らせる。"
+
+        subtitle: "WebSocketサーバーはAPIと連携して認証や永続化を行い、メッセージはNoSQLへ。オンライン状態はキャッシュ、接続が無い相手にはプッシュ通知で知らせる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもち屋のライブ配信、コメントが秒で届くのだ！"
+
+        subtitle: "ずんだもち屋のライブ配信、コメントが秒で届くのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "クラウドアーキテクチャパズル、みんなもリアルタイムチャットチャレンジをやってみてほしいのだ！"
+
+        subtitle: "クラウドアーキテクチャパズル、みんなもリアルタイムチャットチャレンジをやってみてほしいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "次のチャレンジは上級の「EC決済フルスタック」。CDN、WAF、API Gateway、外部決済、メール通知まで、お店の裏方全部が一枚の図に出てくるから楽しみにしてね。"
+
+        subtitle: "次のチャレンジは上級の「EC決済フルスタック」。CDN、WAF、API Gateway、外部決済、メール通知まで、お店の裏方全部が一枚の図に出てくるから楽しみにしてね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "また次の動画で会いましょう。"
+
+        subtitle: "また次の動画で会いましょう。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+        subtitle: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！"
