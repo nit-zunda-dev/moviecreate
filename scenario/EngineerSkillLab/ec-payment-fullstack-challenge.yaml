@@ -1,0 +1,865 @@
+title: "【クラウドアーキテクチャパズル】EC決済フルスタックの仕組みをゼロから理解するのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # 1. オープニング：ずんだもち屋をECサイトで開店したい！
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "前回は「リアルタイムチャットアプリ」チャレンジだったのだ！WebSocket、NoSQL、プッシュ通知、全部わかったのだ！"
+
+        subtitle: "前回は「リアルタイムチャットアプリ」チャレンジだったのだ！WebSocket、NoSQL、プッシュ通知、全部わかったのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。今回はチャレンジ5、「EC決済フルスタック」よ。上級編ね。"
+
+        subtitle: "四国めたんです。今回はチャレンジ5、「EC決済フルスタック」よ。上級編ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもち屋をオンラインで開店するのだ！ずんだもちをネットで売って、全国に届けたいのだ！"
+
+        subtitle: "ずんだもち屋をオンラインで開店するのだ！ずんだもちをネットで売って、全国に届けたいのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "でも、お金のやり取りが入ると、これまでと何かが違う気がするのだ……。不正アクセスも怖いのだ。"
+
+        subtitle: "でも、お金のやり取りが入ると、これまでと何かが違う気がするのだ……。不正アクセスも怖いのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "今回のテーマは四つ。「攻撃を防ぐWAF」「APIを整理するAPI Gateway」「安全に決済する外部サービス連携」「注文を伝えるメール通知」よ。"
+
+        subtitle: "今回のテーマは四つ。「攻撃を防ぐWAF」「APIを整理するAPI Gateway」「安全に決済する外部サービス連携」「注文を伝えるメール通知」よ。"
+
+
+
+  # ============================================================
+
+  # 2. ECサイトの特殊性：セキュリティとお金が絡む
+
+  # ============================================================
+
+  - id: "ec-special"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "チャレンジ2の動的Webアプリと何が違うのだ？ずんだもちの販売ページとAPIがあればいいのだ？"
+
+        subtitle: "チャレンジ2の動的Webアプリと何が違うのだ？ずんだもちの販売ページとAPIがあればいいのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ECサイトは個人情報とクレジットカード情報を扱うから、普通のサービスより格段にセキュリティが厳しいの。"
+
+        subtitle: "ECサイトは個人情報とクレジットカード情報を扱うから、普通のサービスより格段にセキュリティが厳しいの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "SQLインジェクションで注文データを盗まれたり、大量リクエストでサイトを落とされたり、不正なカード情報を送りつけられたり。対策が必要よ。"
+
+        subtitle: "SQLインジェクションで注文データを盗まれたり、大量リクエストでサイトを落とされたり、不正なカード情報を送りつけられたり。対策が必要よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "ずんだもち屋のデータが盗まれたら大変なのだ！どうやって守るのだ？"
+
+        subtitle: "ずんだもち屋のデータが盗まれたら大変なのだ！どうやって守るのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "そこで登場するのが「WAF」と「API Gateway」という二つの新しいコンポーネントよ。"
+
+        subtitle: "そこで登場するのが「WAF」と「API Gateway」という二つの新しいコンポーネントよ。"
+
+
+
+  # ============================================================
+
+  # 3. WAF：悪意ある通信を玄関でブロック
+
+  # ============================================================
+
+  - id: "waf"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "WAFって何なのだ？ファイアウォールとは違うのだ？"
+
+        subtitle: "WAFって何なのだ？ファイアウォールとは違うのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "WAFはWeb Application Firewallの略。普通のファイアウォールがIPやポートで制限するのに対し、WAFはHTTPの中身を見て判断するの。"
+
+        subtitle: "WAFはWeb Application Firewallの略。普通のファイアウォールがIPやポートで制限するのに対し、WAFはHTTPの中身を見て判断するの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "リクエストに「SELECT * FROM users」みたいなSQLが混じっていたらブロック、同じIPから一秒に千回来たらブロック、有名な攻撃パターンなら弾く、という具合ね。"
+
+        subtitle: "リクエストに「SELECT * FROM users」みたいなSQLが混じっていたらブロック、同じIPから一秒に千回来たらブロック、有名な攻撃パターンなら弾く、という具合ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "玄関に立つ門番みたいなのだ！怪しいひとは中に入れないのだ！"
+
+        subtitle: "玄関に立つ門番みたいなのだ！怪しいひとは中に入れないのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "今回の構成ではCDNをくぐったリクエストがWAFへ届く。WAFが安全と判断したものだけを次のAPI Gatewayへ通す。AWSだとAWS WAFがそれにあたるわ。"
+
+        subtitle: "今回の構成ではCDNをくぐったリクエストがWAFへ届く。WAFが安全と判断したものだけを次のAPI Gatewayへ通す。AWSだとAWS WAFがそれにあたるわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "CDNのあとにWAF、そのあとにAPI Gatewayなのだ？三段構えなのだ！"
+
+        subtitle: "CDNのあとにWAF、そのあとにAPI Gatewayなのだ？三段構えなのだ！"
+
+
+
+  # ============================================================
+
+  # 4. API Gateway：APIの玄関口をひとつにまとめる
+
+  # ============================================================
+
+  - id: "api-gateway"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "API GatewayはAPIサーバーと何が違うのだ？名前が似てて紛らわしいのだ。"
+
+        subtitle: "API GatewayはAPIサーバーと何が違うのだ？名前が似てて紛らわしいのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIサーバーは注文処理や商品管理など「ビジネスロジック」を担う。API Gatewayはその手前で、レート制限・ルーティング・トークン検証の代行など「横断的な共通処理」を担うわ。"
+
+        subtitle: "APIサーバーは注文処理や商品管理など「ビジネスロジック」を担う。API Gatewayはその手前で、レート制限・ルーティング・トークン検証の代行など「横断的な共通処理」を担うわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "たとえば「一ユーザーが一分間にAPIを叩ける回数を百回まで」という制限はAPI Gatewayが引き受ける。APIサーバーがその処理をしなくて済む分、商品やお金の処理に集中できるの。"
+
+        subtitle: "たとえば「一ユーザーが一分間にAPIを叩ける回数を百回まで」という制限はAPI Gatewayが引き受ける。APIサーバーがその処理をしなくて済む分、商品やお金の処理に集中できるの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもちの注文処理だけに集中できるのだ！共通の面倒事はAPI Gatewayに任せるのだ！"
+
+        subtitle: "ずんだもちの注文処理だけに集中できるのだ！共通の面倒事はAPI Gatewayに任せるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "パズルの接続は、WAF→API Gateway、API Gateway→APIサーバーの二本。WAFで攻撃を防ぎ、API Gatewayで交通整理し、APIサーバーで注文処理、という三段の流れよ。"
+
+        subtitle: "パズルの接続は、WAF→API Gateway、API Gateway→APIサーバーの二本。WAFで攻撃を防ぎ、API Gatewayで交通整理し、APIサーバーで注文処理、という三段の流れよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "チャレンジ2のロードバランサーの位置に、WAFとAPI Gatewayの二枚重ねが入ったイメージなのだ！"
+
+        subtitle: "チャレンジ2のロードバランサーの位置に、WAFとAPI Gatewayの二枚重ねが入ったイメージなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "いいまとめ方ね。実際、API GatewayがロードバランシングやSSL終端も担うこともあって、LBと役割が重なる部分もあるわ。"
+
+        subtitle: "いいまとめ方ね。実際、API GatewayがロードバランシングやSSL終端も担うこともあって、LBと役割が重なる部分もあるわ。"
+
+
+
+  # ============================================================
+
+  # 5. CDN：全トラフィックの共通エッジ
+
+  # ============================================================
+
+  - id: "cdn-origin"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "商品ページのずんだもち画像もAPIから取るのだ？それとも別の仕組みなのだ？"
+
+        subtitle: "商品ページのずんだもち画像もAPIから取るのだ？それとも別の仕組みなのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "チャレンジ1や3で登場したCDNが今回も活躍するわ。今回は静的アセットと動的リクエストの両方をひとつのCDNがエッジでまとめて受け取る構成よ。"
+
+        subtitle: "チャレンジ1や3で登場したCDNが今回も活躍するわ。今回は静的アセットと動的リクエストの両方をひとつのCDNがエッジでまとめて受け取る構成よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "えっ、CDNが動的なAPIリクエストも受け取るのだ？"
+
+        subtitle: "えっ、CDNが動的なAPIリクエストも受け取るのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "そう。CDNがエッジで画像やJSをキャッシュしつつ、動的なAPIリクエストはWAFへ転送する。DNS→CDN→WAFという一本道で全トラフィックが流れるから、パズルの接続は一本増えないわ。"
+
+        subtitle: "そう。CDNがエッジで画像やJSをキャッシュしつつ、動的なAPIリクエストはWAFへ転送する。DNS→CDN→WAFという一本道で全トラフィックが流れるから、パズルの接続は一本増えないわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "DNSが分岐するんじゃなくて、CDNが最初の関所になって、そこからWAFへ一本でつながるのだ！"
+
+        subtitle: "DNSが分岐するんじゃなくて、CDNが最初の関所になって、そこからWAFへ一本でつながるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "AWSのCloudFrontがまさにその役割よ。エッジでキャッシュしながら、未キャッシュの動的リクエストはWAFを経由してバックエンドへ届ける。"
+
+        subtitle: "AWSのCloudFrontがまさにその役割よ。エッジでキャッシュしながら、未キャッシュの動的リクエストはWAFを経由してバックエンドへ届ける。"
+
+
+
+  # ============================================================
+
+  # 6. 外部決済サービス：カード情報を自社で持たない
+
+  # ============================================================
+
+  - id: "payment-service"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "お客さんのクレジットカード情報、自分のRDBに保存するのだ？なんか怖いのだ……。"
+
+        subtitle: "お客さんのクレジットカード情報、自分のRDBに保存するのだ？なんか怖いのだ……。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "絶対ダメよ。クレジットカード情報を自社で扱うには「PCI DSS」という国際的なセキュリティ基準を満たさないといけない。個人のECサイトには荷が重すぎる。"
+
+        subtitle: "絶対ダメよ。クレジットカード情報を自社で扱うには「PCI DSS」という国際的なセキュリティ基準を満たさないといけない。個人のECサイトには荷が重すぎる。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "だから実務では「外部決済サービス」に委託するの。StripeやPayPayみたいなサービスが、カード情報の受け取りと課金処理を代わりに担ってくれる。"
+
+        subtitle: "だから実務では「外部決済サービス」に委託するの。StripeやPayPayみたいなサービスが、カード情報の受け取りと課金処理を代わりに担ってくれる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "カード番号はずんだもち屋のサーバーに一切触れないのだ！専門家に丸投げするのだ！"
+
+        subtitle: "カード番号はずんだもち屋のサーバーに一切触れないのだ！専門家に丸投げするのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "注文確定のタイミングで、APIサーバーが外部決済サービスに「この金額を請求して」と依頼する。決済サービスが成功か失敗かを返してきたら、APIがRDBの注文ステータスを更新するわ。"
+
+        subtitle: "注文確定のタイミングで、APIサーバーが外部決済サービスに「この金額を請求して」と依頼する。決済サービスが成功か失敗かを返してきたら、APIがRDBの注文ステータスを更新するわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "APIサーバー→外部決済サービスの線が一本増えるのだ！お金の流れを安全に外に出すのだ！"
+
+        subtitle: "APIサーバー→外部決済サービスの線が一本増えるのだ！お金の流れを安全に外に出すのだ！"
+
+
+
+  # ============================================================
+
+  # 7. メール通知：キューとジョブワーカーで非同期送信
+
+  # ============================================================
+
+  - id: "email-notification"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "注文が完了したら「ご注文ありがとうございます」ってメールが来るのだ！あれはどうやって送るのだ？"
+
+        subtitle: "注文が完了したら「ご注文ありがとうございます」ってメールが来るのだ！あれはどうやって送るのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ここでチャレンジ3の動画変換で学んだ「メッセージキューとジョブワーカー」が再登場するわ。"
+
+        subtitle: "ここでチャレンジ3の動画変換で学んだ「メッセージキューとジョブワーカー」が再登場するわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "キューとジョブワーカーがまた出てくるのだ！今度は動画じゃなくてメールを送るために使うのだ？"
+
+        subtitle: "キューとジョブワーカーがまた出てくるのだ！今度は動画じゃなくてメールを送るために使うのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "そう。決済が成功したらAPIはメッセージキューに「このユーザーに注文確認メールを送って」と積むだけ。APIは次のリクエストを受け付けられるわ。"
+
+        subtitle: "そう。決済が成功したらAPIはメッセージキューに「このユーザーに注文確認メールを送って」と積むだけ。APIは次のリクエストを受け付けられるわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "キューを監視しているジョブワーカーがメッセージを取り出して、メールサービスに送信を依頼する。AWSのSES（Simple Email Service）やSendGridが代表例ね。"
+
+        subtitle: "キューを監視しているジョブワーカーがメッセージを取り出して、メールサービスに送信を依頼する。AWSのSES（Simple Email Service）やSendGridが代表例ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "APIサーバー→キュー→ジョブワーカー→メールサービス、という非同期の流れなのだ！チャレンジ3の動画変換と同じパターンなのだ！"
+
+        subtitle: "APIサーバー→キュー→ジョブワーカー→メールサービス、という非同期の流れなのだ！チャレンジ3の動画変換と同じパターンなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "非同期にすることで、大量注文でもAPIが詰まらないし、メール送信に失敗してもキューからリトライできる。決済と通知の両方を外部サービスに委ねる、これがフルスタックのコツよ。"
+
+        subtitle: "非同期にすることで、大量注文でもAPIが詰まらないし、メール送信に失敗してもキューからリトライできる。決済と通知の両方を外部サービスに委ねる、これがフルスタックのコツよ。"
+
+
+
+  # ============================================================
+
+  # 8. 全体フローの整理：購入の流れをたどる
+
+  # ============================================================
+
+  - id: "flow-summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "一度、ずんだもちを買う流れを最初から全部たどってみたいのだ！"
+
+        subtitle: "一度、ずんだもちを買う流れを最初から全部たどってみたいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "すべてのリクエストはまずDNSで名前を解決してCDNに届く。CDNはキャッシュできる静的コンテンツをエッジで返し、動的リクエストはWAF→API Gateway→APIサーバーへ転送する。"
+
+        subtitle: "すべてのリクエストはまずDNSで名前を解決してCDNに届く。CDNはキャッシュできる静的コンテンツをエッジで返し、動的リクエストはWAF→API Gateway→APIサーバーへ転送する。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "DNS→CDN→WAF→API Gateway→API、という一本道なのだ！DNSが分岐するんじゃなくて、CDNが全部まとめて受け取るのだ！"
+
+        subtitle: "DNS→CDN→WAF→API Gateway→API、という一本道なのだ！DNSが分岐するんじゃなくて、CDNが全部まとめて受け取るのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "商品一覧や在庫はAPIがキャッシュを参照し、なければRDBから読み込む。注文確定のとき、APIが認証サービスでユーザーを確認し、外部決済APIに課金を依頼する。"
+
+        subtitle: "商品一覧や在庫はAPIがキャッシュを参照し、なければRDBから読み込む。注文確定のとき、APIが認証サービスでユーザーを確認し、外部決済APIに課金を依頼する。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "決済が成功したらAPIはRDBに注文を書き込んで、メッセージキューに「確認メールを送って」と積む。あとはジョブワーカーがキューを取り出してメールサービスへ依頼する。"
+
+        subtitle: "決済が成功したらAPIはRDBに注文を書き込んで、メッセージキューに「確認メールを送って」と積む。あとはジョブワーカーがキューを取り出してメールサービスへ依頼する。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "APIはキュー→ワーカー→メールの非同期ラインを起動して、自分はもう次の仕事に移れるのだ！"
+
+        subtitle: "APIはキュー→ワーカー→メールの非同期ラインを起動して、自分はもう次の仕事に移れるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "これがフルスタックと呼ばれる理由ね。セキュリティから決済、非同期通知まで、お店の裏方が一枚の図に全部収まるの。"
+
+        subtitle: "これがフルスタックと呼ばれる理由ね。セキュリティから決済、非同期通知まで、お店の裏方が一枚の図に全部収まるの。"
+
+
+
+  # ============================================================
+
+  # 9. パズルの答え
+
+  # ============================================================
+
+  - id: "puzzle-answer"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "では今回のパズルの答えをまとめるわ。コンポーネントは十三個。"
+
+        subtitle: "では今回のパズルの答えをまとめるわ。コンポーネントは十三個。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "クライアント、DNS、CDN、WAF、API Gateway、APIサーバー、認証サービス、RDB、キャッシュ、外部決済API、メッセージキュー、ジョブワーカー、メールサービス。"
+
+        subtitle: "クライアント、DNS、CDN、WAF、API Gateway、APIサーバー、認証サービス、RDB、キャッシュ、外部決済API、メッセージキュー、ジョブワーカー、メールサービス。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "接続は十二本。まずフロントの一本道。クライアント→DNS、DNS→CDN、CDN→WAF、WAF→API Gateway、API Gateway→APIサーバーの五本。"
+
+        subtitle: "接続は十二本。まずフロントの一本道。クライアント→DNS、DNS→CDN、CDN→WAF、WAF→API Gateway、API Gateway→APIサーバーの五本。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "APIサーバーから放射状に伸びる五本。認証サービス、RDB、キャッシュ、外部決済APIへ各一本。そして非同期ラインのAPIサーバー→メッセージキューの一本。"
+
+        subtitle: "APIサーバーから放射状に伸びる五本。認証サービス、RDB、キャッシュ、外部決済APIへ各一本。そして非同期ラインのAPIサーバー→メッセージキューの一本。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "最後は非同期ラインの後半、メッセージキュー→ジョブワーカー、ジョブワーカー→メールサービスの二本で計十二本ね。"
+
+        subtitle: "最後は非同期ラインの後半、メッセージキュー→ジョブワーカー、ジョブワーカー→メールサービスの二本で計十二本ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "五＋五＋二で十二本なのだ！十三ピース十二本なのだ！"
+
+        subtitle: "五＋五＋二で十二本なのだ！十三ピース十二本なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "パズルのキャンバスにこの十三個を置いて、十二本の線でつなげば「EC決済フルスタック」チャレンジクリアよ。"
+
+        subtitle: "パズルのキャンバスにこの十三個を置いて、十二本の線でつなげば「EC決済フルスタック」チャレンジクリアよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "AWSだと、CDNはCloudFront、WAFはAWS WAF、API GatewayはAmazon API Gateway、外部決済はStripe、キューはSQS、ジョブワーカーはLambdaやECS、メールはSES、RDBはAuroraなのだ！"
+
+        subtitle: "AWSだと、CDNはCloudFront、WAFはAWS WAF、API GatewayはAmazon API Gateway、外部決済はStripe、キューはSQS、ジョブワーカーはLambdaやECS、メールはSES、RDBはAuroraなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "チャレンジ2の基本構成に、セキュリティ二枚・決済・チャレンジ3の非同期パターン（キュー＋ワーカー）が全部乗った形ね。"
+
+        subtitle: "チャレンジ2の基本構成に、セキュリティ二枚・決済・チャレンジ3の非同期パターン（キュー＋ワーカー）が全部乗った形ね。"
+
+
+
+  # ============================================================
+
+  # 10. まとめとエンディング
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "今日のまとめ。WAFがHTTPの中身を検査して悪意ある通信をブロックし、API Gatewayがレート制限やルーティングを担う。"
+
+        subtitle: "今日のまとめ。WAFがHTTPの中身を検査して悪意ある通信をブロックし、API Gatewayがレート制限やルーティングを担う。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "カード情報は自社に持たず外部決済サービスへ。注文確認や発送通知はメール通知サービスへ。どちらも専門サービスに委託することで、安全性と信頼性を高める。"
+
+        subtitle: "カード情報は自社に持たず外部決済サービスへ。注文確認や発送通知はメール通知サービスへ。どちらも専門サービスに委託することで、安全性と信頼性を高める。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "DNS→CDN→WAF→API Gatewayの一本道でバックエンドへ届き、APIサーバーを中心に認証・DB・キャッシュ・決済・キューの五本が放射状に広がる。キューの先はジョブワーカー→メールサービスで非同期に完結する構成よ。"
+
+        subtitle: "DNS→CDN→WAF→API Gatewayの一本道でバックエンドへ届き、APIサーバーを中心に認証・DB・キャッシュ・決済・キューの五本が放射状に広がる。キューの先はジョブワーカー→メールサービスで非同期に完結する構成よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもち屋のECサイト、これで安全にオープンできるのだ！注文したら即メールが来て、安全に決済できるのだ！"
+
+        subtitle: "ずんだもち屋のECサイト、これで安全にオープンできるのだ！注文したら即メールが来て、安全に決済できるのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "クラウドアーキテクチャパズル、みんもEC決済フルスタックチャレンジをやってみてほしいのだ！"
+
+        subtitle: "クラウドアーキテクチャパズル、みんもEC決済フルスタックチャレンジをやってみてほしいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "チャレンジ1から5まで、静的サイトから始まってEC決済フルスタックまで来たわね。ここまで来たら本格的なクラウドアーキテクトの第一歩よ。"
+
+        subtitle: "チャレンジ1から5まで、静的サイトから始まってEC決済フルスタックまで来たわね。ここまで来たら本格的なクラウドアーキテクトの第一歩よ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "また次の動画で会いましょう。"
+
+        subtitle: "また次の動画で会いましょう。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+        subtitle: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！"
