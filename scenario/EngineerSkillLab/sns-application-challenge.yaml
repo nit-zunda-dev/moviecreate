@@ -1,0 +1,382 @@
+title: "【クラウドアーキテクチャパズル】SNSアプリケーションの仕組みをゼロから理解するのだ！"
+
+# YouTube: TBD
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+scenes:
+
+  # ============================================================
+  # 1. オープニング：ずんだもち屋SNSを作りたい
+  # ============================================================
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "前回はチャレンジ5のEC決済フルスタックだったのだ！今回はもっとSNSっぽい世界に行くのだ！"
+        subtitle: "前回はチャレンジ5のEC決済フルスタックだったのだ！今回はもっとSNSっぽい世界に行くのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんです。今回はチャレンジ6、「SNSアプリケーション」よ。"
+        subtitle: "四国めたんです。今回はチャレンジ6、「SNSアプリケーション」よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "写真投稿、いいね、検索、通知まで全部入りなのだ？"
+        subtitle: "写真投稿、いいね、検索、通知まで全部入りなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "その通り。大量アクセスをさばきながら、速くて安全な構成にするのが今回のテーマね。"
+        subtitle: "その通り。大量アクセスをさばきながら、速くて安全な構成にするのが今回のテーマね。"
+
+  # ============================================================
+  # 2. まず入口：DNS・WAF・LB・API
+  # ============================================================
+  - id: "ingress-flow"
+
+    lines:
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "最初の入口はどうなるのだ？"
+        subtitle: "最初の入口はどうなるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "クライアントがDNSで宛先を解決して、WAFで不正リクエストをチェックして、LBでAPIへ分散する流れよ。"
+        subtitle: "クライアントがDNSで宛先を解決して、WAFで不正リクエストをチェックして、LBでAPIへ分散する流れよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "クライアント→DNS→WAF→LB→APIの一本道なのだ！"
+        subtitle: "クライアント→DNS→WAF→LB→APIの一本道なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。パズルではこの入口を最初に作ると全体が組み立てやすいわ。"
+        subtitle: "そう。パズルではこの入口を最初に作ると全体が組み立てやすいわ。"
+
+  # ============================================================
+  # 3. 認証とユーザー管理
+  # ============================================================
+  - id: "auth"
+
+    lines:
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "SNSはログインしないと始まらないのだ。APIが全部見るのだ？"
+        subtitle: "SNSはログインしないと始まらないのだ。APIが全部見るのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "認証は専用の認証サービスに切り出すの。APIはトークン検証結果を使って安全に処理するわ。"
+        subtitle: "認証は専用の認証サービスに切り出すの。APIはトークン検証結果を使って安全に処理するわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "つまりAPI→認証サービスの線が一本必要なのだ！"
+        subtitle: "つまりAPI→認証サービスの線が一本必要なのだ！"
+
+  # ============================================================
+  # 4. フィード保存：NoSQLが得意
+  # ============================================================
+  - id: "nosql-feed"
+
+    lines:
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "SNSのフィードは件数が多く、書き込み・読み込みともに高頻度。そこでNoSQLが向いているわ。"
+        subtitle: "SNSのフィードは件数が多く、書き込み・読み込みともに高頻度。そこでNoSQLが向いているわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "投稿、タイムライン、いいね数みたいな変化の速いデータをさばくのだ！"
+        subtitle: "投稿、タイムライン、いいね数みたいな変化の速いデータをさばくのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "パズル上はAPI→NoSQLの接続ね。"
+        subtitle: "パズル上はAPI→NoSQLの接続ね。"
+
+  # ============================================================
+  # 5. 速度改善：キャッシュ
+  # ============================================================
+  - id: "cache"
+
+    lines:
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "人気ユーザーのプロフィールや投稿は何度も読まれるのだ。毎回DBだと重そうなのだ。"
+        subtitle: "人気ユーザーのプロフィールや投稿は何度も読まれるのだ。毎回DBだと重そうなのだ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこでキャッシュ。よく読むデータはメモリに置いて応答時間を短縮するの。"
+        subtitle: "そこでキャッシュ。よく読むデータはメモリに置いて応答時間を短縮するの。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "API→キャッシュも忘れずにつなぐのだ！"
+        subtitle: "API→キャッシュも忘れずにつなぐのだ！"
+
+  # ============================================================
+  # 6. 写真・動画：オブジェクトストレージ
+  # ============================================================
+  - id: "storage"
+
+    lines:
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "SNSは画像や動画が多いから、メディアはオブジェクトストレージで管理するのが定番よ。"
+        subtitle: "SNSは画像や動画が多いから、メディアはオブジェクトストレージで管理するのが定番よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "重いバイナリをAPIサーバーのローカルに置かないのだ！"
+        subtitle: "重いバイナリをAPIサーバーのローカルに置かないのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "そのための線がAPI→ストレージ。投稿メタ情報はNoSQL、実体ファイルはストレージで役割分担ね。"
+        subtitle: "そのための線がAPI→ストレージ。投稿メタ情報はNoSQL、実体ファイルはストレージで役割分担ね。"
+
+  # ============================================================
+  # 7. ハッシュタグ検索：検索エンジン
+  # ============================================================
+  - id: "search"
+
+    lines:
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ユーザーは「#ずんだもち」で投稿を探したいのだ。"
+        subtitle: "ユーザーは「#ずんだもち」で投稿を探したいのだ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "全文検索やランキングは検索エンジンが得意。APIが検索サービスに問い合わせて結果を返すわ。"
+        subtitle: "全文検索やランキングは検索エンジンが得意。APIが検索サービスに問い合わせて結果を返すわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "API→検索エンジンの線で、探しやすいSNSになるのだ！"
+        subtitle: "API→検索エンジンの線で、探しやすいSNSになるのだ！"
+
+  # ============================================================
+  # 8. いいね通知：プッシュ通知
+  # ============================================================
+  - id: "push"
+
+    lines:
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "いいねされたらすぐ知らせたいのだ！"
+        subtitle: "いいねされたらすぐ知らせたいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこでプッシュ通知サービス。APIがイベントを渡すと、端末へ通知が飛ぶの。"
+        subtitle: "そこでプッシュ通知サービス。APIがイベントを渡すと、端末へ通知が飛ぶの。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "つまりAPI→プッシュ通知の線が必要なのだ！"
+        subtitle: "つまりAPI→プッシュ通知の線が必要なのだ！"
+
+  # ============================================================
+  # 9. パズル出題
+  # ============================================================
+  - id: "puzzle"
+
+    lines:
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ではここでパズル。SNSアプリケーションを完成させるのに必要なコンポーネントと接続を考えてみて。"
+        subtitle: "ではここでパズル。SNSアプリケーションを完成させるのに必要なコンポーネントと接続を考えてみて。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ヒントは、入口のセキュリティ経路と、APIから放射状に伸びる六本のバックエンド接続よ。"
+        subtitle: "ヒントは、入口のセキュリティ経路と、APIから放射状に伸びる六本のバックエンド接続よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "クライアント画面はclientピースに含まれるから、別ピースは不要なのだ！"
+        subtitle: "クライアント画面はclientピースに含まれるから、別ピースは不要なのだ！"
+
+  # ============================================================
+  # 10. パズルの答え
+  # ============================================================
+  - id: "puzzle-answer"
+
+    lines:
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "では今回のパズルの答えをまとめるわ。コンポーネントは十一個。"
+        subtitle: "では今回のパズルの答えをまとめるわ。コンポーネントは十一個。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "クライアント、DNS、WAF、ロードバランサー、APIサーバー、認証サービス、NoSQL、キャッシュ、オブジェクトストレージ、検索エンジン、プッシュ通知サービス。"
+        subtitle: "クライアント、DNS、WAF、ロードバランサー、APIサーバー、認証サービス、NoSQL、キャッシュ、オブジェクトストレージ、検索エンジン、プッシュ通知サービス。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "接続は十本。まず入口の四本、クライアント→DNS、DNS→WAF、WAF→ロードバランサー、ロードバランサー→APIサーバー。"
+        subtitle: "接続は十本。まず入口の四本、クライアント→DNS、DNS→WAF、WAF→ロードバランサー、ロードバランサー→APIサーバー。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次にAPIサーバーから六本。認証サービス、NoSQL、キャッシュ、オブジェクトストレージ、検索エンジン、プッシュ通知サービスへ各一本。"
+        subtitle: "次にAPIサーバーから六本。認証サービス、NoSQL、キャッシュ、オブジェクトストレージ、検索エンジン、プッシュ通知サービスへ各一本。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "四＋六で十本、十一ピースなのだ！"
+        subtitle: "四＋六で十本、十一ピースなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "パズルのキャンバスにこの十一個を置いて、十本の線でつなげば「SNSアプリケーション」チャレンジクリアよ。"
+        subtitle: "パズルのキャンバスにこの十一個を置いて、十本の線でつなげば「SNSアプリケーション」チャレンジクリアよ。"
+
+  # ============================================================
+  # 11. まとめとエンディング
+  # ============================================================
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のまとめ。SNSは入口の保護、ユーザー認証、データ保存、検索、通知を組み合わせて成立する。"
+        subtitle: "今日のまとめ。SNSは入口の保護、ユーザー認証、データ保存、検索、通知を組み合わせて成立する。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "APIを中心にNoSQL・キャッシュ・ストレージ・検索・通知へ役割分担すると、スケールしやすく保守もしやすい構成になるわ。"
+        subtitle: "APIを中心にNoSQL・キャッシュ・ストレージ・検索・通知へ役割分担すると、スケールしやすく保守もしやすい構成になるわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ずんだもち屋SNS、これで写真投稿もハッシュタグ検索も通知もできるのだ！"
+        subtitle: "ずんだもち屋SNS、これで写真投稿もハッシュタグ検索も通知もできるのだ！"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "クラウドアーキテクチャパズル、みんなもSNSアプリケーションチャレンジをやってみてほしいのだ！"
+        subtitle: "クラウドアーキテクチャパズル、みんなもSNSアプリケーションチャレンジをやってみてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次はさらに大規模な設計にも挑戦できるわね。ここまで来たら上級クラウド構成の考え方はしっかり身についてるわ。"
+        subtitle: "次はさらに大規模な設計にも挑戦できるわね。ここまで来たら上級クラウド構成の考え方はしっかり身についてるわ。"
