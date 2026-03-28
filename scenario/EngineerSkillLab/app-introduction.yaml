@@ -1,0 +1,211 @@
+title: "【Engineer Skill Lab】クラウドアーキテクチャパズル完全紹介！置いて線でつなぐだけでインフラが身につくのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # 1. フック（0〜8秒）
+
+  # ============================================================
+
+  - id: "hook"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "ねえねえめたん！クラウドって勉強してるんだけど、用語は覚えてても、全体のつながりがイメージできないのだ……。"
+
+        subtitle: "用語は覚えてても、全体のつながりがイメージできないのだ……。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "それ、あるある。「DNSとLBとDBを、どう線でつないだら正解なの？」って感覚ね。"
+
+        subtitle: "「DNSとLBとDBをどう線でつないだら正解なの？」って感覚ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "そうなのだ！まさにそれなのだ！"
+
+        subtitle: "そうなのだ！まさにそれなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "それを解決するために作ったのが、**Engineer Skill Lab** の **クラウドアーキテクチャパズル** よ。"
+
+        subtitle: "それを解決するのが「クラウドアーキテクチャパズル」よ。"
+
+
+
+  # ============================================================
+
+  # 2. アプリ紹介（5〜18秒）
+
+  # ============================================================
+
+  - id: "app-intro"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ブラウザ無料・ログイン不要。DNSやLB、DBをキャンバスに「置いて、線でつなぐ」だけ。"
+
+        subtitle: "部品を「置いて、線でつなぐ」だけ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "全8問！基本的なWebサイトからコンテナとCI/CDの本番構成まで、どんどんレベルアップするのだ！"
+
+        subtitle: "全8問！WebサイトからCI/CDの本番構成まで！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "採点でスコアとランクが出るから、Sランクを目指して配線を見直せるのよ。"
+
+        subtitle: "採点でスコアとランクが出る。Sランクを目指せ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "採点が終わったら、このチャンネルの解説動画で答え合わせができるのだ！"
+
+        subtitle: "採点後はこのチャンネルの解説動画で答え合わせ！"
+
+
+
+  # ============================================================
+
+  # 3. CTA（18〜30秒）
+
+  # ============================================================
+
+  - id: "cta"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "構成の「なぜ」が体で分かるのだ！概要欄のリンクから今すぐ挑戦してほしいのだ！"
+
+        subtitle: "概要欄のリンクから今すぐ挑戦してほしいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "全問クリアしたらコメントで教えてね。チャンネル登録もよろしく。"
+
+        subtitle: "全問クリアしたらコメントで教えてね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！"
