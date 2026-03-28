@@ -1,0 +1,649 @@
+title: "【クラウドアーキテクチャパズル】IoTデータ分析基盤の仕組みをゼロから理解するのだ！"
+
+# YouTube: https://youtu.be/LDbYHmdhkTc
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # 1. オープニング：ずんだもち屋のセンサーデータを分析したい
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "前回はチャレンジ6「SNSアプリケーション」だったのだ！DNS、WAF、API、NoSQL、検索、通知、全部つながったのだ！"
+
+        subtitle: "前回はチャレンジ6「SNSアプリケーション」だったのだ！DNS、WAF、API、NoSQL、検索、通知、全部つながったのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。今回はチャレンジ7、「IoTデータ分析基盤」よ。"
+
+        subtitle: "四国めたんです。今回はチャレンジ7、「IoTデータ分析基盤」よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "倉庫の温度と湿度、お店の人混みセンサー、たくさんの機械から数字が飛んでくるのだ。どこにためて、どう分析すればいいのだ？"
+
+        subtitle: "倉庫の温度と湿度、お店の人混みセンサー、たくさんの機械から数字が飛んでくるのだ。どこにためて、どう分析すればいいのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "ゴールは三つ。「取り込みを止めない」「リアルタイムで様子を見る」「あとからまとめてBI分析」。"
+
+        subtitle: "ゴールは三つ。「取り込みを止めない」「リアルタイムで様子を見る」「あとからまとめてBI分析」。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "そのためにイベントストリーム、時系列DB、データウェアハウス、そして監視が組み合わさるわ。"
+
+        subtitle: "そのためにイベントストリーム、時系列DB、データウェアハウス、そして監視が組み合わさるわ。"
+
+
+
+  # ============================================================
+
+  # 2. 図の「クライアント」はブラウザじゃない
+
+  # ============================================================
+
+  - id: "client-as-device"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "待つのだ。パズルに「クライアント」ピースがあるのだ。センサーにブラウザはないのだ！"
+
+        subtitle: "待つのだ。パズルに「クライアント」ピースがあるのだ。センサーにブラウザはないのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "いいところに気づいたわ。このチャレンジではあえて同じピースを使っていて、図上のクライアントノードはセンサーやゲートウェイ端末の「送信元」として読み替えるの。"
+
+        subtitle: "いいところに気づいたわ。このチャレンジではあえて同じピースを使っていて、図上のクライアントノードはセンサーやゲートウェイ端末の「送信元」として読み替えるの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "つまりクライアント→API Gatewayの一本目は、「現場からクラウドの入口へ届ける」流れなのだ！"
+
+        subtitle: "つまりクライアント→API Gatewayの一本目は、「現場からクラウドの入口へ届ける」流れなのだ！"
+
+
+
+  # ============================================================
+
+  # 3. 取り込み：API Gateway（他チャレンジと同じ「窓口」）
+
+  # ============================================================
+
+  - id: "api-gateway-ingest"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "EC決済やマイクロサービスでも出てきたAPI Gatewayと同じく、ここでも「窓口」よ。認証やレート制御、ルーティングをここでまとめられる。"
+
+        subtitle: "EC決済やマイクロサービスでも出てきたAPI Gatewayと同じく、ここでも「窓口」よ。認証やレート制御、ルーティングをここでまとめられる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "HTTPSでtelemetryをPOSTするデバイスなら、そのまま通せるのだ。"
+
+        subtitle: "HTTPSでtelemetryをPOSTするデバイスなら、そのまま通せるのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "パズルではシンプルに、デバイス側のピースからAPI Gatewayへ、次の段へ流し込む形でつなぐわ。"
+
+        subtitle: "パズルではシンプルに、デバイス側のピースからAPI Gatewayへ、次の段へ流し込む形でつなぐわ。"
+
+
+
+  # ============================================================
+
+  # 4. イベントストリーム：大量データの土手
+
+  # ============================================================
+
+  - id: "event-stream"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "センサーが一斉に数字を送ったら、さばききれなくならないのだ？"
+
+        subtitle: "センサーが一斉に数字を送ったら、さばききれなくならないのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "だからイベントストリーム。KafkaやKinesisのイメージで、追記型のログにまず吸い込む。吸収力と順序・再処理のしやすさが強みよ。"
+
+        subtitle: "だからイベントストリーム。KafkaやKinesisのイメージで、追記型のログにまず吸い込む。吸収力と順序・再処理のしやすさが強みよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "API Gatewayの次はイベントストリームなのだ！"
+
+        subtitle: "API Gatewayの次はイベントストリームなのだ！"
+
+
+
+  # ============================================================
+
+  # 5. ストリーム処理はサーバーレス（ジョブワーカーはキュー向け）
+
+  # ============================================================
+
+  - id: "serverless-not-queue-worker"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "動画チャレンジではメッセージキューとジョブワーカーだったのだ。IoTも同じなのだ？"
+
+        subtitle: "動画チャレンジではメッセージキューとジョブワーカーだったのだ。IoTも同じなのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "このパズルではジョブワーカーは「キューから仕事を取る」想定だから、ストリームの消費にはサーバーレス、つまりFaaSを置くわ。"
+
+        subtitle: "このパズルではジョブワーカーは「キューから仕事を取る」想定だから、ストリームの消費にはサーバーレス、つまりFaaSを置くわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "レコードが流れてきたら関数が起きて集計や整形をして、時系列DBへ書き込む。Kinesis＋Lambdaのようなパターンね。"
+
+        subtitle: "レコードが流れてきたら関数が起きて集計や整形をして、時系列DBへ書き込む。Kinesis＋Lambdaのようなパターンね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "イベントストリーム→サーバーレス→時系列DBの一本道なのだ！"
+
+        subtitle: "イベントストリーム→サーバーレス→時系列DBの一本道なのだ！"
+
+
+
+  # ============================================================
+
+  # 6. 時系列DB：メトリクスのホット保管庫
+
+  # ============================================================
+
+  - id: "time-series-db"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "温度や電力、回転数みたいにタイムスタンプ付きで並ぶデータは、時系列DBが得意よ。ダッシュボードや閾値アラートの土台になる。"
+
+        subtitle: "温度や電力、回転数みたいにタイムスタンプ付きで並ぶデータは、時系列DBが得意よ。ダッシュボードや閾値アラートの土台になる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "サーバーレスが書き込む先は時系列DBなのだ！"
+
+        subtitle: "サーバーレスが書き込む先は時系列DBなのだ！"
+
+
+
+  # ============================================================
+
+  # 7. ETLとデータウェアハウス：まとめて分析へ
+
+  # ============================================================
+
+  - id: "etl-and-dwh"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "現場のモニターだけじゃなく、経営の人がExcelやBIで昨日一週間の推移を見たいのだ。"
+
+        subtitle: "現場のモニターだけじゃなく、経営の人がExcelやBIで昨日一週間の推移を見たいのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "だからETLパイプラインでクレンジングや集計し、データウェアハウスに載せる。DWHは部門横断の分析向けストアのイメージね。"
+
+        subtitle: "だからETLパイプラインでクレンジングや集計し、データウェアハウスに載せる。DWHは部門横断の分析向けストアのイメージね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "パズル上は時系列DBからETLへ、ETLからデータウェアハウスへと一本の分析ラインをつなぐわ。"
+
+        subtitle: "パズル上は時系列DBからETLへ、ETLからデータウェアハウスへと一本の分析ラインをつなぐわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "時系列DB→ETL→データウェアハウスなのだ！"
+
+        subtitle: "時系列DB→ETL→データウェアハウスなのだ！"
+
+
+
+  # ============================================================
+
+  # 8. 監視：メトリクスと健全性
+
+  # ============================================================
+
+  - id: "monitoring"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "閾値超えや取り込み遅延を見逃したくないから監視サービスを置く。主解答では時系列DBからメトリクスを見に行く想定よ。"
+
+        subtitle: "閾値超えや取り込み遅延を見逃したくないから監視サービスを置く。主解答では時系列DBからメトリクスを見に行く想定よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "別解だとサーバーレス→監視で、関数の失敗やレイテンシを見るつなぎ方もあるのだ！"
+
+        subtitle: "別解だとサーバーレス→監視で、関数の失敗やレイテンシを見るつなぎ方もあるのだ！"
+
+
+
+  # ============================================================
+
+  # 9. パズル出題
+
+  # ============================================================
+
+  - id: "puzzle"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ではここでパズル。IoTデータ分析基盤を完成させるのに必要なコンポーネントと接続を考えてみて。"
+
+        subtitle: "ではここでパズル。IoTデータ分析基盤を完成させるのに必要なコンポーネントと接続を考えてみて。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ヒントは、入口がAPI Gatewayで、真ん中がストリームとサーバーレス、その先が時系列DBと分析ライン、あと監視が一枚加わる構成よ。"
+
+        subtitle: "ヒントは、入口がAPI Gatewayで、真ん中がストリームとサーバーレス、その先が時系列DBと分析ライン、あと監視が一枚加わる構成よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "DNSやLBは出てこないから、Webアプリの入口と混同しないのだ！"
+
+        subtitle: "DNSやLBは出てこないから、Webアプリの入口と混同しないのだ！"
+
+
+
+  # ============================================================
+
+  # 10. パズルの答え
+
+  # ============================================================
+
+  - id: "puzzle-answer"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "では今回のパズルの答えをまとめるわ。コンポーネントは八個。"
+
+        subtitle: "では今回のパズルの答えをまとめるわ。コンポーネントは八個。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "クライアント、API Gateway、イベントストリーム、サーバーレス、時系列DB、ETLパイプライン、データウェアハウス、監視サービス。"
+
+        subtitle: "クライアント、API Gateway、イベントストリーム、サーバーレス、時系列DB、ETLパイプライン、データウェアハウス、監視サービス。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "接続は七本。クライアント→API Gateway、API Gateway→イベントストリーム、イベントストリーム→サーバーレス、サーバーレス→時系列DB。"
+
+        subtitle: "接続は七本。クライアント→API Gateway、API Gateway→イベントストリーム、イベントストリーム→サーバーレス、サーバーレス→時系列DB。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "分析ラインは時系列DB→ETLパイプライン、ETLパイプライン→データウェアハウスの二本。監視は時系列DB→監視サービスで一本。"
+
+        subtitle: "分析ラインは時系列DB→ETLパイプライン、ETLパイプライン→データウェアハウスの二本。監視は時系列DB→監視サービスで一本。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "四＋二＋一で七本、八ピースなのだ！"
+
+        subtitle: "四＋二＋一で七本、八ピースなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "別の正当なつなぎ方として、監視だけサーバーレス→監視サービスにしても満点になるわ。部品の集合は同じ八個のままよ。"
+
+        subtitle: "別の正当なつなぎ方として、監視だけサーバーレス→監視サービスにしても満点になるわ。部品の集合は同じ八個のままよ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "喜び"
+
+        text: "パズルのキャンバスにこの八個を置いて、七本の線でつなげば「IoTデータ分析基盤」チャレンジクリアよ。"
+
+        subtitle: "パズルのキャンバスにこの八個を置いて、七本の線でつなげば「IoTデータ分析基盤」チャレンジクリアよ。"
+
+
+
+  # ============================================================
+
+  # 11. まとめとエンディング
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "今日のまとめ。IoTの取り込みはAPI Gatewayで統制し、イベントストリームに一度載せる。ストリームはサーバーレスで処理して時系列DBへ。"
+
+        subtitle: "今日のまとめ。IoTの取り込みはAPI Gatewayで統制し、イベントストリームに一度載せる。ストリームはサーバーレスで処理して時系列DBへ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "分析用途はETLでデータウェアハウスへ。監視で異常を拾う。ジョブワーカーはメッセージキュー向けだから、ストリーム処理とは役割を分けて覚えると混乱しないわ。"
+
+        subtitle: "分析用途はETLでデータウェアハウスへ。監視で異常を拾う。ジョブワーカーはメッセージキュー向けだから、ストリーム処理とは役割を分けて覚えると混乱しないわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもち屋のセンサーも、この流れで倉庫とお店を守れるのだ！"
+
+        subtitle: "ずんだもち屋のセンサーも、この流れで倉庫とお店を守れるのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "クラウドアーキテクチャパズル、みんなもIoTデータ分析基盤チャレンジをやってみてほしいのだ！"
+
+        subtitle: "クラウドアーキテクチャパズル、みんなもIoTデータ分析基盤チャレンジをやってみてほしいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "次はチャレンジ8、「コンテナとCI/CDの本番構成」。LBやAPI Gateway、コンテナ上のAPIとgRPC、キャッシュやキュー、そして監視・ログ・トレースまで、本番参照構成のざっくり全体にいくわ。"
+
+        subtitle: "次はチャレンジ8、「コンテナとCI/CDの本番構成」。LBやAPI Gateway、コンテナ上のAPIとgRPC、キャッシュやキュー、そして監視・ログ・トレースまで、本番参照構成のざっくり全体にいくわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "また次の動画で会いましょう。"
+
+        subtitle: "また次の動画で会いましょう。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+        subtitle: "ずんだもんとめたんのクラウドアーキ講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+
+        subtitle: "チャンネル登録と高評価、よろしくなのだ！"
