@@ -1,0 +1,421 @@
+title: "【SQL道場 第5本｜完結】本番直前の切り分け——CASE・算術・複合JOINで詰みを防ぐのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # オープニング：第5本 Q23〜Q28（シリーズ完結）
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "エスキューエル道場シリーズ、完結編・第5本なのだ！"
+
+        subtitle: "SQL道場シリーズ、完結編・第5本なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。対象はクイズ23から28。算術、ケース式、ヌル、レビュー集計、三枚ジョインの売上まで一気にいくわ。"
+
+        subtitle: "四国めたんです。対象はクイズ23から28。算術、CASE 式、NULL、レビュー集計、3テーブル JOIN の売上まで一気にいくわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "ここまで来たらもう本番のエスキューエルおにぎりなのだ……！"
+
+        subtitle: "ここまで来たらもう本番のSQLおにぎりなのだ……！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "この回を終えたらエスキューエル道場は全問制覇。コメントで報告してね。"
+
+        subtitle: "この回を終えたらSQL道場は全問制覇。コメントで報告してね。"
+
+
+
+  # ============================================================
+
+  # Q23 算術 ORDER LIMIT
+
+  # ============================================================
+
+  - id: "q23"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問23は在庫評価。ストック、かける、プライス、アズ、ストックバリュー、で金額感を出し、オーダーバイで並べてリミット、ゴ、なのだ。"
+
+        subtitle: "問23は在庫評価。stock * price AS stock_value で金額感を出し、ORDER BY して LIMIT 5 なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "シレクトで式を書ける。並べ替えキーに式の別名を使うと読みやすいわ。"
+
+        subtitle: "SELECT で式を書ける。並べ替えキーに式の別名（AS）を使うと読みやすいわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "バッチ死んでも手でエスキューエルを叩いて粗が出るのが強いのだ！"
+
+        subtitle: "バッチ死んでも手でSQLを叩いて粗が出るのが強いのだ！"
+
+
+
+  # ============================================================
+
+  # Q24 CASE 成績
+
+  # ============================================================
+
+  - id: "q24"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問24はケース式で優・良・可ラベル。しきい値はキュウジュウとナナジュウ固定なのだ。"
+
+        subtitle: "問24は CASE 式で優・良・可ラベル。しきい値は90と70固定なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ケース、ウェン、スコア、ダイナリイコール、キュウジュウ、デン、ゆう、ウェン、スコア、ダイナリイコール、ナナジュウ、デン、りょう、エルス、か、エンド。上から順にマッチするのを忘れないで。"
+
+        subtitle: "CASE WHEN score >= 90 THEN '優' WHEN score >= 70 THEN '良' ELSE '可' END。上から順にマッチするのを忘れないで。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "バッチが死んだ夜にエスキューエルが最後のバッチになるのだ……！"
+
+        subtitle: "バッチが死んだ夜にSQLが最後のバッチになるのだ……！"
+
+
+
+  # ============================================================
+
+  # Q25 IS NULL
+
+  # ============================================================
+
+  - id: "q25"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問25は部活、未登録の生徒。ウェア、クラブ、イズヌルの定石なのだ。"
+
+        subtitle: "問25は部活、未登録の生徒。WHERE club IS NULL の定石なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ヌルは等号では拾えない。イズヌル、と、イズノットヌル、を使うのが鉄則よ。"
+
+        subtitle: "NULLは等号では拾えない。IS NULL / IS NOT NULL を使うのが鉄則よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "イコール、ヌル、でハマる人を今ここで減らすのだ！"
+
+        subtitle: "`= NULL` でハマる人を今ここで減らすのだ！"
+
+
+
+  # ============================================================
+
+  # Q26 reviews aggregate
+
+  # ============================================================
+
+  - id: "q26"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問26はレビューと商品をジョイン。アヴェレージ、レーティング、と、カウント、アスタリスク、を商品名でグループバイなのだ。"
+
+        subtitle: "問26はレビューと商品を JOIN。AVG(rating) と COUNT(*) を商品名で GROUP BY なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "オーダーバイ、アヴェレージレーティング、ディーエスシー。評価と母数をセットで見ないと炎上対策にならないわね。"
+
+        subtitle: "ORDER BY avg_rating DESC。評価と母数をセットで見ないと炎上対策にならないわね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "星だけ見たら件数がイチの商品に刺されるのだ！"
+
+        subtitle: "星だけ見たら件数がイチの商品に刺されるのだ！"
+
+
+
+  # ============================================================
+
+  # Q27 CASE 価格帯
+
+  # ============================================================
+
+  - id: "q27"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "問27もケース式。ゴセン未満、ゴマン未満、それ以外、で低・中・高のラベルなのだ。"
+
+        subtitle: "問27も CASE 式。¥5千未満・¥5万未満・それ以外、で低・中・高のラベルなのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェン、プライス、レスザン、ゴセン、から順に。境界をどちらに含めるかは仕様通りに。"
+
+        subtitle: "WHEN price < 5000 … から順に。境界をどちらに含めるかは仕様通りに。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "キャンペーン説明が口だけにならないのだ！"
+
+        subtitle: "キャンペーン説明が口だけにならないのだ！"
+
+
+
+  # ============================================================
+
+  # Q28 3way revenue
+
+  # ============================================================
+
+  - id: "q28"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問28はシリーズ総仕上げ。オーダーズ、プロダクツ、カスタマーズをジョインし、ウェア、ステイタス、イコール、完了、で絞って、サム、クォンティティかけるプライス、を顧客名でグループバイなのだ！"
+
+        subtitle: "問28はシリーズ総仕上げ。orders/products/customers を JOINし、WHERE status='完了' で絞って、SUM(quantity * price) を顧客名で GROUP BY なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ジョインの列はどのテーブルのキーかを指でなぞりながら書く。グループバイは顧客名の列に合わせるのよ。"
+
+        subtitle: "JOIN の列はどのテーブルのキーかを指でなぞりながら書く。GROUP BY は顧客名の列に合わせるのよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ここまで通したらエスキューエル道場ヨシなのだ！"
+
+        subtitle: "ここまで通したらSQL道場ヨシなのだ！"
+
+
+
+  # ============================================================
+
+  # 完結まとめ
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "全5本お疲れ様。列を抜く、絞る、くくる、繋ぐ、ラベルと金額を出す。現場の型はこのループよ。"
+
+        subtitle: "全5本お疲れ様。列を抜く、絞る、くくる、繋ぐ、ラベルと金額を出す。現場の型はこのループよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "エンジニアスキルラボのエスキューエル道場、全28問また挑戦してほしいのだ！他アプリもあるのだ！"
+
+        subtitle: "エンジニアスキルラボのSQL道場、全28問また挑戦してほしいのだ！他アプリもあるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "次のシリーズのリクエストもコメントで。高評価とチャンネル登録、よろしくね。"
+
+        subtitle: "次のシリーズのリクエストもコメントで。高評価とチャンネル登録、よろしくね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "ずんだもんとめたんにまた会いに来てほしいのだ！バイバイなのだ！"
+
+        subtitle: "ずんだもんとめたんにまた会いに来てほしいのだ！バイバイなのだ！"

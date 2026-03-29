@@ -1,0 +1,379 @@
+title: "【SQL道場 第4本】テーブル結合——JOINで社員も注文も一本の表にするのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # オープニング：第4本 Q18〜Q22
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "エスキューエル道場、第4本！ジョインで表をつなぐ回なのだ！"
+
+        subtitle: "SQL道場、第4本！JOINで表をつなぐ回なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。対象はクイズ18から22。キー列さえ合えば、人間にも説明できる表が作れるわ。"
+
+        subtitle: "四国めたんです。対象はクイズ18から22。キー列さえ合えば、人間にも説明できる表が作れるわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "アイディーの羅列だけだと顧客も泣く。名前をくっつけるのがジョインの仕事なのだ。"
+
+        subtitle: "IDの羅列だけだと顧客も泣く。名前をくっつけるのが JOIN の仕事なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "インナーは共通集合、レフトは欠損も見える。監査系はレフトが効くことが多いわね。"
+
+        subtitle: "INNER は共通集合、LEFT は欠損も見える。監査系は LEFT JOIN が効くことが多いわね。"
+
+
+
+  # ============================================================
+
+  # Q18 INNER JOIN
+
+  # ============================================================
+
+  - id: "q18"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問18は社員と部署の対応表。エンプロイーズとデパートメンツをデパートメント・アイ・ディーとアイ・ディーでインナージョインなのだ。"
+
+        subtitle: "問18は社員と部署の対応表。employees と departments を department_id / id で INNER JOIN なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "フロム、エンプロイーズ、イー、インナージョイン、デパートメンツ、ディー、オン、イー、デパートメント・アイ・ディー、イコール、ディー、アイ・ディー。エイリアスを付けると読みやすいわ。"
+
+        subtitle: "FROM employees e INNER JOIN departments d ON e.department_id = d.id。エイリアスを付けると読みやすいわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "再編ピーディーエフが死んでも、エスキューエルなら即リストなのだ！"
+
+        subtitle: "再編PDFが死んでも、SQLなら即リストなのだ！"
+
+
+
+  # ============================================================
+
+  # Q19 LEFT JOIN IS NULL
+
+  # ============================================================
+
+  - id: "q19"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問19は幽霊部署探索。部署に誰もいない名前だけ出すのだ。"
+
+        subtitle: "問19は幽霊部署探索。部署に誰もいない名前だけ出すのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "レフトジョイン、エンプロイーズ、して、ウェア、イー、アイ・ディー、イズヌル。右に行が無いのが「誰もいない部署」よ。"
+
+        subtitle: "LEFT JOIN employees e ... WHERE e.id IS NULL。右に行が無いのが「誰もいない部署」よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "インナーだけだと消えて見えないのがハマりポイントなのだ……！"
+
+        subtitle: "INNER JOIN だけだと消えて見えないのがハマりポイントなのだ……！"
+
+
+
+  # ============================================================
+
+  # Q20 3テーブルJOIN
+
+  # ============================================================
+
+  - id: "q20"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問20は成績の緊急出力。スチューデンツ、スコアーズ、サブジェクツを、二本のオン句でつなぐのだ。"
+
+        subtitle: "問20は成績の緊急出力。students / scores / subjects を、2本の ON でつなぐのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "スコアーズを中心にスチューデント・アイ・ディーとサブジェクト・アイ・ディーで伸ばす。ジョインはハブ表から枝を伸ばすと組み立てやすいわ。"
+
+        subtitle: "scores を中心に student_id と subject_id で伸ばす。JOINはハブ表から枝を伸ばすと組み立てやすいわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "氏名と科目名が横に並ぶと、人に見せられるのだ！"
+
+        subtitle: "氏名と科目名が横に並ぶと、人に見せられるのだ！"
+
+
+
+  # ============================================================
+
+  # Q21 JOIN + GROUP BY
+
+  # ============================================================
+
+  - id: "q21"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問21は社員ごとのアサイン件数。ジョインしてからカウントなのだ。"
+
+        subtitle: "問21は社員ごとのアサイン件数。JOINしてから COUNT なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "グループバイ、イー、ネーム、に、カウント、アスタリスク、アズ、プロジェクトカウント。負荷の偏りはこういう表で一発よ。"
+
+        subtitle: "GROUP BY e.name に COUNT(*) AS project_count。負荷の偏りはこういう表で一発よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "全部やってる人をシーブイエスで晒す前に、まずエスキューエルなのだ！"
+
+        subtitle: "全部やってる人をCSVで晒す前に、まずSQLなのだ！"
+
+
+
+  # ============================================================
+
+  # Q22 orders products
+
+  # ============================================================
+
+  - id: "q22"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "問22は注文と商品。オーダー・アイ・ディーとプロダクトネームとクォンティティを一画面にするのだ。"
+
+        subtitle: "問22は注文と商品。order_id / product_name / quantity を一画面にするのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "オーダーズ、オー、ジョイン、プロダクツ、ピー、オン、オー、プロダクト・アイ・ディー、イコール、ピー、アイ・ディー。窓口が読める列名にエイリアスすると親切ね。"
+
+        subtitle: "orders o JOIN products p ON o.product_id = p.id。窓口が読める列名に AS があると親切ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "カスタマーサポートがアイディーだけ言われて困る問題、ジョインで解決なのだ！"
+
+        subtitle: "サポートがIDだけ言われて困る問題、JOINで解決なのだ！"
+
+
+
+  # ============================================================
+
+  # まとめ
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "第4本のキーワード。オンでキーを合わせる、インナーとレフトの使い分け、結合からシュウケイよ。"
+
+        subtitle: "第4本のキーワード。ON でキーを合わせる、INNER と LEFT の使い分け、結合から集計よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "第5本は最終回！ケース式やフクゴウジョインでガチの切り分けなのだ！"
+
+        subtitle: "第5本は最終回！CASE 式や複合 JOIN でガチの切り分けなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "18から22クリアおつかれ。全5本のラスト、気合入れてね。"
+
+        subtitle: "18から22クリアおつかれ。全5本のラスト、気合入れてね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "高評価よろしくなのだ！バイバイなのだ！"
+
+        subtitle: "高評価よろしくなのだ！バイバイなのだ！"

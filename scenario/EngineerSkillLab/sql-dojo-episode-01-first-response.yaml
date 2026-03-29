@@ -1,0 +1,389 @@
+title: "【SQL道場 第1本｜現場当番】第一報対応——SELECTとWHEREでインシデントの最初の一枚を出し切るのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # オープニング：SQL道場シリーズ第1本 / 対象Q1〜Q5
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "今日はエンジニアスキルラボのエスキューエル道場、シリーズ全5本の第1本なのだ！"
+
+        subtitle: "今日はエンジニアスキルラボのSQL道場、シリーズ全5本の第1本なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。第1本は第一報対応。シレクトとウェアで、障害直後に必要な一覧を即出すのよ。"
+
+        subtitle: "四国めたんです。第1本は第一報対応。SELECTとWHEREで、障害直後に必要な一覧を即出すのよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "対象はクイズ1から5。現場のシナリオを読んで、その場でエスキューエルを打つイメージなのだ！"
+
+        subtitle: "対象はクイズ1から5。現場のシナリオを読んで、その場でSQLを打つイメージなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "概要欄からエスキューエル道場本体に飛べるから、動画を見ながら一問ずつ挑戦してね。"
+
+        subtitle: "概要欄からSQL道場本体に飛べるから、動画を見ながら一問ずつ挑戦してね。"
+
+
+
+  # ============================================================
+
+  # Q1 SELECTの基本
+
+  # ============================================================
+
+  - id: "q01"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問1は、社員マスタが全社で開けない障害。緊急の読取エスキューエルだけが通る状況なのだ。"
+
+        subtitle: "問1は、社員マスタが全社で開けない障害。緊急の読取SQLだけが通る状況なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "まず欲しい列だけ抜く。シレクト、ネーム、エイジ、フロム、エンプロイーズ、で、名前列と年齢列だけ持ってくるの。"
+
+        subtitle: "まず欲しい列だけ抜く。SELECT name, age FROM employees で、名前列と年齢列だけ持ってくるの。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "全列じゃなくて、第一報に必要な最小セット。これが現場の速さなのだ！"
+
+        subtitle: "全列じゃなくて、第一報に必要な最小セット。これが現場の速さなのだ！"
+
+
+
+  # ============================================================
+
+  # Q2 WHERE 等値
+
+  # ============================================================
+
+  - id: "q02"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問2は開発部だけの人件費リスト。開発部はデパートメント・アイ・ディーがイチなのだ。"
+
+        subtitle: "問2は開発部だけの人件費リスト。開発部は department_id が 1 なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、デパートメント・アイ・ディー、イコール、イチ、で行を絞ってから、名前と給与をシレクト。フィルタはウェアの仕事よ。"
+
+        subtitle: "WHERE department_id = 1 で行を絞ってから、名前と給与を SELECT。フィルタは WHERE の仕事よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "「全部見せて」じゃなく「開発だけ」。条件が命なのだ！"
+
+        subtitle: "「全部見せて」じゃなく「開発だけ」。条件が命なのだ！"
+
+
+
+  # ============================================================
+
+  # Q3 比較演算子
+
+  # ============================================================
+
+  - id: "q03"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問3は昇給ラインの確認。給与が45万円以上の人を出せ、って急かされるのだ。"
+
+        subtitle: "問3は昇給ラインの確認。給与が45万円以上の人を出せ、って急かされるのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、サラリー、ダイナリイコール、ヨンジュウゴマン。イコール込みの、イジョウ、よ。境界の数字ミスだけは絶対に避けて。"
+
+        subtitle: "WHERE salary >= 450000。イコール込みの以上よ。境界の数字ミスだけは絶対に避けて。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "閾値ひとつで労務が動く。エスキューエルは大人の社会なのだ……。"
+
+        subtitle: "閾値ひとつで労務が動く。SQLは大人の社会なのだ……。"
+
+
+
+  # ============================================================
+
+  # Q4 ORDER BY
+
+  # ============================================================
+
+  - id: "q04"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問4は役員面談。給与の高い順に並べろって言われたのだ。"
+
+        subtitle: "問4は役員面談。給与の高い順に並べろって言われたのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "オーダーバイ、サラリー、ディーエスシー。ディーエスシーが降順。並び順が決まって初めて「トップ」が意味を持つのよ。"
+
+        subtitle: "ORDER BY salary DESC。DESC が降順。並び順が決まって初めて「トップ」が意味を持つのよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "そのままだとバラバラの表は刺さない。並べ替えで話が進むのだ！"
+
+        subtitle: "そのままだとバラバラの表は刺さない。並べ替えで話が進むのだ！"
+
+
+
+  # ============================================================
+
+  # Q5 AND
+
+  # ============================================================
+
+  - id: "q05"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問5は待遇見直し。30歳以上かつ給与50万未満の人を拾うのだ。"
+
+        subtitle: "問5は待遇見直し。30歳以上かつ給与50万未満の人を拾うのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、エイジ、ダイナリイコール、サンジュウ、アンド、サラリー、レスザン、ゴジュウマン、で条件を積む。片方だけだと別顧客になるから気をつけて。"
+
+        subtitle: "WHERE age >= 30 AND salary < 500000 で条件を積む。片方だけだと別顧客になるから気をつけて。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "複合条件は現場でザラ。カッコの要らないシンプルな積み重ねから慣れるのだ！"
+
+        subtitle: "複合条件は現場でザラ。カッコの要らないシンプルな積み重ねから慣れるのだ！"
+
+
+
+  # ============================================================
+
+  # まとめ・次回予告
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "第1本の型はね。列を決める、ウェアで絞る、オーダーバイで並べる。ここが第一報の三種の神器よ。"
+
+        subtitle: "第1本の型はね。列を決める、WHERE で絞る、ORDER BY で並べる。ここが第一報の三種の神器よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "第2本は絞り込み調査。ライクやイン、ディスティンクトってやつなのだ！チャンネル登録して待つといいのだ！"
+
+        subtitle: "第2本は絞り込み調査。LIKE や IN、DISTINCT ってやつなのだ！チャンネル登録して待つといいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "高評価とコメントもよろしく。エスキューエル道場で1から5まで通したら、達成報告してね。"
+
+        subtitle: "高評価とコメントもよろしく。SQL道場で1から5まで通したら、達成報告してね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "また見てほしいのだ！バイバイなのだ！"
+
+        subtitle: "また見てほしいのだ！バイバイなのだ！"

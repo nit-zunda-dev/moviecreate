@@ -1,0 +1,421 @@
+title: "【SQL道場 第2本】絞り込み調査——LIKE・IN・DISTINCTで現場の論点を切り出すのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # オープニング：第2本 Q6〜Q11
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "エスキューエル道場シリーズ、第2本なのだ！ずんだもんなのだ！"
+
+        subtitle: "SQL道場シリーズ、第2本なのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。今日は絞り込み調査。クイズ6から11よ。"
+
+        subtitle: "四国めたんです。今日は絞り込み調査。クイズ6から11よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "ざっくり検索・複数候補・範囲・重複排除・カッコ付き条件・上位だけ抜く……現場の切り口が増えるのだ！"
+
+        subtitle: "ざっくり検索・複数候補・範囲・重複排除・カッコ付き条件・LIMIT で上位だけ抜く……現場の切り口が増えるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "第1本のシレクトとウェアが身についてれば、この回で検索の幅が一気に広がるわ。"
+
+        subtitle: "第1本の SELECT と WHERE が身についてれば、この回で検索の幅が一気に広がるわ。"
+
+
+
+  # ============================================================
+
+  # Q6 LIKE
+
+  # ============================================================
+
+  - id: "q06"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問6はユーエスビー絡みの噂。商品名にユーエスビーが含まれる行だけ名前と価格で固めるのだ。"
+
+        subtitle: "問6はUSB絡みの噂。商品名にUSBが含まれる行だけ名前と価格で固めるのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、ネーム、ライク、パーセント、ユーエスビー、パーセント。パーセントは前後どちらにもワイルドカード。部分一致の定番よ。"
+
+        subtitle: "WHERE name LIKE '%USB%'。% は前後どちらにも効くワイルドカード。部分一致の定番よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "曖昧なキーワードはライクで殴る。現場のエスエヌエス監視っぽいのだ！"
+
+        subtitle: "曖昧なキーワードは LIKE で殴る。現場のSNS監視っぽいのだ！"
+
+
+
+  # ============================================================
+
+  # Q7 IN
+
+  # ============================================================
+
+  - id: "q07"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "問7は配送混乱。電子機器かストレージのカテゴリだけ先にリストなのだ！"
+
+        subtitle: "問7は配送混乱。電子機器かストレージのカテゴリだけ先にリストなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、カテゴリー、イン、カッコ、電子機器、カンマ、ストレージ、カッコ。オアを量産しない書き方。候補が列挙できてるときに強いわね。"
+
+        subtitle: "WHERE category IN ('電子機器', 'ストレージ')。OR を量産しない書き方。候補が列挙できてるときに強いわね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "オア、オア、オア、地獄から解放されるのだ！"
+
+        subtitle: "OR、OR、OR……地獄から解放されるのだ！"
+
+
+
+  # ============================================================
+
+  # Q8 BETWEEN
+
+  # ============================================================
+
+  - id: "q08"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問8は価格帯バグ疑い。5千〜5万円に入るエスケーユーを安い順なのだ。"
+
+        subtitle: "問8は価格帯バグ疑い。5千〜5万円に入るSKUを安い順なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ビトゥイーン、ゴセン、アンド、ゴマン、に、オーダーバイ、プライス、エーエスシー。境界を含むから仕様を読み違えないで。"
+
+        subtitle: "BETWEEN 5000 AND 50000 に ORDER BY price ASC。境界を含むから仕様を読み違えないで。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "範囲検索はビトゥイーンが読みやすくて偉いのだ！"
+
+        subtitle: "範囲検索は BETWEEN が読みやすくて偉いのだ！"
+
+
+
+  # ============================================================
+
+  # Q9 DISTINCT
+
+  # ============================================================
+
+  - id: "q09"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問9は地域一覧。カスタマーズのリージョンを重複なく出せって法務に言われたのだ。"
+
+        subtitle: "問9は地域一覧。customers の region を重複なく出せって法務に言われたのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "シレクト、ディスティンクト、リージョン。ディスティンクトは集合を素集合にするイメージ。カバー範囲の説明に効くわ。"
+
+        subtitle: "SELECT DISTINCT region。DISTINCT は集合を素集合にするイメージ。カバー範囲の説明に効くわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "同じトウキョウが100行あっても、一覧は1個って分かるのだ！"
+
+        subtitle: "同じトウキョウが100行あっても、一覧は1個って分かるのだ！"
+
+
+
+  # ============================================================
+
+  # Q10 AND/OR カッコ
+
+  # ============================================================
+
+  - id: "q10"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問10はアラート誤爆切り分け。周辺機器で、在庫100以上または価格1万以上なのだ。"
+
+        subtitle: "問10はアラート誤爆切り分け。カテゴリは周辺機器で、在庫100以上または価格1万以上なのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、カテゴリー、イコール、周辺機器、アンド、カッコ、ストック、ダイナリイコール、イチゼロゼロ、オア、プライス、ダイナリイコール、イチマン、カッコ。カッコでオアの範囲を固定。ここを外すと意味が変わるのよ。"
+
+        subtitle: "WHERE category = '周辺機器' AND (stock >= 100 OR price >= 10000)。カッコで OR の範囲を固定。ここを外すと意味が変わるのよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "カッコなしだと優先順位で沼るのだ……注意なのだ！"
+
+        subtitle: "カッコなしだと優先順位で沼るのだ……注意なのだ！"
+
+
+
+  # ============================================================
+
+  # Q11 LIMIT
+
+  # ============================================================
+
+  - id: "q11"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "問11は高単価トップ3。オーダーバイ、プライス、ディーエスシー、リミット、サンの定石なのだ！"
+
+        subtitle: "問11は高単価トップ3。ORDER BY price DESC LIMIT 3 の定石なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "並べてからリミットで頭数を切る。代替案や緊急レビューで「まず上位だけ」が欲しいときに使うわ。"
+
+        subtitle: "並べてから LIMIT で頭数を切る。代替案や緊急レビューで「まず上位だけ」が欲しいときに使うわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "全部じゃなくていい。経営の脳みそは3件から始まるのだ！"
+
+        subtitle: "全部じゃなくていい。経営の脳みそは3件から始まるのだ！"
+
+
+
+  # ============================================================
+
+  # まとめ
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "第2本のキーワードはライク、イン、ビトゥイーン、ディスティンクト、カッコ付き条件、リミット、アンドやオアの整理よ。"
+
+        subtitle: "第2本のキーワードは LIKE / IN / BETWEEN / DISTINCT、カッコ付き条件、LIMIT、AND / OR の整理よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "第3本は集計だぞ！グループバイとハビングが出てくるのだ！"
+
+        subtitle: "第3本は集計だぞ！GROUP BY と HAVING が出てくるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "エスキューエル道場で6から11をクリアしたら、コメントで教えてね。"
+
+        subtitle: "SQL道場で6から11をクリアしたら、コメントで教えてね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "高評価よろしくなのだ！バイバイなのだ！"
+
+        subtitle: "高評価よろしくなのだ！バイバイなのだ！"

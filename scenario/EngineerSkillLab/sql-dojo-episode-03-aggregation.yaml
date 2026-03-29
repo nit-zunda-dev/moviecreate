@@ -1,0 +1,421 @@
+title: "【SQL道場 第3本】集計——GROUP BYとHAVINGで「何人・いくら」と答えを渡すのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # オープニング：第3本 Q12〜Q17
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "エスキューエル道場、第3本！集計・グループ化の回なのだ！"
+
+        subtitle: "SQL道場、第3本！集計・GROUP BYの回なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんです。対象はクイズ12から17。経営や現場が欲しがるのは、だいたい人数と合計と平均よ。"
+
+        subtitle: "四国めたんです。対象はクイズ12から17。経営や現場が欲しがるのは、だいたい人数と合計と平均よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "グループバイって聞くと胃がきつい……でもくくりで潰すだけなのだ！"
+
+        subtitle: "GROUP BYって聞くと胃がきつい……でもくくりで潰すだけなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "ウェアは行単位、ハビングはグループ単位。ここを分けると説明がラクになるわ。"
+
+        subtitle: "WHEREは行単位、HAVINGはグループ単位。ここを分けると説明がラクになるわ。"
+
+
+
+  # ============================================================
+
+  # Q12 COUNT GROUP BY
+
+  # ============================================================
+
+  - id: "q12"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問12は学年ごとの人数。シレクト、グレード、カンマ、カウント、アスタリスク、アズ、カウント、フロム、スチューデンツ、グループバイ、グレード、で出すのだ。"
+
+        subtitle: "問12は学年ごとの人数。SELECT grade, COUNT(*) AS count FROM students GROUP BY grade で出すのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "くくりキーと、そのくくりの個数。同じ学年が何行あっても、1行に畳まれるイメージね。"
+
+        subtitle: "くくりキーと、そのくくりの個数。同じ学年が何行あっても、1行に畳まれるイメージね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "非常時も「学年別に何人」はザラ。グループバイに慣れておくのだ！"
+
+        subtitle: "非常時も「学年別に何人」はザラ。GROUP BYに慣れておくのだ！"
+
+
+
+  # ============================================================
+
+  # Q13 AVG MAX MIN
+
+  # ============================================================
+
+  - id: "q13"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問13は科目別の平均・最高・最低。アヴェレージ、マックス、ミンでスコア論争を数字で止めるやつなのだ。"
+
+        subtitle: "問13は科目別の平均・最高・最低。AVG / MAX / MIN でスコア論争を数字で止めるやつなのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "アヴェレージ、スコア、カンマ、マックス、スコア、カンマ、ミン、スコア、を、グループバイ、サブジェクト・アイ・ディー、集計関数はグループバイとセットが基本よ。"
+
+        subtitle: "AVG(score), MAX(score), MIN(score) を GROUP BY subject_id。集計関数は GROUP BY とセットが基本よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "感覚じゃなく分布の芯を出すのだ！"
+
+        subtitle: "感覚じゃなく分布の芯を出すのだ！"
+
+
+
+  # ============================================================
+
+  # Q14 HAVING
+
+  # ============================================================
+
+  - id: "q14"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問14は平均点がハチジュウ以上の科目だけ。助成ラインみたいなやつなのだ。"
+
+        subtitle: "問14は平均点がハチジュウ以上の科目だけ。助成ラインみたいなやつなのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ハビング、アヴェレージ、スコア、ダイナリイコール、ハチジュウ。平均は集計結果だからウェアじゃなくハビング。ここで初めてエスキューエルらしさが出るわ。"
+
+        subtitle: "HAVING AVG(score) >= 80。平均は集計結果だから WHERE じゃなく HAVING。ここで初めてSQLらしさが出るわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "「グループの平均で絞る」って口で言うより、ハビング一発なのだ！"
+
+        subtitle: "「グループの平均で絞る」って口で言うより、HAVING一発なのだ！"
+
+
+
+  # ============================================================
+
+  # Q15 COUNT DISTINCT
+
+  # ============================================================
+
+  - id: "q15"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "問15は受験者のユニーク人数。二重計上がないか監査に突っ込まれるやつなのだ。"
+
+        subtitle: "問15は受験者のユニーク人数。二重計上がないか監査に突っ込まれるやつなのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "カウント、ディスティンクト、スチューデント・アイ・ディー。同じセイトが複数行あってもイチニンとして数えるのよ。"
+
+        subtitle: "COUNT(DISTINCT student_id)。同じ生徒が複数行あっても1人として数えるのよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "カウントだけだと水増しになる。ディスティンクトは現場の信頼を守るのだ！"
+
+        subtitle: "COUNT(*) だけだと水増しになる。DISTINCTは現場の信頼を守るのだ！"
+
+
+
+  # ============================================================
+
+  # Q16 SUM WHERE GROUP ORDER
+
+  # ============================================================
+
+  - id: "q16"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "問16は完了ステイタスだけを顧客別にクォンティティ合計。キャンセル混ぜたら即アウトなのだ。"
+
+        subtitle: "問16は status='完了' だけを顧客別に quantity 合計。キャンセル混ぜたら即アウトなのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ウェア、ステイタス、イコール、完了、で先に行を切ってから、サム、クォンティティ。ウェアからグループバイ、オーダーバイの王道ね。"
+
+        subtitle: "WHERE status='完了' で先に行を切ってから SUM(quantity)。WHERE → GROUP BY → ORDER BY の王道ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "オペの実績は違うステイタスを混ぜた瞬間に数字が壊れるのだ……！"
+
+        subtitle: "オペの実績は違う status を混ぜた瞬間に数字が壊れるのだ……！"
+
+
+
+  # ============================================================
+
+  # Q17 GROUP BY club NULL除外
+
+  # ============================================================
+
+  - id: "q17"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "問17は部活ごとの人数。ウェア、クラブ、イズノットヌル、してからグループバイするのだ。"
+
+        subtitle: "問17は部活ごとの人数。WHERE club IS NOT NULL してから GROUP BY するのだ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "未所属をくくりに入れたくないなら、事前にヌルを捨てる。名簿系でよくあるわね。"
+
+        subtitle: "未所属をくくりに入れたくないなら、事前に NULL を捨てる。名簿系でよくあるわね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "バス乗車とかで部単位の頭数、急に必要になるのだ！"
+
+        subtitle: "バス乗車とかで部単位の頭数、急に必要になるのだ！"
+
+
+
+  # ============================================================
+
+  # まとめ
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "第3本の型はグループバイでくくる、シュウケイ関数、必要ならハビングでグループを絞るよ。"
+
+        subtitle: "第3本の型は GROUP BY でくくる、集計関数、必要なら HAVING でグループを絞るよ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "第4本はジョイン！テーブルを横に広げる地獄……いや楽園なのだ！"
+
+        subtitle: "第4本は JOIN！テーブルを横に広げる地獄……いや楽園なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "エスキューエル道場12から17クリア、おめでとう。次は結合に進みましょ。"
+
+        subtitle: "SQL道場12から17クリア、おめでとう。次は結合に進みましょ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録よろしくなのだ！バイバイなのだ！"
+
+        subtitle: "チャンネル登録よろしくなのだ！バイバイなのだ！"
