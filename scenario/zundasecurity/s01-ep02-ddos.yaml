@@ -1,0 +1,753 @@
+title: "【登録セキスペ 第2回｜Season1】DDoS攻撃を攻略——ボットネット・反射増幅・サービス妨害の試験ポイントなのだ！"
+
+
+
+characters:
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.05
+
+
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.25
+
+      intonationScale: 1.1
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  voice:
+
+    speedScale: 1.2
+
+    postPhonemeLength: 0.08
+
+  defaultBackground: "./image/background/Movidrill.png"
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+scenes:
+
+  # ============================================================
+
+  # オープニング：インシデント導入（サービスが落ちる）
+
+  # ============================================================
+
+  - id: "incident"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "あれ？！　会社の通販サイトがずーっと読み込み中のままなのだ！　注文できないのだ！"
+
+        subtitle: "あれ？！　会社の通販サイトがずーっと読み込み中のままなのだ！　注文できないのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "困り"
+
+        text: "インフラから連絡が来たわ。外向きのWebサーバに、通常の何百倍ものアクセスが集中してる。"
+
+        subtitle: "インフラから連絡が来たわ。外向きのWebサーバに、通常の何百倍ものアクセスが集中してる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "バズったのだ？！　売れすぎてサーバがパンクしたのだ？！"
+
+        subtitle: "バズったのだ？！　売れすぎてサーバがパンクしたのだ？！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "違うわ。正規ユーザーは入れないくらい、わざとトラフィックを詰め込まれてる。典型的なDDoS攻撃の兆候よ。"
+
+        subtitle: "違うわ。正規ユーザーは入れないくらい、わざとトラフィックを詰め込まれてる。典型的なDDoS攻撃の兆候よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "で、DDoSって第1回のボットネットの話と関係あるのだ？！"
+
+        subtitle: "で、DDoSって第1回のボットネットの話と関係あるのだ？！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "その通り。前回つなぎとして言ったでしょ？　今日は分散型サービス妨害攻撃の全貌を叩き込むわ。"
+
+        subtitle: "その通り。前回つなぎとして言ったでしょ？　今日は分散型サービス妨害攻撃の全貌を叩き込むわ。"
+
+
+
+  # ============================================================
+
+  # オープニング：シリーズ紹介
+
+  # ============================================================
+
+  - id: "opening"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "四国めたんよ。第2回はシーズン1——ハッカーの手口編の続き。ネットワークを狙うDDoS攻撃を扱うわ。"
+
+        subtitle: "四国めたんよ。第2回はシーズン1——ハッカーの手口編の続き。ネットワークを狙うDDoS攻撃を扱うわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "第1回でマルウェア、第2回でサービスが止まる攻撃なのだ。全部つながってくるのだ！"
+
+        subtitle: "第1回でマルウェア、第2回でサービスが止まる攻撃なのだ。全部つながってくるのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "セキスペでは「攻撃の種類」「反射・増幅の仕組み」「ざっくりした対策の考え方」が問われやすいわ。用語の定義を正確にね。"
+
+        subtitle: "セキスペでは「攻撃の種類」「反射・増幅の仕組み」「ざっくりした対策の考え方」が問われやすいわ。用語の定義を正確にね。"
+
+
+
+  # ============================================================
+
+  # DoS と DDoS
+
+  # ============================================================
+
+  - id: "dos_vs_ddos"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "まず「DoS」と「DDoS」、似てるけど違うのだ？"
+
+        subtitle: "まず「DoS」と「DDoS」、似てるけど違うのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "DoSはDenial of Service——サービス拒否。正当な利用を妨げてサービスを使えなくさせる攻撃の総称よ。"
+
+        subtitle: "DoSはDenial of Service——サービス拒否。正当な利用を妨げてサービスを使えなくさせる攻撃の総称よ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "一つの攻撃元から狙い撃つなら単なるDoS。複数の攻撃元から同時に叩くのがDDoS——Distributed DoS、分散型サービス拒否攻撃ね。"
+
+        subtitle: "一つの攻撃元から狙い撃つなら単なるDoS。複数の攻撃元から同時に叩くのがDDoS——Distributed DoS、分散型サービス拒否攻撃ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "分散って、世界中のPCから一斉に攻撃ってことなのだ？！"
+
+        subtitle: "分散って、世界中のPCから一斉に攻撃ってことなのだ？！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "典型例はボットネットよ。第1回で触れた——マルウェアに感染した端末が、C&Cサーバの指令で一斉に攻撃トラフィックを送る。"
+
+        subtitle: "典型例はボットネットよ。第1回で触れた——マルウェアに感染した端末が、C&Cサーバの指令で一斉に攻撃トラフィックを送る。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "だから犯人のPC一台だけブロックしても止まらないのだ……。"
+
+        subtitle: "だから犯人のPC一台だけブロックしても止まらないのだ……。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "そこが試験でも現場でもポイント。攻撃元が大量・分散しているほど、防御と追跡が難しくなるの。"
+
+        subtitle: "そこが試験でも現場でもポイント。攻撃元が大量・分散しているほど、防御と追跡が難しくなるの。"
+
+
+
+  # ============================================================
+
+  # 攻撃のレイヤ（大まかな分類）
+
+  # ============================================================
+
+  - id: "attack_layers"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "教材や問題文では、大きく三つのレイヤに分けて説明されることが多いわ。"
+
+        subtitle: "教材や問題文では、大きく三つのレイヤに分けて説明されることが多いわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "第一にボリュメトリック攻撃——帯域を物理的に埋め尽くす。UDPフラッドやICMPフラッドなどね。"
+
+        subtitle: "第一にボリュメトリック攻撃——帯域を物理的に埋め尽くす。UDPフラッドやICMPフラッドなどね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "第二にプロトコル攻撃——TCPやSYNの仕様を悪用して、接続テーブルや状態管理を枯渇させる。代表がSYNフラッドよ。"
+
+        subtitle: "第二にプロトコル攻撃——TCPやSYNの仕様を悪用して、接続テーブルや状態管理を枯渇させる。代表がSYNフラッドよ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "第三にアプリケーション層攻撃——HTTPリクエストのように、一見まともな通信の形を装ってアプリやWebサーバを疲弊させる。"
+
+        subtitle: "第三にアプリケーション層攻撃——HTTPリクエストのように、一見まともな通信の形を装ってアプリやWebサーバを疲弊させる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "上から下まで全部攻められるのだ……！　試験はどれが出るのだ？！"
+
+        subtitle: "上から下まで全部攻められるのだ……！　試験はどれが出るのだ？！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "名称と「何を狙って枯渇させるか」が一致するか、という当てはめ問題が定番。暗記じゃなく整理して持ちなさい。"
+
+        subtitle: "名称と「何を狙って枯渇させるか」が一致するか、という当てはめ問題が定番。暗記じゃなく整理して持ちなさい。"
+
+
+
+  # ============================================================
+
+  # SYNフラッド
+
+  # ============================================================
+
+  - id: "syn_flood"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "SYNフラッドって、さっき出てきたやつをもうちょい詳しくなのだ！"
+
+        subtitle: "SYNフラッドって、さっき出てきたやつをもうちょい詳しくなのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "TCPのコネクション確立は三次握手でしょ？　クライアントがSYN、サーバがSYN-ACK、クライアントがACK。"
+
+        subtitle: "TCPのコネクション確立は三次握手でしょ？　クライアントがSYN、サーバがSYN-ACK、クライアントがACK。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "攻撃者はSYNだけ大量に送り続けて、最後のACKを返さない。サーバ側は半開接続が溜まり、リソースが枯れる。"
+
+        subtitle: "攻撃者はSYNだけ大量に送り続けて、最後のACKを返さない。サーバ側は半開接続が溜まり、リソースが枯れる。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "握手の途中で逃げるのだ！　失礼なのだ！"
+
+        subtitle: "握手の途中で逃げるのだ！　失礼なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "対策のキーワードとしてSYN Cookieがよく出るわ。半開接続に状態を持たせすぎない工夫の代表例ね。"
+
+        subtitle: "対策のキーワードとしてSYN Cookieがよく出るわ。半開接続に状態を持たせすぎない工夫の代表例ね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "試験では「SYNフラッドの説明として適切なもの」——SYNだけ送ってACKを返さない、という文が正解になりやすいわ。"
+
+        subtitle: "試験では「SYNフラッドの説明として適切なもの」——SYNだけ送ってACKを返さない、という文が正解になりやすいわ。"
+
+
+
+  # ============================================================
+
+  # 反射・増幅攻撃
+
+  # ============================================================
+
+  - id: "reflection_amplification"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "ニュースで「反射型」とか「増幅」とか聞くのだ。ボットネットとどう違うのだ？"
+
+        subtitle: "ニュースで「反射型」とか「増幅」とか聞くのだ。ボットネットとどう違うのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ボットネットは「乗っ取った端末が直接殴る」パターン。反射型は「第三者のサーバを踏み台にして殴らせる」パターンね。"
+
+        subtitle: "ボットネットは「乗っ取った端末が直接殴る」パターン。反射型は「第三者のサーバを踏み台にして殴らせる」パターンね。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "攻撃者は送信元IPを被害者に偽装——IPスプーフィング——して、DNSサーバなどに問い合わせを送る。"
+
+        subtitle: "攻撃者は送信元IPを被害者に偽装——IPスプーフィング——して、DNSサーバなどに問い合わせを送る。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "すると応答パケットが全部被害者に飛ぶ。攻撃者自身は小さなリクエストだけで、被害者側には大きなトラフィックが集中する。"
+
+        subtitle: "すると応答パケットが全部被害者に飛ぶ。攻撃者自身は小さなリクエストだけで、被害者側には大きなトラフィックが集中する。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "レバーみたいに倍率がかかるのだ！　だから増幅攻撃なのだ！"
+
+        subtitle: "レバーみたいに倍率がかかるのだ！　だから増幅攻撃なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "その通り。DNSや過去にはNTPなど、プロトコルによっては増幅率が非常に大きくなる脆弱な設定が問題になったわ。"
+
+        subtitle: "その通り。DNSや過去にはNTPなど、プロトコルによっては増幅率が非常に大きくなる脆弱な設定が問題になったわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "困り"
+
+        text: "試験では「攻撃トラフィックの大部分はどこから来るか」——反射元のサーバから、という理解が問われるの。"
+
+        subtitle: "試験では「攻撃トラフィックの大部分はどこから来るか」——反射元のサーバから、という理解が問われるの。"
+
+
+
+  # ============================================================
+
+  # 対策の考え方
+
+  # ============================================================
+
+  - id: "mitigation"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "じゃあどうすれば止まるのだ？！　帯域を太くすればいいのだ？！"
+
+        subtitle: "じゃあどうすれば止まるのだ？！　帯域を太くすればいいのだ？！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "困り"
+
+        text: "帯域増強だけは銀の弾じゃないわ。攻撃規模が追いついてくる。多層防御で考えるの。"
+
+        subtitle: "帯域増強だけは銀の弾じゃないわ。攻撃規模が追いついてくる。多層防御で考えるの。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "上流でトラフィックを洗浄するスクラビング——クリーンなトラフィックだけを通すサービスや装置の利用。"
+
+        subtitle: "上流でトラフィックを洗浄するスクラビング——クリーンなトラフィックだけを通すサービスや装置の利用。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "CDNやリバースプロキシで吸収・分散する。アプリケーション層攻撃ではWAFやレート制限が効く場面もあるわ。"
+
+        subtitle: "CDNやリバースプロキシで吸収・分散する。アプリケーション層攻撃ではWAFやレート制限が効く場面もあるわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "WAFってシーズン2で詳しくやるやつなのだ？"
+
+        subtitle: "WAFってシーズン2で詳しくやるやつなのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "そうね。今日は「DDoS対策の道具箱に入ってる」くらいの位置づけでOK。レート制限やCAPTCHAでボットを減らす、もセットで覚えて。"
+
+        subtitle: "そうね。今日は「DDoS対策の道具箱に入ってる」くらいの位置づけでOK。レート制限やCAPTCHAでボットを減らす、もセットで覚えて。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "スプーフィング対策として、BCP38など送信元アドレスの検証——アウトバウンドで偽装された送信元を出さない——も教科書に載るわ。"
+
+        subtitle: "スプーフィング対策として、BCP38など送信元アドレスの検証——アウトバウンドで偽装された送信元を出さない——も教科書に載るわ。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "困り"
+
+        text: "緊急時は被害を局所化するため、ブラックホールルーティングでトラフィックを捨てる判断もある。サービス停止と天秤ね。"
+
+        subtitle: "緊急時は被害を局所化するため、ブラックホールルーティングでトラフィックを捨てる判断もある。サービス停止と天秤ね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "捨てることも選択肢なのだ……。現場はキツいのだ……。"
+
+        subtitle: "捨てることも選択肢なのだ……。現場はキツいのだ……。"
+
+
+
+  # ============================================================
+
+  # 試験あるある
+
+  # ============================================================
+
+  - id: "exam_tips"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "ひっかけポイントをまとめてほしいのだ！"
+
+        subtitle: "ひっかけポイントをまとめてほしいのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "定番その1——「DDoSの特徴」。複数の攻撃元・分散している、が軸よ。一台だけじゃない、と迷ったら疑いなさい。"
+
+        subtitle: "定番その1——「DDoSの特徴」。複数の攻撃元・分散している、が軸よ。一台だけじゃない、と迷ったら疑いなさい。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "定番その2——「反射増幅」。攻撃者が被害者に直接大量パケットを送る、と書いてあれば反射の仕組みと矛盾しがち。"
+
+        subtitle: "定番その2——「反射増幅」。攻撃者が被害者に直接大量パケットを送る、と書いてあれば反射の仕組みと矛盾しがち。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "偽の送信元で第三者を騙すのだ！　図を頭に描くのだ！"
+
+        subtitle: "偽の送信元で第三者を騙すのだ！　図を頭に描くのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "定番その3——攻撃タイプとレイヤの対応。SYNフラッドはプロトコル層、ボリュメトリックは帯域埋め、と整理しておく。"
+
+        subtitle: "定番その3——攻撃タイプとレイヤの対応。SYNフラッドはプロトコル層、ボリュメトリックは帯域埋め、と整理しておく。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "あと「可用性への攻撃」という分類でDoSが載るテキストも多いわ。機密性・完全性とセットで整理すると試験が楽よ。"
+
+        subtitle: "あと「可用性への攻撃」という分類でDoSが載るテキストも多いわ。機密性・完全性とセットで整理すると試験が楽よ。"
+
+
+
+  # ============================================================
+
+  # まとめ・次回予告
+
+  # ============================================================
+
+  - id: "summary"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "今回のまとめよ。DoSはサービス拒否、DDoSは分散型。ボットネットは典型の攻撃源。攻撃はボリュメトリック・プロトコル・アプリ層に大別。"
+
+        subtitle: "今回のまとめよ。DoSはサービス拒否、DDoSは分散型。ボットネットは典型の攻撃源。攻撃はボリュメトリック・プロトコル・アプリ層に大別。"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "SYNフラッドは三次握手の悪用。反射増幅はスプーフィングと第三者サーバの応答。対策はスクラビング、CDN、レート制限、スプーフィング対策など多層で。"
+
+        subtitle: "SYNフラッドは三次握手の悪用。反射増幅はスプーフィングと第三者サーバの応答。対策はスクラビング、CDN、レート制限、スプーフィング対策など多層で。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "だからさっきのサイトは「攻撃で詰まった」だけで、バズってなかったのだ……。冷静にインシデント対応なのだ！"
+
+        subtitle: "だからさっきのサイトは「攻撃で詰まった」だけで、バズってなかったのだ……。冷静にインシデント対応なのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "その意気よ。第3回は標的型攻撃の入り口——フィッシングや水飲み場攻撃など、人と組織を狙う手口を扱うわ。"
+
+        subtitle: "その意気よ。第3回は標的型攻撃の入り口——フィッシングや水飲み場攻撃など、人と組織を狙う手口を扱うわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+
+        subtitle: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "また見てほしいのだ！　バイバイなのだ！"
+
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"
