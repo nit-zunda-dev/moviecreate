@@ -1,0 +1,332 @@
+title: "【登録セキスペ 第5回｜Season2】SQLインジェクションを攻略——文字列連結の罠と対策の試験ポイントなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング：インシデント導入（検索窓が暴走）
+  # ============================================================
+  - id: "incident"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "た、たすけてほしいのだ！　社内のお知らせ検索で『商品』って入れたら、関係ない社員名簿まで全部出てきたのだ！"
+        subtitle: "た、たすけてほしいのだ！　社内のお知らせ検索で『商品』って入れたら、関係ない社員名簿まで全部出てきたのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……典型的ね。入力がそのままSQLに混ざって、想定外の文が組み立てられてる。Season1で言った「実行」——今度はデータベース側よ。"
+        subtitle: "……典型的ね。入力がそのままSQLに混ざって、想定外の文が組み立てられてる。Season1で言った「実行」——今度はデータベース側よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "検索ってただの文字なのだ……。どうしてDBまで触れるのだ？！"
+        subtitle: "検索ってただの文字なのだ……。どうしてDBまで触れるのだ？！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だから今日はSQLインジェクション。Webアプリの代表性の高い攻撃を、試験で取り違えない形に叩き込むわ。"
+
+
+  # ============================================================
+  # オープニング：シリーズ紹介
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。第5回からSeason2——Webアプリの弱点編。まずはSQLインジェクションを扱うわ。"
+        subtitle: "四国めたんよ。第5回からSeason2——Webアプリの弱点編。まずはSQLインジェクションを扱うわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Season1はマルウェアから侵入の流れだったのだ。今度は「画面の向こうのDB」なのだね？"
+        subtitle: "Season1はマルウェアから侵入の流れだったのだ。今度は「画面の向こうのDB」なのだね？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。セキスペでは「入力がどう混ざるか」「何が漏えるか」「根本対策は何か」がセットで問われやすいの。定義を正確にね。"
+
+
+  # ============================================================
+  # SQLインジェクションとは何か
+  # ============================================================
+  - id: "what_is_sqli"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "SQLインジェクションって、難しい略語なのだ？"
+        subtitle: "SQLインジェクションって、難しい略語なのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "略称はSQLiと書かれることもあるわ。攻撃者が入力欄に特殊な文字列を入れて、アプリが組み立てるSQL文の意味を変えてしまう攻撃の総称よ。"
+        subtitle: "略称はSQLiと書かれることもあるわ。攻撃者が入力欄に特殊な文字列を入れて、アプリが組み立てるSQL文の意味を変えてしまう攻撃の総称よ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型は「文字列連結」でSQLを組んでいる実装。ユーザ入力が引用符を閉じたり、論理式を足したりして、意図しない文になる。"
+        subtitle: "典型は「文字列連結」でSQLを組んでいる実装。ユーザ入力が引用符を閉じたり、論理式を足したりして、意図しない文になる。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "検索窓が「SQLの一部」になってるのだ……！　だからさっきの名簿が……。"
+        subtitle: "検索窓が「SQLの一部」になってるのだ……！　だからさっきの名簿が……。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験では「SQL文に不正な文字列が埋め込まれる」みたいな言い回しがそのまま正解になりやすいわ。"
+
+
+  # ============================================================
+  # 何が起きうるか（機密性・完全性）
+  # ============================================================
+  - id: "impact"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "具体的に何ができるのだ？　見えるだけ？"
+        subtitle: "具体的に何ができるのだ？　見えるだけ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "状況次第で、機密情報の窃取——本来見えない行の閲覧、スキーマ情報の露出——に加えて、データ改ざんや削除、場合によってはOSコマンド実行まで議論される。"
+        subtitle: "状況次第で、機密情報の窃取——本来見えない行の閲覧、スキーマ情報の露出——に加えて、データ改ざんや削除、場合によってはOSコマンド実行まで議論される。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "削除まで……？！　可用性も完全性も機密性も全部ヤバいのだ！"
+        subtitle: "削除まで……？！　可用性も完全性も機密性も全部ヤバいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "文章問題では「どのセキュリティ属性が損なわれるか」とセットで出るの。覚えるのは属性名より、被害のイメージね。"
+
+
+  # ============================================================
+  # 攻撃の型（試験で名前が出るやつ）
+  # ============================================================
+  - id: "attack_types"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "種類がいっぱい出てくるのだ……。全部暗記？"
+        subtitle: "種類がいっぱい出てくるのだ……。全部暗記？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "暗記より「結果が画面にどう出るか」で持ちなさい。エラー情報やレスポンスの違いから推測するブラインド系、UNIONで列を合わせて結果を盗む型、など。"
+        subtitle: "暗記より「結果が画面にどう出るか」で持ちなさい。エラー情報やレスポンスの違いから推測するブラインド系、UNIONで列を合わせて結果を盗む型、など。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ブラインドSQLインジェクションは、真偽で挙動が変わるか、時間遅延で推測するか、に大別される説明が多いわ。"
+        subtitle: "ブラインドSQLインジェクションは、真偽で挙動が変わるか、時間遅延で推測するか、に大別される説明が多いわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "画面にエラーが出ると、攻撃者にヒントを渡しちゃうのだね……。"
+        subtitle: "画面にエラーが出ると、攻撃者にヒントを渡しちゃうのだね……。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その通り。だから「情報漏えいの入口」としてエラーメッセージの扱いもセットで覚えるの。"
+
+
+  # ============================================================
+  # 根本対策：プレースホルダと静的プレペアド
+  # ============================================================
+  - id: "fundamental_fix"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "じゃあどう直すのが正解なのだ？　入力を禁止ワードで弾けばいいのだ？"
+        subtitle: "じゃあどう直すのが正解なのだ？　入力を禁止ワードで弾けばいいのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "禁止リストだけは抜け道が出やすいの。根本は「SQLの構造」と「値」を分離すること。プリペアドステートメント——静的プレペアドが定番のキーワードよ。"
+        subtitle: "禁止リストだけは抜け道が出やすいの。根本は「SQLの構造」と「値」を分離すること。プリペアドステートメント——静的プレペアドが定番のキーワードよ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "プレースホルダに値をバインドして、入力がSQLの構文として解釈されないようにする。試験ではこの説明がそのまま正解肢になりやすいわ。"
+        subtitle: "プレースホルダに値をバインドして、入力がSQLの構文として解釈されないようにする。試験ではこの説明がそのまま正解肢になりやすいわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "「文字列連結でSQLを作らない」が一番の近道なのだ！"
+        subtitle: "「文字列連結でSQLを作らない」が一番の近道なのだ！"
+
+
+  # ============================================================
+  # 補助対策：WAF・権限最小化・エラー制御
+  # ============================================================
+  - id: "defense_in_depth"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "補助対策もセットで。WAFは第2回で触れたでしょ？　代表的パターンを検知・ブロックできるけど、銀の弾じゃないわ。"
+        subtitle: "補助対策もセットで。WAFは第2回で触れたでしょ？　代表的パターンを検知・ブロックできるけど、銀の弾じゃないわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "WAFだけじゃダメなのだ？"
+        subtitle: "WAFだけじゃダメなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "多層防御の一層として位置づけるの。あとDB接続ユーザの権限最小化——必要なテーブル操作だけ——も被害拡大を抑える。"
+        subtitle: "多層防御の一層として位置づけるの。あとDB接続ユーザの権限最小化——必要なテーブル操作だけ——も被害拡大を抑える。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "エラーメッセージの過剰表示を抑える、入力バリデーションを層でやる、も教科書どおりね。"
+        subtitle: "エラーメッセージの過剰表示を抑える、入力バリデーションを層でやる、も教科書どおりね。"
+
+
+  # ============================================================
+  # 試験あるある
+  # ============================================================
+  - id: "exam_tips"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけポイントをまとめてほしいのだ！"
+        subtitle: "ひっかけポイントをまとめてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その1——「文字列連結でSQLを組む」が脆弱性の温床、と書いてあればSQLiの文脈を疑いなさい。"
+        subtitle: "定番その1——「文字列連結でSQLを組む」が脆弱性の温床、と書いてあればSQLiの文脈を疑いなさい。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その2——根本対策は「静的プレペアド／バインド」。入力のエスケープだけで安心、は選択肢として危ないことが多いわ。"
+        subtitle: "定番その2——根本対策は「静的プレペアド／バインド」。入力のエスケープだけで安心、は選択肢として危ないことが多いわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "定番その3——別の攻撃と混ぜないのだ！　SQLiはDBへの不正な問い合わせ、XSSは別の話なのだ！"
+        subtitle: "定番その3——別の攻撃と混ぜないのだ！　SQLiはDBへの不正な問い合わせ、XSSは別の話なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "文章問題は、動詞を見る。「埋め込む」「結合する」「バインドする」——どこで構文が混ざるかが核心よ。"
+
+
+  # ============================================================
+  # まとめ・次回予告
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のまとめよ。SQLインジェクションは、入力がSQL文に混ざって意図を変える攻撃。窃取・改ざん・削除など被害は幅広い。"
+        subtitle: "今回のまとめよ。SQLインジェクションは、入力がSQL文に混ざって意図を変える攻撃。窃取・改ざん・削除など被害は幅広い。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "根本対策はプリペアドステートメントとバインド。WAFや権限最小化、エラー制御は多層防御。文字列連結は危険信号よ。"
+        subtitle: "根本対策はプリペアドステートメントとバインド。WAFや権限最小化、エラー制御は多層防御。文字列連結は危険信号よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "検索窓は「文字」じゃなくて「DBへの材料」だったのだ……。もう変な記号は入れないのだ！"
+        subtitle: "検索窓は「文字」じゃなくて「DBへの材料」だったのだ……。もう変な記号は入れないのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次回（第6回）は、画面にスクリプトが紛れ込む攻撃——クロスサイトスクリプティング、XSSを扱うわ。SQLiと混ぜないようにね。"
+        subtitle: "次回（第6回）は、画面にスクリプトが紛れ込む攻撃——クロスサイトスクリプティング、XSSを扱うわ。SQLiと混ぜないようにね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+        subtitle: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ！　バイバイなのだ！"
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"
