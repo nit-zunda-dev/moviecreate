@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>API設計ワークショップ：メモ・ノートAPI設計</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <!-- テーマの指定 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section img {
+      max-height: 380px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    .highlight-brand { color: #88DD44 !important; font-weight: bold; } /* ずんだもんカラー */
+    .highlight-accent { color: #FF88BB !important; font-weight: bold; } /* めたんカラー */
+    ul.custom-list li { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      
+      <!-- スライド 1: タイトル -->
+      <section>
+        <h2 style="text-transform: none;">【Engineer Skill Lab】<br>API設計ワークショップ</h2>
+        <h3 class="highlight-accent" style="text-transform: none;">メモ・ノートAPIをRESTで設計する</h3>
+        <p>〜メソッド・パス・ステータスとヘッダー編〜</p>
+      </section>
+
+      <!-- スライド 2: 前提とCRUD -->
+      <section>
+        <h3 style="text-transform: none;">シナリオの前提</h3>
+        <ul class="custom-list">
+          <li><strong>対象：</strong> 社内用のシンプルなメモアプリ（新規開発）</li>
+          <li><strong>利用者：</strong> ログイン済み</li>
+          <li><strong>操作：</strong> メモの<span class="highlight-brand">CRUD</span>（Create, Read, Update, Delete）</li>
+          <li><strong>リソース：</strong> <code>/notes</code> (名詞の複数形を使う)</li>
+        </ul>
+      </section>
+
+      <!-- スライド 3: CRUD全体像 -->
+      <section>
+        <h3 style="text-transform: none;">CRUDとAPIの全体像</h3>
+        <img src="./images/api_crud_overview_1776652849043.png" alt="CRUD Overview">
+        <p style="font-size: 0.8em; margin: 0;">作る(POST)・読む(GET)・直す(PUT/PATCH)・消す(DELETE)</p>
+      </section>
+
+      <!-- スライド 4: GET -->
+      <section>
+        <h3 style="text-transform: none;">一覧取得 <span class="highlight-brand">GET /notes</span></h3>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 40px;">
+          <img src="./images/api_get_list_1776652869016.png" alt="GET /notes" style="width: 45%;">
+          <ul style="font-size: 0.85em; width: 50%;">
+            <li><strong>ステータス：</strong> 200 OK</li>
+            <li><strong>ヘッダー：</strong> 
+              <ul>
+                <li><code>Authorization</code><br>(Bearerトークンなど)</li>
+                <li><code>Accept: application/json</code></li>
+              </ul>
+            </li>
+            <li>リクエスト本文は<strong>なし</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- スライド 5: POST -->
+      <section>
+        <h3 style="text-transform: none;">新規作成 <span class="highlight-brand">POST /notes</span></h3>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 40px;">
+          <img src="./images/api_post_create_1776652882643.png" alt="POST /notes" style="width: 45%;">
+          <ul style="font-size: 0.85em; width: 50%;">
+            <li><strong>ステータス：</strong> 201 Created</li>
+            <li><strong>ヘッダー：</strong> 
+              <ul>
+                <li><code>Authorization</code></li>
+                <li><code>Content-Type: application/json</code></li>
+              </ul>
+            </li>
+            <li>リクエストとレスポンスの<strong>両方に本文あり</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- スライド 6: PUT / PATCH -->
+      <section>
+        <h3 style="text-transform: none;">更新 <span class="highlight-brand">PUT or PATCH /notes/{id}</span></h3>
+        <ul class="custom-list" style="font-size: 0.9em;">
+          <li><strong>PUT：</strong> 1件を全文置き換えで更新</li>
+          <li><strong>PATCH：</strong> 一部だけ（部分）更新</li>
+          <li><strong>ステータス：</strong> 200 OK (更新後のJSONを返すことが多い)</li>
+          <li><strong>必須ヘッダー：</strong>
+            <ul>
+              <li><code>Authorization</code></li>
+              <li><code>Content-Type: application/json</code></li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <!-- スライド 7: DELETE -->
+      <section>
+        <h3 style="text-transform: none;">削除 <span class="highlight-brand">DELETE /notes/{id}</span></h3>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 40px;">
+          <img src="./images/api_delete_remove_1776652895756.png" alt="DELETE /notes" style="width: 45%;">
+          <ul style="font-size: 0.8em; width: 50%;">
+            <li><strong>ステータス：</strong> 204 No Content<br><small>(本文なしの定番)</small></li>
+            <li><em>※200 OKでJSONを返す別解もある</em></li>
+            <li><strong>ヘッダー：</strong> <code>Authorization</code> のみ</li>
+            <li>本文がないのでContent-Typeは不要</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- スライド 8: ヘッダーまとめ -->
+      <section>
+        <h3 style="text-transform: none;">重要なHTTPヘッダーまとめ</h3>
+        <table style="color: white; border-collapse: collapse; font-size: 0.8em; margin: 0 auto; width: 100%;">
+          <thead style="background-color: #444;">
+             <tr>
+               <th style="padding: 10px; border: 1px solid #777; text-align: center;">ヘッダー名</th>
+               <th style="padding: 10px; border: 1px solid #777; text-align: center;">用途</th>
+               <th style="padding: 10px; border: 1px solid #777; text-align: center;">よく使われる時</th>
+             </tr>
+          </thead>
+          <tbody>
+             <tr>
+               <td style="padding: 10px; border: 1px solid #777; text-align: center;" class="highlight-brand">Accept</td>
+               <td style="padding: 10px; border: 1px solid #777;">受け取りたい表現（JSONなど）を指定</td>
+               <td style="padding: 10px; border: 1px solid #777;">GET（読み取り時）</td>
+             </tr>
+             <tr>
+               <td style="padding: 10px; border: 1px solid #777; text-align: center;" class="highlight-accent">Content-Type</td>
+               <td style="padding: 10px; border: 1px solid #777;">送る本文の形式（JSONなど）を指定</td>
+               <td style="padding: 10px; border: 1px solid #777;">POST, PUT, PATCH（書き込み時）</td>
+             </tr>
+             <tr>
+               <td style="padding: 10px; border: 1px solid #777; text-align: center;">Authorization</td>
+               <td style="padding: 10px; border: 1px solid #777;">本人確認や認証情報（Bearerトークン）</td>
+               <td style="padding: 10px; border: 1px solid #777;">保護されたすべてのアクション</td>
+             </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- スライド 9: エンディング -->
+      <section>
+        <h3 style="text-transform: none;">おつかれさまなのだ！</h3>
+        <p>API設計も、パズルのようにメソッドと<br>ヘッダーとステータスコードを組み立てる！</p>
+        <br>
+        <p><span class="highlight-brand" style="font-size: 1.2em;">高評価・チャンネル登録よろしくなのだ！</span></p>
+      </section>
+      
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade'
+    });
+  </script>
+</body>
+</html>

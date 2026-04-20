@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XSS解説スライド — s01-ep06</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #5eead4;
+      --accent2: #f472b6;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: 2.5rem 3rem 5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+      color: var(--accent);
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+      font-weight: 500;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+      border: 1px solid rgba(94, 234, 212, 0.15);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+    .bullets {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .bullets li { margin: 0.4rem 0; }
+    .bullets strong { color: var(--text); }
+    .note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-left: 3px solid var(--accent2);
+      padding-left: 1rem;
+      margin-top: 1rem;
+    }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(94, 234, 212, 0.35);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .kbd { font-family: var(--mono); font-size: 0.8em; opacity: 0.85; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.5rem 1.25rem 4.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide active" data-i="1">
+      <span class="tag">シナリオ解説</span>
+      <h1>【登録セキスペ 第6回｜Season2】XSSを攻略</h1>
+      <h2>反射型・蓄積型・DOM型と出力エンコードの試験ポイント</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" aria-label="エピソードの流れ">
+          <defs>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#5eead4"/>
+              <stop offset="100%" style="stop-color:#f472b6"/>
+            </linearGradient>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#5eead4"/>
+            </marker>
+          </defs>
+          <rect x="10" y="70" width="130" height="60" rx="8" fill="#243044" stroke="#5eead4" stroke-width="1.5"/>
+          <text x="75" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">導入</text>
+          <text x="75" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">掲示板事故</text>
+          <path d="M 145 100 L 175 100" stroke="url(#g1)" stroke-width="2" marker-end="url(#arr)"/>
+          <rect x="180" y="70" width="130" height="60" rx="8" fill="#243044" stroke="#5eead4" stroke-width="1.5"/>
+          <text x="245" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">XSSとは</text>
+          <text x="245" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">SQLiとの違い</text>
+          <path d="M 315 100 L 345 100" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="350" y="70" width="130" height="60" rx="8" fill="#243044" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="415" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">3つの型</text>
+          <text x="415" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">反射・蓄積・DOM</text>
+          <path d="M 485 100 L 515 100" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="520" y="70" width="90" height="60" rx="8" fill="#243044" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="565" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">対策</text>
+          <text x="565" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">試験</text>
+          <text x="360" y="40" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">このスライドはシナリオ s01-ep06-xss.yaml に対応</text>
+        </svg>
+      </div>
+      <p class="note">ブラウザで開き、下部の「次へ」またはキーボード <span class="kbd">→</span> <span class="kbd">←</span> で進められます。</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" data-i="2">
+      <span class="tag">導入（incident）</span>
+      <h1>掲示板コメントが「表示」ではなく「実行」になった</h1>
+      <h2>シナリオの問題意識：入力がHTML/JSとして解釈され、閲覧者のブラウザで動く</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 248" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="40" width="140" height="50" rx="6" fill="#1e3a2f" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="90" y="70" text-anchor="middle" fill="#e7edf4" font-size="14" font-family="sans-serif">投稿者</text>
+          <path d="M 165 65 L 220 65" stroke="#5eead4" stroke-width="2" marker-end="url(#a2)"/>
+          <rect x="225" y="30" width="200" height="90" rx="8" fill="#243044" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="325" y="58" text-anchor="middle" fill="#f472b6" font-size="12" font-family="sans-serif">掲示板サーバ</text>
+          <text x="325" y="80" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">コメントを保存・配信</text>
+          <text x="325" y="100" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="sans-serif">エスケープなしでHTMLに混入</text>
+          <path d="M 430 75 L 500 75" stroke="#5eead4" stroke-width="2" marker-end="url(#a2)"/>
+          <rect x="505" y="40" width="120" height="50" rx="6" fill="#3a2438" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="565" y="70" text-anchor="middle" fill="#e7edf4" font-size="14" font-family="sans-serif">閲覧者</text>
+          <path d="M 565 95 L 565 118" stroke="#f87171" stroke-width="2" stroke-dasharray="4 3"/>
+          <text x="565" y="136" text-anchor="middle" fill="#f87171" font-size="12" font-family="sans-serif">ブラウザでスクリプト実行（ポップアップ等）</text>
+          <rect x="455" y="152" width="220" height="44" rx="6" fill="#2d1f1f" stroke="#f87171" stroke-width="1"/>
+          <text x="565" y="172" text-anchor="middle" fill="#fca5a5" font-size="10" font-family="sans-serif">&lt;script&gt; やイベント属性が解釈される</text>
+          <defs>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#5eead4"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>前回（SQLi）</strong>：DBへの不正な問い合わせが主戦場。</li>
+        <li><strong>今回（XSS）</strong>：HTMLにスクリプトが紛れ込み、<strong>閲覧者のブラウザ</strong>で動く。</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide" data-i="3">
+      <span class="tag">XSSの定義（what_is_xss）</span>
+      <h1>Cross-Site Scripting（XSS）</h1>
+      <h2>攻撃者のスクリプトが、他ユーザのブラウザ上で実行されてしまう脆弱性の総称</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 180" xmlns="http://www.w3.org/2000/svg">
+          <text x="360" y="28" text-anchor="middle" fill="#8b9cb3" font-size="13" font-family="sans-serif">なぜ略称が XSS？ — Cross-Site <tspan fill="#f472b6" font-weight="bold">S</tspan>cripting（末尾が重なるので X「S」S）</text>
+          <rect x="40" y="55" width="150" height="55" rx="8" fill="#243044" stroke="#5eead4" stroke-width="1.5"/>
+          <text x="115" y="88" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">入力・パラメータ</text>
+          <path d="M 195 82 L 250 82" stroke="#8b9cb3" stroke-width="2"/>
+          <text x="222" y="75" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">そのまま</text>
+          <rect x="255" y="55" width="200" height="55" rx="8" fill="#2d2640" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="355" y="82" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">HTML / JavaScript 文脈へ混入</text>
+          <path d="M 460 82 L 520 82" stroke="#8b9cb3" stroke-width="2" marker-end="url(#a3)"/>
+          <rect x="525" y="55" width="155" height="55" rx="8" fill="#3a2438" stroke="#f87171" stroke-width="1.5"/>
+          <text x="602" y="82" text-anchor="middle" fill="#fca5a5" font-size="12" font-family="sans-serif">ブラウザが「実行」</text>
+          <text x="360" y="145" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">ページを「表示」する処理が、結果的に「実行」まで許してしまう典型パターン</text>
+          <defs>
+            <marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#f472b6"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <p class="note">試験では「<strong>HTMLに埋め込まれる</strong>」「<strong>クライアント側で実行される</strong>」という言い回しがヒントになりやすい。</p>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" data-i="4">
+      <span class="tag">SQLi と XSS — 舞台の違い</span>
+      <h1>攻撃の「舞台」を取り違えない</h1>
+      <h2>同じ“入力が悪い”でも、到達点が違う</h2>
+      <div class="grid-2">
+        <div class="diagram">
+          <strong style="color:var(--accent)">SQLインジェクション</strong>
+          <svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="30" width="100" height="40" rx="6" fill="#243044" stroke="#5eead4"/>
+            <text x="70" y="55" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">攻撃者</text>
+            <path d="M 125 50 L 175 50" stroke="#5eead4" stroke-width="2"/>
+            <rect x="180" y="25" width="140" height="70" rx="8" fill="#1e2d3d" stroke="#fbbf24"/>
+            <text x="250" y="50" text-anchor="middle" fill="#fde68a" font-size="11" font-family="sans-serif">アプリ／サーバ</text>
+            <text x="250" y="68" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">クエリ組み立て</text>
+            <path d="M 250 100 L 250 125" stroke="#fbbf24" stroke-width="2"/>
+            <rect x="175" y="130" width="150" height="45" rx="6" fill="#2d1f10" stroke="#fbbf24"/>
+            <text x="250" y="158" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="sans-serif">データベース</text>
+          </svg>
+        </div>
+        <div class="diagram">
+          <strong style="color:var(--accent2)">XSS</strong>
+          <svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="30" width="100" height="40" rx="6" fill="#243044" stroke="#f472b6"/>
+            <text x="70" y="55" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">攻撃者</text>
+            <path d="M 125 50 L 175 50" stroke="#f472b6" stroke-width="2"/>
+            <rect x="180" y="25" width="140" height="50" rx="8" fill="#1e2d3d" stroke="#8b9cb3"/>
+            <text x="250" y="55" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">サーバ（HTML配信）</text>
+            <path d="M 250 80 L 250 105" stroke="#8b9cb3" stroke-width="2"/>
+            <rect x="175" y="110" width="150" height="55" rx="6" fill="#3a2438" stroke="#f87171"/>
+            <text x="250" y="135" text-anchor="middle" fill="#fca5a5" font-size="12" font-family="sans-serif">被害者のブラウザ</text>
+            <text x="250" y="155" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">スクリプト実行</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" data-i="5">
+      <span class="tag">3つの型（xss_types）</span>
+      <h1>暗記より「どこに残るか」「どこで混入するか」</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- 反射型 -->
+          <text x="130" y="28" text-anchor="middle" fill="#5eead4" font-size="14" font-weight="bold" font-family="sans-serif">反射型（Reflected）</text>
+          <rect x="20" y="40" width="220" height="95" rx="8" fill="#243044" stroke="#5eead4" stroke-width="1.5"/>
+          <text x="130" y="68" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">誘導URLなどでパラメータを送る</text>
+          <text x="130" y="88" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">レスポンスに「その場で」反映</text>
+          <text x="130" y="108" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="sans-serif">サーバは悪性ペイロードを返す</text>
+          <path d="M 130 140 L 130 165" stroke="#5eead4" stroke-width="2" marker-end="url(#ad)"/>
+          <text x="130" y="185" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">永続ストアに残らないイメージ</text>
+
+          <!-- 蓄積型 -->
+          <text x="400" y="28" text-anchor="middle" fill="#f472b6" font-size="14" font-weight="bold" font-family="sans-serif">蓄積型（Stored）</text>
+          <rect x="290" y="40" width="220" height="95" rx="8" fill="#2d2438" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="400" y="68" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">掲示板・DBなどに保存</text>
+          <text x="400" y="88" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">閲覧するたびに被害が広がる</text>
+          <text x="400" y="108" text-anchor="middle" fill="#f87171" font-size="10" font-family="sans-serif">シナリオの掲示板＝これ</text>
+          <ellipse cx="400" cy="175" rx="55" ry="22" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="400" y="180" text-anchor="middle" fill="#86efac" font-size="10" font-family="sans-serif">DB / 保存領域</text>
+
+          <!-- DOMベース -->
+          <text x="670" y="28" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="bold" font-family="sans-serif">DOMベース</text>
+          <rect x="560" y="40" width="220" height="138" rx="8" fill="#2d2a1f" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="670" y="66" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">サーバのHTMLは「綺麗」でも起きうる</text>
+          <text x="670" y="88" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">クライアントJSが #fragment 等を</text>
+          <text x="670" y="108" text-anchor="middle" fill="#fde68a" font-size="10" font-family="sans-serif">unsafe に DOM へ流し込み</text>
+          <text x="670" y="135" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">キーワード: DOM・フラグメント・</text>
+          <text x="670" y="152" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">クライアント処理</text>
+
+          <defs>
+            <marker id="ad" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#5eead4"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>反射型</strong>：その場のレスポンスに乗る。フィッシングURLとセットで出題されやすい。</li>
+        <li><strong>蓄積型</strong>：保存される。閲覧者全員が踏む。</li>
+        <li><strong>DOMベース</strong>：混入点が<strong>フロントの処理</strong>。サーバだけ見て安心しない。</li>
+      </ul>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide" data-i="6">
+      <span class="tag">DOMベース XSS のイメージ</span>
+      <h1>サーバは無罪そうに見える — 疑うのはクライアント側</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 760 288" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="36" width="160" height="56" rx="6" fill="#243044" stroke="#5eead4"/>
+          <text x="110" y="62" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">サーバ応答</text>
+          <text x="110" y="82" text-anchor="middle" fill="#4ade80" font-size="10" font-family="sans-serif">静的で安全なHTML</text>
+          <path d="M 195 64 L 255 64" stroke="#8b9cb3" stroke-width="2"/>
+          <rect x="260" y="34" width="200" height="58" rx="8" fill="#3a3020" stroke="#fbbf24"/>
+          <text x="360" y="58" text-anchor="middle" fill="#fde68a" font-size="11" font-family="sans-serif">ブラウザ内 JavaScript</text>
+          <text x="360" y="78" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">location.hash 等を読み取り…</text>
+          <path d="M 465 64 L 530 64" stroke="#f87171" stroke-width="2" marker-end="url(#ae)"/>
+          <rect x="535" y="34" width="195" height="58" rx="8" fill="#3a2438" stroke="#f87171"/>
+          <text x="632" y="58" text-anchor="middle" fill="#fca5a5" font-size="11" font-family="sans-serif">innerHTML 等でDOM更新</text>
+          <text x="632" y="78" text-anchor="middle" fill="#f87171" font-size="10" font-family="sans-serif">結果としてスクリプト実行</text>
+
+          <rect x="28" y="118" width="704" height="118" rx="10" fill="#1a2332" stroke="rgba(94,234,212,0.3)"/>
+          <text x="380" y="146" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">例（概念）：https://example.com/app#&lt;img src=x onerror=…&gt;</text>
+          <text x="380" y="168" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">フラグメント（#以降）は通常サーバに送られない</text>
+          <text x="380" y="186" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">→ サーバログだけ見ると「何も悪くない」</text>
+          <text x="380" y="210" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="sans-serif">→ 試験では「クライアント側処理」「DOM」を手がかりに</text>
+          <defs>
+            <marker id="ae" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#f87171"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide" data-i="7">
+      <span class="tag">影響（impact）</span>
+      <h1>ポップアップは入口にすぎない</h1>
+      <h2>機密性・完全性の観点で「何が奪える／偽れるか」</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="360" cy="120" r="45" fill="#3a2438" stroke="#f472b6" stroke-width="2"/>
+          <text x="360" y="118" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">XSSで</text>
+          <text x="360" y="135" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">実行権限</text>
+
+          <path d="M 360 75 L 360 40" stroke="#5eead4" stroke-width="1.5"/>
+          <rect x="300" y="5" width="120" height="32" rx="6" fill="#243044" stroke="#5eead4"/>
+          <text x="360" y="26" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">Cookie窃取</text>
+
+          <path d="M 410 95 L 480 60" stroke="#fbbf24" stroke-width="1.5"/>
+          <rect x="485" y="40" width="130" height="36" rx="6" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="550" y="62" text-anchor="middle" fill="#fde68a" font-size="10" font-family="sans-serif">セッションハイジャック</text>
+
+          <path d="M 420 140 L 500 170" stroke="#f472b6" stroke-width="1.5"/>
+          <rect x="505" y="155" width="120" height="50" rx="6" fill="#243044" stroke="#f472b6"/>
+          <text x="565" y="175" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">画面改ざん</text>
+          <text x="565" y="192" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">フィッシング表示</text>
+
+          <path d="M 310 140 L 230 170" stroke="#8b9cb3" stroke-width="1.5"/>
+          <rect x="95" y="155" width="125" height="50" rx="6" fill="#243044" stroke="#8b9cb3"/>
+          <text x="157" y="175" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">キー入力取得</text>
+          <text x="157" y="192" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">ログイン情報等</text>
+
+          <path d="M 360 168 L 360 210" stroke="#f87171" stroke-width="1.5"/>
+          <rect x="270" y="215" width="180" height="38" rx="6" fill="#2d1f1f" stroke="#f87171"/>
+          <text x="360" y="238" text-anchor="middle" fill="#fca5a5" font-size="10" font-family="sans-serif">管理者操作の足がかり など</text>
+        </svg>
+      </div>
+      <p class="note">可用性というより、<strong>信頼と表示の破壊</strong>が主戦場、という整理がシナリオの指摘と一致。</p>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide" data-i="8">
+      <span class="tag">根本対策（fundamental_fix）</span>
+      <h1>コンテキストに応じた出力エスケープ</h1>
+      <h2>入力の全面禁止ではなく、「表示する直前」で文脈に合わせて無害化</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 248" xmlns="http://www.w3.org/2000/svg">
+          <text x="380" y="22" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">同じ文字でも、置かれる場所で危険度が変わる</text>
+          <rect x="40" y="45" width="150" height="50" rx="8" fill="#243044" stroke="#5eead4"/>
+          <text x="115" y="75" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">HTML本文</text>
+          <rect x="210" y="45" width="150" height="50" rx="8" fill="#243044" stroke="#f472b6"/>
+          <text x="285" y="75" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">属性値</text>
+          <rect x="380" y="45" width="150" height="50" rx="8" fill="#243044" stroke="#fbbf24"/>
+          <text x="455" y="75" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">JavaScript</text>
+          <rect x="550" y="45" width="170" height="50" rx="8" fill="#243044" stroke="#4ade80"/>
+          <text x="635" y="75" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">URL</text>
+
+          <path d="M 380 110 L 380 128" stroke="#8b9cb3" stroke-width="2"/>
+          <rect x="36" y="132" width="688" height="96" rx="10" fill="#1e3a2f" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="380" y="156" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">フレームワークの自動エスケープ／テンプレート機能を</text>
+          <text x="380" y="174" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">正しく使う</text>
+          <text x="380" y="198" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">試験の正解肢になりやすい語：</text>
+          <text x="380" y="216" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">「エスケープ」「サニタイズ（特に出力側）」</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide" data-i="9">
+      <span class="tag">多層防御（defense_in_depth）</span>
+      <h1>CSP・HttpOnly・入力バリデーションの位置づけ</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 760 250" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="40" width="700" height="50" rx="8" fill="#243044" stroke="#5eead4" stroke-width="1.5"/>
+          <text x="380" y="72" text-anchor="middle" fill="#5eead4" font-size="13" font-family="sans-serif">① 根本：出力エスケープ（コンテキスト別）</text>
+
+          <rect x="30" y="105" width="700" height="45" rx="8" fill="#2d2a1f" stroke="#fbbf24" stroke-width="1.2"/>
+          <text x="380" y="133" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">② CSP：インラインJS・外部読み込み制限 → 被害の抑え込み</text>
+
+          <rect x="30" y="165" width="700" height="55" rx="8" fill="#2d2438" stroke="#f472b6" stroke-width="1.2"/>
+          <text x="380" y="188" text-anchor="middle" fill="#f9a8d4" font-size="12" font-family="sans-serif">③ HttpOnly：JSからCookieを読みにくくする（窃取のしやすさ↓）</text>
+          <text x="380" y="208" text-anchor="middle" fill="#f87171" font-size="11" font-family="sans-serif">→ 脆弱性そのものの根本対策ではない（誤解注意）</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>入力バリデーション</strong>は補助。<strong>ブラックリストのみ</strong>は抜け道が出やすい（SQLiと同じ発想）。</li>
+      </ul>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" data-i="10">
+      <span class="tag">試験あるある（exam_tips）</span>
+      <h1>ひっかけ3点セット</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="30" width="200" height="75" rx="8" fill="#243044" stroke="#5eead4"/>
+          <text x="120" y="58" text-anchor="middle" fill="#5eead4" font-size="12" font-family="sans-serif">定番①</text>
+          <text x="120" y="80" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">SQLi と XSS を混ぜない</text>
+          <text x="120" y="98" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">DB vs ブラウザ</text>
+
+          <rect x="260" y="30" width="200" height="75" rx="8" fill="#2d2438" stroke="#f472b6"/>
+          <text x="360" y="58" text-anchor="middle" fill="#f472b6" font-size="12" font-family="sans-serif">定番②</text>
+          <text x="360" y="78" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">「HttpOnlyでXSSは起きない」</text>
+          <text x="360" y="95" text-anchor="middle" fill="#f87171" font-size="10" font-family="sans-serif">言い切り → 危険</text>
+
+          <rect x="500" y="30" width="200" height="75" rx="8" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="600" y="58" text-anchor="middle" fill="#fbbf24" font-size="12" font-family="sans-serif">定番③</text>
+          <text x="600" y="80" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">DOMベースはサーバが綺麗でも</text>
+
+          <rect x="80" y="125" width="560" height="55" rx="8" fill="#1a2332" stroke="rgba(139,156,179,0.4)"/>
+          <text x="360" y="148" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">文章問題は動詞と主語：「埋め込む」「エスケープ」「実行される」</text>
+          <text x="360" y="168" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">主語が <tspan fill="#f472b6">ブラウザ</tspan> か <tspan fill="#5eead4">DB</tspan> かが核心</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide" data-i="11">
+      <span class="tag">まとめ（summary）</span>
+      <h1>1枚で振り返り</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 760 290" xmlns="http://www.w3.org/2000/svg">
+          <rect x="25" y="20" width="710" height="55" rx="10" fill="#243044" stroke="#5eead4"/>
+          <text x="380" y="45" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">XSS ＝ 他ユーザのブラウザでスクリプトが動く</text>
+          <text x="380" y="65" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">型の切り分け：残り方 × 混入点（反射／蓄積／DOM）</text>
+
+          <rect x="25" y="90" width="340" height="90" rx="10" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="195" y="120" text-anchor="middle" fill="#86efac" font-size="12" font-family="sans-serif">根本対策</text>
+          <text x="195" y="145" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">コンテキスト別 出力エスケープ</text>
+          <text x="195" y="165" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">プリペアド文だけでは XSS は止まらない</text>
+
+          <rect x="395" y="90" width="340" height="90" rx="10" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="565" y="120" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">多層防御</text>
+          <text x="565" y="145" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">CSP / HttpOnly / 入力検証</text>
+          <text x="565" y="165" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">役割を取り違えない</text>
+
+          <rect x="25" y="195" width="710" height="80" rx="10" fill="#2d2438" stroke="#f472b6"/>
+          <text x="380" y="225" text-anchor="middle" fill="#f9a8d4" font-size="12" font-family="sans-serif">次回（第7回）：CSRF — ログイン済みユーザへのリクエスト偽造</text>
+          <text x="380" y="248" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">XSSとの「なりすまし」仕組みは違う → 混同しない</text>
+        </svg>
+      </div>
+      <p class="note">シナリオ出典: <code style="color:var(--accent)">scenario/zundasecurity/s01-ep06-xss.yaml</code></p>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <span class="progress" id="prog">1 / 11</span>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) {
+          s.classList.toggle("active", j === idx);
+        });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          e.preventDefault();
+          show(idx + 1);
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          show(idx - 1);
+        }
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>

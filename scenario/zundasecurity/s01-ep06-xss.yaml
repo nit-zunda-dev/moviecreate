@@ -1,0 +1,333 @@
+title: "【登録セキスペ 第6回｜Season2】XSSを攻略——反射型・蓄積型・DOM型と出力エンコードの試験ポイントなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング：インシデント導入（掲示板コメントが暴走）
+  # ============================================================
+  - id: "incident"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "た、たすけてほしいのだ！　社内掲示板に『お疲れ様』って書いたら、開いた人の画面で変なポップアップが出るって通報が……！"
+        subtitle: "た、たすけてほしいのだ！　社内掲示板に『お疲れ様』って書いたら、開いた人の画面で変なポップアップが出るって通報が……！"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……典型的ね。前回はSQL——データベースへの不正な問い合わせ。今度はHTMLにスクリプトが紛れ込んで、閲覧者のブラウザで動いてる。"
+        subtitle: "……典型的ね。前回はSQL——データベースへの不正な問い合わせ。今度はHTMLにスクリプトが紛れ込んで、閲覧者のブラウザで動いてる。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ずんだもんはただ文字を書いただけなのだ……。なのに他人の画面まで壊れるのはおかしいのだ！"
+        subtitle: "ずんだもんはただ文字を書いただけなのだ……。なのに他人の画面まで壊れるのはおかしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だから今日はクロスサイトスクリプティング——XSS。Webの代表性の高い弱点を、試験で取り違えない形に叩き込むわ。"
+
+
+  # ============================================================
+  # オープニング：シリーズ紹介
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。第6回もSeason2——Webアプリの弱点編。SQLインジェクションの次はXSSよ。"
+        subtitle: "四国めたんよ。第6回もSeason2——Webアプリの弱点編。SQLインジェクションの次はXSSよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "第5回は検索窓がDBに繋がってたのだ。今度は「画面に表示される文字」が攻撃になるのだね？"
+        subtitle: "第5回は検索窓がDBに繋がってたのだ。今度は「画面に表示される文字」が攻撃になるのだね？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。セキスペでは「どこで混ざるか」「誰のブラウザで動くか」「根本対策は何か」がセットで問われやすいの。SQLiと混ぜないでね。"
+
+
+  # ============================================================
+  # XSSとは何か（SQLiとの違い）
+  # ============================================================
+  - id: "what_is_xss"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "XSSって、なんか難しそうな略語なのだ……。"
+        subtitle: "XSSって、なんか難しそうな略語なのだ……。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Cross-Site Scriptingの略で、末尾が重なるからX「S」Sって書くの。攻撃者が用意したスクリプトが、他ユーザのブラウザ上で実行されてしまう脆弱性の総称よ。"
+        subtitle: "Cross-Site Scriptingの略で、末尾が重なるからX「S」Sって書くの。攻撃者が用意したスクリプトが、他ユーザのブラウザ上で実行されてしまう脆弱性の総称よ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型は、入力やパラメータがHTMLやJavaScriptとして解釈される文脈に、そのまま埋め込まれる実装。ページを「表示する」処理が、結果的に「実行」まで許してしまう。"
+        subtitle: "典型は、入力やパラメータがHTMLやJavaScriptとして解釈される文脈に、そのまま埋め込まれる実装。ページを「表示する」処理が、結果的に「実行」まで許してしまう。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "SQLiはサーバ側のDB、XSSは閲覧者のブラウザ……。攻撃の「舞台」が違うのだ！"
+        subtitle: "SQLiはサーバ側のDB、XSSは閲覧者のブラウザ……。攻撃の「舞台」が違うのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験では「HTMLに埋め込まれる」「クライアント側で実行される」みたいな言い回しがヒントになりやすいわ。"
+
+
+  # ============================================================
+  # 三つの型：反射型・蓄積型・DOMベース
+  # ============================================================
+  - id: "xss_types"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "XSSにも種類があるのだ？　全部暗記？"
+        subtitle: "XSSにも種類があるのだ？　全部暗記？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "暗記より「どこに残るか」で持ちなさい。反射型はレスポンスにその場で反映され、誘導URLなどで踏ませるイメージ。蓄積型はDBや掲示板に残って、閲覧するたびに被害が広がる。"
+        subtitle: "暗記より「どこに残るか」で持ちなさい。反射型はレスポンスにその場で反映され、誘導URLなどで踏ませるイメージ。蓄積型はDBや掲示板に残って、閲覧するたびに被害が広がる。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "さっきの掲示板は「残ってる」から蓄積型なのだ……！"
+        subtitle: "さっきの掲示板は「残ってる」から蓄積型なのだ……！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "DOMベースは、サーバが悪いHTMLを返さなくても、クライアント側のJavaScriptがURLフラグメントなどをunsafeにDOMへ流し込んで起きる型。文章では「DOM」「フラグメント」「クライアント側処理」が手がかりよ。"
+        subtitle: "DOMベースは、サーバが悪いHTMLを返さなくても、クライアント側のJavaScriptがURLフラグメントなどをunsafeにDOMへ流し込んで起きる型。文章では「DOM」「フラグメント」「クライアント側処理」が手がかりよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "サーバが綺麗でも、フロントの書き方で落ちるのだ……。怖いのだ……。"
+        subtitle: "サーバが綺麗でも、フロントの書き方で落ちるのだ……。怖いのだ……。"
+
+
+  # ============================================================
+  # 何が起きうるか
+  # ============================================================
+  - id: "impact"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ポップアップ以外に、何ができるのだ？　いたずらで終わり？"
+        subtitle: "ポップアップ以外に、何ができるのだ？　いたずらで終わり？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型はCookieの窃取——セッションハイジャック、画面の改ざん——フィッシング表示、キー入力の取得、あとは管理者画面への不正操作の足がかり、など。"
+        subtitle: "典型はCookieの窃取——セッションハイジャック、画面の改ざん——フィッシング表示、キー入力の取得、あとは管理者画面への不正操作の足がかり、など。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ログインした人の「なりすまし」まで行けるのだ？！"
+        subtitle: "ログインした人の「なりすまし」まで行けるのだ？！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "状況次第ね。文章問題では「機密性」「完全性」あたりがセットで出るの。可用性というより、信頼と表示の破壊が主戦場よ。"
+
+
+  # ============================================================
+  # 根本対策：コンテキストに応じた出力エスケープ
+  # ============================================================
+  - id: "fundamental_fix"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "じゃあどう直すのが正解なのだ？　入力を全部禁止すればいいのだ？"
+        subtitle: "じゃあどう直すのが正解なのだ？　入力を全部禁止すればいいのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "業務が止まるでしょ。根本は「出力時に、文脈に合わせてエスケープする」こと。HTML本文、属性、JavaScript、URL——同じ文字でも危険度が変わるの。"
+        subtitle: "業務が止まるでしょ。根本は「出力時に、文脈に合わせてエスケープする」こと。HTML本文、属性、JavaScript、URL——同じ文字でも危険度が変わるの。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "フレームワークの自動エスケープやテンプレートエンジンの機能を正しく使うのが定番。試験では「エスケープ」「サニタイズ」——特に出力側——の説明が正解肢になりやすいわ。"
+        subtitle: "フレームワークの自動エスケープやテンプレートエンジンの機能を正しく使うのが定番。試験では「エスケープ」「サニタイズ」——特に出力側——の説明が正解肢になりやすいわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "「表示する直前」が一番大事なのだ！"
+        subtitle: "「表示する直前」が一番大事なのだ！"
+
+
+  # ============================================================
+  # 補助対策：CSP・HttpOnly・入力バリデーション
+  # ============================================================
+  - id: "defense_in_depth"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "多層防御もセットで。CSP——コンテンツセキュリティポリシーは、インラインスクリプトや外部読み込みを制限して被害を抑える。"
+        subtitle: "多層防御もセットで。CSP——Content Security Policyは、インラインスクリプトや外部読み込みを制限して被害を抑える。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "HttpOnlyって、XSSを止めるのだ？"
+        subtitle: "HttpOnlyって、XSSを止めるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "誤解しやすいわ。HttpOnlyはJavaScriptからCookieを読めにくくするフラグで、窃取の「しやすさ」を下げる。脆弱性そのものの根本対策じゃないの。"
+        subtitle: "誤解しやすいわ。HttpOnlyはJavaScriptからCookieを読めにくくするフラグで、窃取の「しやすさ」を下げる。脆弱性そのものの根本対策じゃないの。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "入力バリデーションは補助。ブラックリストだけに頼るのは抜け道が出やすい——前回のSQLiと同じ発想ね。"
+        subtitle: "入力バリデーションは補助。ブラックリストだけに頼るのは抜け道が出やすい——前回のSQLiと同じ発想ね。"
+
+
+  # ============================================================
+  # 試験あるある
+  # ============================================================
+  - id: "exam_tips"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけポイントをまとめてほしいのだ！"
+        subtitle: "ひっかけポイントをまとめてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その1——SQLiと混ぜない。SQLiはDBへの不正な問い合わせ、XSSはブラウザ上でのスクリプト実行、ね。"
+        subtitle: "定番その1——SQLiと混ぜない。SQLiはDBへの不正な問い合わせ、XSSはブラウザ上でのスクリプト実行、ね。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その2——「HttpOnlyを付けたからXSSは起きない」系の言い切りは危ない。被害軽減と根本対策を取り違えない。"
+        subtitle: "定番その2——「HttpOnlyを付けたからXSSは起きない」系の言い切りは危ない。被害軽減と根本対策を取り違えない。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "定番その3——DOMベースは「サーバが無罪そうに見える」問題なのだ！　クライアント側の処理を疑うのだ！"
+        subtitle: "定番その3——DOMベースは「サーバが無罪そうに見える」問題なのだ！　クライアント側の処理を疑うのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "文章問題は動詞を見る。「埋め込む」「エスケープする」「実行される」——主語がブラウザかDBかが核心よ。"
+
+
+  # ============================================================
+  # まとめ・次回予告
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のまとめよ。XSSはスクリプトが他ユーザのブラウザで動く攻撃。反射型・蓄積型・DOMベースは「残り方」と「混入点」で切り分ける。"
+        subtitle: "今回のまとめよ。XSSはスクリプトが他ユーザのブラウザで動く攻撃。反射型・蓄積型・DOMベースは「残り方」と「混入点」で切り分ける。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "根本対策はコンテキストに応じた出力エスケープ。CSPやHttpOnlyは多層防御。SQLi対策のプリペアドだけではXSSは止まらないわ。"
+        subtitle: "根本対策はコンテキストに応じた出力エスケープ。CSPやHttpOnlyは多層防御。SQLi対策のプリペアドだけではXSSは止まらないわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "掲示板の文字は「表示」じゃなくて「ブラウザへの指示」になり得たのだ……。もうスクリプトっぽいのは書かないのだ！"
+        subtitle: "掲示板の文字は「表示」じゃなくて「ブラウザへの指示」になり得たのだ……。もうスクリプトっぽいのは書かないのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次回（第7回）は、ログイン済みユーザをだますリクエスト偽造——CSRFを扱うわ。XSSと「なりすまし」の仕組みが違うから、混ぜないようにね。"
+        subtitle: "次回（第7回）は、ログイン済みユーザをだますリクエスト偽造——CSRFを扱うわ。XSSと「なりすまし」の仕組みが違うから、混ぜないようにね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+        subtitle: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ！　バイバイなのだ！"
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"

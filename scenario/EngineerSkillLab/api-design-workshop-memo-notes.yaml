@@ -1,0 +1,276 @@
+title: "【Engineer Skill Lab｜API設計ワークショップ】メモ・ノートAPIをRESTで設計する——メソッド・パス・ステータスとヘッダーまでなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。今日は エンジニア・スキル・ラボ の エーピーアイ設計ワークショップ から、入門シナリオ「メモ・ノートのエーピーアイ」を解説するわ。"
+        subtitle: "四国めたんよ。今日は Engineer Skill Lab の API設計ワークショップ から、入門シナリオ「メモ・ノートAPI」を解説するわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "エーピーアイってユーアールエルを決めるだけじゃないのだ？　なんでワークショップなのだ？"
+        subtitle: "APIってURLを決めるだけじゃないのだ？　なんでワークショップなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "このアプリでは エイチティーティーピー のメソッド と パス と ステータスコード に加えて、誰向けか（認証）、どのヘッダーで形式と本人確認を伝えるか、リクエストとレスポンスに本文があるかまで、セットで組み立てるの。"
+        subtitle: "このアプリでは HTTPメソッド と パス と ステータスコード に加えて、誰向けか（認証）、どのヘッダーで形式と本人確認を伝えるか、リクエストとレスポンスに本文があるかまで、セットで組み立てるの。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "おおっ、フルセットなのだ！　じゃあずんだもんの社内メモもちゃんと設計できるのだ！"
+
+  # ============================================================
+  # シナリオ前提（workshopData チャレンジ1）
+  # ============================================================
+  - id: "scenario_setup"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "題材の前提はこう。社内用のシンプルなメモアプリを新規開発する。利用者は ログイン済み と決め打ち。メモのクラッド——作成・一覧・更新・削除をレストで設計するの。"
+        subtitle: "題材の前提はこう。社内用のシンプルなメモアプリを新規開発する。利用者は ログイン済み と決め打ち。メモのCRUD——作成・一覧・更新・削除をRESTで設計するの。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "クラッドって、英語でいうとクリエイト、リード、アップデート、デリート……作る・読む・直す・消す、の四兄弟なのだ！"
+        subtitle: "CRUDって、英語でいうとCreate Read Update Delete……作る・読む・直す・消す、の四兄弟なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "いい言い方ね。リソースは 名詞の複数形 で表すのが典型よ。このシナリオではメモの集合を スラッシュノーツ のようなパスで表す想定。"
+        subtitle: "いい言い方ね。リソースは 名詞の複数形 で表すのが典型よ。このシナリオではメモの集合を /notes のようなパスで表す想定。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ノートじゃなくてノーツ！　たくさんあるから複数形なのだ！"
+        subtitle: "noteじゃなくてnotes！　たくさんあるから複数形なのだ！"
+
+  # ============================================================
+  # 一覧取得 GET /notes
+  # ============================================================
+  - id: "list_notes"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず メモ一覧を取得。データを読むだけだからメソッドは ゲット。パスはコレクションの スラッシュノーツ。成功なら にひゃく のオーケー、返す表現はジェイソンにすることが多いわ。"
+        subtitle: "まず メモ一覧を取得。データを読むだけだからメソッドは GET。パスはコレクションの /notes。成功なら 200 OK、返す表現はJSONにすることが多いわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ログイン済みって言ったのに、ヘッダーは何を付けるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "保護された一覧なら オーソライゼーション にベアラー・トークンなどで本人確認。ジェイソンで受け取りたいなら アクセプト、コロン、アプリケーションスラッシュジェイソン もセットね。ゲットなので リクエスト本文は無し が典型よ。"
+        subtitle: "保護された一覧なら Authorization にBearerトークンなどで本人確認。JSONで受け取りたいなら Accept: application/json もセットね。GETなので リクエスト本文は無し が典型よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "読むだけなのに、ちゃんと「ジェイソンでください」「私はログインしてます」って名刺を出すのだ！"
+        subtitle: "読むだけなのに、ちゃんと「JSONでください」「私はログインしてます」って名刺を出すのだ！"
+
+  # ============================================================
+  # 新規作成 POST /notes → 201
+  # ============================================================
+  - id: "create_note"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に 新しいメモを作成。新規リソースを生み出すから ポスト、同じコレクション スラッシュノーツ に送る。作れた合図は にひゃくいち クリエイティッド を使うことが多いわ。"
+        subtitle: "次に 新しいメモを作成。新規リソースを生み出すから POST、同じコレクション /notes に送る。作れた合図は 201 Created を使うことが多いわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ポストだから、本文にタイトルとか本文をジェイソンで載せるのだ？"
+        subtitle: "POSTだから、本文にタイトルとか本文をJSONで載せるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その通り。コンテントタイプ、コロン、アプリケーションスラッシュジェイソン と本文をセット。認証付きなら オーソライゼーション も。作成結果をジェイソンで返すなら レスポンスにも本文 ね。"
+        subtitle: "その通り。Content-Type: application/json と本文をセット。認証付きなら Authorization も。作成結果をJSONで返すなら レスポンスにも本文 ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "にひゃくいちは「生まれたよ！」ってステータスなのだ！　にひゃくと混ぜないようにするのだ！"
+        subtitle: "201は「生まれたよ！」ってステータスなのだ！　200と混ぜないようにするのだ！"
+
+  # ============================================================
+  # 更新 PUT /notes/{id}（PATCHは別解）
+  # ============================================================
+  - id: "update_note"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "1件を全文置き換えで更新するなら プット、パスは スラッシュノーツのあとに、そのメモのアイディーの値を続ける形で1件を特定。成功は にひゃく で更新後の表現をジェイソンで返す、がよくあるパターンよ。"
+        subtitle: "1件を全文置き換えで更新するなら PUT、パスは /notes/{id} のようにIDで1件を特定。成功は 200 で更新後の表現をJSONで返す、がよくあるパターンよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "一部だけ直したいときはどうするのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "パッチ で部分更新、という設計もよくあるわ。ワークショップではモデル解答の別解として パッチ も用意されているから、要件に合わせて選べるの。"
+        subtitle: "PATCH で部分更新、という設計もよくあるわ。ワークショップではモデル解答の別解として PATCH も用意されているから、要件に合わせて選べるの。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "プットもパッチも、書き込みだから コンテントタイプ と オーソライゼーション は付けがちなのだ！"
+        subtitle: "PUTもPATCHも、書き込みだから Content-Type と Authorization は付けがちなのだ！"
+
+  # ============================================================
+  # 削除 DELETE /notes/{id} → 204
+  # ============================================================
+  - id: "delete_note"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "削除は デリート、パスは スラッシュノーツのあとにアイディーの値を続けた1件指定。本文が要らない成功の定番は にひゃくよん ノーコンテント——レスポンス本文なしね。"
+        subtitle: "削除は DELETE、パスは /notes/{id}。本文が要らない成功の定番は 204 No Content——レスポンス本文なしね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "にひゃくよんって、からっぽでオーケーってことなのだ？"
+        subtitle: "204って、からっぽでOKってことなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そういう理解で大丈夫。デリートで オーソライゼーション だけ付けて、ボディは送らない構成もよくあるわ。"
+        subtitle: "そういう理解で大丈夫。DELETEで Authorization だけ付けて、ボディは送らない構成もよくあるわ。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "なお にひゃく でジェイソンの結果を返すエーピーアイも現場にはある。ワークショップでも別解として触れてあるから、チームの慣習と整合させてね。"
+        subtitle: "なお 200 でJSONの結果を返すAPIも現場にはある。ワークショップでも別解として触れてあるから、チームの慣習と整合させてね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "にひゃくよん派とにひゃく派、どっちも知っておくと安心なのだ！"
+        subtitle: "204派と200派、どっちも知っておくと安心なのだ！"
+
+  # ============================================================
+  # ヘッダーまとめ
+  # ============================================================
+  - id: "headers_recap"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "このチャレンジで繰り返し出るヘッダーは三つ。アクセプト は受け取りたい表現、コンテントタイプ は送る本文の形式、オーソライゼーション はベアラーなどの認証情報。"
+        subtitle: "このチャレンジで繰り返し出るヘッダーは三つ。Accept は受け取りたい表現、Content-Type は送る本文の形式、Authorization はBearerなどの認証情報。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ゲットは読むから アクセプト 多め、ポストとプットは書くから コンテントタイプ 多め、秘密の操作には オーソライゼーション、なのだ！"
+        subtitle: "GETは読むから Accept 多め、POSTとPUTは書くから Content-Type 多め、秘密の操作には Authorization、なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "うん。アプリ上ではこれらをパズルみたいに組み合わせて、エンドポイントごとに正解形を作っていくわ。"
+
+  # ============================================================
+  # まとめ・エンディング
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめ。社内メモのクラッドは、一覧の スラッシュノーツ と、1件の スラッシュノーツにアイディーの値を続けるパス に、ゲット、ポスト、プット、またはパッチ、デリート を割り当てる。"
+        subtitle: "まとめ。社内メモのCRUDは、コレクション /notes と /notes/{id} に、GET・POST・PUT（またはPATCH）・DELETE を割り当てる。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ステータスは にひゃく、にひゃくいち、にひゃくよん の使い分け、認証はベアラー前提なら オーソライゼーション、ジェイソンなら アクセプト と コンテントタイプ を忘れないで。"
+        subtitle: "ステータスは 200・201・204 の使い分け、認証はBearer前提なら Authorization、JSONなら Accept と Content-Type を忘れないで。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "エンジニア・スキル・ラボ の エーピーアイ設計ワークショップ で、同じ要領でレストラン予約や動画配信までレベルアップできるのだ！"
+        subtitle: "Engineer Skill Lab の API設計ワークショップ で、同じ要領でレストラン予約や動画配信までレベルアップできるのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "ブラウザで無料プレイできるから、動画を見ながら手を動かしてみて。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ずんだもんとめたんのエーピーアイ講座、今回もおつかれさまなのだ！"
+        subtitle: "ずんだもんとめたんのAPI講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価、よろしくなのだ！"
