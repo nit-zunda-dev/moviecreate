@@ -1,0 +1,293 @@
+title: "【登録セキスペ 第7回｜Season2】CSRFを攻略——ログイン済みユーザへのリクエスト偽造と対策トークンの試験ポイントなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング：インシデント導入（知らないうちに設定変更）
+  # ============================================================
+  - id: "incident"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "た、たすけてほしいのだ！　ただ猫画像のリンクを踏んだだけなのに、社内ポータルの『通知メールアドレス』が勝手に変わってたのだ！"
+        subtitle: "た、たすけてほしいのだ！　ただ猫画像のリンクを踏んだだけなのに、社内ポータルの『通知メールアドレス』が勝手に変わってたのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……ログインしたまま別サイトを開いて、本人のブラウザから正規のリクエストが飛んだ典型ね。前回のXSSは『スクリプトを実行』——今度は『意図しない操作を送らせる』が主戦場よ。"
+        subtitle: "……ログインしたまま別サイトを開いて、本人のブラウザから正規のリクエストが飛んだ典型ね。前回のXSSは『スクリプトを実行』——今度は『意図しない操作を送らせる』が主戦場よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ずんだもんはパスワードも打ってないのだ……。なのに勝手に書き換わるのはおかしいのだ！"
+        subtitle: "ずんだもんはパスワードも打ってないのだ……。なのに勝手に書き換わるのはおかしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だから今日はクロスサイトリクエストフォージェリ——CSRF。ログイン状態を悪用して、被害者に『本人の手』で状態変更させる攻撃を、試験向けに整理するわ。"
+
+
+  # ============================================================
+  # オープニング：シリーズ紹介
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。第7回もSeason2——Webアプリの弱点編。前回はXSS——ブラウザ上でのスクリプト実行。今回はCSRFよ。"
+        subtitle: "四国めたんよ。第7回もSeason2——Webアプリの弱点編。前回はXSS——ブラウザ上でのスクリプト実行。今回はCSRFよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "第6回は『表示が実行になった』のだ。今度は『ログインしてるから通っちゃった』系なのだね？"
+        subtitle: "第6回は『表示が実行になった』のだ。今度は『ログインしてるから通っちゃった』系なのだね？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そういう理解でOK。セキスペでは『誰のブラウザから送るか』『何を偽るか』『根本対策は何か』がセットで問われやすいの。XSSと混ぜないでね。"
+
+
+  # ============================================================
+  # CSRFとは何か
+  # ============================================================
+  - id: "what_is_csrf"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "CSRFって、また長い名前なのだ……。"
+        subtitle: "CSRFって、また長い名前なのだ……。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Cross-Site Request Forgeryの略で、日本語ではサイト間リクエスト偽造と呼ばれることが多いわ。攻撃者が用意したページなどを踏ませ、被害者のブラウザから、本人の意思とは別のリクエストを送らせる攻撃の総称よ。"
+        subtitle: "Cross-Site Request Forgeryの略で、日本語ではサイト間リクエスト偽造と呼ばれることが多いわ。攻撃者が用意したページなどを踏ませ、被害者のブラウザから、本人の意思とは別のリクエストを送らせる攻撃の総称よ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型は、ログイン済みのセッションCookieが自動で付くので、サーバ側から見ると『本人っぽい正規リクエスト』に見える点。だから状態変更——設定変更や送金依頼など——が狙われやすい。"
+        subtitle: "典型は、ログイン済みのセッションCookieが自動で付くので、サーバ側から見ると『本人っぽい正規リクエスト』に見える点。だから状態変更——設定変更や送金依頼など——が狙われやすい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "悪いのは攻撃サイトなのに、送るのは自分のブラウザなのだ……！"
+        subtitle: "悪いのは攻撃サイトなのに、送るのは自分のブラウザなのだ……！"
+
+
+  # ============================================================
+  # 成立しやすい条件
+  # ============================================================
+  - id: "conditions"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "どんなときに起きやすいのだ？　全部暗記？"
+        subtitle: "どんなときに起きやすいのだ？　全部暗記？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "暗記より『なぜ通るか』で持ちなさい。ログインしている——Cookieや認証情報が付く。重要操作がGETだけで完結する、またはトークン検証がない——予測や自動送信で再現しやすい。"
+        subtitle: "暗記より『なぜ通るか』で持ちなさい。ログインしている——Cookieや認証情報が付く。重要操作がGETだけで完結する、またはトークン検証がない——予測や自動送信で再現しやすい。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験では『第三者サイトから被害者のブラウザを利用』『本人の意思に基づかない』みたいな言い回しがヒントになりやすいわ。"
+        subtitle: "試験では『第三者サイトから被害者のブラウザを利用』『本人の意思に基づかない』みたいな言い回しがヒントになりやすいわ。"
+
+
+  # ============================================================
+  # XSSとの違い
+  # ============================================================
+  - id: "csrf_vs_xss"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "前回のXSSも『なりすまし』って聞いたのだ……。同じ？"
+        subtitle: "前回のXSSも『なりすまし』って聞いたのだ……。同じ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ニュアンスが違うわ。XSSは攻撃者のスクリプトが被害者ブラウザで動き、DOM操作やCookie窃取などが主戦場。CSRFはスクリプトが必須じゃなくても、フォーム送信や画像タグのGETなどで『意図しないリクエスト』を送らせれば成立しうる。"
+        subtitle: "ニュアンスが違うわ。XSSは攻撃者のスクリプトが被害者ブラウザで動き、DOM操作やCookie窃取などが主戦場。CSRFはスクリプトが必須じゃなくても、フォーム送信や画像タグのGETなどで『意図しないリクエスト』を送らせれば成立しうる。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "文章問題では『実行されるのはスクリプトか』『送られるのはHTTPリクエストか』で切ると取り違えにくいわ。"
+        subtitle: "文章問題では『実行されるのはスクリプトか』『送られるのはHTTPリクエストか』で切ると取り違えにくいわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "XSS対策だけしてもCSRFは残る可能性があるのだ……！"
+        subtitle: "XSS対策だけしてもCSRFは残る可能性があるのだ……！"
+
+
+  # ============================================================
+  # 根本対策・多層防御
+  # ============================================================
+  - id: "defenses"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "じゃあどう直すのが正解なのだ？　ログイン禁止？"
+        subtitle: "じゃあどう直すのが正解なのだ？　ログイン禁止？"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "業務が止まるでしょ。定番は同期トークン——ワンタイムトークンや秘密情報をフォームに埋め込み、サーバ側で検証する方式。第三者サイトはその値を知らないから、偽造リクエストが通りにくい。"
+        subtitle: "業務が止まるでしょ。定番は同期トークン——ワンタイムトークンや秘密情報をフォームに埋め込み、サーバ側で検証する方式。第三者サイトはその値を知らないから、偽造リクエストが通りにくい。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Cookie面ではSameSite属性でクロスサイトからのCookie送信を制限するのが現代的な補助策。あとは重要操作は再認証——パスワードの再入力など——も有効ね。"
+        subtitle: "Cookie面ではSameSite属性でクロスサイトからのCookie送信を制限するのが現代的な補助策。あとは重要操作は再認証——パスワードの再入力など——も有効ね。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "RefererやOriginの検証も使われるけど、環境依存やプライバシー設定で抜けることがあるから、単独の根本対策としては弱いことがあるわ。"
+        subtitle: "RefererやOriginの検証も使われるけど、環境依存やプライバシー設定で抜けることがあるから、単独の根本対策としては弱いことがあるわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "GETで重要なことしちゃダメなのだ……！　試験でも出るのだ？！"
+        subtitle: "GETで重要なことしちゃダメなのだ……！　試験でも出るのだ？！"
+
+
+  # ============================================================
+  # 試験あるある
+  # ============================================================
+  - id: "exam_tips"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけポイントをまとめてほしいのだ！"
+        subtitle: "ひっかけポイントをまとめてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その1——XSSと混ぜない。XSSはスクリプト実行、CSRFは意図しないリクエスト送信の問題、ね。"
+        subtitle: "定番その1——XSSと混ぜない。XSSはスクリプト実行、CSRFは意図しないリクエスト送信の問題、ね。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その2——『CSRF対策だからXSSも防げる』みたいな言い切りは危ない。対策の目的を取り違えない。"
+        subtitle: "定番その2——『CSRF対策だからXSSも防げる』みたいな言い切りは危ない。対策の目的を取り違えない。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "定番その3——ログインしてるから『本人』とみなすのは攻撃者にとって都合がいいのだ！"
+        subtitle: "定番その3——ログインしてるから『本人』とみなすのは攻撃者にとって都合がいいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "文章問題は動詞を見る。『偽造する』『検証する』『送信する』——主語がブラウザかサーバか、何を信じているかが核心よ。"
+
+
+  # ============================================================
+  # まとめ・次回予告
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のまとめよ。CSRFはログイン済みユーザのブラウザから、本人の意思と別の状態変更リクエストを送らせる攻撃。Cookieが自動で付くことが鍵。"
+        subtitle: "今回のまとめよ。CSRFはログイン済みユーザのブラウザから、本人の意思と別の状態変更リクエストを送らせる攻撃。Cookieが自動で付くことが鍵。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "根本対策の代表は同期トークンなどの検証。SameSiteや再認証は多層防御。SQLiやXSSの対策だけではCSRFは必ずしも止まらないわ。"
+        subtitle: "根本対策の代表は同期トークンなどの検証。SameSiteや再認証は多層防御。SQLiやXSSの対策だけではCSRFは必ずしも止まらないわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "猫画像は可愛いのに、裏でフォームが動くのは怖いのだ……。もう怪しいリンクは踏まないのだ！"
+        subtitle: "猫画像は可愛いのに、裏でフォームが動くのは怖いのだ……。もう怪しいリンクは踏まないのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次回（第8回）は、見えないフレームに騙される操作奪取——クリックジャッキングの周辺を扱うわ。画面の見え方と、クリックの意味がズレる話よ。"
+        subtitle: "次回（第8回）は、見えないフレームに騙される操作奪取——クリックジャッキングの周辺を扱うわ。画面の見え方と、クリックの意味がズレる話よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+        subtitle: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ！　バイバイなのだ！"
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"
