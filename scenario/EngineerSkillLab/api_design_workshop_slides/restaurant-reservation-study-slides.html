@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>API設計ワークショップ：レストラン予約API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .centered { text-align: center; }
+    .reveal .diagram {
+      background: rgba(0,0,0,0.25);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin: 0.6rem 0 0;
+      border: 1px solid rgba(136, 221, 68, 0.25);
+    }
+    .reveal .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .highlight-brand { color: #88DD44 !important; font-weight: bold; }
+    .highlight-accent { color: #FF88BB !important; font-weight: bold; }
+    .reveal .small { font-size: 0.72em; color: #aaa; }
+    .reveal table.api-table { font-size: 0.55em; width: 100%; border-collapse: collapse; }
+    .reveal table.api-table th, .reveal table.api-table td { border: 1px solid #555; padding: 0.4em 0.5em; }
+    .reveal table.api-table th { background: #444; }
+    .reveal .pill {
+      display: inline-block; padding: 0.2em 0.55em; border-radius: 6px; font-size: 0.75em;
+      margin: 0.1em; font-family: ui-monospace, Consolas, monospace;
+    }
+    .reveal .pill-pub { background: rgba(100, 200, 255, 0.2); color: #9cdcfe; }
+    .reveal .pill-bearer { background: rgba(255, 136, 187, 0.2); color: #ffaac8; }
+    /* スライド③ 自分の予約一覧 */
+    .slide-me-list h3 { margin-bottom: 0.35em; line-height: 1.2; }
+    .slide-me-list .me-title-line {
+      display: block;
+      color: #bd93f9;
+      font-size: 0.85em;
+      font-weight: 700;
+    }
+    .slide-me-list .me-path-hero {
+      display: block;
+      margin-top: 0.2em;
+      font-size: 1.35em;
+      font-weight: 800;
+      color: #88dd44;
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      letter-spacing: -0.02em;
+    }
+    .slide-me-list .me-lead {
+      font-size: 0.75em;
+      line-height: 1.5;
+      color: #d0d0d8;
+      margin: 0.4rem 0 0.65rem;
+    }
+    .slide-me-list .me-token { color: #ffb86c; font-weight: 700; }
+    .slide-me-list .me-compare-outer {
+      background: #1e1e2e;
+      border: 1px solid rgba(139, 156, 179, 0.35);
+      border-radius: 12px;
+      padding: 0.75rem 0.9rem 0.6rem;
+      margin: 0.25rem 0 0.5rem;
+    }
+    .slide-me-list .me-compare-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+    @media (max-width: 700px) {
+      .slide-me-list .me-compare-row { flex-direction: column; }
+    }
+    .slide-me-list .me-box {
+      flex: 1;
+      min-width: 0;
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem 0.55rem;
+      font-size: 0.7em;
+      line-height: 1.45;
+    }
+    .slide-me-list .me-box-bad {
+      border: 2px solid #61afef;
+      background: rgba(97, 175, 239, 0.06);
+    }
+    .slide-me-list .me-box-good {
+      border: 2px solid #88dd44;
+      background: rgba(136, 221, 68, 0.08);
+    }
+    .slide-me-list .me-path-bad { color: #9cdcfe; font-family: ui-monospace, Consolas, monospace; font-weight: 700; font-size: 1.05em; display: block; margin-bottom: 0.35em; }
+    .slide-me-list .me-path-good { color: #88dd44; font-family: ui-monospace, Consolas, monospace; font-weight: 800; font-size: 1.15em; display: block; margin-bottom: 0.35em; }
+    .slide-me-list .me-note { color: #b0b0b8; }
+    .slide-me-list .me-note-warn { color: #f87171; display: block; margin-top: 0.3em; font-size: 0.92em; }
+    .slide-me-list .me-alt {
+      font-size: 0.65em;
+      color: #8b8b9a;
+      margin: 0 0 0.5rem;
+      line-height: 1.5;
+    }
+    .slide-me-list .me-alt code { color: #ccc; font-size: 1.05em; }
+    .slide-me-list .me-foot {
+      font-size: 0.75em;
+      color: #d0d0d8;
+      margin: 0;
+    }
+    .slide-me-list .me-status-200 { color: #f1fa8c; font-weight: 800; }
+    .slide-me-list .me-head-ok { color: #88dd44; font-weight: 600; font-family: ui-monospace, Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section class="centered">
+        <h2>【Engineer Skill Lab】<br>API設計ワークショップ</h2>
+        <h3 class="highlight-accent">レストラン予約APIをRESTで設計する</h3>
+        <p>〜パブリックとBearer、<code class="highlight-brand">/me</code> パスとステータス〜</p>
+      </section>
+
+      <section>
+        <h3>シナリオの前提</h3>
+        <ul style="font-size: 0.85em; line-height: 1.55;">
+          <li><strong>目的：</strong> 飲食店の予約サイトのバックエンドAPI</li>
+          <li><span class="highlight-brand">空き状況の閲覧</span> → ゲスト（未ログイン）でも可</li>
+          <li><span class="highlight-accent">予約の新規 / 自分の一覧 / キャンセル</span> → 認証（Bearer）必須</li>
+        </ul>
+        <div class="diagram" aria-label="public と認証ゾーンの図">
+          <svg viewBox="0 0 720 200" width="100%" height="auto">
+            <defs>
+              <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#1a3a4a;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#2a1a2e;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <rect x="8" y="20" width="320" height="150" rx="12" fill="url(#g1)" stroke="#5bc0de" stroke-width="2"/>
+            <text x="168" y="55" text-anchor="middle" fill="#9cdcfe" font-size="18" font-weight="bold">パブリック帯</text>
+            <text x="168" y="90" text-anchor="middle" fill="#ccc" font-size="15">来店前に席を“見るだけ”</text>
+            <text x="168" y="120" text-anchor="middle" fill="#88dd44" font-size="20" font-family="Consolas,monospace">GET /availability</text>
+            <text x="168" y="150" text-anchor="middle" fill="#888" font-size="12">Authorization ヘッダなし</text>
+            <rect x="392" y="20" width="320" height="150" rx="12" fill="#2a1a28" stroke="#ff88bb" stroke-width="2"/>
+            <text x="552" y="55" text-anchor="middle" fill="#ffaac8" font-size="18" font-weight="bold">Bearer 認証帯</text>
+            <text x="552" y="90" text-anchor="middle" fill="#ccc" font-size="15">予約の作成・自分の束・取り消し</text>
+            <text x="552" y="120" text-anchor="middle" fill="#88dd44" font-size="15" font-family="Consolas,monospace">POST /reservations ほか</text>
+            <text x="552" y="150" text-anchor="middle" fill="#888" font-size="12">Authorization: Bearer …</text>
+            <text x="360" y="195" text-anchor="middle" fill="#666" font-size="12">同じ“レスト風”でも、行ごとに名札の要否が切り替わる</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>リソースの地図（典型パス）</h3>
+        <p class="small" style="margin:0 0 0.5rem;">名詞の複数形＋ <code>/{id}</code> で1件。空きは <code>availability</code> を1リソースに切る例。</p>
+        <div class="diagram">
+          <svg viewBox="0 0 760 320" width="100%" height="auto">
+            <line x1="60" y1="40" x2="700" y2="40" stroke="#555" stroke-width="2"/>
+            <text x="60" y="32" fill="#88dd44" font-size="14" font-weight="bold">API base</text>
+            <rect x="50" y="55" width="200" height="36" rx="6" fill="#1a3a2a" stroke="#88dd44" stroke-width="1.5"/>
+            <text x="150" y="78" text-anchor="middle" fill="#cde" font-size="16" font-family="Consolas,monospace">/availability</text>
+            <text x="150" y="110" text-anchor="middle" fill="#5bc0de" font-size="12">GET · public</text>
+            <rect x="280" y="55" width="200" height="36" rx="6" fill="#2a1a28" stroke="#ff88bb" stroke-width="1.5"/>
+            <text x="380" y="78" text-anchor="middle" fill="#cde" font-size="16" font-family="Consolas,monospace">/reservations</text>
+            <text x="380" y="110" text-anchor="middle" fill="#ffaac8" font-size="12">POST（作成）/ GET（別解）</text>
+            <rect x="510" y="55" width="200" height="36" rx="6" fill="#2a1a28" stroke="#ff88bb" stroke-width="1.5"/>
+            <text x="610" y="78" text-anchor="middle" fill="#cde" font-size="15" font-family="Consolas,monospace">/me/reservations</text>
+            <text x="610" y="110" text-anchor="middle" fill="#ffaac8" font-size="12">GET（自分の一覧・典型）</text>
+            <path d="M 380 130 L 380 150 L 200 150 L 200 170" fill="none" stroke="#666" stroke-dasharray="4 3"/>
+            <rect x="90" y="170" width="220" height="100" rx="8" fill="#1e1e2e" stroke="#88dd44" stroke-width="1"/>
+            <text x="200" y="198" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">/reservations/{id}</text>
+            <text x="200" y="225" text-anchor="middle" fill="#ffaac8" font-size="12">DELETE（キャンセル）</text>
+            <text x="200" y="250" text-anchor="middle" fill="#aaa" font-size="11">204 No Content が定番</text>
+            <text x="450" y="220" text-anchor="middle" fill="#888" font-size="13" style="font-style:italic">別階層: /tables/availability も可</text>
+            <text x="450" y="250" text-anchor="middle" fill="#888" font-size="12">別解: /users/me/reservations など</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>① 空き状況 <span class="highlight-brand">GET /availability</span></h3>
+        <ul style="font-size: 0.78em;">
+          <li><strong>200 OK</strong> · レスポンス本文 <code>json</code></li>
+          <li><span class="pill pill-pub">public</span> → <code>Authorization</code> なし</li>
+          <li>読み取り： <code>Accept: application/json</code> を付与しがち</li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 700 120" width="100%" height="auto">
+            <defs>
+              <marker id="arr-avail" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#88dd44"/></marker>
+            </defs>
+            <rect x="10" y="25" width="120" height="70" rx="8" fill="#2d3a4a" stroke="#5bc0de"/>
+            <text x="70" y="55" text-anchor="middle" fill="#9cdcfe" font-size="13">Client</text>
+            <text x="70" y="78" text-anchor="middle" fill="#888" font-size="11">guest</text>
+            <path d="M 135 60 L 250 60" stroke="#88dd44" stroke-width="3" marker-end="url(#arr-avail)"/>
+            <text x="175" y="50" text-anchor="middle" fill="#88dd44" font-size="13" font-weight="bold">GET</text>
+            <rect x="260" y="20" width="420" height="80" rx="8" fill="#1a2a1a" stroke="#88dd44" stroke-width="1.5"/>
+            <text x="280" y="50" fill="#aaa" font-size="12">Request headers</text>
+            <text x="280" y="75" fill="#ddd" font-size="14" font-family="Consolas,monospace">Accept: application/json</text>
+            <text x="280" y="95" fill="#666" font-size="11">（Authorization 行なし）</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>② 新規予約 <span class="highlight-brand">POST /reservations</span></h3>
+        <ul style="font-size: 0.78em;">
+          <li><strong>201 Created</strong> · 予約IDなどを <code>json</code> で返す想定</li>
+          <li><span class="pill pill-bearer">bearer</span>
+            <code>Authorization</code> + <code>Content-Type: application/json</code></li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 720 140" width="100%" height="auto">
+            <rect x="15" y="30" width="100" height="80" rx="8" fill="#2d2a3a" stroke="#ff88bb"/>
+            <text x="65" y="62" text-anchor="middle" fill="#ffaac8" font-size="13">User</text>
+            <text x="65" y="88" text-anchor="middle" fill="#888" font-size="11">logged in</text>
+            <rect x="150" y="20" width="550" height="100" rx="8" fill="#1e1a24" stroke="#88dd44"/>
+            <text x="170" y="48" fill="#888" font-size="12">POST /reservations</text>
+            <text x="170" y="72" fill="#ddd" font-size="13" font-family="Consolas,monospace">Authorization: Bearer eyJ…</text>
+            <text x="170" y="96" fill="#ddd" font-size="13" font-family="Consolas,monospace">Content-Type: application/json</text>
+            <text x="400" y="75" fill="#88dd44" font-size="14" font-weight="bold">→ 201 + JSON body</text>
+          </svg>
+        </div>
+      </section>
+
+      <section class="slide-me-list">
+        <h3>
+          <span class="me-title-line">③ 自分の予約一覧 GET</span>
+          <span class="me-path-hero">/me/reservations</span>
+        </h3>
+        <p class="me-lead">「どのユーザーか」をURLに生のIDで載せず、<span class="me-token">トークン＝私</span>に閉じる典型。</p>
+        <div class="me-compare-outer">
+          <div class="me-compare-row">
+            <div class="me-box me-box-bad">
+              <span class="me-path-bad">/users/12345/reservations</span>
+              <span class="me-note">他者のIDの列挙が露見しやすい</span>
+              <span class="me-note-warn">（管理画面向けの別文脈では有用）</span>
+            </div>
+            <div class="me-box me-box-good">
+              <span class="me-path-good">/me/reservations</span>
+              <span class="me-note" style="color:#c8e6c0;">Bearer とセットで「自分の束」</span>
+            </div>
+          </div>
+        </div>
+        <p class="me-alt">別解: <code>/users/me/reservations</code> ・ <code>GET /reservations</code>（文脈で“自分”と決め打ち）</p>
+        <p class="me-foot">成功 <span class="me-status-200">200</span> ・ <span class="me-head-ok">Accept + Authorization</span></p>
+      </section>
+
+      <section>
+        <h3>④ キャンセル <span class="highlight-brand">DELETE /reservations/{id}</span></h3>
+        <ul style="font-size: 0.78em;">
+          <li>成功の定番：<strong>204 No Content</strong>（レスポンス本文なし）</li>
+          <li><code>Authorization</code> のみ（送るJSONが無いので通常 <code>Content-Type</code> 不要）</li>
+          <li class="small">別解: <strong>200</strong> + キャンセル結果JSON（チーム方針次第）</li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 640 100" width="100%" height="auto">
+            <rect x="20" y="25" width="300" height="50" rx="6" fill="#2a1a1a" stroke="#f87171"/>
+            <text x="170" y="56" text-anchor="middle" fill="#fff" font-size="16" font-family="Consolas,monospace">DELETE /reservations/42a7…</text>
+            <text x="420" y="50" fill="#88dd44" font-size="22" font-weight="bold">204</text>
+            <text x="500" y="50" fill="#aaa" font-size="15">+ empty body</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>4本のエンドポイント一覧</h3>
+        <table class="api-table">
+          <thead>
+            <tr><th>操作</th><th>Method</th><th>Path</th><th>Auth</th><th>主な status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>空き状況</td>
+              <td>GET</td>
+              <td><code>/availability</code> <span class="small">（/tables/availability 可）</span></td>
+              <td><span class="pill pill-pub">public</span></td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td>予約作成</td>
+              <td>POST</td>
+              <td><code>/reservations</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>201</td>
+            </tr>
+            <tr>
+              <td>自分の一覧</td>
+              <td>GET</td>
+              <td><code>/me/reservations</code> <span class="small">他に別解あり</span></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td>キャンセル</td>
+              <td>DELETE</td>
+              <td><code>/reservations/{id}</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>204 <span class="small">(200+JSON 別解)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h3>HTTPヘッダのクイック凡例</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 700 200" width="100%" height="auto">
+            <rect x="20" y="20" width="200" height="70" rx="8" fill="#1a2a1e" stroke="#88dd44"/>
+            <text x="120" y="48" text-anchor="middle" fill="#88dd44" font-size="16" font-weight="bold">Accept</text>
+            <text x="120" y="75" text-anchor="middle" fill="#ccc" font-size="12">GETで受け取り形式を希望</text>
+            <rect x="250" y="20" width="200" height="70" rx="8" fill="#2a1a20" stroke="#ff88bb"/>
+            <text x="350" y="48" text-anchor="middle" fill="#ffaac8" font-size="16" font-weight="bold">Content-Type</text>
+            <text x="350" y="75" text-anchor="middle" fill="#ccc" font-size="12">POST等で送るJSONの形式</text>
+            <rect x="480" y="20" width="200" height="70" rx="8" fill="#1a1a2e" stroke="#9cdcfe"/>
+            <text x="580" y="48" text-anchor="middle" fill="#9cdcfe" font-size="16" font-weight="bold">Authorization</text>
+            <text x="580" y="75" text-anchor="middle" fill="#ccc" font-size="12">Bearer トークン（秘密系）</text>
+            <text x="350" y="120" text-anchor="middle" fill="#666" font-size="13">public行 → Accept だけ、など「行ごと」に減る</text>
+            <text x="350" y="150" text-anchor="middle" fill="#888" font-size="12">ワークショップではヘッダをパズル同様に組み立てるUI</text>
+          </svg>
+        </div>
+      </section>
+
+      <section class="centered">
+        <h3>おつかれさまなのだ！</h3>
+        <p>パブリックとBearerが混在すると、<br><span class="highlight-brand">同じCRUD脳</span>でも<strong>1行ずつ</strong>名札の要否を確認するのがコツ！</p>
+        <p style="margin-top:1.2em;"><span class="highlight-brand" style="font-size:1.15em;">高評価・チャンネル登録よろしくなのだ！</span></p>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: 'c/t', transition: 'fade' });
+  </script>
+</body>
+</html>

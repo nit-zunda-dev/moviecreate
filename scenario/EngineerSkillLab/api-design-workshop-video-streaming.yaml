@@ -1,0 +1,194 @@
+title: "【Engineer Skill Lab｜API設計ワークショップ】動画配信APIをRESTで設計する——いいね・コメント・チャンネル登録を組み立てるのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！ ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。今日は API設計ワークショップ、中級向けテーマとして『動画配信API』を設計していくわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "配信サービスのAPI、見るだけと会員向け操作が混ざっていて、設計が難しそうなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そこが今回の肝。視聴系はパブリック、いいね・コメント・チャンネル登録はBearer認証で分けると整理しやすいの。"
+
+  # ============================================================
+  # シナリオ前提
+  # ============================================================
+  - id: "scenario_setup"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "前提はこう。未ログインでも視聴や作品情報の取得はできる。ログイン後は『いいね』『コメント投稿』『チャンネル登録』ができる。"
+        subtitle: "前提はこう。未ログインでも視聴や作品情報の取得はできる。ログイン後は『いいね』『コメント投稿』『チャンネル登録』ができる。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "公開棚を眺めるのは名札なし、個人の棚を触るのは名札あり、なのだ！"
+        subtitle: "公開棚を眺めるのは認証なし、個人の棚を触るのは認証あり、なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "その感覚でOK。リソースは名詞で切り、集合は複数形。今回は /videos と /channels を中心に、子リソースとして /likes /comments /subscriptions を使うわ。"
+
+  # ============================================================
+  # 作品詳細 GET /videos/{id}
+  # ============================================================
+  - id: "video_detail"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まずは動画のメタ情報と再生用URLを取得する操作。1件参照だから GET /videos/{id}。公開情報として auth は public ね。"
+        subtitle: "まずは動画のメタ情報と再生用URLを取得する操作。1件参照だから GET /videos/{id}。公開情報として auth は public ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "GETだから本文なし、Accept を添える感じなのだ？"
+        subtitle: "GETだから本文なし、Accept を添える感じなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その通り。成功は 200 OK、レスポンス本文は JSON。ヘッダは Accept: application/json の読み取り構成が分かりやすいわ。"
+        subtitle: "その通り。成功は 200 OK、レスポンス本文は JSON。ヘッダは Accept: application/json の読み取り構成が分かりやすいわ。"
+
+  # ============================================================
+  # いいね POST /videos/{id}/likes
+  # ============================================================
+  - id: "add_like"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次は動画にいいねを付ける操作。新しい『いいね関係』を作るなら POST /videos/{id}/likes が素直。認証は bearer 必須。"
+        subtitle: "次は動画にいいねを付ける操作。新しい『いいね関係』を作るなら POST /videos/{id}/likes が素直。認証は bearer 必須。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "本文は JSON あり、Content-Type と Authorization を付けるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その組み合わせでOK。基本回答は 201 Created + JSON。別解として PUT /videos/{id}/likes と 200 を採る流儀もあるわ。"
+        subtitle: "その組み合わせでOK。基本回答は 201 Created + JSON。別解として PUT /videos/{id}/likes と 200 を採る流儀もあるわ。"
+
+  # ============================================================
+  # コメント投稿 POST /videos/{id}/comments
+  # ============================================================
+  - id: "post_comment"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三つ目はコメント投稿。動画の子リソースとして POST /videos/{id}/comments。これも bearer + JSON 書き込み構成ね。"
+        subtitle: "三つ目はコメント投稿。動画の子リソースとして POST /videos/{id}/comments。これも bearer + JSON 書き込み構成ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "いいねと同じで、Content-Type と Authorization をセットにするのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "そう。成功は 201 Created + JSON を基本にしておくと、投稿操作の意図が伝わりやすいわ。"
+        subtitle: "そう。成功は 201 Created + JSON を基本にしておくと、投稿操作の意図が伝わりやすいわ。"
+
+  # ============================================================
+  # チャンネル登録 POST /channels/{id}/subscriptions
+  # ============================================================
+  - id: "subscribe_channel"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "最後はチャンネル登録。関係を作る操作だから POST /channels/{id}/subscriptions。これも bearer + JSON、成功は 201 が基本。"
+        subtitle: "最後はチャンネル登録。関係を作る操作だから POST /channels/{id}/subscriptions。これも bearer + JSON、成功は 201 が基本。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "代替で /subscriptions に POST する設計や、PUT を使う設計もありえるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "その通り。ワークショップでも別解として /subscriptions や PUT 案を許容してる。大事なのはチーム内で一貫した意味付けよ。"
+
+  # ============================================================
+  # まとめ
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめ。今回の4本は GET /videos/{id}、POST /videos/{id}/likes、POST /videos/{id}/comments、POST /channels/{id}/subscriptions。公開取得は public、投稿系は bearer + JSON で揃える。"
+        subtitle: "まとめ。今回の4本は GET /videos/{id}、POST /videos/{id}/likes、POST /videos/{id}/comments、POST /channels/{id}/subscriptions。公開取得は public、投稿系は bearer + JSON で揃える。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "公開と個人の境界を先に決めると、パスとヘッダーの迷子が減るのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そのとおり。次は実装前に、エラー系ステータスやレート制御も設計書に追記して仕上げてね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ずんだもんとめたんのAPI講座、今回もおつかれさまなのだ！ チャンネル登録と高評価よろしくなのだ！"

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>クリックジャッキング解説スライド — s01-ep08</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #fb923c;
+      --accent2: #f472b6;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: 2.5rem 3rem 5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+      color: var(--accent);
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+      border: 1px solid rgba(251, 146, 60, 0.25);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+    .bullets {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .bullets li { margin: 0.4rem 0; }
+    .bullets strong { color: var(--text); }
+    .note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-left: 3px solid var(--accent2);
+      padding-left: 1rem;
+      margin-top: 1rem;
+    }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(251, 146, 60, 0.45);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .kbd { font-family: var(--mono); font-size: 0.8em; opacity: 0.85; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.5rem 1.25rem 4.5rem; }
+      .rich-row { flex-direction: column; }
+      .rich-arrow { transform: rotate(90deg); margin: 1rem 0; }
+    }
+
+    .rich-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 2rem;
+      background: linear-gradient(145deg, rgba(26,35,50,0.6), rgba(15,20,25,0.8));
+      border: 1px solid rgba(251, 146, 60, 0.18);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .rich-diagram::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .rich-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      width: 100%;
+    }
+    .rich-box {
+      flex: 1;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background: rgba(36, 48, 68, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(139, 156, 179, 0.2);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+    .rich-box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+    .box-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .box-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); }
+    .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); }
+    .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(251, 146, 60, 0.45); background: rgba(251, 146, 60, 0.06); }
+    .theme-accent .box-title { color: var(--accent); }
+
+    .rich-arrow {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--muted);
+      position: relative;
+    }
+    .arrow-line {
+      width: 40px; height: 3px; background: var(--muted); position: relative;
+      border-radius: 2px;
+    }
+    .arrow-line::after {
+      content: ""; position: absolute; right: -2px; top: -4px;
+      border-width: 5px 0 5px 8px; border-style: solid;
+      border-color: transparent transparent transparent var(--muted);
+    }
+    .arrow-label { font-size: 0.75rem; margin-bottom: 4px; font-weight: 600; white-space: nowrap; }
+    .arrow-animated .arrow-line { background: linear-gradient(90deg, transparent, var(--danger) 50%, transparent); background-size: 200% 100%; animation: moveGradient 1.5s infinite linear; }
+    .arrow-animated .arrow-line::after { border-left-color: var(--danger); }
+    .arrow-animated .arrow-label { color: var(--danger); animation: pulse 2s infinite; }
+
+    @keyframes moveGradient { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+    @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+    .anim-float { animation: float 4s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide active" data-i="1">
+      <span class="tag">シナリオ解説</span>
+      <h1>【登録セキスペ 第8回｜Season2】クリックジャッキングを攻略</h1>
+      <h2>透明なiframe・UIリダレッシングと埋め込み制限ヘッダの試験ポイント</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" aria-label="エピソードの流れ">
+          <defs>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#fb923c"/>
+              <stop offset="100%" style="stop-color:#f472b6"/>
+            </linearGradient>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#fb923c"/>
+            </marker>
+          </defs>
+          <rect x="10" y="70" width="120" height="60" rx="8" fill="#243044" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="70" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">導入</text>
+          <text x="70" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">見え方の罠</text>
+          <path d="M 135 100 L 160 100" stroke="url(#g1)" stroke-width="2" marker-end="url(#arr)"/>
+          <rect x="165" y="70" width="120" height="60" rx="8" fill="#243044" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="225" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">定義</text>
+          <text x="225" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">UI偽装</text>
+          <path d="M 290 100 L 315 100" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="320" y="70" width="120" height="60" rx="8" fill="#243044" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="380" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">仕組み</text>
+          <text x="380" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">重ね合わせ</text>
+          <path d="M 445 100 L 470 100" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="475" y="70" width="100" height="60" rx="8" fill="#243044" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="525" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">対策</text>
+          <text x="525" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">XFO/CSP</text>
+          <path d="M 580 100 L 605 100" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="610" y="70" width="100" height="60" rx="8" fill="#243044" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="660" y="105" text-anchor="middle" fill="#e7edf4" font-size="13" font-family="sans-serif">比較</text>
+          <text x="660" y="122" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">試験</text>
+          <text x="360" y="40" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">このスライドはシナリオ s01-ep08-clickjacking.yaml に対応</text>
+        </svg>
+      </div>
+      <p class="note">ブラウザで開き、下部の「次へ」またはキーボード <span class="kbd">→</span> <span class="kbd">←</span> で進められます。</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" data-i="2">
+      <span class="tag">導入（incident）</span>
+      <h1>見えているボタンと、実際にクリックされる要素がズレる</h1>
+      <h2>「クーポン」の下に、透明なフレームで別ページの本物ボタンが重なる</h2>
+      <div class="rich-diagram">
+        <div class="rich-row">
+          <div class="rich-box theme-warn anim-float" style="animation-delay: 0s;">
+            <span class="box-icon">🎁</span>
+            <div class="box-title">偽の見た目</div>
+            <div class="box-desc">「無料クーポン」など<br><strong>魅力的なデコ</strong></div>
+          </div>
+          <div class="rich-arrow">
+            <span class="arrow-label">同じ座標に重ねる</span>
+            <div class="arrow-line"></div>
+          </div>
+          <div class="rich-box theme-danger anim-float" style="animation-delay: -1s;">
+            <span class="box-icon">👻</span>
+            <div class="box-title">透明iframe内</div>
+            <div class="box-desc">opacity / z-index で隠す<br><strong>正規サイトの危険ボタン</strong></div>
+          </div>
+          <div class="rich-arrow arrow-animated">
+            <span class="arrow-label">クリックは下に届く</span>
+            <div class="arrow-line"></div>
+          </div>
+          <div class="rich-box theme-accent anim-float" style="animation-delay: -2s;">
+            <span class="box-icon">🖱️</span>
+            <div class="box-title">ブラウザの解釈</div>
+            <div class="box-desc">ユーザーは上を押したつもり<br><strong>実際はフレーム内が反応</strong></div>
+          </div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li><strong>前回（CSRF）</strong>：意図しない<strong>リクエスト送信</strong>を誘発しやすい。</li>
+        <li><strong>今回</strong>：ユーザー本人の<strong>実クリック</strong>の意味をすり替える。</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide" data-i="3">
+      <span class="tag">定義（what_is_clickjacking）</span>
+      <h1>クリックジャッキング（UI redress）</h1>
+      <h2>画面の見せ方を偽装し、操作（クリック）を奪う</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg">
+          <text x="360" y="28" text-anchor="middle" fill="#8b9cb3" font-size="13" font-family="sans-serif">別名：UIリダレッシング — 「dress＝装う」画面を装い替える</text>
+          <rect x="40" y="55" width="150" height="50" rx="8" fill="#243044" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="115" y="85" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">攻撃者ページ</text>
+          <path d="M 195 80 L 245 80" stroke="#8b9cb3" stroke-width="2" marker-end="url(#m1)"/>
+          <rect x="250" y="48" width="220" height="64" rx="8" fill="#3a2a1f" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="360" y="75" text-anchor="middle" fill="#fdba74" font-size="11" font-family="sans-serif">iframe で正規ページを読込</text>
+          <text x="360" y="95" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">CSS で透明化・位置調整</text>
+          <path d="M 475 80 L 525 80" stroke="#f472b6" stroke-width="2" marker-end="url(#m2)"/>
+          <rect x="530" y="55" width="150" height="50" rx="8" fill="#1e2d3d" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="605" y="85" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">本人のクリックで実行</text>
+          <text x="360" y="145" text-anchor="middle" font-size="12" font-family="sans-serif">
+            <tspan fill="#e7edf4">状態変更ボタン（2FAオフ等）が</tspan><tspan fill="#fdba74">ワンクリック</tspan><tspan fill="#e7edf4">だと特に危険</tspan>
+          </text>
+          <text x="360" y="175" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">試験キーワード：iframe / オーバレイ / ヒットテスト</text>
+          <defs>
+            <marker id="m1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#fb923c"/>
+            </marker>
+            <marker id="m2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#f472b6"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <p class="note">透明でも<strong>最前面に重なっていれば</strong>ポインタイベントは下の要素に届きうる（誤解しやすい点）。</p>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" data-i="4">
+      <span class="tag">仕組み（mechanism）</span>
+      <h1>レイヤ構造で整理する</h1>
+      <h2>①iframe読込 → ②見えない層 → ③クリックのすり替え</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="40" width="220" height="68" rx="10" fill="#2d2438" stroke="#fb923c"/>
+          <text x="140" y="68" text-anchor="middle" fill="#fdba74" font-size="12" font-family="sans-serif">① iframe</text>
+          <text x="140" y="92" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">対象オリジンのページを子フレームに</text>
+
+          <rect x="270" y="40" width="220" height="68" rx="10" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="380" y="68" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">② CSS</text>
+          <text x="380" y="92" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">opacity, z-index, 位置ずらし</text>
+
+          <rect x="510" y="40" width="220" height="68" rx="10" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="620" y="68" text-anchor="middle" fill="#86efac" font-size="12" font-family="sans-serif">③ クリック</text>
+          <text x="620" y="92" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">偽UIの下の要素が反応</text>
+
+          <rect x="30" y="130" width="700" height="90" rx="10" fill="#1a2332" stroke="rgba(251,146,60,0.55)"/>
+          <text x="380" y="158" text-anchor="middle" font-size="12" font-family="sans-serif">
+            <tspan fill="#e7edf4">本質：「ユーザーが</tspan><tspan fill="#fdba74">見ている意味</tspan><tspan fill="#e7edf4">」と「</tspan><tspan fill="#f472b6">イベントが当たる要素</tspan><tspan fill="#e7edf4">」のズレ</tspan>
+          </text>
+          <text x="380" y="188" text-anchor="middle" font-size="11" font-family="sans-serif">
+            <tspan fill="#8b9cb3">マウス／タップは見た目より</tspan><tspan fill="#fde68a">手前／奥</tspan><tspan fill="#8b9cb3">のフレームに届くことがある</tspan>
+          </text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" data-i="5">
+      <span class="tag">成立条件（conditions）</span>
+      <h1>「他サイトにiframeで載せられる」ことが前提</h1>
+      <h2>埋め込み禁止ヘッダが無い・緩いと攻撃ページに載せやすい</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="35" width="220" height="70" rx="10" fill="#2d1f1f" stroke="#f87171"/>
+          <text x="140" y="62" text-anchor="middle" fill="#fca5a5" font-size="12" font-family="sans-serif">埋め込みが許容</text>
+          <text x="140" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">XFO / CSP 未設定や誤設定</text>
+
+          <rect x="270" y="35" width="220" height="70" rx="10" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="380" y="62" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">危険操作が軽い</text>
+          <text x="380" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">ワンクリックで重大な状態変更</text>
+
+          <rect x="510" y="35" width="220" height="70" rx="10" fill="#2d2438" stroke="#fb923c"/>
+          <text x="620" y="62" text-anchor="middle" fill="#fdba74" font-size="12" font-family="sans-serif">オーバレイ可能</text>
+          <text x="620" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">透明レイヤでクリック奪取</text>
+
+          <rect x="30" y="120" width="700" height="62" rx="10" fill="#1a2332" stroke="rgba(139,156,179,0.35)"/>
+          <text x="380" y="148" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">試験では「埋め込み可能」「透明オーバレイ」「実クリック」の語がセットで出やすい</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide" data-i="6">
+      <span class="tag">対策（defenses）</span>
+      <h1>本命：フレーム埋め込みを禁止・制限する</h1>
+      <h2>X-Frame-Options と CSP frame-ancestors</h2>
+      <div class="grid-2">
+        <div class="rich-diagram" style="padding: 1.5rem;">
+          <div class="box-title" style="color:var(--accent); font-size: 1.15rem; text-align: center;">X-Frame-Options（古典）</div>
+          <div class="rich-box theme-accent" style="height: 100%;">
+            <span class="box-icon">🖼️</span>
+            <div class="box-title">DENY / SAMEORIGIN</div>
+            <div class="box-desc" style="margin-top: 0.75rem;">他オリジン（または全体）からの<br><strong>frame 表示</strong>を抑止<br><br><span style="font-family:var(--mono);font-size:0.8rem;color:#fdba74">X-Frame-Options: DENY</span></div>
+          </div>
+        </div>
+        <div class="rich-diagram" style="padding: 1.5rem;">
+          <div class="box-title" style="color:var(--ok); font-size: 1.15rem; text-align: center;">CSP frame-ancestors（現代的説明）</div>
+          <div class="rich-box theme-ok" style="height: 100%;">
+            <span class="box-icon">🛡️</span>
+            <div class="box-title">許可する親を明示</div>
+            <div class="box-desc" style="margin-top: 0.75rem;">iframe/embed 等の<strong>親</strong>を制御<br>試験で説明が出やすい<br><br><span style="font-family:var(--mono);font-size:0.75rem;color:#86efac">Content-Security-Policy: frame-ancestors 'self'</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="note">多層防御：<strong>重要操作の確認ダイアログ・再認証</strong>は補助。ヘッダと役割を取り違えない。</p>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide" data-i="7">
+      <span class="tag">CSRF / XSS との違い（compare_csrf_xss）</span>
+      <h1>「騙す」でも主戦場が違う</h1>
+      <h2>リクエスト自動誘発 vs 実クリックのすり替え vs スクリプト実行</h2>
+      <div class="grid-2">
+        <div class="rich-diagram" style="padding: 1.25rem;">
+          <div class="box-title" style="color:var(--accent2); font-size: 1.05rem; text-align: center;">CSRF</div>
+          <div class="rich-box theme-warn">
+            <div class="box-title">送信の誘発</div>
+            <div class="box-desc">罠ページから<br><strong>フォーム自動送信</strong>等で<br>意図しないHTTP要求</div>
+          </div>
+        </div>
+        <div class="rich-diagram" style="padding: 1.25rem;">
+          <div class="box-title" style="color:var(--accent); font-size: 1.05rem; text-align: center;">クリックジャッキング</div>
+          <div class="rich-box theme-accent">
+            <div class="box-title">クリックの奪取</div>
+            <div class="box-desc">ユーザーが<strong>実際にクリック</strong><br>ヒットテストが<br>隠れた要素へ</div>
+          </div>
+        </div>
+        <div class="rich-diagram" style="padding: 1.25rem; grid-column: 1 / -1;">
+          <div class="box-title" style="color:#5eead4; font-size: 1.05rem; text-align: center;">XSS</div>
+          <div class="rich-box theme-danger" style="max-width:100%;">
+            <div class="box-title">スクリプト実行</div>
+            <div class="box-desc">注入コードがブラウザで動く——クリックジャッキングは<strong>フレーム＋CSSだけでも成立しうる</strong>（注入必須ではない）</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide" data-i="8">
+      <span class="tag">試験あるある（exam_tips）</span>
+      <h1>ひっかけ3点セット</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="28" width="200" height="80" rx="8" fill="#243044" stroke="#fb923c"/>
+          <text x="120" y="55" text-anchor="middle" fill="#fb923c" font-size="12" font-family="sans-serif">定番①</text>
+          <text x="120" y="78" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">CSRFトークンだけでは</text>
+          <text x="120" y="95" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">必ずしも防げないことも</text>
+
+          <rect x="260" y="28" width="200" height="80" rx="8" fill="#2d2438" stroke="#f472b6"/>
+          <text x="360" y="55" text-anchor="middle" fill="#f472b6" font-size="12" font-family="sans-serif">定番②</text>
+          <text x="360" y="78" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">XFO と CSP</text>
+          <text x="360" y="95" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">frame-ancestors を混同しない</text>
+
+          <rect x="500" y="28" width="200" height="80" rx="8" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="600" y="55" text-anchor="middle" fill="#fbbf24" font-size="12" font-family="sans-serif">定番③</text>
+          <text x="600" y="78" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">透明＝クリック不可？</text>
+          <text x="600" y="95" text-anchor="middle" fill="#f87171" font-size="9" font-family="sans-serif">→ 重なり次第で奪える</text>
+
+          <rect x="60" y="125" width="600" height="72" rx="8" fill="#1a2332" stroke="rgba(139,156,179,0.4)"/>
+          <text x="360" y="152" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">文章問題：最前面はどれか／iframe の内側か外か——レイヤで切る</text>
+          <text x="360" y="178" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">主語が <tspan fill="#fb923c">偽UI</tspan> か <tspan fill="#4ade80">正規ページ</tspan> か <tspan fill="#f472b6">攻撃者の親</tspan> か</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide" data-i="9">
+      <span class="tag">まとめ（summary）</span>
+      <h1>1枚で振り返り</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg">
+          <rect x="25" y="18" width="710" height="52" rx="10" fill="#243044" stroke="#fb923c"/>
+          <text x="380" y="42" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">クリックジャッキング ＝ 透明iframe等でUIを重ね、クリックの意味をすり替える</text>
+          <text x="380" y="60" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">前提：対象ページが他サイトのフレーム内に載せられる</text>
+
+          <rect x="25" y="82" width="340" height="88" rx="10" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="195" y="112" text-anchor="middle" fill="#86efac" font-size="12" font-family="sans-serif">本命対策</text>
+          <text x="195" y="138" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">X-Frame-Options / CSP frame-ancestors</text>
+          <text x="195" y="158" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">埋め込み制限が核</text>
+
+          <rect x="395" y="82" width="340" height="88" rx="10" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="565" y="112" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">多層防御</text>
+          <text x="565" y="138" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">確認DLG・再認証など</text>
+          <text x="565" y="158" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">単体万能ではない</text>
+
+          <rect x="25" y="182" width="710" height="88" rx="10" fill="#2d2438" stroke="#f472b6"/>
+          <text x="380" y="220" text-anchor="middle" fill="#f9a8d4" font-size="12" font-family="sans-serif">次回以降：弱点編の総仕上げ・セキュリティヘッダ横断など（シナリオに合わせて更新）</text>
+        </svg>
+      </div>
+      <p class="note">動画収録時はブラウザ全画面表示（<span class="kbd">F11</span> 等）でスライドを映し、キーやボタンで送りにすると安定します。</p>
+      <p class="note">シナリオ出典: <code style="color:var(--accent)">scenario/zundasecurity/s01-ep08-clickjacking.yaml</code></p>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <span class="progress" id="prog">1 / 9</span>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) {
+          s.classList.toggle("active", j === idx);
+        });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          e.preventDefault();
+          show(idx + 1);
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          show(idx - 1);
+        }
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>

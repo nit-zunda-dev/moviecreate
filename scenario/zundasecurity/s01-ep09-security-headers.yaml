@@ -1,0 +1,337 @@
+title: "【登録セキスペ 第9回｜Season2】セキュリティヘッダを攻略——HSTS・CSP・X-CTO・Referrer-Policyの試験ポイントなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング：インシデント導入（HTTP直打ち・MIME・情報漏えい）
+  # ============================================================
+  - id: "incident"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "た、助けてほしいのだ！　カフェのWi-Fiで『http://』のまま銀行っぽいページを開いたら、見た目はいつもと同じなのにログインしたら口座番号がバレたのだ……！"
+        subtitle: "た、助けてほしいのだ！　カフェのWi-Fiで『http://』のまま銀行っぽいページを開いたら、見た目はいつもと同じなのにログインしたら口座番号がバレたのだ……！"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……中間者がHTTP通信をすり替えやすい典型ね。前回のクリックジャッキングは『iframeで見え方を偽装』——今度は『ブラウザとサーバの約束事』であるHTTPレスポンスヘッダが弱いと、別の穴が開くわ。"
+        subtitle: "……中間者がHTTP通信をすり替えやすい典型ね。前回のクリックジャッキングは『iframeで見え方を偽装』——今度は『ブラウザとサーバの約束事』であるHTTPレスポンスヘッダが弱いと、別の穴が開くわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "HTTPSじゃないとダメなのは分かるのだ……でもブックマークが古くてhttpのままなのだ！　そこから泥棒にすり替えられるのだ？！"
+        subtitle: "HTTPSじゃないとダメなのは分かるのだ……でもブックマークが古くてhttpのままなのだ！　そこから泥棒にすり替えられるのだ？！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だから今日はセキュリティ関連のHTTPレスポンスヘッダを横断整理するわ。試験では『名前』『目的』『ブラウザに何を強制するか』がセットで問われやすい。"
+
+
+  # ============================================================
+  # オープニング：シリーズ紹介
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。第9回もSeason2——Webアプリの弱点編。前回はクリックジャッキング——透明iframeと埋め込み制限。今回はレスポンスヘッダの防衛線よ。"
+        subtitle: "四国めたんよ。第9回もSeason2——Webアプリの弱点編。前回はクリックジャッキング——透明iframeと埋め込み制限。今回はレスポンスヘッダの防衛線よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ヘッダって、なんか難しそうなのだ……。全部暗記なのだ？"
+        subtitle: "ヘッダって、なんか難しそうなのだ……。全部暗記なのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "暗記は最小でいいわ。『どの脅威を減らすか』で束ねる。Transport、MIME、埋め込み、読み込み元制限、リファラ——この5系統を頭の中で棚に分けるの。"
+        subtitle: "暗記は最小でいいわ。『どの脅威を減らすか』で束ねる。Transport、MIME、埋め込み、読み込み元制限、リファラ——この5系統を頭の中で棚に分けるの。"
+
+
+  # ============================================================
+  # セキュリティヘッダとは
+  # ============================================================
+  - id: "what_are_headers"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "セキュリティヘッダって、ざっくり何なのだ？"
+        subtitle: "セキュリティヘッダって、ざっくり何なのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "HTTPレスポンスに付ける指示で、ブラウザの振る舞いを『より安全側』に寄せるものの総称ね。アプリのバグ修正と別軸で、クライアント側のデフォルト挙動を締める。"
+        subtitle: "HTTPレスポンスに付ける指示で、ブラウザの振る舞いを『より安全側』に寄せるものの総称ね。アプリのバグ修正と別軸で、クライアント側のデフォルト挙動を締める。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "万能ではないけれど、多層防御の要。試験では『この脅威に、このヘッダ』の対応表が作れると強いわ。"
+        subtitle: "万能ではないけれど、多層防御の要。試験では『この脅威に、このヘッダ』の対応表が作れると強いわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ブラウザに『こうしろ』って命令するのだ……！　サーバが偉いのだ！"
+        subtitle: "ブラウザに『こうしろ』って命令するのだ……！　サーバが偉いのだ！"
+
+
+  # ============================================================
+  # Transport：Strict-Transport-Security（HSTS）
+  # ============================================================
+  - id: "hsts"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ずんだもんの被害は、httpブックマークが悪いのだ？"
+        subtitle: "ずんだもんの被害は、httpブックマークが悪いのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "入口がhttpだと中間者攻撃の余地が残りやすい。Strict-Transport-Security——HSTS——は、一度HTTPSで正規応答を受け取った後、一定期間はhttpへ降りにくくする指示よ。"
+        subtitle: "入口がhttpだと中間者攻撃の余地が残りやすい。Strict-Transport-Security——HSTS——は、一度HTTPSで正規応答を受け取った後、一定期間はhttpへ降りにくくする指示よ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験ではmax-ageに加え、includeSubDomainsやpreloadの説明が絡むことがあるわ。初回アクセスがすでに危険な場合の限界もセットで押さえなさい。"
+        subtitle: "試験ではmax-ageに加え、includeSubDomainsやpreloadの説明が絡むことがあるわ。初回アクセスがすでに危険な場合の限界もセットで押さえなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "『HTTPSを続けろ』の呪文なのだ……！　でも最初の一回は気をつけるのだ！"
+        subtitle: "『HTTPSを続けろ』の呪文なのだ……！　でも最初の一回は気をつけるのだ！"
+
+
+  # ============================================================
+  # MIME sniffing：X-Content-Type-Options
+  # ============================================================
+  - id: "xcto"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "MIMEって何なのだ？　ずんだもんは豆しか食べないのだ。"
+        subtitle: "MIMEって何なのだ？　ずんだもんは豆しか食べないのだ。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Content-Typeね。ブラウザが『これはHTMLか画像か』と解釈する手がかり。X-Content-Type-Options: nosniff は、実体を見て勝手に種類を変えない——スニッフィング抑制——を指示するわ。"
+        subtitle: "Content-Typeね。ブラウザが『これはHTMLか画像か』と解釈する手がかり。X-Content-Type-Options: nosniff は、実体を見て勝手に種類を変えない——スニッフィング抑制——を指示するわ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アップロードや配信経路のミスで『text/plainのつもりが実行扱い』みたいな事故を減らす狙い。試験ではnosniffの意味を言い換えた選択肢が出やすいわ。"
+        subtitle: "アップロードや配信経路のミスで『text/plainのつもりが実行扱い』みたいな事故を減らす狙い。試験ではnosniffの意味を言い換えた選択肢が出やすいわ。"
+
+
+  # ============================================================
+  # 埋め込み・読み込み：XFO / CSP（前回の接続）
+  # ============================================================
+  - id: "framing_and_csp"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "前回のiframe対策もヘッダなのだ？"
+        subtitle: "前回のiframe対策もヘッダなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。X-Frame-OptionsやContent-Security-Policyのframe-ancestorsは、クリックジャッキング対策の本命として説明されることが多いわ。"
+        subtitle: "そう。X-Frame-OptionsやContent-Security-Policyのframe-ancestorsは、クリックジャッキング対策の本命として説明されることが多いわ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "CSPはframe-ancestors以外にも、script-srcやdefault-srcなど『どこから何を読み込めるか』を縛る。XSSの影響範囲を小さくする説明とセットで問われやすいわ。"
+        subtitle: "CSPはframe-ancestors以外にも、script-srcやdefault-srcなど『どこから何を読み込めるか』を縛る。XSSの影響範囲を小さくする説明とセットで問われやすいわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "第8回とつながったのだ！　ヘッダで『枠』と『中身』両方いじれるのだ！"
+        subtitle: "第8回とつながったのだ！　ヘッダで『枠』と『中身』両方いじれるのだ！"
+
+
+  # ============================================================
+  # リファラとその他
+  # ============================================================
+  - id: "referrer_and_misc"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "Referrer-Policyって、プライバシーの話なのだ？　試験にも出るのだ？"
+        subtitle: "Referrer-Policyって、プライバシーの話なのだ？　試験にも出るのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "プライバシーにも効くけれど、セキュリティ的にはURLに紛れ込みがちなトークンや内部パスが、別オリジンへRefererで漏れないようにする、という整理も重要よ。"
+        subtitle: "プライバシーにも効くけれど、セキュリティ的にはURLに紛れ込みがちなトークンや内部パスが、別オリジンへRefererで漏れないようにする、という整理も重要よ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "あわせてPermissions-Policy——旧Feature-Policy——はブラウザ機能の利用許可を細かく制御する説明が文献に出るわ。試験では名前と目的の大枠を押さえれば十分なことが多い。"
+        subtitle: "あわせてPermissions-Policy——旧Feature-Policy——はブラウザ機能の利用許可を細かく制御する説明が文献に出るわ。試験では名前と目的の大枠を押さえれば十分なことが多い。"
+
+
+  # ============================================================
+  # 他攻撃との位置づけ
+  # ============================================================
+  - id: "mapping_threats"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "XSSやCSRFともどう関係するのだ？"
+        subtitle: "XSSやCSRFともどう関係するのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "CSPはXSS対策の補助になりうる——ただし設定ミスやnonce運用の難しさもある。CSRFは同期トークンやSameSiteなど、アプリ側対策が主役で、ヘッダは役割が違う。"
+        subtitle: "CSPはXSS対策の補助になりうる——ただし設定ミスやnonce運用の難しさもある。CSRFは同期トークンやSameSiteなど、アプリ側対策が主役で、ヘッダは役割が違う。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験のひっかけは『万能ヘッダ』扱い。ヘッダだけで全欠陥が消える、とは言い切れない——多層防御の一片、と思いなさい。"
+        subtitle: "試験のひっかけは『万能ヘッダ』扱い。ヘッダだけで全欠陥が消える、とは言い切れない——多層防御の一片、と思いなさい。"
+
+
+  # ============================================================
+  # 試験あるある
+  # ============================================================
+  - id: "exam_tips"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけをまとめてほしいのだ！"
+        subtitle: "ひっかけをまとめてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その1——HSTSは『初回アクセス前』の中間者を魔法では防げない。文章の言い切りに注意。"
+        subtitle: "定番その1——HSTSは『初回アクセス前』の中間者を魔法では防げない。文章の言い切りに注意。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その2——CSPとX-Frame-Optionsの役割を混同しない。どちらも『制限』だが、ディレクティブの世界観が違う。"
+        subtitle: "定番その2——CSPとX-Frame-Optionsの役割を混同しない。どちらも『制限』だが、ディレクティブの世界観が違う。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "定番その3——nosniffは『暗号化』じゃないのだ！　MIMEの解釈を締めるのだ！"
+        subtitle: "定番その3——nosniffは『暗号化』じゃないのだ！　MIMEの解釈を締めるのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "用語問題は英語の頭文字ではなく、日本語の言い換えで攻めてくる。効果を一文で言えるかが勝負よ。"
+        subtitle: "用語問題は英語の頭文字ではなく、日本語の言い換えで攻めてくる。効果を一文で言えるかが勝負よ。"
+
+
+  # ============================================================
+  # まとめ・次回予告
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のまとめよ。セキュリティヘッダは、ブラウザの挙動を安全側に寄せるHTTPレスポンスの指示。HSTSはHTTPS維持、nosniffはMIMEスニッフィング抑制、CSPは読み込みや埋め込みの許可範囲を絞る、が試験の骨格。"
+        subtitle: "今回のまとめよ。セキュリティヘッダは、ブラウザの挙動を安全側に寄せるHTTPレスポンスの指示。HSTSはHTTPS維持、nosniffはMIMEスニッフィング抑制、CSPは読み込みや埋め込みの許可範囲を絞る、が試験の骨格。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Referrer-PolicyやPermissions-Policyは漏えい・機能制御の補助線。前回までのXSS／CSRF／クリックジャッキングと、『どのヘッダがどの穴を塞ぎうるか』を対応表にしておきなさい。"
+        subtitle: "Referrer-PolicyやPermissions-Policyは漏えい・機能制御の補助線。前回までのXSS／CSRF／クリックジャッキングと、『どのヘッダがどの穴を塞ぎうるか』を対応表にしておきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ブックマークもhttpsに直すのだ……！　ヘッダは鈍器じゃなくて、複数枚の盾なのだ！"
+        subtitle: "ブックマークもhttpsに直すのだ……！　ヘッダは鈍器じゃなくて、複数枚の盾なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次回以降は、弱点編をさらに深掘りするか、別カテゴリへ進むか——シラバスに合わせて伸ばしていくわ。コメントのリクエストも参考にする。"
+        subtitle: "次回以降は、弱点編をさらに深掘りするか、別カテゴリへ進むか——シラバスに合わせて伸ばしていくわ。コメントのリクエストも参考にする。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感想やリクエストはコメント欄へ。次回もヘッダの名前だけでなく、効果で語れるようにしておきなさい。"
+        subtitle: "感想やリクエストはコメント欄へ。次回もヘッダの名前だけでなく、効果で語れるようにしておきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ！　バイバイなのだ！"
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"

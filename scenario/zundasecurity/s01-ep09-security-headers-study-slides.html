@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>セキュリティHTTPヘッダ解説スライド — s01-ep09</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #22d3ee;
+      --accent2: #a78bfa;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: 2.5rem 3rem 5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+      color: var(--accent);
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+      border: 1px solid rgba(34, 211, 238, 0.25);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+    .bullets {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .bullets li { margin: 0.4rem 0; }
+    .bullets strong { color: var(--text); }
+    .note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-left: 3px solid var(--accent2);
+      padding-left: 1rem;
+      margin-top: 1rem;
+    }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .kbd { font-family: var(--mono); font-size: 0.8em; opacity: 0.85; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.5rem 1.25rem 4.5rem; }
+    }
+
+    .rich-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 2rem;
+      background: linear-gradient(145deg, rgba(26,35,50,0.6), rgba(15,20,25,0.8));
+      border: 1px solid rgba(34, 211, 238, 0.18);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .rich-diagram::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .rich-box {
+      padding: 1.25rem;
+      border-radius: 12px;
+      background: rgba(36, 48, 68, 0.4);
+      border: 1px solid rgba(139, 156, 179, 0.2);
+    }
+    .box-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); }
+    .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); }
+    .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(34, 211, 238, 0.45); background: rgba(34, 211, 238, 0.06); }
+    .theme-accent .box-title { color: var(--accent); }
+    .slide-lead {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0 0 1rem;
+    }
+    .slide-lead strong { color: var(--text); }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 0.75rem 0 0;
+    }
+    .pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      color: #a5f3fc;
+    }
+    .summary-hero {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0 0 1rem;
+      padding: 0.9rem 1rem;
+      background: rgba(26, 35, 50, 0.65);
+      border-radius: 10px;
+      border: 1px solid rgba(139, 156, 179, 0.2);
+    }
+    .summary-hero strong { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide active" data-i="1">
+      <span class="tag">オープニング</span>
+      <h1>【登録セキスペ 第9回｜Season2】セキュリティヘッダを攻略——HSTS・CSP・X-CTO・Referrer-Policyの試験ポイント</h1>
+      <h2>HTTP <strong>レスポンス</strong>ヘッダでブラウザの挙動を安全側へ寄せる（動画シナリオと同一タイトル）</h2>
+      <p class="slide-lead">本回は <strong>Webサーバがレスポンスに付与するセキュリティ関連ヘッダ</strong>がテーマ。アプリの入力検証や出力エスケープなど<strong>アプリケーション対策と別軸</strong>で、<strong>ユーザエージェント（ブラウザ）のデフォルト挙動</strong>を締める役割を持つ。試験では <strong>正式なヘッダ名</strong>・<strong>目的</strong>・<strong>ブラウザにどう効くか</strong>の三点がセットで問われやすい。</p>
+      <div class="rich-diagram" style="padding:1.25rem;margin:0.75rem 0;">
+        <div class="grid-2" style="margin:0;">
+          <div class="rich-box theme-accent">
+            <div class="box-title">この回の位置づけ</div>
+            <div class="box-desc"><strong>Season2：Webアプリの弱点編・第9回</strong>。シリーズは「ずんだもんとめたんのセキスペ」想定。教材YAML: <code style="font-family:var(--mono);font-size:0.78rem;color:#67e8f9">s01-ep09-security-headers.yaml</code></div>
+          </div>
+          <div class="rich-box theme-warn">
+            <div class="box-title">第8回（直前）とのつながり</div>
+            <div class="box-desc"><strong>クリックジャッキング</strong>で学んだ <strong>X-Frame-Options</strong> や <strong>CSP の frame-ancestors</strong> も、本回の「レスポンスヘッダ横断」の一部として位置づけ直す。</div>
+          </div>
+        </div>
+      </div>
+      <p class="slide-lead" style="margin-top:0.5rem;"><strong>暗記の仕方（動画内の整理）</strong>：名前の羅列ではなく、次の<strong>5つの棚</strong>に分類して脅威と対応づける。</p>
+      <div class="pill-row" aria-label="5分類">
+        <span class="pill">① Transport（通信経路・HTTPSの維持）</span>
+        <span class="pill">② MIME（Content-Type と実体解釈）</span>
+        <span class="pill">③ 埋め込み（iframe 等の親子関係）</span>
+        <span class="pill">④ 読み込み元制限（CSP の script-src 等）</span>
+        <span class="pill">⑤ Referer・付随情報（Referrer-Policy 等）</span>
+      </div>
+      <p class="slide-lead" style="margin-top:0.65rem;">加えて文献では <strong>Permissions-Policy</strong>（旧称 Feature-Policy）による<strong>ブラウザ強力機能の許可制御</strong>もセキュリティ文脈で説明される。万能対策ではなく<strong>多層防御の一層</strong>である点も本回の軸。</p>
+      <ul class="bullets">
+        <li><strong>学習目標①</strong>：<code style="font-family:var(--mono);font-size:0.85em">Strict-Transport-Security</code>（HSTS）が <strong>HTTPS への接続を継続しやすくする</strong>こと、および <strong>初回アクセス前の中間者</strong>は別論点であることを説明できる。</li>
+        <li><strong>学習目標②</strong>：<code style="font-family:var(--mono);font-size:0.85em">X-Content-Type-Options: nosniff</code> が <strong>MIME スニッフィング抑制</strong>であり、<strong>暗号化や認証そのものではない</strong>と区別できる。</li>
+        <li><strong>学習目標③</strong>：<strong>CSP</strong> と <strong>X-Frame-Options</strong> の役割を混同せず、<strong>frame-ancestors</strong> と <strong>script-src / default-src</strong> の論点を分けて語れる。</li>
+        <li><strong>学習目標④</strong>：<strong>Referrer-Policy</strong> が Referer の送り方を制御し、<strong>URL に紛れうる情報の漏えい</strong>を減らしうることを理解する。</li>
+      </ul>
+      <div class="diagram">
+        <svg viewBox="0 0 760 120" xmlns="http://www.w3.org/2000/svg" aria-label="本編の流れ">
+          <defs>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#22d3ee"/>
+              <stop offset="100%" style="stop-color:#a78bfa"/>
+            </linearGradient>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#22d3ee"/>
+            </marker>
+          </defs>
+          <text x="380" y="22" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">本編の流れ（スライド2〜）：導入事例 → ヘッダの定義 → HSTS → nosniff → 埋め込み/CSP → Referrer・Permissions → 脅威対応表 → 試験ひっかけ → まとめ</text>
+          <rect x="20" y="42" width="88" height="52" rx="8" fill="#243044" stroke="#22d3ee" stroke-width="1.5"/>
+          <text x="64" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">導入</text>
+          <path d="M 110 68 L 128 68" stroke="url(#g1)" stroke-width="2" marker-end="url(#arr)"/>
+          <rect x="132" y="42" width="88" height="52" rx="8" fill="#243044" stroke="#22d3ee" stroke-width="1.5"/>
+          <text x="176" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">概要</text>
+          <path d="M 222 68 L 240 68" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="244" y="42" width="88" height="52" rx="8" fill="#243044" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="288" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">HSTS</text>
+          <path d="M 334 68 L 352 68" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="356" y="42" width="88" height="52" rx="8" fill="#243044" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="400" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">nosniff</text>
+          <path d="M 446 68 L 464 68" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="468" y="42" width="88" height="52" rx="8" fill="#243044" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="512" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">CSP/XFO</text>
+          <path d="M 558 68 L 576 68" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="580" y="42" width="88" height="52" rx="8" fill="#243044" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="624" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">他</text>
+          <path d="M 670 68 L 688 68" stroke="url(#g1)" stroke-width="2"/>
+          <rect x="692" y="42" width="48" height="52" rx="8" fill="#243044" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="716" y="73" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">総括</text>
+        </svg>
+      </div>
+      <p class="note">操作：<span class="kbd">→</span> <span class="kbd">←</span> <span class="kbd">Space</span> または画面下のボタン。収録はブラウザ全画面表示が扱いやすい。</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" data-i="2">
+      <span class="tag">導入（incident）</span>
+      <h1>HTTPのままだと、中間者に通信をすり替えられやすい</h1>
+      <h2>カフェWi-Fi・古い http ブックマークは「入口」のリスク</h2>
+      <div class="rich-diagram">
+        <div class="grid-2" style="margin:0;">
+          <div class="rich-box theme-danger">
+            <div class="box-title">http で開始</div>
+            <div class="box-desc">暗号化されない区間で<strong>改ざん・盗聴</strong>の余地。見た目は正規そうでも中身が偽物になりうる。</div>
+          </div>
+          <div class="rich-box theme-warn">
+            <div class="box-title">ユーザーの習慣</div>
+            <div class="box-desc">古いブックマーク・手打ちの <span style="font-family:var(--mono);color:#fde68a">http://</span> が<strong>攻撃者の入口</strong>になりうる。</div>
+          </div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li><strong>前回（クリックジャッキング）</strong>：iframe と<strong>見え方</strong>の問題。</li>
+        <li><strong>今回</strong>：レスポンスヘッダで<strong>ブラウザの振る舞い</strong>を安全側へ。</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide" data-i="3">
+      <span class="tag">概要（what_are_headers）</span>
+      <h1>セキュリティヘッダ＝ブラウザへの「安全寄りの指示」</h1>
+      <h2>アプリ修正と別軸の、クライアント側デフォルトの締め</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="50" width="140" height="56" rx="8" fill="#243044" stroke="#22d3ee"/>
+          <text x="110" y="82" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">オリジンサーバ</text>
+          <path d="M 185 78 L 240 78" stroke="#8b9cb3" stroke-width="2"/>
+          <polygon points="240,78 232,74 232,82" fill="#8b9cb3"/>
+          <text x="285" y="70" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">HTTP レスポンス</text>
+          <rect x="200" y="85" width="170" height="40" rx="6" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="285" y="110" text-anchor="middle" fill="#86efac" font-size="10" font-family="sans-serif">Security-Related Headers</text>
+          <path d="M 375 78 L 430 78" stroke="#a78bfa" stroke-width="2"/>
+          <polygon points="430,78 422,74 422,82" fill="#a78bfa"/>
+          <rect x="440" y="50" width="140" height="56" rx="8" fill="#243044" stroke="#a78bfa"/>
+          <text x="510" y="82" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">ユーザーブラウザ</text>
+          <text x="360" y="155" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">試験のコツ：<tspan fill="#22d3ee">名前</tspan>より <tspan fill="#fbbf24">どの脅威を減らすか</tspan> を一文で言えるか</text>
+          <text x="360" y="185" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">万能ではない → <tspan fill="#f472b6">多層防御の一片</tspan></text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" data-i="4">
+      <span class="tag">HSTS（hsts）</span>
+      <h1>Strict-Transport-Security（HSTS）</h1>
+      <h2>HTTPS を維持しやすくする（max-age / includeSubDomains / preload）</h2>
+      <div class="grid-2">
+        <div class="rich-diagram" style="padding:1.25rem;margin:0;">
+          <div class="rich-box theme-accent">
+            <div class="box-title">効果（骨格）</div>
+            <div class="box-desc">正規のHTTPS応答で一度受け取ると、<strong>一定期間は HTTP へ降りにくい</strong>。ブックマークやリダイレクトの癖とセットで効く。</div>
+          </div>
+        </div>
+        <div class="rich-diagram" style="padding:1.25rem;margin:0;">
+          <div class="rich-box theme-warn">
+            <div class="box-title">限界（試験のひっかけ）</div>
+            <div class="box-desc"><strong>初回アクセス前</strong>の中間者を魔法では防げない。文章の言い切りに注意。</div>
+          </div>
+        </div>
+      </div>
+      <p class="note">例: <code style="color:var(--accent);font-family:var(--mono);font-size:0.85rem">Strict-Transport-Security: max-age=31536000; includeSubDomains</code></p>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" data-i="5">
+      <span class="tag">X-CTO（xcto）</span>
+      <h1>X-Content-Type-Options: nosniff</h1>
+      <h2>MIME スニッフィング（種類の勝手な再判定）を抑える</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="40" width="200" height="70" rx="10" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="130" y="68" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">Content-Type</text>
+          <text x="130" y="92" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">サーバが宣言した種類</text>
+          <text x="250" y="82" fill="#8b9cb3" font-size="18" font-family="sans-serif">→</text>
+          <rect x="280" y="40" width="200" height="70" rx="10" fill="#2d2438" stroke="#22d3ee"/>
+          <text x="380" y="68" text-anchor="middle" fill="#67e8f9" font-size="12" font-family="sans-serif">nosniff</text>
+          <text x="380" y="92" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">実体を見て種類を変えない</text>
+          <text x="500" y="82" fill="#8b9cb3" font-size="18" font-family="sans-serif">→</text>
+          <rect x="530" y="40" width="200" height="70" rx="10" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="630" y="68" text-anchor="middle" fill="#86efac" font-size="12" font-family="sans-serif">実行系ミスの抑制</text>
+          <text x="630" y="92" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">text/plain 扱いのはずが… 等</text>
+          <text x="380" y="145" text-anchor="middle" fill="#f87171" font-size="11" font-family="sans-serif">nosniff ＝ 暗号化、ではない（用語の取り違え注意）</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide" data-i="6">
+      <span class="tag">埋め込み・CSP（framing_and_csp）</span>
+      <h1>第8回との接続：XFO / CSP frame-ancestors / script-src</h1>
+      <h2>「枠」と「読み込み元」を別ディレクティブで縛る</h2>
+      <div class="grid-2">
+        <div class="rich-diagram" style="padding:1.25rem;margin:0;">
+          <div class="rich-box theme-accent">
+            <div class="box-title">埋め込み（クリックジャッキング）</div>
+            <div class="box-desc"><strong>X-Frame-Options</strong> または <strong>CSP frame-ancestors</strong> で、親フレームからの表示を制限。</div>
+          </div>
+        </div>
+        <div class="rich-diagram" style="padding:1.25rem;margin:0;">
+          <div class="rich-box theme-ok">
+            <div class="box-title">読み込み制限（XSS補助）</div>
+            <div class="box-desc"><strong>default-src</strong> / <strong>script-src</strong> などで、スクリプトやリソースの許可オリジンを絞る。設定難易度あり。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide" data-i="7">
+      <span class="tag">Referrer / Permissions（referrer_and_misc）</span>
+      <h1>Referrer-Policy と Permissions-Policy</h1>
+      <h2>URL に紛れがちな情報の漏えい抑制・ブラウザ機能の許可制御</h2>
+      <ul class="bullets">
+        <li><strong>Referrer-Policy</strong>：別オリジンへ渡す Referer を減らす／丸める。<strong>トークンや内部パス</strong>がクエリに乗るケースと相性。</li>
+        <li><strong>Permissions-Policy</strong>（旧 Feature-Policy）：カメラ・位置情報・フルスクリーン等の<strong>機能利用</strong>をページ単位で制御する説明が文献に出る。</li>
+      </ul>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide" data-i="8">
+      <span class="tag">脅威マッピング（mapping_threats）</span>
+      <h1>XSS / CSRF との役割分担</h1>
+      <h2>ヘッダは「万能パッチ」ではない</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="35" width="200" height="75" rx="8" fill="#2d2438" stroke="#f472b6"/>
+          <text x="130" y="62" text-anchor="middle" fill="#f9a8d4" font-size="12" font-family="sans-serif">XSS</text>
+          <text x="130" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">エスケープ等が主役</text>
+          <text x="130" y="102" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">CSPは補助・範囲縮小</text>
+          <rect x="260" y="35" width="200" height="75" rx="8" fill="#2d2a1f" stroke="#fbbf24"/>
+          <text x="360" y="62" text-anchor="middle" fill="#fde68a" font-size="12" font-family="sans-serif">CSRF</text>
+          <text x="360" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">同期トークン・SameSite等</text>
+          <text x="360" y="102" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">主役はアプリ側設計</text>
+          <rect x="490" y="35" width="200" height="75" rx="8" fill="#1e3a2f" stroke="#4ade80"/>
+          <text x="590" y="62" text-anchor="middle" fill="#86efac" font-size="12" font-family="sans-serif">クリックジャッキング</text>
+          <text x="590" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">埋め込み制限ヘッダ</text>
+          <text x="590" y="102" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">第8回と対応表で結ぶ</text>
+          <rect x="60" y="125" width="600" height="58" rx="8" fill="#1a2332" stroke="rgba(34,211,238,0.4)"/>
+          <text x="360" y="158" text-anchor="middle" fill="#8b9cb3" font-size="11" font-family="sans-serif">「このヘッダだけで全欠陥解消」系の選択肢は慎重に</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide" data-i="9">
+      <span class="tag">試験あるある（exam_tips）</span>
+      <h1>ひっかけ3点セット</h1>
+      <div class="grid-2">
+        <div class="rich-box theme-warn">
+          <div class="box-title">① HSTS の限界</div>
+          <div class="box-desc">初回前の中間者を<strong>常に</strong>防ぐ、と言い切らない。</div>
+        </div>
+        <div class="rich-box theme-accent">
+          <div class="box-title">② CSP と XFO</div>
+          <div class="box-desc">どちらも制限だが<strong>世界観とディレクティブ</strong>が違う。混同しない。</div>
+        </div>
+        <div class="rich-box theme-danger" style="grid-column:1/-1;">
+          <div class="box-title">③ nosniff</div>
+          <div class="box-desc"><strong>暗号化ではない</strong>。MIME の解釈を締める。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" data-i="10">
+      <span class="tag">まとめ（summary）</span>
+      <h1>第9回まとめ — セキュリティ関連HTTPレスポンスヘッダ</h1>
+      <h2>それぞれ「ブラウザに何を強制・抑制するか」を一文で言えるようにする（試験は言い換え問題が多い）</h2>
+      <div class="summary-hero"><strong>定義の整理：</strong>ここで扱うのは主に <strong>HTTP レスポンス</strong>に含まれるヘッダで、<strong>サーバからユーザエージェント（ブラウザ）へ</strong>「より安全な挙動」を指示する。アプリの実装修正だけでは足りない論点を、<strong>クライアント側のデフォルト</strong>から締める。<strong>すべてを防ぐ万能スイッチではない</strong>——出力エスケープ・CSRF トークン・認証設計などと<strong>役割分担（多層防御）</strong>で覚える。</div>
+      <div class="grid-2">
+        <div class="rich-box theme-accent">
+          <div class="box-title">Strict-Transport-Security（HSTS）</div>
+          <div class="box-desc"><strong>効果：</strong>一度正規の HTTPS 応答で受け取ると、ブラウザが<strong>同一ホスト名への接続を HTTPS 側に寄せやすく</strong>する（<code style="font-family:var(--mono);font-size:0.78rem">max-age</code> 必須。必要に応じ <code style="font-family:var(--mono);font-size:0.78rem">includeSubDomains</code> 等）。<br><strong>限界：</strong><strong>初回訪問前</strong>にユーザーが騙されて接続した場合など、文脈によっては別途対策が必要。<br><strong>試験：</strong>「HTTPS を<strong>強制</strong>する」と<strong>誤解しやすい</strong>が、実際はブラウザの挙動を<strong>HTTPS 維持へ誘導</strong>するヘッダ。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">X-Content-Type-Options: nosniff</div>
+          <div class="box-desc"><strong>効果：</strong><code style="font-family:var(--mono);font-size:0.78rem">Content-Type</code> の宣言を尊重し、<strong>MIME スニッフィング</strong>（実体を見て種類を再判定する挙動）による<strong>解釈のずれ</strong>を抑える。<br><strong>典型の誤答：</strong>「通信の<strong>暗号化</strong>」「<strong>認証</strong>を行う」——<strong>別物</strong>。<br><strong>試験：</strong>「スニッフィング」「nosniff」の語が<strong>セット</strong>で出やすい。</div>
+        </div>
+        <div class="rich-box theme-ok">
+          <div class="box-title">Content-Security-Policy（CSP）</div>
+          <div class="box-desc"><strong>効果：</strong><code style="font-family:var(--mono);font-size:0.78rem">script-src</code> / <code style="font-family:var(--mono);font-size:0.78rem">default-src</code> 等で<strong>読み込めるリソースの出所</strong>を制限。XSS 被害の<strong>影響範囲を小さくする補助</strong>になりうるが<strong>設定・運用は難しい</strong>こともある。<br><strong>第8回との接続：</strong><code style="font-family:var(--mono);font-size:0.78rem">frame-ancestors</code> で<strong>親フレームからの埋め込み</strong>を制限し、<strong>クリックジャッキング対策</strong>の本命の一つとして説明される。</div>
+        </div>
+        <div class="rich-box theme-accent">
+          <div class="box-title">X-Frame-Options（XFO）</div>
+          <div class="box-desc"><strong>効果：</strong><code style="font-family:var(--mono);font-size:0.78rem">DENY</code> / <code style="font-family:var(--mono);font-size:0.78rem">SAMEORIGIN</code> 等で、<strong>他サイトの frame 内への表示</strong>を制限（クリックジャッキング対策として古典的に扱われる）。<br><strong>試験・実務：</strong>文献では <strong>CSP の frame-ancestors</strong> が<strong>現代的な説明</strong>として併記されることが多いが、<strong>名称と効果</strong>は問われうる。<strong>CSP 全体と混同しない</strong>。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">Referrer-Policy</div>
+          <div class="box-desc"><strong>効果：</strong>遷移時に送られる <strong>Referer（参照元）</strong> の<strong>量・粒度</strong>を制御。別オリジンへ<strong>URL クエリに載ったトークンや内部パス</strong>が流れないよう<strong>漏えいリスクを下げる</strong>整理ができる。<br><strong>試験：</strong>プライバシー文脈だけでなく<strong>セキュリティ（情報漏えい）</strong>の観点でも語られる。</div>
+        </div>
+        <div class="rich-box theme-ok">
+          <div class="box-title">Permissions-Policy</div>
+          <div class="box-desc"><strong>効果：</strong>カメラ・マイク・位置情報・全画面表示など、<strong>強力なブラウザ機能</strong>を<strong>文書・iframe 単位</strong>で許可・拒否する（文献では旧称 <strong>Feature-Policy</strong> の表記も残る）。<br><strong>試験：</strong>細部のディレクティブより、<strong>何を制御するヘッダか</strong>の大枠が問われやすい。</div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li><strong>脅威対応表（自習用）</strong>：第5〜8回の <strong>XSS / CSRF / クリックジャッキング</strong> と並べ、「<strong>主役の対策</strong>（エスケープ、トークン、SameSite 等）」と「<strong>ヘッダが補助する論点</strong>」を1枚に書き出す。</li>
+        <li><strong>ひっかけ再掲</strong>：HSTS の<strong>初回前限界</strong>／CSP と XFO の<strong>混同</strong>／nosniff は<strong>暗号化ではない</strong>。</li>
+        <li><strong>動画クロージング（シナリオ summary）</strong>：ブックマークや入口 URL は <strong>HTTPS</strong> に揃える。ヘッダは<strong>複数枚の盾</strong>として多層防御の一角。</li>
+      </ul>
+      <p class="note">シナリオ（台本）: <code style="color:var(--accent)">scenario/zundasecurity/s01-ep09-security-headers.yaml</code>　／　スライドは同フォルダ <code style="color:var(--accent)">s01-ep09-security-headers-study-slides.html</code></p>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <span class="progress" id="prog">1 / 10</span>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) {
+          s.classList.toggle("active", j === idx);
+        });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          e.preventDefault();
+          show(idx + 1);
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          show(idx - 1);
+        }
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>

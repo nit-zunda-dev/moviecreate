@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSRF 解説スライド — s01-ep11</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #22d3ee;
+      --accent2: #a78bfa;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: 2.5rem 3rem 5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      line-height: 1.3;
+      color: var(--accent);
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+      border: 1px solid rgba(34, 211, 238, 0.25);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+    .bullets {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .bullets li { margin: 0.4rem 0; }
+    .bullets strong { color: var(--text); }
+    .note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-left: 3px solid var(--accent2);
+      padding-left: 1rem;
+      margin-top: 1rem;
+    }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(34, 211, 238, 0.45);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    #scene-ref { font-family: var(--mono); font-weight: 500; }
+    .kbd { font-family: var(--mono); font-size: 0.8em; opacity: 0.85; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.5rem 1.25rem 4.5rem; }
+    }
+    .rich-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 2rem;
+      background: linear-gradient(145deg, rgba(26,35,50,0.6), rgba(15,20,25,0.8));
+      border: 1px solid rgba(34, 211, 238, 0.18);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .rich-diagram::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .rich-box {
+      padding: 1.25rem;
+      border-radius: 12px;
+      background: rgba(36, 48, 68, 0.4);
+      border: 1px solid rgba(139, 156, 179, 0.2);
+    }
+    .box-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); }
+    .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); }
+    .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(34, 211, 238, 0.45); background: rgba(34, 211, 238, 0.06); }
+    .theme-accent .box-title { color: var(--accent); }
+    .slide-lead {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0 0 1rem;
+    }
+    .slide-lead strong { color: var(--text); }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 0.75rem 0 0;
+    }
+    .pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      color: #a5f3fc;
+    }
+    .summary-hero {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0 0 1.1rem;
+      padding: 1rem 1.1rem 1.05rem;
+      background: linear-gradient(180deg, rgba(26, 35, 50, 0.9), rgba(20, 28, 40, 0.75));
+      border-radius: 12px;
+      border: 1px solid rgba(34, 211, 238, 0.22);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    }
+    .summary-hero__label {
+      margin: 0 0 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #67e8f9;
+    }
+    .summary-hero__p {
+      margin: 0 0 0.75rem;
+    }
+    .summary-hero__p:last-child { margin-bottom: 0; }
+    .summary-hero strong { color: var(--text); }
+    .summary-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin: 0.35rem 0 0.9rem;
+    }
+    @media (max-width: 700px) {
+      .summary-pillars { grid-template-columns: 1fr; }
+    }
+    .summary-pillar {
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.45;
+      text-align: center;
+      color: #a5b4c8;
+      padding: 0.55rem 0.5rem 0.6rem;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+    .summary-section-h {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #94a3b8;
+      margin: 0.85rem 0 0.4rem;
+      letter-spacing: 0.02em;
+    }
+    .summary-prev {
+      border-left: 4px solid var(--accent2);
+      padding: 0.75rem 0 0.75rem 1.05rem;
+      margin-top: 0.9rem;
+      background: rgba(30, 27, 45, 0.35);
+      border-radius: 0 8px 8px 0;
+    }
+    .summary-prev .summary-prev__tag {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #c4b5fd;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+    .summary-prev code {
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.86rem;
+    }
+    .beginner-hint {
+      font-size: 0.88rem;
+      color: #a5b4c8;
+      line-height: 1.6;
+      margin: 0.5rem 0 0;
+      padding: 0.65rem 0.9rem;
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 8px;
+      border: 1px dashed rgba(34, 211, 238, 0.25);
+    }
+    .beginner-hint::before { content: "［補足］ "; color: #67e8f9; font-weight: 600; }
+
+    /* スライド7：3つの棚（レイアウト用） */
+    .shelf-diagram-wrap {
+      margin: 1rem 0 0;
+      padding: 0;
+      background: transparent;
+      border: none;
+    }
+    .shelf-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.5rem;
+      margin-bottom: 1rem;
+      padding: 0.65rem 0.9rem;
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 10px;
+      border: 1px solid rgba(34, 211, 238, 0.22);
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .shelf-flow strong { color: var(--text); }
+    .shelf-flow__arrow { color: #22d3ee; font-weight: 700; padding: 0 0.15rem; }
+    .shelf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+    @media (max-width: 960px) {
+      .shelf-grid { grid-template-columns: 1fr; }
+    }
+    .shelf-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 0.9rem 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1.5px solid;
+      background: rgba(26, 35, 50, 0.65);
+    }
+    .shelf-card--self { border-color: rgba(74, 222, 128, 0.55); background: linear-gradient(165deg, rgba(30, 45, 36, 0.5), rgba(26, 35, 50, 0.7)); }
+    .shelf-card--corp { border-color: rgba(251, 191, 36, 0.5); background: linear-gradient(165deg, rgba(45, 42, 31, 0.45), rgba(26, 35, 50, 0.7)); }
+    .shelf-card--cloud { border-color: rgba(167, 139, 250, 0.5); background: linear-gradient(165deg, rgba(45, 31, 42, 0.45), rgba(26, 35, 50, 0.7)); }
+    .shelf-card__head {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .shelf-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 20, 25, 0.5);
+    }
+    .shelf-icon svg { width: 28px; height: 28px; opacity: 0.95; }
+    .shelf-card__title {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .shelf-card--self .shelf-card__title { color: #86efac; }
+    .shelf-card--corp .shelf-card__title { color: #fde68a; }
+    .shelf-card--cloud .shelf-card__title { color: #c4b5fd; }
+    .shelf-card__ip {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin: 0.35rem 0 0.5rem;
+      padding: 0.3rem 0.45rem;
+      border-radius: 6px;
+      background: rgba(15, 20, 25, 0.45);
+      border: 1px solid rgba(139, 156, 179, 0.15);
+    }
+    .shelf-card__text {
+      margin: 0;
+      font-size: 0.82rem;
+      color: #a5b4c8;
+      line-height: 1.55;
+      flex: 1;
+    }
+    .shelf-footnote {
+      margin-top: 1rem;
+      padding: 0.75rem 0.9rem 0.85rem;
+      border-radius: 10px;
+      background: rgba(127, 29, 29, 0.12);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      border-left: 4px solid #f87171;
+    }
+    .shelf-footnote__label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fca5a5;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .shelf-footnote p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      color: #e7edf4;
+    }
+
+    /* スライド9：禁止リストの限界（NG→OK の縦型） */
+    .bypass-deck { margin: 0.5rem 0 0; }
+    .bypass-section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fca5a5;
+      letter-spacing: 0.04em;
+      margin: 0 0 0.5rem;
+    }
+    .bypass-step {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 0.35rem 0.75rem;
+      align-items: start;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid rgba(248, 113, 113, 0.32);
+      background: rgba(30, 24, 28, 0.55);
+      margin-bottom: 0.45rem;
+    }
+    .bypass-step__num {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fecaca;
+      background: linear-gradient(145deg, #7f1d1d, #991b1b);
+      border: 1px solid rgba(252, 165, 165, 0.4);
+    }
+    .bypass-step__body { min-width: 0; }
+    .bypass-step__head {
+      margin: 0 0 0.25rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fef2f2;
+      line-height: 1.35;
+    }
+    .bypass-step__text {
+      margin: 0;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #a5b4c8;
+    }
+    .bypass-connector {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f87171;
+      margin: 0.2rem 0 0.45rem;
+      padding: 0.2rem 0;
+    }
+    .bypass-split {
+      margin: 0.9rem 0 0.65rem;
+      padding-top: 0.75rem;
+      border-top: 2px dashed rgba(100, 116, 139, 0.45);
+    }
+    .bypass-split__label {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin: 0 0 0.5rem;
+    }
+    .bypass-ok {
+      padding: 0.9rem 1rem 1rem;
+      border-radius: 12px;
+      border: 1.5px solid rgba(74, 222, 128, 0.5);
+      background: linear-gradient(180deg, rgba(20, 40, 30, 0.55), rgba(26, 35, 50, 0.85));
+    }
+    .bypass-ok__tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #0f1419;
+      background: #4ade80;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    .bypass-ok__head {
+      margin: 0 0 0.4rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #86efac;
+    }
+    .bypass-ok ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: #cbd5e1;
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+    .bypass-ok li { margin: 0.35rem 0; }
+    .bypass-foot {
+      margin: 0.75rem 0 0;
+      font-size: 0.82rem;
+      color: #8b9cb3;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide active" data-i="1" data-yaml-scene="opening,what_is_ssrf" title="台本: opening + what_is_ssrf（冒頭）">
+      <span class="tag">オープニング</span>
+      <h1>【登録セキスペ 第11回｜Season2】SSRF（サーバーサイドリクエスト・フォージェリ）を攻略</h1>
+      <h2>悪い人が送った「開いてほしい先」を、<strong>あなたの代わりにサーバが開けてしまう</strong>攻撃（動画と同じテーマ）</h2>
+      <p class="slide-lead">第10回は <strong>ブラウザの中</strong>の話（クッキー等）。今回は <strong>Webサイトの裏方であるサーバ</strong>の話。インターネットの悪い人は、<strong>自分のPCからは届かない</strong>「社内のURL」や「自分自身（127.0.0.1）」へ、<strong>サーバの手で</strong>アクセスさせようとする——それが <strong>SSRF</strong> です。図ではいつも <strong>「誰の手（矢印）でページを開いているか」</strong>を意識してください。</p>
+      <div class="rich-diagram" style="padding:1.25rem;margin:0.75rem 0;">
+        <div class="grid-2" style="margin:0;">
+          <div class="rich-box theme-accent">
+            <div class="box-title">この回の立ち位置</div>
+            <div class="box-desc"><strong>Webアプリの弱点編・第11回</strong>。台本は <code style="font-family:var(--mono);font-size:0.78rem;color:#67e8f9">s01-ep11-ssrf.yaml</code></div>
+          </div>
+          <div class="rich-box theme-warn">
+            <div class="box-title">第7回のCSRFと混同しない</div>
+            <div class="box-desc">CSRF＝<strong>あなたのブラウザ</strong>を悪用。SSRF＝<strong>サーバ</strong>が「行き先」を踏みに行くのが主役。</div>
+          </div>
+        </div>
+      </div>
+      <p class="slide-lead" style="margin-top:0.5rem;"><strong>図の見方（比喩）</strong>：</p>
+      <div class="pill-row" aria-label="比喩">
+        <span class="pill">社宅の受付がトラックを出す ＝ サーバがURLを「開きに行く」</span>
+        <span class="pill">届け先の倉庫 ＝ 社内・自分自身・クラウドの秘密の棚</span>
+        <span class="pill">偽の荷主伝票 ＝ 悪意の入ったURLパラメータ</span>
+      </div>
+      <ul class="bullets">
+        <li><strong>学習目標①</strong>：SSRFを「<strong>サーバに、意図しないURLを開かせる</strong>」と説明できる。</li>
+        <li><strong>学習目標②</strong>：図のとおり、<strong>あなたのPCから届かない所</strong>（自分自身・社内IP・クラウドの特別URL）が狙われやすいと言える。</li>
+        <li><strong>学習目標③</strong>：防ぎ方を <strong>アプリ（許可するURLをしぼる）</strong>と <strong>通信の仕組み（外への出口を分ける／制限する）</strong>の2段で話せる。</li>
+        <li><strong>学習目標④</strong>：「危ない番号を禁止リストに入れただけ」では<strong>足りない理由</strong>（すり抜け）を図のイメージで覚える。</li>
+      </ul>
+      <p class="beginner-hint">スライドは上から順に「なにが起きるか → 何を狙うか → どう防ぐか」の流れです。英語略語（SSRF）は「サーバが頼まれたURLを開きに行く攻撃」でOK。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg" aria-label="本編の流れ（やさしめ）">
+          <defs>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#22d3ee"/>
+              <stop offset="100%" style="stop-color:#a78bfa"/>
+            </linearGradient>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#22d3ee"/>
+            </marker>
+          </defs>
+          <text x="400" y="16" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">例の話の流れ：はじまり → 2つの世界 → 4ステップ → よく狙う先 → すり抜け → アプリで防ぐ → 通信で防ぐ → 試験のコツ → まとめ</text>
+          <g transform="translate(0,28)">
+            <rect x="4" y="0" width="52" height="48" rx="6" fill="#243044" stroke="#22d3ee"/>
+            <text x="30" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">はじまり</text>
+            <text x="30" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">導入</text>
+            <path d="M 58 24 L 68 24" stroke="url(#g1)" stroke-width="2" marker-end="url(#arr)"/>
+            <rect x="72" y="0" width="56" height="48" rx="6" fill="#243044" stroke="#a78bfa"/>
+            <text x="100" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">2つの世界</text>
+            <text x="100" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">到達圏</text>
+            <path d="M 130 24 L 140 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="144" y="0" width="52" height="48" rx="6" fill="#243044" stroke="#f472b6"/>
+            <text x="170" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">4ステップ</text>
+            <text x="170" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">流れ</text>
+            <path d="M 198 24 L 208 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="212" y="0" width="68" height="48" rx="6" fill="#243044" stroke="#4ade80"/>
+            <text x="246" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">よく狙う所</text>
+            <text x="246" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">社内/雲</text>
+            <path d="M 282 24 L 292 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="296" y="0" width="60" height="48" rx="6" fill="#243044" stroke="#fbbf24"/>
+            <text x="326" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">すり抜け</text>
+            <text x="326" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">抜道</text>
+            <path d="M 358 24 L 368 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="372" y="0" width="60" height="48" rx="6" fill="#243044" stroke="#22d3ee"/>
+            <text x="402" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">アプリ側</text>
+            <text x="402" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">入口のルール</text>
+            <path d="M 434 24 L 444 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="448" y="0" width="56" height="48" rx="6" fill="#243044" stroke="#94a3b8"/>
+            <text x="476" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">通信側</text>
+            <text x="476" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">出口の分け方</text>
+            <path d="M 506 24 L 516 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="520" y="0" width="52" height="48" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="546" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">試験</text>
+            <text x="546" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">落とし穴</text>
+            <path d="M 576 24 L 586 24" stroke="url(#g1)" stroke-width="2"/>
+            <rect x="590" y="0" width="48" height="48" rx="6" fill="#243044" stroke="#a78bfa"/>
+            <text x="614" y="22" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">まとめ</text>
+            <text x="614" y="36" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">おさらい</text>
+          </g>
+        </svg>
+      </div>
+      <p class="note">操作：<span class="kbd">→</span> <span class="kbd">←</span> <span class="kbd">Space</span> または画面下のボタン。画面下の2行目は、<strong>動画台本</strong>（<code style="font-family:var(--mono);font-size:0.8rem">s01-ep11-ssrf.yaml</code>）の <code style="font-family:var(--mono);font-size:0.8rem">scenes</code> ブロックの <code style="font-family:var(--mono);font-size:0.8rem">id</code> です。詳しい対応表は<strong>同じYAMLの先頭コメント</strong>を参照。</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" data-i="2" data-yaml-scene="incident" title="台本: incident">
+      <span class="tag">導入（incident）</span>
+      <h1>例：「リンク先をプレビュー表示」に、<strong>社内専用のURL</strong>を入れられたら？</h1>
+      <h2>悪い人のPCは社内に入れない。でも、<strong>社内手続き用のWebサーバ</strong>なら、社内のURLに手が届く</h2>
+      <p class="beginner-hint">図の①②③④を順に読めば、物語が追えます。悪意の入った依頼 → 本物のサイトが中継 → 社内の扉 → 中身の一部が外に戻る、の流れです。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 780 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="a1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#f87171"/>
+            </marker>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#22d3ee"/>
+            </marker>
+          </defs>
+          <circle cx="80" cy="40" r="16" fill="#2d1f2a" stroke="#f472b6" stroke-width="1.5"/>
+          <text x="80" y="45" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="700" font-family="sans-serif">①</text>
+          <text x="80" y="75" text-anchor="middle" fill="#f9a8d4" font-size="11" font-family="sans-serif">悪い人</text>
+          <text x="80" y="92" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">（あなたの敵：インターネット上）</text>
+          <path d="M 145 45 L 230 45" stroke="#f87171" stroke-width="2" marker-end="url(#a1)"/>
+          <text x="192" y="32" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="sans-serif">「ここを開いて」</text>
+          <text x="192" y="64" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">（本物のフォームに入力）</text>
+          <circle cx="350" cy="38" r="16" fill="#243044" stroke="#22d3ee" stroke-width="1.5"/>
+          <text x="350" y="43" text-anchor="middle" fill="#67e8f9" font-size="12" font-weight="700" font-family="sans-serif">②</text>
+          <text x="350" y="75" text-anchor="middle" fill="#67e8f9" font-size="12" font-family="sans-serif">みんなが使うWebサイト</text>
+          <text x="350" y="95" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">＋ プレビュー機能</text>
+          <text x="350" y="115" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">裏方の「サーバ」が、送られたURLを実際に開きに行く</text>
+          <path d="M 350 125 L 350 150" stroke="#22d3ee" stroke-width="2" marker-end="url(#a2)"/>
+          <circle cx="350" cy="200" r="16" fill="#1e2d24" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="350" y="205" text-anchor="middle" fill="#4ade80" font-size="12" font-weight="700" font-family="sans-serif">③</text>
+          <text x="350" y="235" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">悪意URLが指した「奥の扉」</text>
+          <text x="350" y="255" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">例：社内管理画面、自分自身(127.0.0.1)の管理画面</text>
+          <text x="350" y="272" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="sans-serif">＝ あなたのブラウザから直接は行けない所、が狙われやすい</text>
+          <rect x="520" y="140" width="220" height="100" rx="10" fill="#2d1f2a" stroke="#f47171" stroke-width="1.2"/>
+          <text x="560" y="175" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="700" font-family="sans-serif">④</text>
+          <text x="635" y="170" text-anchor="middle" fill="#fca5a5" font-size="10" font-family="sans-serif">画面表示やログの形で</text>
+          <text x="635" y="195" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">中身の一部が</text>
+          <text x="635" y="213" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">外の悪い人の手元に</text>
+          <text x="635" y="230" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">戻ることがある</text>
+          <path d="M 465 195 L 515 195" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a1)"/>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>本質</strong>：悪い人がブラウザで直接「社内専用URL」に行けなくても、<strong>Webサーバに代わりに行かせる</strong>道があると困る。</li>
+        <li><strong>第10回との違い</strong>：クッキーは「ブラウザの中の話」——今回の矢印の主役は<strong>サーバ</strong>。</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide" data-i="3" data-yaml-scene="what_is_ssrf,attack_flow" title="台本: what_is_ssrf / attack_flow（到達圏）">
+      <span class="tag">2つの世界</span>
+      <h1>円2つで考える：「あなたのPC」から行ける所 と 「サーバ」から行ける所</h1>
+      <h2>重なり＝<strong>悪い人はあなたのブラウザでは届かない</strong>が、<strong>サーバなら届く</strong>所</h2>
+      <p class="beginner-hint">左の円＝家の外から見える世界、右の円＝会社の中や機械の中まで届く世界、と雑に覚えてOK。試験では「<strong>誰の手で</strong>ページを取りに行くか」がキーワード。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="280" cy="150" rx="200" ry="120" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="2"/>
+          <text x="180" y="35" text-anchor="middle" fill="#67e8f9" font-size="13" font-weight="600" font-family="sans-serif">青い円</text>
+          <text x="180" y="58" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">あなたのPC＋ブラウザ</text>
+          <text x="180" y="80" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">一般に「家のWi-Fi等」から直接は</text>
+          <text x="180" y="96" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">社内専用のURLには行けない</text>
+          <ellipse cx="480" cy="150" rx="200" ry="120" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="2"/>
+          <text x="600" y="35" text-anchor="middle" fill="#c4b5fd" font-size="13" font-weight="600" font-family="sans-serif">紫の円</text>
+          <text x="600" y="58" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">Webサイトを動かすサーバ</text>
+          <text x="600" y="80" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">社内の別PC・自分自身(127.0.0.1)・</text>
+          <text x="600" y="96" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">クラウドの特別URLなど、届くことも多い</text>
+          <text x="380" y="150" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="600" font-family="sans-serif">重なる所 ＝ 攻め手が狙いやすい</text>
+          <text x="380" y="185" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">SSRF ＝ ここに矢印のテコを入れる</text>
+          <text x="380" y="255" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="sans-serif">毎回「誰の手で、ページの取りに行きが起きる？」と図の真ん中を指さす</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" data-i="4" data-yaml-scene="attack_flow" title="台本: attack_flow">
+      <span class="tag">4ステップの流れ</span>
+      <h1>SSRF という言葉（英名は後回しでOK）</h1>
+      <h2>意味：「<strong>サーバ側</strong>に、<strong>本当は開いてほしくない所</strong>を開かせる」＝<strong>届け先の偽装</strong></h2>
+      <p class="beginner-hint">Forgery＝偽物の届け先、とだけ覚えれば十分。下の図は「誰が・どの順番で・どこに手を伸ばすか」です。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="30" width="100" height="48" rx="8" fill="#2d1f2a" stroke="#f472b6"/>
+          <text x="80" y="52" text-anchor="middle" fill="#f9a8d4" font-size="11" font-family="sans-serif">悪い人</text>
+          <path d="M 135 54 L 195 54" stroke="#f87171" stroke-width="2"/>
+          <polygon points="195,54 183,50 183,58" fill="#f87171"/>
+          <text x="168" y="40" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="sans-serif">① 依頼</text>
+          <text x="168" y="70" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">「このURLを開いて」</text>
+          <rect x="200" y="25" width="200" height="58" rx="8" fill="#243044" stroke="#22d3ee"/>
+          <text x="300" y="44" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">Webの入力欄</text>
+          <text x="300" y="64" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">例：?url=… / 取り込み欄 など</text>
+          <path d="M 305 86 L 305 108" stroke="#22d3ee" stroke-width="2"/>
+          <text x="345" y="100" text-anchor="middle" fill="#67e8f9" font-size="8" font-family="sans-serif">② 中の人が開く</text>
+          <rect x="240" y="120" width="120" height="50" rx="8" fill="#1e2d24" stroke="#4ade80"/>
+          <text x="300" y="142" text-anchor="middle" fill="#86efac" font-size="10" font-family="sans-serif">狙われる場所</text>
+          <text x="300" y="160" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">社内・自分自身・雲の秘密URL</text>
+          <path d="M 370 145 L 500 145" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <text x="435" y="132" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="sans-serif">③ 中身・痕跡が戻る</text>
+          <rect x="520" y="110" width="200" height="60" rx="8" fill="#2d1f2a" stroke="#f472b6"/>
+          <text x="630" y="132" text-anchor="middle" fill="#f9a8d4" font-size="9" font-family="sans-serif">④ 悪い人の元へ</text>
+          <text x="630" y="152" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">（画面表示・遅れ・エラー等）</text>
+        </svg>
+      </div>
+      <p class="note"><strong>上級向け</strong>：中身が画面に戻りにくい「ブラインド」でも、<strong>時間差・エラーの出方・DNSの出方</strong>など「別の形で情報が漏れる」話として文献に出ます。まずは①〜④の流れを体に入れてからで大丈夫です。</p>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" data-i="5" data-yaml-scene="what_is_ssrf" title="台本: what_is_ssrf（CSRFとの違い）">
+      <span class="tag">第7回 CSRF との違い</span>
+      <h1>名前が似るけど、物語の「主役」が違う</h1>
+      <h2>CSRF＝<strong>あなたのブラウザ</strong>を悪用　／　SSRF＝<strong>Webサイトのサーバ</strong>を悪用</h2>
+      <p class="beginner-hint">左は「家の中の手（ブラウザ）」、右は「店の倉庫の手（サーバ）」のイメージ。防ぎ方も違います（第7回のトークンは左向けの道具）。</p>
+      <div class="grid-2">
+        <div class="diagram" style="margin:0;">
+          <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">
+            <text x="180" y="22" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">CSRF（第7回・復習）</text>
+            <rect x="40" y="40" width="80" height="40" rx="6" fill="#2d2a1f" stroke="#fbbf24"/>
+            <text x="80" y="64" text-anchor="middle" fill="#fde68a" font-size="9" font-family="sans-serif">罠サイト</text>
+            <path d="M 125 60 L 200 60" stroke="#f87171" stroke-width="2"/>
+            <text x="162" y="50" text-anchor="middle" fill="#fca5a5" font-size="8" font-family="sans-serif">勝手に依頼が飛ぶ</text>
+            <rect x="210" y="40" width="100" height="40" rx="6" fill="#243044" stroke="#22d3ee"/>
+            <text x="260" y="64" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">本物のサイト</text>
+            <text x="180" y="110" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">主役＝<tspan fill="#67e8f9">あなたのブラウザ</tspan>（＋クッキー等）</text>
+            <text x="180" y="135" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">悪い人のPCからは、あなたの代わりに</text>
+            <text x="180" y="150" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">本物のサイトへ「意図しない操作」を出す</text>
+            <text x="180" y="180" text-anchor="middle" fill="#4ade80" font-size="9" font-family="sans-serif">防ぎ方の代表：隠しトークン、SameSite など</text>
+          </svg>
+        </div>
+        <div class="diagram" style="margin:0;">
+          <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">
+            <text x="180" y="22" text-anchor="middle" fill="#8b9cb3" font-size="12" font-family="sans-serif">SSRF（今回）</text>
+            <rect x="30" y="40" width="80" height="40" rx="6" fill="#2d1f2a" stroke="#f472b6"/>
+            <text x="70" y="64" text-anchor="middle" fill="#f9a8d4" font-size="9" font-family="sans-serif">悪い人</text>
+            <path d="M 115 60 L 170 60" stroke="#f87171" stroke-width="2"/>
+            <text x="142" y="50" text-anchor="middle" fill="#fca5a5" font-size="8" font-family="sans-serif">偽の「開いて」</text>
+            <rect x="180" y="32" width="150" height="56" rx="6" fill="#243044" stroke="#a78bfa" stroke-width="1.2"/>
+            <text x="255" y="52" text-anchor="middle" fill="#c4b5fd" font-size="9" font-family="sans-serif">本物のWebサーバ</text>
+            <text x="255" y="70" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">が、URLを開きに行く</text>
+            <text x="180" y="120" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">主役＝<tspan fill="#a78bfa">サイトを動かすサーバ</tspan>の手</text>
+            <text x="180" y="145" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">悪い人のブラウザでは届かない所へ</text>
+            <text x="180" y="160" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">サーバの手が届く</text>
+            <text x="180" y="185" text-anchor="middle" fill="#4ade80" font-size="9" font-family="sans-serif">CSRF用トークンだけでは、たいてい止まらない</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide" data-i="6" data-yaml-scene="what_is_ssrf" title="台本: what_is_ssrf（URL取り込み例）">
+      <span class="tag">「そういう便利機能」に注意</span>
+      <h1>悪用されやすいのは、<strong>人が入れたURLを、サーバが開きに行く</strong>所</h1>
+      <h2>相手は、<strong>普通の人と同じ画面</strong>から送りつけてくる</h2>
+      <p class="beginner-hint">全部の名前を覚えなくて大丈夫。「URLを１行入れたら、裏方が取りに行く」＝要チェック、と思えれば十分です。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="sans-serif" font-size="9">
+            <text x="360" y="18" text-anchor="middle" fill="#e7edf4" font-size="11" font-weight="600">身近な例（どれか一つ当てはまる？）</text>
+            <rect x="20" y="32" width="120" height="50" rx="6" fill="#1a2332" stroke="#22d3ee"/>
+            <text x="80" y="52" text-anchor="middle" fill="#67e8f9">プレビュー</text>
+            <text x="80" y="70" text-anchor="middle" fill="#8b9cb3">サムネ・要約</text>
+            <rect x="160" y="32" width="120" height="50" rx="6" fill="#1a2332" stroke="#a78bfa"/>
+            <text x="220" y="52" text-anchor="middle" fill="#c4b5fd">PDF/取込</text>
+            <text x="220" y="70" text-anchor="middle" fill="#8b9cb3">他サイト取得</text>
+            <rect x="300" y="32" width="120" height="50" rx="6" fill="#1a2332" stroke="#4ade80"/>
+            <text x="360" y="52" text-anchor="middle" fill="#86efac">通知のテスト</text>
+            <text x="360" y="70" text-anchor="middle" fill="#8b9cb3">他URLに送る等</text>
+            <rect x="440" y="32" width="120" height="50" rx="6" fill="#1a2332" stroke="#fbbf24"/>
+            <text x="500" y="52" text-anchor="middle" fill="#fde68a">RSS/読込</text>
+            <text x="500" y="70" text-anchor="middle" fill="#8b9cb3">URL欄</text>
+            <rect x="580" y="32" width="120" height="50" rx="6" fill="#1a2332" stroke="#f472b6"/>
+            <text x="640" y="52" text-anchor="middle" fill="#f9a8d4">中継</text>
+            <text x="640" y="70" text-anchor="middle" fill="#8b9cb3">任せ先あり</text>
+            <rect x="100" y="100" width="520" height="60" rx="8" fill="#243044" stroke="#f87171" stroke-width="1.2" stroke-dasharray="4 2"/>
+            <text x="360" y="128" text-anchor="middle" fill="#e7edf4" font-size="10">→ 裏方の「サーバ」が、<tspan fill="#fbbf24">入れたアドレス</tspan>に<tspan fill="#4ade80">取りに行く</tspan>のが共通</text>
+            <text x="360" y="150" text-anchor="middle" fill="#8b9cb3" font-size="9">試験：この一文が言えれば、説明択一も怖くない</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide" data-i="7" data-yaml-scene="internal_access,cloud_metadata" title="台本: internal_access + cloud_metadata（3つの棚）">
+      <span class="tag">よく狙われる「届け先」</span>
+      <h1>3つの棚：「自分自身」「社の中」「クラウドの秘密の棚」</h1>
+      <h2>覚え方：数字の細部より、<strong>あなたのPCからは届きにくい</strong>所、と考える</h2>
+      <p class="beginner-hint">下の表は「難しい番号」はざっくりでOK。試験で再登場したら、その時の用語集を当てれば足ります。</p>
+      <div class="diagram shelf-diagram-wrap">
+        <div class="shelf-flow" role="region" aria-label="SSRFで届きうる先：インターネットの悪意からWebサーバ、そして3種類の届け先">
+          <span>インターネット上の悪意</span>
+          <span class="shelf-flow__arrow" aria-hidden="true">→</span>
+          <span><strong>Webサーバ</strong>がURLを「開きに行く」</span>
+          <span class="shelf-flow__arrow" aria-hidden="true">→</span>
+          <span>下の<strong>3つの届け先</strong>のどれか</span>
+        </div>
+        <div class="shelf-grid">
+          <article class="shelf-card shelf-card--self" aria-labelledby="shelf-t1">
+            <div class="shelf-card__head">
+              <div class="shelf-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="12" rx="1.5" stroke="#4ade80" stroke-width="1.4"/>
+                  <path d="M7 20h10" stroke="#4ade80" stroke-width="1.4" stroke-linecap="round"/>
+                  <path d="M9 16h6l-1.2 4H10.2L9 16z" fill="#1e2d24" stroke="#4ade80" stroke-width="1"/>
+                </svg>
+              </div>
+              <h3 class="shelf-card__title" id="shelf-t1">① 自分自身</h3>
+            </div>
+            <p class="shelf-card__ip" title="ざっくり覚えでOK">127.0.0.1 など</p>
+            <p class="shelf-card__text">「<strong>このマシン自身</strong>」の管理画面。家の外の人は直接いじれないが、<strong>サーバの手</strong>なら届きうる。</p>
+          </article>
+          <article class="shelf-card shelf-card--corp" aria-labelledby="shelf-t2">
+            <div class="shelf-card__head">
+              <div class="shelf-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 20V10l8-3 8 3v10" stroke="#fbbf24" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M9 20v-6h6v6" stroke="#fbbf24" stroke-width="1.2"/>
+                  <rect x="10" y="8" width="4" height="3" rx="0.3" fill="#fbbf24" opacity="0.35"/>
+                </svg>
+              </div>
+              <h3 class="shelf-card__title" id="shelf-t2">② 社の中</h3>
+            </div>
+            <p class="shelf-card__ip" title="ざっくり覚えでOK">192.168.x.x など</p>
+            <p class="shelf-card__text">社内専用の管理画面・社内専用API。「<strong>社内は安全</strong>」に頼ると、穴が大きいことがある。</p>
+          </article>
+          <article class="shelf-card shelf-card--cloud" aria-labelledby="shelf-t3">
+            <div class="shelf-card__head">
+              <div class="shelf-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M6 18h12a4 4 0 0 0 .2-7.99A5.5 5.5 0 0 0 7 8.5a4 4 0 0 0-1 7.9V18z" stroke="#a78bfa" stroke-width="1.3" stroke-linejoin="round" fill="rgba(167,139,250,0.1)"/>
+                </svg>
+              </div>
+              <h3 class="shelf-card__title" id="shelf-t3">③ 雲の秘密棚</h3>
+            </div>
+            <p class="shelf-card__ip" title="ざっくり覚えでOK">例：169.254.x 付近</p>
+            <p class="shelf-card__text">クラウドの「<strong>この1台専用の合鍵置き</strong>」のような専用URL。正確な用語名は<strong>教材の用語集</strong>で。</p>
+          </article>
+        </div>
+        <div class="shelf-footnote">
+          <span class="shelf-footnote__label">注意（試験のスタンス）</span>
+          <p>「危ない番号を文字で禁止！」<strong>だけ</strong>だと、<strong>転送（リダイレクト）などの別ルート</strong>で抜かれる。だから<strong>完璧な禁止リスト</strong>は作りにくい、と覚えておく。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide" data-i="8" data-yaml-scene="cloud_metadata" title="台本: cloud_metadata（雲の合鍵棚）">
+      <span class="tag">クラウド（難しい名前はあと回しOK）</span>
+      <h1>雲上のPCには「この1台専用の、秘密の取説URL」が付く、というイメージ</h1>
+      <h2>用語 IMDS などの<strong>定義の細部</strong>は出題本で。ここは<strong>図の形</strong>だけ掴む</h2>
+      <p class="beginner-hint">「レンタルサーバの中に、合鍵が書かれた専用の小さな棚がある」＝中身を取られないようにするのが、設計の話につながります。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg">
+          <rect x="60" y="40" width="200" height="100" rx="10" fill="#243044" stroke="#22d3ee"/>
+          <text x="160" y="68" text-anchor="middle" fill="#e7edf4" font-size="12" font-family="sans-serif">クラウド上の1台</text>
+          <text x="160" y="90" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">（ふつうのWebアプリが動いている）</text>
+          <text x="160" y="120" text-anchor="middle" fill="#67e8f9" font-size="9" font-family="sans-serif">SSRFの穴＝悪用されやすい</text>
+          <rect x="120" y="150" width="80" height="50" rx="6" fill="#1e2d24" stroke="#4ade80"/>
+          <text x="160" y="180" text-anchor="middle" fill="#86efac" font-size="8" font-family="sans-serif">専用の</text>
+          <text x="160" y="194" text-anchor="middle" fill="#86efac" font-size="8" font-family="sans-serif">合鍵棚</text>
+          <path d="M 170 100 L 170 145" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#marr)"/>
+          <defs>
+            <marker id="marr" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#22d3ee"/>
+            </marker>
+          </defs>
+          <rect x="420" y="40" width="280" height="100" rx="10" fill="#2d1f2a" stroke="#f47171" stroke-width="1.2"/>
+          <text x="560" y="70" text-anchor="middle" fill="#fca5a5" font-size="11" font-family="sans-serif">悪用されると？</text>
+          <text x="560" y="95" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">秘密の合鍵が外に出る、など</text>
+          <text x="560" y="118" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">（用語：IMDS 等。詳細は本文で）</text>
+        </svg>
+      </div>
+      <p class="note">実務の方向性：「<strong>必要以上に強い合鍵を渡さない</strong>」「棚に近づけない」など、<strong>重ねて守る</strong>と考えると試験の長文にも向き合いやすいです。</p>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide" data-i="9" data-yaml-scene="bypass_concepts" title="台本: bypass_concepts">
+      <span class="tag">「禁止リストだけ」は足りない、がよく出る</span>
+      <h1>ダメと書くだけのフィルタは、<strong>すり抜け</strong>がありうる</h1>
+      <h2>上から順に読む：①見せかけのブロック → ②抜け道 → ③結果　／ 下は<strong>正しい考え方</strong></h2>
+      <p class="beginner-hint">横に並べた図はやめて、<strong>縦の物語</strong>にしました。専門用語の名前は本で。ここは「<strong>3段で何が起きるか</strong>」だけ掴めればOK。</p>
+      <div class="diagram" style="padding:1rem 1.1rem 1.1rem;">
+        <div class="bypass-deck">
+          <p class="bypass-section-title">まず「禁止リストだけ」だと起こりがちな流れ</p>
+          <div class="bypass-step">
+            <div class="bypass-step__num" aria-hidden="true">1</div>
+            <div class="bypass-step__body">
+              <p class="bypass-step__head">アプリのフィルタ</p>
+              <p class="bypass-step__text">受け取ったURLの文字を見て、「<strong>社内IPっぽい</strong>」「<strong>よく知られた危ない形</strong>」などを機械的に弾く。</p>
+            </div>
+          </div>
+          <p class="bypass-connector">▼ でも、ここから先が落とし穴</p>
+          <div class="bypass-step">
+            <div class="bypass-step__num" aria-hidden="true">2</div>
+            <div class="bypass-step__body">
+              <p class="bypass-step__head">攻撃側の「抜け道」</p>
+              <p class="bypass-step__text">いったん<strong>安全そうに見える別のURL</strong>に飛ばす（<strong>転送</strong>）・<strong>別の表記</strong>に着せ替える など、フィルタの<strong>下ごしらえ</strong>をしてから、実体は危ない先へ行く。細かい手口の名までは参考書任せでよい。</p>
+            </div>
+          </div>
+          <p class="bypass-connector">▼ 最終的に</p>
+          <div class="bypass-step" style="margin-bottom:0;">
+            <div class="bypass-step__num" aria-hidden="true">3</div>
+            <div class="bypass-step__body">
+              <p class="bypass-step__head">サーバのリクエストが届く</p>
+              <p class="bypass-step__text">弾きたかった<strong>危ない通信先</strong>（社内・自分自身 等）に、<strong>やはり到達</strong>してしまう。だから「危ない番号の文字列を列挙」だけだと、文献では<strong>不十分</strong>になりやすい、というスタンスが試験に出やすい。</p>
+            </div>
+          </div>
+
+          <div class="bypass-split">
+            <p class="bypass-split__label">区切り線の下＝ 対案（こう考えると整理しやすい）</p>
+            <div class="bypass-ok">
+              <span class="bypass-ok__tag">OK</span>
+              <p class="bypass-ok__head">望ましい方針（イメージ）</p>
+              <ul>
+                <li><strong>許可リスト</strong>：最初から「<strong>行ってよい相手</strong>」だけ紙に書く（＝何でも弾かないで、<strong>通す相手に絞る</strong>）。</li>
+                <li><strong>転送のルール</strong>：URLが途中で飛ばされるとき、<strong>追跡をどこまでするか</strong>・<strong>最終的にどこに着くか</strong>を、別の論点として決めておく（フィルタ1枚に頼り切らない）。</li>
+              </ul>
+            </div>
+          </div>
+          <p class="bypass-foot">試験の狙い：手口名を暗記するより、<strong>「単純な禁止だけでは完結しにくい」</strong>と言えるか。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" data-i="10" data-yaml-scene="defense_input" title="台本: defense_input">
+      <span class="tag">まずはアプリ側（入口のルール）</span>
+      <h1>方針はシンプル：<strong>「行ってよい所」を先に紙に書く</strong>＝ホワイトリスト</h1>
+      <h2>何でもかんでもURLを「開きに行かない」設計にできないか、を疑う</h2>
+      <p class="beginner-hint">下の3つは、言葉の意味が分かれば合格ライン。細かい技術名は、教材で追い付けます。</p>
+      <div class="grid-2">
+        <div class="rich-box theme-ok">
+          <div class="box-title">① 最初から「行ってよい所」だけ</div>
+          <div class="box-desc">難しい正規表現で縛るより、<strong>本当に行ってよい相手</strong>を数える。変な形のURL（<code style="font-family:var(--mono)">file:</code> など）は最初から捨てる、という考え方。</div>
+        </div>
+        <div class="rich-box theme-accent">
+          <div class="box-title">② 「本当はどの住所に届くか」を確認</div>
+          <div class="box-desc">人間が書いたURLは、<strong>最終的にどの家（IP）に配達されるか</strong>を、つなげる前に見る。社内専用の家なら止める、という流れ（文献では詳しく説明）。</div>
+        </div>
+        <div class="rich-box theme-warn" style="grid-column:1/-1;">
+          <div class="box-title">③ 途中で道が変わる（転送）に注意</div>
+          <div class="box-desc">一度は安全そうに見えても、<strong>あとから別の危ない所に転送</strong>される、という抜け道がある。だから「転送をどう扱うか」は、別の論点として持つ、と覚えておく。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide" data-i="11" data-yaml-scene="defense_network" title="台本: defense_network">
+      <span class="tag">あわせて：通信の出口も分けて考える</span>
+      <h1>1枚のプログラムだけで、全部の穴をふさぐのは、むずかしい</h1>
+      <h2>図：「外へ出る荷物」<strong>専用の倉庫</strong>・<strong>検査所</strong>・<strong>あとで気づく仕組み</strong>、のイメージ</h2>
+      <p class="beginner-hint">エグレス＝外への出口、とだけ覚えてOK。用語（SG等）は本文で。ここは「<strong>何段かで守る</strong>」とだけ持ち帰る。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="30" width="200" height="100" rx="10" fill="#243044" stroke="#22d3ee" stroke-width="1.2"/>
+          <text x="140" y="56" text-anchor="middle" fill="#67e8f9" font-size="11" font-weight="600" font-family="sans-serif">専用の出荷所</text>
+          <text x="140" y="78" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">（URL取り専用の部屋）</text>
+          <text x="140" y="98" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">外へ行ってよい相手を絞る、など</text>
+          <rect x="300" y="30" width="200" height="100" rx="10" fill="#1e2d24" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="400" y="56" text-anchor="middle" fill="#86efac" font-size="11" font-weight="600" font-family="sans-serif">出口の検査所</text>
+          <text x="400" y="78" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">通過する荷物の記録</text>
+          <text x="400" y="98" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">（WAF/プロキシ的な所——名前は本で）</text>
+          <rect x="540" y="30" width="150" height="100" rx="10" fill="#2d1f2a" stroke="#a78bfa"/>
+          <text x="615" y="62" text-anchor="middle" fill="#c4b5fd" font-size="10" font-weight="600" font-family="sans-serif">あとから気づく</text>
+          <text x="615" y="90" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">ログ集め・</text>
+          <text x="615" y="105" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">お知らせ（SIEM的）</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide" data-i="12" data-yaml-scene="exam_tips" title="台本: exam_tips">
+      <span class="tag">試験でつまずきやすい所</span>
+      <h1>3つの「うっかり」＋ 覚えておく1行</h1>
+      <h2>択一で<strong>違う攻撃の対策</strong>を選ばない。起点はいつも<strong>誰の手で開くか</strong></h2>
+      <div class="grid-2">
+        <div class="rich-box theme-warn">
+          <div class="box-title">① 別物と混同しない</div>
+          <div class="box-desc">SSRF は、DBに変な文を入れる <strong>SQLインジェクション</strong> とは違う。入り口の話と取り違えない。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">② CSRF 対策だけでは足りない、がある</div>
+          <div class="box-desc">第7回の隠しトークンは <strong>ブラウザ</strong>向け。今回の穴は <strong>サーバが出荷</strong>する所——別の道具が要る、と聞かれたらその筋。</div>
+        </div>
+        <div class="rich-box theme-danger" style="grid-column:1/-1;">
+          <div class="box-title">③ 「社内IPを禁じたから安心」系の言い切り</div>
+          <div class="box-desc">文献のスタンスは、多くの場合 <strong>そう簡単ではない</strong>。転送や別の抜道を想像できると強い。</div>
+        </div>
+        <div class="rich-box theme-ok" style="grid-column:1/-1;">
+          <div class="box-title">＋1 最後に一言で</div>
+          <div class="box-desc">「<strong>信頼できるサーバの手で、悪意の届け先を取りに行かせる</strong>」——これが口で言えれば、第11回の中心は掴めています。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide" data-i="13" data-yaml-scene="summary" title="台本: summary">
+      <span class="tag">まとめ</span>
+      <h1>第11回まとめ — SSRF</h1>
+      <h2>矢印の<strong>出発点</strong>、<strong>行ってよい所のルール</strong>、<strong>重ねて守る</strong>の3つ</h2>
+      <p class="slide-lead" style="margin: -0.5rem 0 0.35rem; font-size:0.95rem; color:#94a3b8; line-height:1.5;">下の3枚は、スライド全体を<strong>3本の柱</strong>で覚えるための目次です（文献では多く、<strong>1手だけで全部解決</strong>とは言いにくい、という立場も含めて）。</p>
+      <div class="summary-pillars" role="list" aria-label="第11回の3本柱（イメージ）">
+        <div class="summary-pillar" role="listitem">
+          <b>柱①</b>
+          誰の手でURLを受け取るか（<strong>サーバ</strong>が届け先に「<strong>開きに行く</strong>」のが主役　※ブラウザ主役のCSRFと対比）
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱②</b>
+          <strong>許可</strong>で絞る・接続前に<strong>辿る先</strong>を見る・<strong>転送</strong>の扱いを決める、など
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱③</b>
+          アプリ層＋<strong>出口の分離</strong>・<strong>記録</strong>など、<strong>重ねて</strong>想定外を減らす
+        </div>
+      </div>
+      <div class="summary-hero" role="region" aria-label="SSRFのやさしい整理">
+        <p class="summary-hero__label">整理（やさしめ）</p>
+        <p class="summary-hero__p">
+          <strong>攻撃のイメージ：</strong>SSRFは、<strong>Webサイトのサーバ</strong>に、人が意図しないURLを「<strong>開きに行かせ</strong>」、<strong>あなたのブラウザからは行けない所</strong>（自分自身・社内・雲の秘密の棚 等）の中身に触れさせようとする攻撃だと整理できる。
+        </p>
+        <p class="summary-hero__p">
+          <strong>防ぎ方の向き（文献でよく出る立ち位置）：</strong><strong>行ってよい所を先に決める</strong>、<strong>本当の届け先をつなぐ前に見る</strong>、<strong>転送の扱いを決める</strong>、のほか、<strong>外への出口を専用に分けたり、記録する</strong>、など。<strong>どれか一つで全部解決</strong>、とは多くの文献で言いにくい、というのが定番のスタンス。
+        </p>
+      </div>
+      <p class="summary-section-h">自習・教材</p>
+      <ul class="bullets">
+        <li><strong>自習</strong>：第7回（CSRF）の「<strong>ブラウザ</strong>が主役」と、今回の「<strong>サーバ</strong>が主役」を、同じ用紙に左右で1枚図にしてみる。</li>
+        <li><strong>動画</strong>：台本 <code style="color:var(--accent);font-family:var(--mono);font-size:0.88rem">s01-ep11-ssrf.yaml</code> と一緒に。</li>
+      </ul>
+      <aside class="summary-prev" aria-label="前回（第10回）との位置づけ">
+        <span class="summary-prev__tag">前回とのつながり</span>
+        第10回: <code>s01-ep10-cookie-session.yaml</code> — クッキーは「<strong>ブラウザの中</strong>」。今回は「<strong>サーバの手</strong>」で届け先を取りに行く話、とセットで思い出すと定着しやすい。
+      </aside>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 13</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#67e8f9; line-height:1.25; text-align:center; word-break:break-all;" title="s01-ep11-ssrf.yaml の scenes / id">台本: opening, what_is_ssrf</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) {
+          s.classList.toggle("active", j === idx);
+        });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          var human = sc ? sc.split(",").map(function (x) { return x.trim(); }).join(" ＋ ") : "";
+          sceneRef.textContent = sc ? "台本 id: " + human : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          e.preventDefault();
+          show(idx + 1);
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          show(idx - 1);
+        }
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>

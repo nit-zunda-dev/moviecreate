@@ -1,0 +1,326 @@
+title: "【登録セキスペ 第8回｜Season2】クリックジャッキングを攻略——見えないフレームとUIのズレの試験ポイントなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング：インシデント導入（見えているボタンと実際のクリック先）
+  # ============================================================
+  - id: "incident"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "た、助けてほしいのだ！　『無料クーポンを受け取る』ってボタンを押しただけなのに、別のサイトで『二段階認証をオフにする』が通っちゃったのだ！"
+        subtitle: "た、助けてほしいのだ！　『無料クーポンを受け取る』ってボタンを押しただけなのに、別のサイトで『二段階認証をオフにする』が通っちゃったのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……画面に見えている『クーポン』の下に、透明なフレームで別ページのボタンが重なっていた典型ね。前回のCSRFは『意図しないリクエストを送らせる』——今度は『ユーザーが自分でクリックしたつもり』を悪用する。"
+        subtitle: "……画面に見えている『クーポン』の下に、透明なフレームで別ページのボタンが重なっていた典型ね。前回のCSRFは『意図しないリクエストを送らせる』——今度は『ユーザーが自分でクリックしたつもり』を悪用する。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ずんだもんは悪いボタンなんて見てないのだ……！　見た目と、ブラウザが解釈したクリック先がズレてるのだ？！"
+        subtitle: "ずんだもんは悪いボタンなんて見てないのだ……！　見た目と、ブラウザが解釈したクリック先がズレてるのだ？！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だから今日はクリックジャッキング——UIリダレッシングの一種。試験では『iframe』『重ね合わせ』『フレーム内の埋め込み制限』がセットで問われやすいわ。"
+        subtitle: "だから今日はクリックジャッキング——UIリダレッシングの一種。試験では『iframe』『重ね合わせ』『フレーム内の埋め込み制限』がセットで問われやすいわ。"
+
+
+  # ============================================================
+  # オープニング：シリーズ紹介
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。第8回もSeason2——Webアプリの弱点編。前回はCSRF——意図しないリクエスト送信。今回はクリックジャッキングよ。"
+        subtitle: "四国めたんよ。第8回もSeason2——Webアプリの弱点編。前回はCSRF——意図しないリクエスト送信。今回はクリックジャッキングよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "第7回は『送らせる』だったのだ。今度は『見えてる場所と押してる場所が違う』系なのだね？"
+        subtitle: "第7回は『送らせる』だったのだ。今度は『見えてる場所と押してる場所が違う』系なのだね？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。ユーザーは『この見た目のボタンを押した』と思っているのに、実際には隠れたページ上の別要素がクリックされる——試験ではその仕組みと、埋め込みを防ぐヘッダの名前を押さえておきなさい。"
+        subtitle: "そう。ユーザーは『この見た目のボタンを押した』と思っているのに、実際には隠れたページ上の別要素がクリックされる——試験ではその仕組みと、埋め込みを防ぐヘッダの名前を押さえておきなさい。"
+
+
+  # ============================================================
+  # クリックジャッキングとは
+  # ============================================================
+  - id: "what_is_clickjacking"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "クリックジャッキングって、英語だと何ていうのだ……？"
+        subtitle: "クリックジャッキングって、英語だと何ていうのだ……？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "UI redress attack——画面の見せ方を偽装して操作を奪う、という説明が文献でよく出るわ。日本語ではクリックジャッキング、UIリダレッシングと呼ばれることもある。"
+        subtitle: "UI redress attack——画面の見せ方を偽装して操作を奪う、という説明が文献でよく出るわ。日本語ではクリックジャッキング、UIリダレッシングと呼ばれることもある。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型は、攻撃者ページ上にiframeで正規サイトを載せ、CSSで透明化や位置調整して、ユーザーが見ているデコレーションの下に本物のボタンを重ねること。結果、本人の操作としてクリックが成立しやすい。"
+        subtitle: "典型は、攻撃者ページ上にiframeで正規サイトを載せ、CSSで透明化や位置調整して、ユーザーが見ているデコレーションの下に本物のボタンを重ねること。結果、本人の操作としてクリックが成立しやすい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "透明にすると『見えないのにクリックできる』のだ……！　ブラウザは普通にイベントを渡すのだ？！"
+        subtitle: "透明にすると『見えないのにクリックできる』のだ……！　ブラウザは普通にイベントを渡すのだ？！"
+
+
+  # ============================================================
+  # 仕組み（重ね合わせ）
+  # ============================================================
+  - id: "mechanism"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "仕組みを一気に言うとどうなるのだ？"
+        subtitle: "仕組みを一気に言うとどうなるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "①攻撃者サイトがiframeで対象ページを読み込む。②opacityやz-index、位置ずらしで『見えない層』を作る。③ユーザーが上の偽UIをクリック——実際はiframe内の要素がクリックされる。"
+        subtitle: "①攻撃者サイトがiframeで対象ページを読み込む。②opacityやz-index、位置ずらしで『見えない層』を作る。③ユーザーが上の偽UIをクリック——実際はiframe内の要素がクリックされる。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "だから『見えている意味』と『ヒットテストが当たる要素』がズレるのが本質。マウスやタップは、見た目より下のフレームに届くことがある。"
+        subtitle: "だから『見えている意味』と『ヒットテストが当たる要素』がズレるのが本質。マウスやタップは、見た目より下のフレームに届くことがある。"
+
+
+  # ============================================================
+  # 成立しやすい条件
+  # ============================================================
+  - id: "conditions"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "全部のサイトがiframeに載せ放題なのだ？"
+        subtitle: "全部のサイトがiframeに載せ放題なのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "いいえ。対象ページが『他サイトのフレーム内表示』を許していることが前提。禁止ヘッダやCSPが無い、または設定ミスで抜けていると危ない。"
+        subtitle: "いいえ。対象ページが『他サイトのフレーム内表示』を許していることが前提。禁止ヘッダやCSPが無い、または設定ミスで抜けていると危ない。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "加えて、ワンクリックで危険な状態変更が進むUIだと被害が大きい。試験では『埋め込み可能』『透明オーバレイ』『ユーザーの実クリック』の三語がセットで出やすいわ。"
+        subtitle: "加えて、ワンクリックで危険な状態変更が進むUIだと被害が大きい。試験では『埋め込み可能』『透明オーバレイ』『ユーザーの実クリック』の三語がセットで出やすいわ。"
+
+
+  # ============================================================
+  # 対策（X-Frame-Options / CSP）
+  # ============================================================
+  - id: "defenses"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "じゃあどう直すのが本命なのだ？　JavaScriptで透明禁止？"
+        subtitle: "じゃあどう直すのが本命なのだ？　JavaScriptで透明禁止？"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "根本は『正規ページを他オリジンのフレームに載せない』こと。古典的にはX-Frame-Options——DENYやSAMEORIGIN——で埋め込みを制御する。"
+        subtitle: "根本は『正規ページを他オリジンのフレームに載せない』こと。古典的にはX-Frame-Options——DENYやSAMEORIGIN——で埋め込みを制御する。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "現代的にはContent-Security-Policyのframe-ancestorsディレクティブが主流の説明として出やすいわ。許可する親を明示し、それ以外は埋め込めないようにする。"
+        subtitle: "現代的にはContent-Security-Policyのframe-ancestorsディレクティブが主流の説明として出やすいわ。許可する親を明示し、それ以外は埋め込めないようにする。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "あわせて、重要操作は確認ダイアログや再認証で『意図』を補強するのも多層防御。単体で万能ではないけれど、試験では『ヘッダ＋UI設計』の組み合わせが語られることがあるわ。"
+        subtitle: "あわせて、重要操作は確認ダイアログや再認証で『意図』を補強するのも多層防御。単体で万能ではないけれど、試験では『ヘッダ＋UI設計』の組み合わせが語られることがあるわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "『フレームに載せない』がキーワードなのだ……！　暗記は名前と役割でいいのだ？"
+        subtitle: "『フレームに載せない』がキーワードなのだ……！　暗記は名前と役割でいいのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そうね。試験は『何を防ぐヘッダか』『iframeの親子関係』が噛み合っているかを見ることが多いわ。"
+        subtitle: "そうね。試験は『何を防ぐヘッダか』『iframeの親子関係』が噛み合っているかを見ることが多いわ。"
+
+
+  # ============================================================
+  # CSRF / XSS との違い
+  # ============================================================
+  - id: "compare_csrf_xss"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "CSRFともまた違うのだ？　どっちも『騙す』じゃないのだ？"
+        subtitle: "CSRFともまた違うのだ？　どっちも『騙す』じゃないのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "狙いが違うわ。CSRFは罠ページから自動送信などでリクエストを誘発しやすい。クリックジャッキングは、ユーザーが実際にポインタでクリックしたイベントを、見えないターゲットに奪う。"
+        subtitle: "狙いが違うわ。CSRFは罠ページから自動送信などでリクエストを誘発しやすい。クリックジャッキングは、ユーザーが実際にポインタでクリックしたイベントを、見えないターゲットに奪う。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "XSSはスクリプト実行が中心。クリックジャッキングは必ずしもスクリプト注入が要らない——フレームとCSSの重ね合わせだけで成立しうる、という整理が試験向きよ。"
+        subtitle: "XSSはスクリプト実行が中心。クリックジャッキングは必ずしもスクリプト注入が要らない——フレームとCSSの重ね合わせだけで成立しうる、という整理が試験向きよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "『見た目のUI』が攻撃の主役なのだ……！"
+        subtitle: "『見た目のUI』が攻撃の主役なのだ……！"
+
+
+  # ============================================================
+  # 試験あるある
+  # ============================================================
+  - id: "exam_tips"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけをまとめてほしいのだ！"
+        subtitle: "ひっかけをまとめてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その1——CSRF対策の同期トークンだけでは、クリックジャッキングが必ずしも防げない、と言われることがあるわ。ユーザー本人の実クリックで通る操作は別論点。"
+        subtitle: "定番その1——CSRF対策の同期トークンだけでは、クリックジャッキングが必ずしも防げない、と言われることがあるわ。ユーザー本人の実クリックで通る操作は別論点。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その2——X-Frame-OptionsとCSP frame-ancestorsを混同しない。どちらも『埋め込み制限』だが、試験では説明文の細部が違う。"
+        subtitle: "定番その2——X-Frame-OptionsとCSP frame-ancestorsを混同しない。どちらも『埋め込み制限』だが、試験では説明文の細部が違う。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "定番その3——『透明だからクリックできない』は逆なのだ！　透明でも上に重なっていればクリックを奪えるのだ！"
+        subtitle: "定番その3——『透明だからクリックできない』は逆なのだ！　透明でも上に重なっていればクリックを奪えるのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "文章問題は図を想像して。『どの要素が最前面か』『iframeの中か外か』——レイヤ構造で切ると取り違えにくいわ。"
+        subtitle: "文章問題は図を想像して。『どの要素が最前面か』『iframeの中か外か』——レイヤ構造で切ると取り違えにくいわ。"
+
+
+  # ============================================================
+  # まとめ・次回予告
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のまとめよ。クリックジャッキングは、透明なiframe等で正規UIを重ね、ユーザーのクリックの意味をすり替える攻撃。埋め込みを許す設計が前提になりやすい。"
+        subtitle: "今回のまとめよ。クリックジャッキングは、透明なiframe等で正規UIを重ね、ユーザーのクリックの意味をすり替える攻撃。埋め込みを許す設計が前提になりやすい。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "対策の本命はフレーム埋め込み制限——X-Frame-OptionsやCSP frame-ancestors。CSRFトークンやXSS対策だけに寄せないで、『見え方』の問題だと位置づけなさい。"
+        subtitle: "対策の本命はフレーム埋め込み制限——X-Frame-OptionsやCSP frame-ancestors。CSRFトークンやXSS対策だけに寄せないで、『見え方』の問題だと位置づけなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "クーポンは魅力的だけど、下に何がいるか想像するのだ……！　もう怪しいページは素直に閉じるのだ！"
+        subtitle: "クーポンは魅力的だけど、下に何がいるか想像するのだ……！　もう怪しいページは素直に閉じるのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次回以降は、弱点編の総仕上げや関連トピックに進む予定よ。セキュリティヘッダやブラウザの挙動を横断で整理する回もあるかもしれないわ。"
+        subtitle: "次回以降は、弱点編の総仕上げや関連トピックに進む予定よ。セキュリティヘッダやブラウザの挙動を横断で整理する回もあるかもしれないわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+        subtitle: "感想やリクエストはコメント欄へ。次回もしっかりついてきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ！　バイバイなのだ！"
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"

@@ -1,0 +1,230 @@
+title: "【Engineer Skill Lab｜API設計ワークショップ】レストラン予約APIをRESTで設計する——空き状況はパブリック、予約操作はBearer認証と「/me」パスなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。今日は エンジニア・スキル・ラボ の エーピーアイ設計ワークショップ、中級向けの『レストラン予約のエーピーアイ』を一緒に整理するわ。"
+        subtitle: "四国めたんよ。今日は Engineer Skill Lab の API設計ワークショップ、中級向けの『レストラン予約のAPI』を一緒に整理するわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "前回のメモはずっとログイン前提だったのに、今回はお店の空き枠を見る人はログインしなくてもいい、って難しそうなのだ……！"
+        subtitle: "前回のメモはずっとログイン前提だったのに、今回はお店の空き枠を見る人はログインしなくてもいい、って難しそうなのだ……！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "難易度二のポイントはそこ。エンドポイントごとに『誰向け（パブリックかベアラー）』が変わるから、同じレスト風の設計でも組み方が一段ひねれるの。"
+        subtitle: "難易度2のポイントはそこ。エンドポイントごとに『誰向け（publicかbearer）』が変わるから、同じREST風の設計でも組み方が一段ひねれるの。"
+
+  # ============================================================
+  # シナリオ前提
+  # ============================================================
+  - id: "scenario_setup"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "前提は ワークショップの説明通り。飲食店の予約サイト。空き状況の閲覧はゲストOK。予約の新規や自分の一覧、キャンセルは認証必須って前提ね。"
+        subtitle: "前提は ワークショップの説明通り。飲食店の予約サイト。空き状況の閲覧はゲストOK。予約の新規や自分の一覧、キャンセルは認証必須って前提ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "空き枠を見るだけは『名刺なし』、席を取るのは『名刺あり』なのだ！"
+        subtitle: "空き枠を見るだけは『認証なし』、席を取るのは『認証あり』なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "いい比喩。リソース名は エーブイアイラビリティー で空き、レザベーションズ で予約の集合、のように 名詞の複数形で表す想定。パス断片の並び方はアプリの慣習に合わせるのがコツよ。"
+
+  # ============================================================
+  # 空き状況 GET /availability
+  # ============================================================
+  - id: "availability"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず 指定日の空きテーブル状況。読むだけだからメソッドは ゲット。空き状況を表すリソース名として スラッシュエーブイアイラビリティー など。認証は パブリック ね。"
+        subtitle: "まず 指定日の空きテーブル状況。読むだけだからメソッドは GET。空き状況を表すリソース名として /availability など。認証は public ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "お店の画面では『テーブル』って言葉が出てきそうなのに、なんでエーブイアイが単独のパスなのだ？"
+        subtitle: "お店の画面では『テーブル』って言葉が出てきそうなのに、なんで /availability が単独のパスなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "空き＝ エーブイアイラビリティー を一つの観測可能な概念として切るとシンプル。代替として スラッシュテーブルズに続けてスラッシュエーブイアイラビリティー、という階層案も ワークショップでは有効よ。"
+        subtitle: "空き= availability を一つの観測可能な概念として切るとシンプル。代替として /tables/availability という階層案も ワークショップでは有効よ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "成功は にひゃく オーケー。返す表現はジェイソン。ゲストでも読むから リクエスト本文はなし。ジェイソンで受け取りたい印として アクセプト、アプリケーションスラッシュジェイソン を付ける、が定番の型ね。"
+        subtitle: "成功は 200 OK。返す表現はJSON。ゲストでも読むから リクエスト本文はなし。JSONで受け取りたい印として Accept: application/json を付ける、が定番の型ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "オーソライゼーション が無い行が初めて出てきたのだ！　パーティの案内状なしで窓口を覗きに来た感じなのだ！"
+        subtitle: "Authorization が無い行が初めて出てきたのだ！　パーティの案内状なしで窓口を覗きに来た感じなのだ！"
+
+  # ============================================================
+  # 新規予約 POST /reservations
+  # ============================================================
+  - id: "create_reservation"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に 新しい予約を作成。新規の予約リソースを生むから ポスト。コレクションは スラッシュレザベーションズ。作れた合図は にひゃくいち クリエイティッド。認証は ベアラー 必須。"
+        subtitle: "次に 新しい予約を作成。新規の予約リソースを生むから POST。コレクションは /reservations。作れた合図は 201 Created。認証は bearer 必須。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "日時と人数と卓番とか、本文にジェイソンで乗せるのだ？"
+        subtitle: "日時と人数と卓番とか、本文にJSONで載せるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その通り。コンテントタイプ、コロン、アプリケーションスラッシュジェイソン と オーソライゼーション をセット。作成結果を返すなら レスポンス本文も ジェイソン ね。"
+        subtitle: "その通り。Content-Type: application/json と Authorization をセット。作成結果を返すなら レスポンス本文も JSON ね。"
+
+  # ============================================================
+  # 自分の予約一覧 GET /me/reservations
+  # ============================================================
+  - id: "my_reservations"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ログイン中のユーザーの予約一覧。読み取りだから ゲット。ここで『誰の一覧か』の表現をパスに組み込むのが肝よ。モデル解答は スラッシュミーに続く スラッシュレザベーションズ。"
+        subtitle: "ログイン中のユーザーの予約一覧。読み取りだから GET。ここで『誰の一覧か』の表現をパスに組み込むのが肝よ。モデル解答は /me/reservations。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ユーザーIDをURLに入れて スラッシュユーザーズ、ユーザーのID、レザベーションズ みたいにしないのだ？"
+        subtitle: "ユーザーIDをURLに入れて /users/{id}/reservations みたいにしないのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "特定の相手の一覧を管理者が扱うならそういう階層もあるけれど、一般利用者の『私の分だけ』は ミー に寄せると トークンに紐づく相手 だけに閉じるのが扱いやすいの。別解として スラッシュユーザーズ、スラッシュミー、の順でもよく使われるわ。"
+        subtitle: "特定の相手の一覧を管理者が扱うならそういう階層もあるけれど、一般利用者の『私の分だけ』は /me に寄せると トークンに紐づく相手 だけに閉じるのが扱いやすいの。別解として /users/me/reservations もよく使われるわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "同じ レザベーションズ でも、ミーの前には付けない『全体の取り扱い』用の ゲット スラッシュレザベーションズ という別解も ワークショップにあるのだ！"
+        subtitle: "同じ /reservations でも、/me なし版の GET /reservations という別解も ワークショップにあるのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。前提が『ログイン中の予約の束だけ』でスコープが明確なら、文脈上それで通る。成功は にひゃく オーケー、ジェイソン。ベアラー前提だから オーソライゼーション に アクセプト の読み手セットね。"
+
+  # ============================================================
+  # キャンセル DELETE /reservations/{id}
+  # ============================================================
+  - id: "cancel_reservation"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "最後に 指定した予約をキャンセル。消す＝ デリート。どの予約かはパス末に 波かっこのアイディー。本文なし成功の定番は にひゃくよん ノーコンテント。トークンで本人を決めるから オーソライゼーション 必須。"
+        subtitle: "最後に 指定した予約をキャンセル。消す= DELETE。どの予約かはパス末に {id}。本文なし成功の定番は 204 No Content。トークンで本人を決めるから Authorization 必須。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "にひゃく でも ジェイソンを返すお店のエーピーアイもあるのだ？"
+        subtitle: "200 でも JSONを返す店のAPIもあるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ある。ワークショップでも デリートで にひゃく と 返す表現 ジェイソン を別解として扱うわ。チームの慣習に合わせるのが大事ね。"
+
+  # ============================================================
+  # まとめ
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめ。空き枠の閲覧は パブリック の ゲット。予約の作成、自分の束の取得、一件の取り消しは ベアラー 付き。ステータスは 作成は にひゃくいち、閲覧成功はにひゃく、本文なしの消し成功はにひゃくよん、が定番形。"
+        subtitle: "まとめ。空き枠の閲覧は public の GET。予約の作成、自分の束の取得、1件の取り消しは bearer 付き。ステータスは 作成は 201、閲覧成功は200、本文なしの消し成功は204、が定番形。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "パブリックの行に アクセプト だけ。書き込みの行に コンテントタイプ。秘密系は全部 オーソライゼーション も。パズルが一段パワーアップしたのだ！"
+        subtitle: "publicの行に Accept だけ。書き込みの行に Content-Type。秘密系は全部 Authorization も。パズルが一段パワーアップしたのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "ブラウザの無料プレイで、パス断片の別解も試してから設計図に落としてね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ずんだもんとめたんの エーピーアイ講座、今回もおつかれさまなのだ！"
+        subtitle: "ずんだもんとめたんのAPI講座、今回もおつかれさまなのだ！"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価、よろしくなのだ！"

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>API設計ワークショップ：動画配信API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .centered { text-align: center; }
+    .highlight-brand { color: #88DD44 !important; font-weight: bold; }
+    .highlight-accent { color: #FF88BB !important; font-weight: bold; }
+    .small { font-size: 0.72em; color: #aaa; }
+    .diagram {
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(136, 221, 68, 0.25);
+    }
+    .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .api-table { font-size: 0.58em; width: 100%; border-collapse: collapse; }
+    .api-table th, .api-table td { border: 1px solid #555; padding: 0.4em 0.5em; }
+    .api-table th { background: #444; }
+    .pill {
+      display: inline-block;
+      border-radius: 6px;
+      font-size: 0.75em;
+      padding: 0.2em 0.55em;
+      margin-right: 0.3em;
+      font-family: ui-monospace, Consolas, monospace;
+    }
+    .pill-public { background: rgba(100, 200, 255, 0.2); color: #9cdcfe; }
+    .pill-bearer { background: rgba(255, 136, 187, 0.2); color: #ffaac8; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="centered">
+        <h2>【Engineer Skill Lab】<br>API設計ワークショップ</h2>
+        <h3 class="highlight-accent">動画配信APIをRESTで設計する</h3>
+        <p>いいね・コメント・チャンネル登録を設計する4問</p>
+      </section>
+
+      <section>
+        <h3>シナリオの前提</h3>
+        <ul style="font-size: 0.84em; line-height: 1.5;">
+          <li>未ログインでも動画視聴・動画詳細の取得は可能（public）</li>
+          <li>いいね・コメント投稿・チャンネル登録はログイン必須（bearer）</li>
+          <li>動画配下の子リソース（likes/comments）と channels 配下の subscriptions を使う</li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 760 210" width="100%" height="auto">
+            <rect x="12" y="25" width="340" height="150" rx="12" fill="#1a3242" stroke="#5bc0de" stroke-width="2"/>
+            <text x="182" y="58" text-anchor="middle" fill="#9cdcfe" font-size="20" font-weight="bold">public ゾーン</text>
+            <text x="182" y="92" text-anchor="middle" fill="#ddd" font-size="15">動画情報の取得</text>
+            <text x="182" y="125" text-anchor="middle" fill="#88dd44" font-size="16" font-family="Consolas,monospace">GET /videos/{id}</text>
+            <text x="182" y="150" text-anchor="middle" fill="#888" font-size="13">Accept: application/json</text>
+            <rect x="410" y="25" width="340" height="150" rx="12" fill="#2a1a2a" stroke="#ff88bb" stroke-width="2"/>
+            <text x="580" y="58" text-anchor="middle" fill="#ffaac8" font-size="20" font-weight="bold">bearer ゾーン</text>
+            <text x="580" y="92" text-anchor="middle" fill="#ddd" font-size="15">ユーザー操作の作成系</text>
+            <text x="580" y="125" text-anchor="middle" fill="#88dd44" font-size="14" font-family="Consolas,monospace">POST /videos/{id}/likes</text>
+            <text x="580" y="150" text-anchor="middle" fill="#88dd44" font-size="14" font-family="Consolas,monospace">POST /videos/{id}/comments ほか</text>
+            <text x="380" y="198" text-anchor="middle" fill="#666" font-size="12">最初に「公開情報」と「個人状態」を分けると設計が安定する</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>エンドポイントの全体図</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 760 320" width="100%" height="auto">
+            <line x1="80" y1="32" x2="690" y2="32" stroke="#666" stroke-width="2"/>
+            <text x="80" y="22" fill="#88dd44" font-size="13" font-weight="bold">API base</text>
+
+            <rect x="70" y="48" width="280" height="44" rx="8" fill="#183224" stroke="#88dd44"/>
+            <text x="210" y="76" text-anchor="middle" fill="#dbe" font-size="16" font-family="Consolas,monospace">GET /videos/{id}</text>
+            <text x="210" y="108" text-anchor="middle" fill="#9cdcfe" font-size="12">動画メタ情報と再生用URL（public）</text>
+
+            <rect x="390" y="48" width="300" height="44" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="540" y="76" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">POST /videos/{id}/likes</text>
+            <text x="540" y="108" text-anchor="middle" fill="#ffaac8" font-size="12">いいね作成（bearer, 201）</text>
+
+            <rect x="70" y="160" width="300" height="44" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="220" y="188" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">POST /videos/{id}/comments</text>
+            <text x="220" y="220" text-anchor="middle" fill="#ffaac8" font-size="12">コメント投稿（bearer, 201）</text>
+
+            <rect x="390" y="160" width="320" height="44" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="550" y="188" text-anchor="middle" fill="#dbe" font-size="14" font-family="Consolas,monospace">POST /channels/{id}/subscriptions</text>
+            <text x="550" y="220" text-anchor="middle" fill="#ffaac8" font-size="12">チャンネル登録（bearer, 201）</text>
+
+            <text x="380" y="285" text-anchor="middle" fill="#888" font-size="12">別解: PUT /videos/{id}/likes, POST /subscriptions, PUT /channels/{id}/subscriptions</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>公開取得：<span class="highlight-brand">GET /videos/{id}</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：動画のメタ情報と再生用URLを取得</li>
+          <li>認証：<span class="pill pill-public">public</span>（Authorization なし）</li>
+          <li>成功：<strong>200 OK</strong> + JSON</li>
+          <li>ヘッダ：<code>Accept: application/json</code></li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 700 120" width="100%" height="auto">
+            <rect x="15" y="20" width="140" height="80" rx="10" fill="#283848" stroke="#5bc0de"/>
+            <text x="85" y="54" text-anchor="middle" fill="#9cdcfe" font-size="14">Guest Client</text>
+            <text x="85" y="78" text-anchor="middle" fill="#888" font-size="11">no token</text>
+            <path d="M 160 60 L 290 60" stroke="#88dd44" stroke-width="3"/>
+            <text x="225" y="48" text-anchor="middle" fill="#88dd44" font-size="13" font-weight="bold">GET /videos/v-1024</text>
+            <rect x="300" y="16" width="390" height="88" rx="10" fill="#1a2a1a" stroke="#88dd44"/>
+            <text x="320" y="44" fill="#aaa" font-size="12">Request</text>
+            <text x="320" y="68" fill="#ddd" font-size="14" font-family="Consolas,monospace">Accept: application/json</text>
+            <text x="320" y="90" fill="#666" font-size="11">Authorization は送らない</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>いいね：<span class="highlight-brand">POST /videos/{id}/likes</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：動画への「いいね」関係を作成</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>ヘッダ：<code>Authorization</code> と <code>Content-Type: application/json</code></li>
+          <li>成功：<strong>201 Created</strong> + JSON（別解: PUT + 200）</li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 700 150" width="100%" height="auto">
+            <rect x="12" y="28" width="130" height="90" rx="10" fill="#32243a" stroke="#ff88bb"/>
+            <text x="77" y="58" text-anchor="middle" fill="#ffaac8" font-size="14">Member</text>
+            <text x="77" y="84" text-anchor="middle" fill="#888" font-size="11">Bearer token</text>
+            <rect x="160" y="16" width="530" height="118" rx="10" fill="#1f1a24" stroke="#ff88bb"/>
+            <text x="180" y="42" fill="#88dd44" font-size="13" font-family="Consolas,monospace">POST /videos/v-1024/likes</text>
+            <text x="180" y="66" fill="#ddd" font-size="12" font-family="Consolas,monospace">Authorization: Bearer eyJ...</text>
+            <text x="180" y="88" fill="#ddd" font-size="12" font-family="Consolas,monospace">Content-Type: application/json</text>
+            <text x="180" y="112" fill="#ccc" font-size="12" font-family="Consolas,monospace">{ "reaction": "like" }</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>コメント投稿とチャンネル登録</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 740 260" width="100%" height="auto">
+            <rect x="30" y="26" width="300" height="90" rx="10" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="180" y="56" text-anchor="middle" fill="#88dd44" font-size="15" font-family="Consolas,monospace">POST /videos/v-1024/comments</text>
+            <text x="180" y="80" text-anchor="middle" fill="#ddd" font-size="13">body: { "text": "最高！" }</text>
+            <text x="180" y="103" text-anchor="middle" fill="#ffaac8" font-size="12">201 Created</text>
+
+            <rect x="410" y="26" width="300" height="90" rx="10" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="560" y="56" text-anchor="middle" fill="#88dd44" font-size="14" font-family="Consolas,monospace">POST /channels/ch-77/subscriptions</text>
+            <text x="560" y="80" text-anchor="middle" fill="#ddd" font-size="13">body: { "notify": true }</text>
+            <text x="560" y="103" text-anchor="middle" fill="#ffaac8" font-size="12">201 Created</text>
+
+            <rect x="30" y="150" width="680" height="84" rx="10" fill="#1d1d2c" stroke="#777"/>
+            <text x="50" y="178" fill="#ccc" font-size="13">設計メモ</text>
+            <text x="50" y="200" fill="#9cdcfe" font-size="12">・投稿系3本はいずれも bearer + JSON + 201 を基本にすると覚えやすい</text>
+            <text x="50" y="220" fill="#9cdcfe" font-size="12">・subscriptions は /subscriptions 単独案や PUT 案も別解としてありえる</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>ワークショップ回答例（4本）</h3>
+        <table class="api-table">
+          <thead>
+            <tr><th>用途</th><th>Method</th><th>Path</th><th>Auth</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>作品詳細</td>
+              <td>GET</td>
+              <td><code>/videos/{id}</code></td>
+              <td><span class="pill pill-public">public</span></td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td>いいね追加</td>
+              <td>POST</td>
+              <td><code>/videos/{id}/likes</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>201</td>
+            </tr>
+            <tr>
+              <td>コメント投稿</td>
+              <td>POST</td>
+              <td><code>/videos/{id}/comments</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>201</td>
+            </tr>
+            <tr>
+              <td>チャンネル登録</td>
+              <td>POST</td>
+              <td><code>/channels/{id}/subscriptions</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>201</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="centered">
+        <h3>おつかれさまなのだ！</h3>
+        <p>公開リソースと個人リソースを先に分離すると、<br>メソッド・パス・ヘッダーの整合が取りやすくなる。</p>
+        <p style="margin-top: 1rem;"><span class="highlight-brand" style="font-size: 1.15em;">高評価・チャンネル登録よろしくなのだ！</span></p>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "fade" });
+  </script>
+</body>
+</html>

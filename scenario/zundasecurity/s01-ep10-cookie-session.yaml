@@ -1,0 +1,338 @@
+title: "【登録セキスペ 第10回｜Season2】クッキーとセッション管理を攻略——HttpOnly・Secure・SameSiteとセッション固定化の試験ポイントなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ============================================================
+  # オープニング：インシデント導入（XSSでセッションCookieが抜かれた）
+  # ============================================================
+  - id: "incident"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "た、助けてほしいのだ！　掲示板に貼ったリンクから変なサイトに飛んだら、何もしてないのにずんだもんのアカウントで勝手に書き込まれてたのだ……！"
+        subtitle: "た、助けてほしいのだ！　掲示板に貼ったリンクから変なサイトに飛んだら、何もしてないのにずんだもんのアカウントで勝手に書き込まれてたのだ……！"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "……前回のXSSで学んだように、悪いスクリプトが動くと document.cookie を読める実装だと、セッション識別子が外部に渡りうるわ。第9回のヘッダは『ブラウザの挙動』——今回は『サーバがブラウザに預ける小さな名札』であるクッキーと、セッション管理の急所よ。"
+        subtitle: "……前回のXSSで学んだように、悪いスクリプトが動くと document.cookie を読める実装だと、セッション識別子が外部に渡りうるわ。第9回のヘッダは『ブラウザの挙動』——今回は『サーバがブラウザに預ける小さな名札』であるクッキーと、セッション管理の急所よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ログインしてるだけで名札が付いてるのだ……？　その名札を盗まれたら、本人と同じ権限なのだ？！"
+        subtitle: "ログインしてるだけで名札が付いてるのだ……？　その名札を盗まれたら、本人と同じ権限なのだ？！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型はそう。だから今日は Set-Cookie の属性——HttpOnly・Secure・SameSite——と、セッション固定化攻撃まで、試験で問われやすい形で束ねるわ。"
+        subtitle: "典型はそう。だから今日は Set-Cookie の属性——HttpOnly・Secure・SameSite——と、セッション固定化攻撃まで、試験で問われやすい形で束ねるわ。"
+
+
+  # ============================================================
+  # オープニング：シリーズ紹介
+  # ============================================================
+  - id: "opening"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+        subtitle: "みんな、こんにちはなのだ！　ずんだもんなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。第10回もSeason2——Webアプリの弱点編。前回はセキュリティHTTPヘッダ。今回はクッキーを軸にしたセッション管理の防衛線よ。"
+        subtitle: "四国めたんよ。第10回もSeason2——Webアプリの弱点編。前回はセキュリティHTTPヘッダ。今回はクッキーを軸にしたセッション管理の防衛線よ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "第6回はXSS、第7回はCSRF、第9回はHSTSとか……名前が増えすぎて頭がパンクしそうなのだ！"
+        subtitle: "第6回はXSS、第7回はCSRF、第9回はHSTSとか……名前が増えすぎて頭がパンクしそうなのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "覚え方はシンプルでいいわ。『名札を盗まれない』『電車の窓から落とさない』『勝手に別サイトから便乗されない』——HttpOnly・Secure・SameSite の三語に対応させなさい。"
+        subtitle: "覚え方はシンプルでいいわ。『名札を盗まれない』『電車の窓から落とさない』『勝手に別サイトから便乗されない』——HttpOnly・Secure・SameSite の三語に対応させなさい。"
+
+
+  # ============================================================
+  # セッションIDとクッキーの役割
+  # ============================================================
+  - id: "session_basics"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "セッションって、サーバ側の話なのに、なんでクッキーが出てくるのだ？"
+        subtitle: "セッションって、サーバ側の話なのに、なんでクッキーが出てくるのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "HTTPはもともとステートレス。ログイン状態を覚えさせるには、サーバが発行した識別子をクライアントが毎回持ち歩くのが一般的——多くの場合それがクッキーに載るセッションIDね。"
+        subtitle: "HTTPはもともとステートレス。ログイン状態を覚えさせるには、サーバが発行した識別子をクライアントが毎回持ち歩くのが一般的——多くの場合それがクッキーに載るセッションIDね。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験の急所は『この属性が、どの経路からの窃取・悪用を減らすか』。名前暗記より、脅威のマッピングよ。"
+        subtitle: "試験の急所は『この属性が、どの経路からの窃取・悪用を減らすか』。名前暗記より、脅威のマッピングよ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "つまりセッションIDは『本人確認のバトン渡し』みたいなのだ……！　落としたら終わりなのだ！"
+        subtitle: "つまりセッションIDは『本人確認のバトン渡し』みたいなのだ……！　落としたら終わりなのだ！"
+
+
+  # ============================================================
+  # HttpOnly
+  # ============================================================
+  - id: "httponly"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "HttpOnlyって、何がOnlyなのだ？　HTTPしかダメとか？"
+        subtitle: "HttpOnlyって、何がOnlyなのだ？　HTTPしかダメとか？"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "誤解しがちね。HttpOnly は『JavaScript から document.cookie で読めないようにする』ための属性の説明として試験に出やすいわ。"
+        subtitle: "誤解しがちね。HttpOnly は『JavaScript から document.cookie で読めないようにする』ための属性の説明として試験に出やすいわ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "XSSで埋め込まれたスクリプトによる窃取リスクを下げるが、万能ではない——ネットワーク盗聴や、ブラウザ自体の別経路の問題まではカバーしない。"
+        subtitle: "XSSで埋め込まれたスクリプトによる窃取リスクを下げるが、万能ではない——ネットワーク盗聴や、ブラウザ自体の別経路の問題まではカバーしない。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "第6回のXSS対策とセットで覚えるのだ！"
+        subtitle: "第6回のXSS対策とセットで覚えるのだ！"
+
+
+  # ============================================================
+  # Secure と通信経路
+  # ============================================================
+  - id: "secure_flag"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "Secure 属性は、『安全なクッキー』ってことなのだ？"
+        subtitle: "Secure 属性は、『安全なクッキー』ってことなのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ざっくり『HTTPS の接続のときだけ送る』という制約ね。平文HTTPに紛れて送られにくくする——第9回のHSTSとセットで、入口と運搬経路の両方を締める話になるわ。"
+        subtitle: "ざっくり『HTTPS の接続のときだけ送る』という制約ね。平文HTTPに紛れて送られにくくする——第9回のHSTSとセットで、入口と運搬経路の両方を締める話になるわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "http のままだとクッキーが付いてこないのだ……！　中間者に見られにくくするピースなのだ！"
+        subtitle: "http のままだとクッキーが付いてこないのだ……！　中間者に見られにくくするピースなのだ！"
+
+
+  # ============================================================
+  # SameSite と CSRF
+  # ============================================================
+  - id: "samesite"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "SameSite って、第7回のCSRFと同じ棚なのだ？"
+        subtitle: "SameSite って、第7回のCSRFと同じ棚なのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "近いわ。SameSite は『クロスサイトからのリクエストにクッキーを便乗させにくい』方向に振る舞いを寄せる。Strict・Lax・None など値の違いは文献と選択肢で押さえて。"
+        subtitle: "近いわ。SameSite は『クロスサイトからのリクエストにクッキーを便乗させにくい』方向に振る舞いを寄せる。Strict・Lax・None など値の違いは文献と選択肢で押さえて。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ただし銀弾ではない——同期トークンや重要操作の再認証など、アプリ側のCSRF対策と多層で組み合わせるのが現実的ね。"
+        subtitle: "ただし銀弾ではない——同期トークンや重要操作の再認証など、アプリ側のCSRF対策と多層で組み合わせるのが現実的ね。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "『便乗禁止』ステッカーをクッキーに貼るイメージなのだ！"
+        subtitle: "『便乗禁止』ステッカーをクッキーに貼るイメージなのだ！"
+
+
+  # ============================================================
+  # セッション固定化攻撃
+  # ============================================================
+  - id: "session_fixation"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "セッション固定化って、なんか難しそうなのだ……。"
+        subtitle: "セッション固定化って、なんか難しそうなのだ……。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "攻撃者があらかじめ知っているセッションIDを、被害者に使わせたあと、ログイン成功状態のままそのIDを奪う——典型的な流れは『IDをすり替えずに権限だけ上がる』がキーワードよ。"
+        subtitle: "攻撃者があらかじめ知っているセッションIDを、被害者に使わせたあと、ログイン成功状態のままそのIDを奪う——典型的な流れは『IDをすり替えずに権限だけ上がる』がキーワードよ。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "対策の定番は、認証成功後にセッションIDを再発行して、古いIDを無効化すること。試験では『ログイン後にIDを変える』系の文言に敏感になって。"
+        subtitle: "対策の定番は、認証成功後にセッションIDを再発行して、古いIDを無効化すること。試験では『ログイン後にIDを変える』系の文言に敏感になって。"
+
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ログインした瞬間に名札を新しくするのだ……！　古い名札はもう通用しないのだ！"
+        subtitle: "ログインした瞬間に名札を新しくするのだ……！　古い名札はもう通用しないのだ！"
+
+
+  # ============================================================
+  # 属性の対応表・多層防御
+  # ============================================================
+  - id: "defense_layers"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "HttpOnly だけ付ければ無敵なのだ？"
+        subtitle: "HttpOnly だけ付ければ無敵なのだ？"
+
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "だめ。属性は『窃取・便乗の難易度を上げる』のであって、XSSそのものの注入や、推測可能なセッションID、固定化の論点までは自動では潰せない。"
+        subtitle: "だめ。属性は『窃取・便乗の難易度を上げる』のであって、XSSそのものの注入や、推測可能なセッションID、固定化の論点までは自動では潰せない。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験あるある——『この属性だけで全欠陥解消』は疑え。多層防御の一片、と言い切れるかが勝負よ。"
+        subtitle: "試験あるある——『この属性だけで全欠陥解消』は疑え。多層防御の一片、と言い切れるかが勝負よ。"
+
+
+  # ============================================================
+  # 試験あるある
+  # ============================================================
+  - id: "exam_tips"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけをまとめてほしいのだ！"
+        subtitle: "ひっかけをまとめてほしいのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その1——HttpOnlyは『暗号化』ではない。スクリプトから読みにくくする属性の説明として選べ。"
+        subtitle: "定番その1——HttpOnlyは『暗号化』ではない。スクリプトから読みにくくする属性の説明として選べ。"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "定番その2——Secureは『クッキーの中身を暗号化する』ではなく、送る接続の種類を制限する、という整理が多い。"
+        subtitle: "定番その2——Secureは『クッキーの中身を暗号化する』ではなく、送る接続の種類を制限する、という整理が多い。"
+
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "定番その3——セッション固定化の対策は『ログイン後にID再発行』。ただし他の対策と混ぜないで選ぶのだ！"
+        subtitle: "定番その3——セッション固定化の対策は『ログイン後にID再発行』。ただし他の対策と混ぜないで選ぶのだ！"
+
+
+  # ============================================================
+  # まとめ・次回予告
+  # ============================================================
+  - id: "summary"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回のまとめよ。セッションIDは多くの場合クッキーで運ばれ、Set-Cookie の HttpOnly・Secure・SameSite が窃取と便乗の難易度を左右する。セッション固定化はログイン後のID再発行で潰すのが試験の型。"
+        subtitle: "今回のまとめよ。セッションIDは多くの場合クッキーで運ばれ、Set-Cookie の HttpOnly・Secure・SameSite が窃取と便乗の難易度を左右する。セッション固定化はログイン後のID再発行で潰すのが試験の型。"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "第6回XSS・第7回CSRF・第9回HSTSと、『どのピースがどの穴を塞ぐか』を対応表にしておきなさい。万能ではない、多層防御、を口癖に。"
+        subtitle: "第6回XSS・第7回CSRF・第9回HSTSと、『どのピースがどの穴を塞ぐか』を対応表にしておきなさい。万能ではない、多層防御、を口癖に。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "名札は HttpOnly でスクリプトから隠し、Secure でHTTPS専用便に乗せ、SameSite で便乗を減らすのだ……！"
+        subtitle: "名札は HttpOnly でスクリプトから隠し、Secure でHTTPS専用便に乗せ、SameSite で便乗を減らすのだ……！"
+
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次回以降はシラバスに沿って弱点編を続けるか、別シーズンへ進むか——コメントのリクエストも参考にするわ。"
+        subtitle: "次回以降はシラバスに沿って弱点編を続けるか、別シーズンへ進むか——コメントのリクエストも参考にするわ。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+        subtitle: "チャンネル登録と高評価もよろしくなのだ！　一緒にセキスペ合格を目指すのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "感想やリクエストはコメント欄へ。属性名ではなく『どの脅威を減らすか』で語れるようにしておきなさい。"
+        subtitle: "感想やリクエストはコメント欄へ。属性名ではなく『どの脅威を減らすか』で語れるようにしておきなさい。"
+
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ！　バイバイなのだ！"
+        subtitle: "また見てほしいのだ！　バイバイなのだ！"
