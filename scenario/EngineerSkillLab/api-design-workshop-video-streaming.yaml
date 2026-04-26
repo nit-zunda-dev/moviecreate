@@ -1,4 +1,4 @@
-title: "【Engineer Skill Lab｜API設計ワークショップ】動画配信APIをRESTで設計する——いいね・コメント・チャンネル登録を組み立てるのだ！"
+title: "【Engineer Skill Lab｜API設計ワークショップ】動画配信APIをRESTで設計する——公開カタログと会員操作を切り分けるのだ！"
 
 characters:
   metan:
@@ -24,6 +24,8 @@ global:
   voice:
     speedScale: 1.2
     postPhonemeLength: 0.08
+  # 解説用 HTML スライド（Reveal）— generate-video 時に PNG 化して背景にする
+  slidesHtml: "./api_design_workshop_slides/video-streaming-study-slides.html"
   defaultBackground: "./image/background/Movidrill.png"
 
 output:
@@ -33,9 +35,10 @@ output:
 
 scenes:
   # ============================================================
-  # オープニング
+  # オープニング（スライド0: タイトル）
   # ============================================================
   - id: "opening"
+    slideIndex: 0
     lines:
       - type: dialogue
         character: zundamon
@@ -58,9 +61,10 @@ scenes:
         text: "そこが今回の肝。視聴系はパブリック、いいね・コメント・チャンネル登録はBearer認証で分けると整理しやすいの。"
 
   # ============================================================
-  # シナリオ前提
+  # シナリオ前提（スライド1）
   # ============================================================
   - id: "scenario_setup"
+    slideIndex: 1
     lines:
       - type: dialogue
         character: metan
@@ -80,9 +84,26 @@ scenes:
         text: "その感覚でOK。リソースは名詞で切り、集合は複数形。今回は /videos と /channels を中心に、子リソースとして /likes /comments /subscriptions を使うわ。"
 
   # ============================================================
-  # 作品詳細 GET /videos/{id}
+  # エンドポイント全体図（スライド2）
+  # ============================================================
+  - id: "endpoint_overview"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "次の図は四本の置き場所のマップ。GET は公開側、bearer 三本は 201 作成のイメージで押さえれば安心なのだ！"
+
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "別解のパス表記はスライド下にメモ。チーム内で一貫した名付けに寄せるのがコツ。"
+
+  # ============================================================
+  # 作品詳細 GET /videos/{id}（スライド3）
   # ============================================================
   - id: "video_detail"
+    slideIndex: 3
     lines:
       - type: dialogue
         character: metan
@@ -103,9 +124,10 @@ scenes:
         subtitle: "その通り。成功は 200 OK、レスポンス本文は JSON。ヘッダは Accept: application/json の読み取り構成が分かりやすいわ。"
 
   # ============================================================
-  # いいね POST /videos/{id}/likes
+  # いいね POST /videos/{id}/likes（スライド4）
   # ============================================================
   - id: "add_like"
+    slideIndex: 4
     lines:
       - type: dialogue
         character: metan
@@ -125,9 +147,10 @@ scenes:
         subtitle: "その組み合わせでOK。基本回答は 201 Created + JSON。別解として PUT /videos/{id}/likes と 200 を採る流儀もあるわ。"
 
   # ============================================================
-  # コメント投稿 POST /videos/{id}/comments
+  # コメント投稿 POST /videos/{id}/comments（スライド5: コメント+登録 まとめ図）
   # ============================================================
   - id: "post_comment"
+    slideIndex: 5
     lines:
       - type: dialogue
         character: metan
@@ -147,9 +170,10 @@ scenes:
         subtitle: "そう。成功は 201 Created + JSON を基本にしておくと、投稿操作の意図が伝わりやすいわ。"
 
   # ============================================================
-  # チャンネル登録 POST /channels/{id}/subscriptions
+  # チャンネル登録 POST /channels/{id}/subscriptions（スライド5 続き）
   # ============================================================
   - id: "subscribe_channel"
+    slideIndex: 5
     lines:
       - type: dialogue
         character: metan
@@ -168,9 +192,10 @@ scenes:
         text: "その通り。ワークショップでも別解として /subscriptions や PUT 案を許容してる。大事なのはチーム内で一貫した意味付けよ。"
 
   # ============================================================
-  # まとめ
+  # まとめ（スライド6: 回答例テーブル）
   # ============================================================
   - id: "summary"
+    slideIndex: 6
     lines:
       - type: dialogue
         character: metan
@@ -188,7 +213,13 @@ scenes:
         face: "笑い"
         text: "そのとおり。次は実装前に、エラー系ステータスやレート制御も設計書に追記して仕上げてね。"
 
+  # ============================================================
+  # エンディング（スライド7）
+  # ============================================================
+  - id: "outro"
+    slideIndex: 7
+    lines:
       - type: dialogue
         character: zundamon
         face: "喜び"
-        text: "ずんだもんとめたんのAPI講座、今回もおつかれさまなのだ！ チャンネル登録と高評価よろしくなのだ！"
+        text: "ずんだもんとめたんの API 講座、今回もおつかれさまなのだ！ チャンネル登録と高評価よろしくなのだ！"

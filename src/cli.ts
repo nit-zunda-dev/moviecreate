@@ -8,6 +8,7 @@ import { concatAudioFiles } from "./media/ffmpegWrapper";
 import { fetchSpeakers } from "./voicevox/client";
 import { buildVideoManifest, writeManifest, LineResultWithContext } from "./media/manifestBuilder";
 import { renderVideo } from "./video/renderVideo";
+import { applyHtmlSlideBackgrounds } from "./slides/captureHtmlSlides";
 
 const program = new Command();
 
@@ -56,6 +57,10 @@ async function generateVideoCommand(
     console.log("--dry-run: シナリオを読み込みました:", JSON.stringify(scenario, null, 2));
     return;
   }
+
+  // [0] Reveal スライド → 背景 PNG（slideIndex 指定シーンがある場合）
+  const absScenarioPath = path.resolve(scenarioPath);
+  await applyHtmlSlideBackgrounds(scenario, absScenarioPath);
 
   // [1] 音声合成 + タイミング取得
   const lineResults: LineResultWithContext[] = [];

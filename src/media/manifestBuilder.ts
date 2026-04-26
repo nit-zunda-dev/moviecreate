@@ -3,6 +3,7 @@ import path from "path";
 import { Scenario, Line } from "../types/scenario";
 import { VideoManifest, ManifestLine, CharacterDisplayConfig } from "../types/videoManifest";
 import { LineTimingResult } from "../voicevox/synthesizeLine";
+import { DEFAULT_VIDEO_HEIGHT, DEFAULT_VIDEO_WIDTH } from "../config/videoLayout";
 
 export interface LineResultWithContext {
   result: LineTimingResult;
@@ -34,8 +35,8 @@ export function buildVideoManifest(
   audioFile: string,
 ): VideoManifest {
   const fps = scenario.output?.fps ?? scenario.global?.defaultFps ?? 30;
-  const width = scenario.output?.width ?? 1280;
-  const height = scenario.output?.height ?? 720;
+  const width = scenario.output?.width ?? DEFAULT_VIDEO_WIDTH;
+  const height = scenario.output?.height ?? DEFAULT_VIDEO_HEIGHT;
 
   // キャラクター表示設定を構築
   const characterEntries = Object.entries(scenario.characters ?? {});
@@ -66,9 +67,9 @@ export function buildVideoManifest(
       imageFile = path.join(charDir, line.face + ".png");
     }
 
-    const backgroundFile = sceneBackground
-      ? path.resolve(sceneBackground)
-      : undefined;
+    const fromLine = line.background ? path.resolve(line.background) : undefined;
+    const fromScene = sceneBackground ? path.resolve(sceneBackground) : undefined;
+    const backgroundFile = fromLine ?? fromScene;
 
     lines.push({
       globalIndex: i,

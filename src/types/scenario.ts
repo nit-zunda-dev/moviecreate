@@ -12,6 +12,11 @@ export interface Line {
   start?: number;
   offset?: number;
   face?: string;
+  /**
+   * 行単位の背景画像（通常はシナリオ実行ディレクトリ相対、または絶対パス）
+   * 指定時はシーンの background より優先
+   */
+  background?: string;
   effects?: {
     volume?: number;
     fadeInSec?: number;
@@ -33,6 +38,14 @@ export interface VoiceParam {
 export interface Scene {
   id: string;
   background?: string;
+  /**
+   * Reveal.js 等の HTML スライドの横スライド index（0 始まり）。
+   * 指定した場合、generate-video 時にそのスライドを PNG 化し background に使う
+   * （`global.slidesHtml` または本フィールドの `slidesHtml` が必要）
+   */
+  slideIndex?: number;
+  /** このシーンだけ別の HTML デッキを使う場合（シナリオファイルのディレクトリ基準の相対パス可） */
+  slidesHtml?: string;
   bgm?: string;
   duration?: number;
   lines: Line[];
@@ -40,6 +53,8 @@ export interface Scene {
 
 export interface GlobalSettings {
   defaultBackground?: string;
+  /** 複数シーンで共有する Reveal スライドの HTML パス（シナリオと同じディレクトリ基準の相対パス可） */
+  slidesHtml?: string;
   defaultBgm?: string;
   defaultSpeaker?: SpeakerName;
   defaultFps?: number;
