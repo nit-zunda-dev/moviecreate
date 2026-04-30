@@ -1,6 +1,11 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
-import { SUBTITLE_MAX_LINES } from "../../src/config/videoLayout";
+import {
+  CLASSROOM_SUBTITLE_MAX_LINES,
+  CLASSROOM_SUBTITLE_FONT_MAX,
+  CLASSROOM_SUBTITLE_FONT_MIN,
+  SUBTITLE_MAX_LINES,
+} from "../../src/config/videoLayout";
 import type { VideoManifest } from "../../src/types/videoManifest";
 
 interface Props {
@@ -12,6 +17,10 @@ interface Props {
   /** 字幕ブロックの高さ（px）。未指定の underSlideBar は従来の可変高さ */
   fixedBlockHeight?: number;
   width?: number;
+  /** 教室フレーム（下段黒板）内に絶対配置。指定時は underSlideBar より優先 */
+  classroomEmbed?: { left: number; top: number; width: number; height: number };
+  /** 全体幅（chalk 時の maxWidth 用、省略時は useVideoConfig） */
+  storyWidth?: number;
 }
 
 export const SubtitleLayer: React.FC<Props> = ({
@@ -20,6 +29,8 @@ export const SubtitleLayer: React.FC<Props> = ({
   underSlideBar,
   fixedBlockHeight,
   width: widthProp,
+  classroomEmbed,
+  storyWidth,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width: vcWidth } = useVideoConfig();
@@ -36,6 +47,56 @@ export const SubtitleLayer: React.FC<Props> = ({
     activeLine.character && manifest.characters[activeLine.character]
       ? manifest.characters[activeLine.character].subtitleColor
       : "#FFFFFF";
+
+  if (classroomEmbed) {
+    const lh = 1.38;
+    const blockH = classroomEmbed.height;
+    const fontSize = Math.min(
+      CLASSROOM_SUBTITLE_FONT_MAX,
+      Math.max(
+        CLASSROOM_SUBTITLE_FONT_MIN,
+        Math.floor((blockH - 24) / (CLASSROOM_SUBTITLE_MAX_LINES * lh)),
+      ),
+    );
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: classroomEmbed.left,
+          top: classroomEmbed.top,
+          width: classroomEmbed.width,
+          height: classroomEmbed.height,
+          zIndex: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxSizing: "border-box",
+          padding: "10px 14px",
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            color: subtitleColor,
+            fontSize,
+            fontFamily: "Noto Sans JP, Yu Gothic, Meiryo, sans-serif",
+            fontWeight: "bold",
+            maxWidth: Math.min((storyWidth ?? width) * 0.92, classroomEmbed.width - 20),
+            maxHeight: blockH - 12,
+            textAlign: "center",
+            lineHeight: `${lh}em`,
+            whiteSpace: "pre-line",
+            overflow: "hidden",
+            textShadow:
+              "0 2px 4px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.6), 1px 1px 0 rgba(0,0,0,0.8)",
+            WebkitFontSmoothing: "antialiased",
+          }}
+        >
+          {activeLine.text}
+        </div>
+      </div>
+    );
+  }
 
   if (underSlideBar) {
     const lh = 1.42;

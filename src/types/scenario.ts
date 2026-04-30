@@ -53,6 +53,11 @@ export interface Scene {
 
 export interface GlobalSettings {
   defaultBackground?: string;
+  /**
+   * 動画全体の教室フレーム画像（PNG/WebP 等）。指定時は「フレーム全面 → 上段黒板にスライド・下段に字幕・左右の黒に立ち絵」レイアウトになる。
+   * シナリオファイルからの相対パスまたは絶対パス。
+   */
+  videoFrame?: string;
   /** 複数シーンで共有する Reveal スライドの HTML パス（シナリオと同じディレクトリ基準の相対パス可） */
   slidesHtml?: string;
   defaultBgm?: string;

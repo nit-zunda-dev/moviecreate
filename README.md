@@ -172,17 +172,31 @@ characters:
 global:
   defaultSpeaker: "zundamon"  # character/speaker 未指定時のデフォルト話者
   defaultBackground: "./image/bg.png"  # 背景画像（省略時は単色 #1a1a2e）
+  # videoFrame: "./docs/generate_scene_illustrations/hikei.png"  # 教室フレーム（任意・下記参照）
   # slidesHtml: "./slides/my-study-slides.html"  # 任意。下記「HTMLスライド背景」と併用
   voice:
     speedScale: 1.1           # 全キャラ共通のデフォルト話速
     intonationScale: 1.0
 ```
 
+#### 教室フレーム（`global.videoFrame`）
+
+講義向けの **1枚の背景イラスト**（黒板と左右の黒地など）を指定すると、従来の「左右20%＋中央スライド＋下帯字幕」とは別の **教室レイアウト** になります。
+
+- **全面**: `videoFrame` の画像（`object-fit: cover`）
+- **上段の黒板エリア**: Reveal キャプチャや `defaultBackground`／行ごとの `background`（中央の「スライド」相当）
+- **下段の黒板エリア**: 字幕（キャラ色＋影付きで黒板の上にのせる想定）
+- **左の黒地**: `position: left` のキャラ（通常はずんだもん）／**右の黒地**: `position: right` のキャラ（通常はめたん）
+
+`slideIndex` 付きシーンの PNG 背景や、スライド無しのシーンの `defaultBackground` は、いずれも **上段矩形の内側**に収めて表示します。座標・サイズの比率は `src/config/videoLayout.ts` の **`CLASSROOM_FRAME_LAYOUT`** で調整します（1280×720 基準の 0〜1）。
+
+`--transparent` 指定時は、教室レイアウトは使わず従来の透過用レイアウトです。
+
 ---
 
 ### HTML スライド（Reveal）を背景に使う
 
-`generate-video` では **Reveal** のスライドを **中央列**に `object-fit: contain` で表示し、**左右列**に立ち絵、**下段**に字幕、という **縦方向 flex** です。下段の字幕は **`SUBTITLE_BLOCK_HEIGHT_RATIO`（既定で約3行分）**で高さ**固定**し、上段（スライド＋立ち絵）の高さを**常に同じ**にしています。長い字幕は `SUBTITLE_MAX_LINES` 行相当で打ち切り（はみ出し隠し）。行数・ブロック高さは `src/config/videoLayout.ts` で調整できます。立ち絵列は `TACHIE_SIDE_WIDTH_RATIO` 等。
+`global.videoFrame` **未指定**のとき、`generate-video` では **Reveal** のスライドを **中央列**に `object-fit: contain` で表示し、**左右列**に立ち絵、**下段**に字幕、という **縦方向 flex** です。下段の字幕は **`SUBTITLE_BLOCK_HEIGHT_RATIO`（既定で約3行分）**で高さ**固定**し、上段（スライド＋立ち絵）の高さを**常に同じ**にしています。長い字幕は `SUBTITLE_MAX_LINES` 行相当で打ち切り（はみ出し隠し）。行数・ブロック高さは `src/config/videoLayout.ts` で調整できます。立ち絵列は `TACHIE_SIDE_WIDTH_RATIO` 等。
 
 - **手順**（1）`global.slidesHtml` に HTML パス、または各シーンで `scenes[].slidesHtml` で HTML を指定（**シナリオ YAML ファイルを基準にした相対パス**が使えます）。（2）背景にしたいスライドの **横方向インデックス**（0 始まり）を `scenes[].slideIndex` に指定。
 - 該当シーンに **`slideIndex` があると `scene.background` の静的画像は使われず、キャプチャ画像で上書き**されます。HTML を使わないシーンは従来どおり `background` または `defaultBackground` です。

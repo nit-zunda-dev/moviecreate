@@ -93,6 +93,8 @@ export function buildVideoManifest(
     ? path.resolve(scenario.global.defaultBackground)
     : undefined;
 
+  const videoFrameFile = scenario.global?.videoFrame ? path.resolve(scenario.global.videoFrame) : undefined;
+
   return {
     title: scenario.title,
     totalDurationMs: currentMs,
@@ -101,6 +103,7 @@ export function buildVideoManifest(
     height,
     audioFile: path.resolve(audioFile),
     defaultBackground,
+    videoFrameFile,
     characters,
     lines,
     generatedAt: new Date().toISOString(),

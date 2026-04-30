@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第12回 オープンリダイレクト — Reveal（generate-video 用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    /* 1280x720 動画内でも読みやすいよう、既定より大きめ（~0.5em は小さすぎた） */
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.15em; line-height: 1.25; margin-bottom: 0.35em; color: #f9a8d4; }
+    :root { --a: #f9a8d4; --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; }
+    .tag {
+      display: inline-block; font-size: 0.9em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #f472b6, #a78bfa);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.35em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.45em 0.55em; margin: 0.35em 0;
+      border: 1px solid rgba(244, 114, 182, 0.4);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.5em 0.55em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 1em; line-height: 1.45; }
+    .box-title { font-weight: 700; margin-bottom: 0.3em; font-size: 1.05em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); }
+    .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); }
+    .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.95em; color: var(--m); line-height: 1.5; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; margin: 0.35em 0 0; padding-left: 1.1em; }
+    .slide-bullets li { margin: 0.25em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4em; font-size: 0.9em; margin: 0.4em 0; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- 0: incident (YAML 順) -->
+      <section>
+        <span class="tag">導入</span>
+        <h3 style="color: #f9a8d4;">return / next に悪用先 — メールの「公式リンク」から偽ログイン</h3>
+        <p class="ph">①悪用リンク ②本物で認証 ③302+Location ④偽先 — 図の①②③④を上から</p>
+        <p class="ph" style="font-size:1em; margin-bottom:0.35em;">流れ：①不審なリンク → ②本物でログイン → ③302とLocation → ④偽サイト</p>
+        <div class="diagram">
+          <svg viewBox="0 0 780 200" xmlns="http://www.w3.org/2000/svg" aria-label="導入">
+            <rect x="40" y="28" width="200" height="90" rx="8" fill="#1e293b" stroke="#f472b6" stroke-width="3"/>
+            <text x="140" y="58" text-anchor="middle" fill="#e7edf4" font-size="20" font-weight="700" font-family="sans-serif">被害者のブラウザ</text>
+            <text x="140" y="88" text-anchor="middle" fill="#f9a8d4" font-size="15" font-family="sans-serif">① 悪用リンク</text>
+            <rect x="280" y="28" width="200" height="90" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="3"/>
+            <text x="380" y="58" text-anchor="middle" fill="#e7edf4" font-size="20" font-weight="700" font-family="sans-serif">本物 認証</text>
+            <text x="380" y="88" text-anchor="middle" fill="#86efac" font-size="15" font-family="sans-serif">② 正規ログイン</text>
+            <rect x="520" y="28" width="200" height="90" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="3"/>
+            <text x="620" y="58" text-anchor="middle" fill="#e7edf4" font-size="20" font-weight="700" font-family="sans-serif">偽サイト</text>
+            <text x="620" y="88" text-anchor="middle" fill="#fca5a5" font-size="15" font-family="sans-serif">③④ Location 経由</text>
+            <text x="390" y="168" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">本物のあと、無検証の行き先 ＝ オープンリダイレクト</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 1: opening -->
+      <section>
+        <span class="tag">第12回</span>
+        <h3>【登録セキスペ 第12回】オープンリダイレクト</h3>
+        <p class="ph">第11回 SSRF ＝ サーバが悪いURLを開く。今回 ＝ 302 と Location で、利用者のブラウザが悪い次のページへ飛ばされる。</p>
+        <ul class="slide-bullets">
+          <li>学習の軸：<code>return</code> / <code>next</code> など、行き先の文字列をそのまま受け取る設計の危険性</li>
+          <li>図の見方：要求 → サーバの応答 → ブラウザの移動、の矢印</li>
+        </ul>
+      </section>
+
+      <!-- 2: what_is -->
+      <section>
+        <span class="tag">302 と Location</span>
+        <h3>リダイレクト＝<span style="color:#f9a8d4">サーバの返答</span>の「次のURL」をブラウザが辿る</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="18" width="160" height="88" rx="8" fill="#1e293b" stroke="#f472b6" stroke-width="2.5"/>
+            <text x="96" y="48" text-anchor="middle" fill="#e7edf4" font-size="18" font-weight="700" font-family="sans-serif">ブラウザ</text>
+            <text x="96" y="80" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="ui-monospace,monospace">GET …?return=悪用</text>
+            <text x="196" y="68" text-anchor="middle" fill="#f472b6" font-size="22" font-weight="800">→</text>
+            <rect x="220" y="18" width="160" height="88" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2.5"/>
+            <text x="300" y="46" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">Webアプリ</text>
+            <text x="300" y="78" text-anchor="middle" fill="#f9a8d4" font-size="15" font-family="ui-monospace,monospace">302 + Location</text>
+            <text x="400" y="68" text-anchor="middle" fill="#a78bfa" font-size="22" font-weight="800">→</text>
+            <rect x="424" y="18" width="280" height="88" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2.5"/>
+            <text x="564" y="52" text-anchor="middle" fill="#fca5a5" font-size="20" font-weight="700" font-family="sans-serif">悪用先へジャンプ</text>
+            <text x="360" y="136" text-anchor="middle" fill="#fbbf24" font-size="15" font-weight="600" font-family="sans-serif">危ないのは「検証なし」で return を Location にのせること</text>
+          </svg>
+        </div>
+        <ul class="slide-bullets">
+          <li>壊れやすい導線：ログイン後の戻り、OAuth、公式ドメインを一度通すメールのリンク など</li>
+        </ul>
+      </section>
+
+      <!-- 3: not_ssrf -->
+      <section>
+        <span class="tag">3分類</span>
+        <h3>CSRF / SSRF / オープンリダイレクト</h3>
+        <div class="diagram" style="padding:0.4em;">
+          <svg viewBox="0 0 850 190" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="22" width="250" height="130" rx="10" fill="rgba(244,114,182,0.12)" stroke="#f472b6" stroke-width="2"/>
+            <text x="145" y="55" text-anchor="middle" fill="#f9a8d4" font-size="20" font-weight="800" font-family="sans-serif">CSRF</text>
+            <text x="145" y="88" text-anchor="middle" fill="#e7edf4" font-size="15" font-family="sans-serif">被害者ブラウザが</text>
+            <text x="145" y="112" text-anchor="middle" fill="#e7edf4" font-size="15" font-family="sans-serif">本番へ悪意の操作</text>
+            <rect x="300" y="22" width="250" height="130" rx="10" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="2"/>
+            <text x="425" y="55" text-anchor="middle" fill="#67e8f9" font-size="20" font-weight="800" font-family="sans-serif">SSRF</text>
+            <text x="425" y="88" text-anchor="middle" fill="#e7edf4" font-size="15" font-family="sans-serif">サーバが内製・</text>
+            <text x="425" y="112" text-anchor="middle" fill="#e7edf4" font-size="15" font-family="sans-serif">メタデータへ</text>
+            <rect x="580" y="22" width="250" height="130" rx="10" fill="rgba(167,139,250,0.14)" stroke="#a78bfa" stroke-width="2"/>
+            <text x="705" y="50" text-anchor="middle" fill="#c4b5fd" font-size="17" font-weight="800" font-family="sans-serif">Open Redirect</text>
+            <text x="705" y="82" text-anchor="middle" fill="#e7edf4" font-size="15" font-family="sans-serif">本番の302で</text>
+            <text x="705" y="106" text-anchor="middle" fill="#e7edf4" font-size="15" font-family="sans-serif">ブラウザが悪用先へ</text>
+            <text x="425" y="172" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">キーワード：一度本物のドメインを開く → 次は偽のページ</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 4: attack_flow -->
+      <section>
+        <span class="tag">4ステップ</span>
+        <h3>拡散 → 本物で認証 → 無検証のLocation → 偽のサイト</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 760 125" xmlns="http://www.w3.org/2000/svg">
+            <g font-family="sans-serif">
+              <rect x="8" y="12" width="130" height="58" rx="8" fill="#3f1d2a" stroke="#f87171" stroke-width="2"/>
+              <text x="73" y="48" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">① 拡散</text>
+              <text x="153" y="44" text-anchor="middle" fill="#94a3b8" font-size="22">→</text>
+              <rect x="168" y="12" width="130" height="58" rx="8" fill="#1a3d2d" stroke="#4ade80" stroke-width="2"/>
+              <text x="233" y="48" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">② 本物で認証</text>
+              <text x="313" y="44" text-anchor="middle" fill="#94a3b8" font-size="22">→</text>
+              <rect x="328" y="12" width="130" height="58" rx="8" fill="#2d1f3d" stroke="#a78bfa" stroke-width="2"/>
+              <text x="393" y="48" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">③ Location</text>
+              <text x="473" y="44" text-anchor="middle" fill="#94a3b8" font-size="22">→</text>
+              <rect x="488" y="12" width="130" height="58" rx="8" fill="#3f1d1d" stroke="#f87171" stroke-width="2"/>
+              <text x="553" y="48" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">④ 偽先</text>
+            </g>
+            <text x="380" y="110" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">③の中身をそのまま信じない ＝ アプリ設計の責任</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 5: abuse_phishing -->
+      <section>
+        <span class="tag">悪用①</span>
+        <h3>フィッシングでの使い方</h3>
+        <div class="grid-2">
+          <div class="diagram" style="margin:0;">
+            <svg viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 30 80 Q 150 20 270 80" fill="none" stroke="#f472b6" stroke-width="3"/>
+              <text x="150" y="32" text-anchor="middle" fill="#f9a8d4" font-size="15" font-weight="600" font-family="sans-serif">本物でログイン</text>
+              <text x="150" y="92" text-anchor="middle" fill="#f87171" font-size="15" font-weight="600" font-family="sans-serif">偽ページで二段階</text>
+            </svg>
+          </div>
+          <div class="rich-box theme-warn">
+            <div class="box-title">XSS 等との違い</div>
+            <p style="margin:0; font-size:1em; color:#cbd5e1; line-height:1.45;">スクリプト奪取（XSS など）と、遷移先の悪用（今回）は別。長文の問題では、どちらの対策かを区別する。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6: abuse_oauth -->
+      <section>
+        <span class="tag">悪用② / OAuth</span>
+        <h3>redirect_uri ＝ リダイレクト信頼境界</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 700 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="24" y="18" width="120" height="64" rx="8" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+            <text x="84" y="48" text-anchor="middle" fill="#67e8f9" font-size="16" font-weight="700" font-family="sans-serif">クライアント</text>
+            <text x="164" y="52" text-anchor="middle" fill="#94a3b8" font-size="18">→</text>
+            <rect x="192" y="18" width="100" height="64" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+            <text x="242" y="52" text-anchor="middle" fill="#86efac" font-size="16" font-weight="700" font-family="sans-serif">IdP</text>
+            <text x="312" y="52" text-anchor="middle" fill="#94a3b8" font-size="18">→</text>
+            <rect x="340" y="18" width="300" height="64" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+            <text x="490" y="44" text-anchor="middle" fill="#c4b5fd" font-size="16" font-weight="600" font-family="sans-serif">redirect_uri ＝ 事前登録と一致</text>
+            <text x="490" y="70" text-anchor="middle" fill="#f87171" font-size="14" font-family="sans-serif">一致しない偽先は弾く</text>
+          </svg>
+        </div>
+        <p class="ph" style="margin-top:0.25em;">用語の枠は違うが、届けてよい先を先に決める、という考え方は同じ。</p>
+      </section>
+
+      <!-- 7: trust_theft -->
+      <section>
+        <span class="tag">本物のドメイン</span>
+        <h3>本物のドメインを一度通す</h3>
+        <p class="ph">表示は公式のドメイン → 注意が一瞬ゆるみやすい。</p>
+        <div class="diagram">
+          <svg viewBox="0 0 640 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="20" width="180" height="60" rx="8" fill="rgba(74,222,128,0.12)" stroke="#4ade80" stroke-width="2"/>
+            <text x="110" y="56" text-anchor="middle" fill="#86efac" font-size="20" font-weight="700" font-family="sans-serif">公式URL</text>
+            <text x="220" y="55" text-anchor="middle" fill="#a78bfa" font-size="22" font-weight="800">→</text>
+            <rect x="250" y="20" width="180" height="60" rx="8" fill="rgba(248,113,113,0.1)" stroke="#f87171" stroke-width="2"/>
+            <text x="340" y="56" text-anchor="middle" fill="#fca5a5" font-size="20" font-weight="700" font-family="sans-serif">偽のページ</text>
+            <text x="500" y="40" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">メール・教材も</text>
+            <text x="500" y="64" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">「一応公式のURL」で通す</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 8: defense_validate -->
+      <section>
+        <span class="tag">対策①</span>
+        <h3>届け先は許可集合（ホワイトリスト）</h3>
+        <div class="grid-2" style="font-size:1.02em;">
+          <div class="rich-box theme-ok">
+            <div class="box-title">まず守る</div>
+            同一オリジン、相対パスだけ、登録したホストだけ、など 許可リストで照合
+          </div>
+          <div class="rich-box theme-danger">
+            <div class="box-title">すり抜け例</div>
+            <code style="font-size:0.95em">//evil</code>、<code>\\</code>、<code>javascript:</code> など。正規化の前後で形が変わる。
+          </div>
+        </div>
+        <p class="ph" style="margin-top:0.3em; font-size:0.95em;">禁止だけのリストより、「行ってよい所を先に決める」方が扱いやすい、という文脈が多い。</p>
+      </section>
+
+      <!-- 9: defense_design (設計+良悪例) -->
+      <section>
+        <span class="tag">対策②</span>
+        <h3>意図ID ＋ サーバ内の表</h3>
+        <p class="ph">利用者に生のURL を渡さず、番号だけ受け、サーバの表で解決する。</p>
+        <div class="diagram" style="padding:0.4em;">
+          <svg viewBox="0 0 600 88" xmlns="http://www.w3.org/2000/svg">
+            <rect x="16" y="14" width="120" height="58" rx="6" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+            <text x="76" y="52" text-anchor="middle" fill="#f9a8d4" font-size="18" font-family="ui-monospace,monospace">?next=7</text>
+            <text x="150" y="48" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <rect x="168" y="10" width="220" height="66" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+            <text x="278" y="40" text-anchor="middle" fill="#86efac" font-size="16" font-weight="700" font-family="sans-serif">サーバ内の表</text>
+            <text x="278" y="64" text-anchor="middle" fill="#f9a8d4" font-size="16" font-family="ui-monospace,monospace">Location: /safe</text>
+            <text x="410" y="48" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <text x="500" y="50" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">外部の文字列を</text>
+            <text x="500" y="70" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">載せない</text>
+          </svg>
+        </div>
+        <div class="grid-2" style="margin-top:0.3em; font-size:0.95em;">
+          <div class="rich-box theme-danger"><div class="box-title">悪い例</div> <code>return=https://何でも</code> → そのまま Location へ</div>
+          <div class="rich-box theme-ok"><div class="box-title">良い例</div> 相対パスだけ、または <code>id=3</code> だけ など</div>
+        </div>
+      </section>
+
+      <!-- 10: exam_tips -->
+      <section>
+        <span class="tag">試験</span>
+        <h3>3つの取り違え</h3>
+        <ul class="slide-bullets" style="font-size:0.98em;">
+          <li>① CSRF 対策があっても、行き先の確認は別の話</li>
+          <li>② CORS は「どのサイトが読み取れるか」— 今回はページ遷移</li>
+          <li>③ SSRF 対策（サーバの外への通信）は別 — 主役はブラウザ</li>
+        </ul>
+        <p class="ph" style="margin-top:0.35em; font-size:0.95em;">選択肢：リダイレクト先をどう限定するか、の話かを見る</p>
+      </section>
+
+      <!-- 11: summary -->
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第12回: Open Redirect</h3>
+        <div class="sum-p3" style="color:#cbd5e1; font-size:0.95em;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.5em; border:1px solid rgba(244,114,182,0.3);"><b style="color:#f9a8d4; font-size:1.05em;">1</b><br>本番の302で<br>偽先へ飛ばす</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.5em; border:1px solid rgba(244,114,182,0.3);"><b style="color:#f9a8d4; font-size:1.05em;">2</b><br>許可リスト・<br>相対・表で解決</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.5em; border:1px solid rgba(244,114,182,0.3);"><b style="color:#f9a8d4; font-size:1.05em;">3</b><br>第7回・第11回と<br>矢印で並べ替え</div>
+        </div>
+        <p style="font-size:0.9em; color:#e2e8f0; line-height:1.5; margin-top:0.35em;">攻撃：本物でログインしたあと、無検証の Location。対策：外部URLをLocationに載せない、許可集合、意図ID＋表。</p>
+        <p style="font-size:0.82em; color:#94a3b8;">前回 第11回：SSRF ＝ サーバが届け先を開く</p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>

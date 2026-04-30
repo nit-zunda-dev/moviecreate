@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ディレクトリトラバーサル 解説スライド — s01-ep13</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #fb923c;
+      --accent2: #38bdf8;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html {
+      font-size: clamp(17px, 0.55vw + 14px, 28px);
+    }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: clamp(0.85rem, 2vh, 1.75rem) clamp(1rem, 4.5vw, 5rem) calc(5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1820px);
+      margin: 0 auto;
+      width: 100%;
+      min-height: calc(100vh - 5.25rem);
+      overflow-x: auto;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+      font-size: 1.07rem;
+    }
+    .slide code {
+      font-family: var(--mono);
+      font-size: 0.94em;
+      padding: 0.08em 0.28em;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.65);
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: clamp(1.45rem, 2.4vw + 0.65rem, 2.35rem);
+      font-weight: 700;
+      margin: 0 0 0.45rem;
+      line-height: 1.28;
+      color: #fdba74;
+    }
+    h2 {
+      font-size: clamp(1.08rem, 1.15vw + 0.75rem, 1.55rem);
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 0 1rem;
+      line-height: 1.45;
+    }
+    .tag {
+      display: inline-block;
+      font-size: clamp(0.72rem, 0.6vw + 0.55rem, 0.95rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: linear-gradient(90deg, #fb923c, #38bdf8);
+      padding: 0.28rem 0.65rem;
+      border-radius: 4px;
+      margin-bottom: 0.65rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 14px;
+      padding: clamp(1rem, 2.2vw, 2rem);
+      margin: clamp(0.65rem, 1.5vh, 1.1rem) 0;
+      border: 1px solid rgba(251, 146, 60, 0.35);
+      zoom: 1.14;
+    }
+    @media (max-width: 900px) {
+      .diagram { zoom: 1.02; }
+    }
+    @media (min-width: 1600px) {
+      .diagram { zoom: 1.22; }
+    }
+    .diagram svg {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; }
+    .bullets strong { color: var(--text); }
+    .note { font-size: 0.95em; color: var(--muted); border-left: 4px solid var(--accent2); padding-left: 1.1rem; margin-top: 0.85rem; line-height: 1.55; }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem);
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(251, 146, 60, 0.5);
+      padding: 0.55rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: #fdba74; font-size: 0.88em; max-width: 100%; }
+    .kbd { font-family: var(--mono); font-size: 0.85em; opacity: 0.88; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; }
+      html { font-size: clamp(16px, 2.5vw + 12px, 22px); }
+    }
+    .rich-box {
+      padding: clamp(1rem, 2vw, 1.45rem);
+      border-radius: 14px;
+      background: rgba(36, 48, 68, 0.4);
+      border: 1px solid rgba(139, 156, 179, 0.2);
+    }
+    .box-title { font-size: clamp(1rem, 0.8vw + 0.75rem, 1.2rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: clamp(0.92rem, 0.5vw + 0.75rem, 1.05rem); color: var(--muted); line-height: 1.58; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); }
+    .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); }
+    .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(251, 146, 60, 0.45); background: rgba(251, 146, 60, 0.06); }
+    .theme-accent .box-title { color: #fdba74; }
+    .slide-lead { font-size: clamp(1rem, 0.65vw + 0.8rem, 1.2rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.9rem; }
+    .slide-lead strong { color: var(--text); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0; }
+    .pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.22rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(251, 146, 60, 0.12);
+      border: 1px solid rgba(251, 146, 60, 0.35);
+      color: #fed7aa;
+    }
+    .summary-hero {
+      font-size: clamp(0.95rem, 0.5vw + 0.8rem, 1.12rem); color: var(--muted); line-height: 1.65;
+      margin: 0 0 0.85rem; padding: clamp(0.85rem, 2vw, 1.15rem) clamp(1rem, 2.5vw, 1.35rem);
+      background: linear-gradient(180deg, rgba(26, 35, 50, 0.9), rgba(20, 28, 40, 0.75));
+      border-radius: 12px; border: 1px solid rgba(251, 146, 60, 0.25);
+    }
+    .summary-hero__label { margin: 0 0 0.5rem; font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 800; letter-spacing: 0.04em; color: #fdba74; }
+    .summary-hero__p { margin: 0 0 0.65rem; }
+    .summary-hero__p:last-child { margin-bottom: 0; }
+    .summary-hero strong { color: var(--text); }
+    .summary-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.3rem 0 0.75rem; }
+    @media (max-width: 700px) { .summary-pillars { grid-template-columns: 1fr; } }
+    .summary-pillar {
+      font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1.02rem); font-weight: 600; line-height: 1.48; text-align: center; color: #a5b4c8;
+      padding: clamp(0.55rem, 1.2vw, 0.85rem); border-radius: 12px; background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b { display: block; font-size: clamp(0.78rem, 0.4vw + 0.62rem, 0.92rem); font-weight: 800; color: #fdba74; margin-bottom: 0.25rem; }
+    .summary-section-h { font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 700; color: #94a3b8; margin: 0.75rem 0 0.4rem; }
+    .summary-prev { border-left: 4px solid var(--accent2); padding: 0.7rem 0 0.7rem 1rem; margin-top: 0.8rem; background: rgba(30, 40, 55, 0.35); border-radius: 0 8px 8px 0; }
+    .summary-prev__tag { display: block; font-size: clamp(0.82rem, 0.45vw + 0.6rem, 0.95rem); font-weight: 800; color: #7dd3fc; margin-bottom: 0.35rem; }
+    .beginner-hint {
+      font-size: clamp(0.95rem, 0.5vw + 0.75rem, 1.1rem); color: #a5b4c8; line-height: 1.62; margin: 0.5rem 0 0;
+      padding: clamp(0.65rem, 1.5vw, 0.95rem) clamp(0.85rem, 2vw, 1.15rem); background: rgba(15, 23, 42, 0.55);
+      border-radius: 8px; border: 1px dashed rgba(251, 146, 60, 0.35);
+    }
+    .beginner-hint::before { content: "［図の読み方］ "; color: #fdba74; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide active" data-i="1" data-yaml-scene="opening" title="冒頭">
+      <span class="tag">第13回 · 図解多め</span>
+      <h1>【登録セキスペ 第13回｜Season2】ディレクトリトラバーサル（パストラバーサル）を攻略</h1>
+      <h2>「ファイル名」をユーザーに渡す処理で、フォルダの外まで読みにいってしまう欠陥</h2>
+      <p class="slide-lead">第12回は <strong>HTTPの Location</strong> でブラウザが跳ぶ話。第13回は <strong>サーバ内部のファイルパス</strong> の話。<code style="color:#fdba74;font-family:var(--mono)">../</code> で親フォルダへ上がり、公開ディレクトリの外のファイルを読む——図では <strong>①誰の入力 ②どこで結合 ③OS上の実パス</strong> を意識する。</p>
+      <div class="grid-2" style="margin:0.5rem 0 0.75rem;">
+        <div class="rich-box theme-accent">
+          <div class="box-title">この回の立ち位置</div>
+          <div class="box-desc">Webの弱点 · Season2 第13回。台本: <code style="font-family:var(--mono);font-size:0.78rem;color:#fdba74">s01-ep13-path-traversal.yaml</code></div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">第12回（オープンリダイレクト）との違い</div>
+          <div class="box-desc">オープンリダイレクト ＝ <strong>次のURL</strong> を誤認させる。パストラバーサル ＝ <strong>サーバ上のパス</strong> を誤って辿り、秘密ファイルを<strong>読む／露出</strong>する。</div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li>学習目標①：<code>../</code> やエンコードされた同等文字列が、パス結合をどう破るか説明できる。</li>
+        <li>学習目標②：ファイル取得・テンプレート include・画像パス など、典型的な発生箇所を挙げられる。</li>
+        <li>学習目標③：正規化（canonical path）・ベースディレクトリ固定・間接参照（IDのみ）など対策の型を言える。</li>
+        <li>学習目標④：LFI・RFI・SSRF と、どこに「悪い文字列」が効くかで区別できる。</li>
+      </ul>
+      <div class="diagram" style="padding:0.85rem 1rem;">
+        <svg viewBox="0 0 860 108" xmlns="http://www.w3.org/2000/svg" aria-label="本編の流れ">
+          <defs>
+            <linearGradient id="go13" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#fb923c"/><stop offset="100%" style="stop-color:#38bdf8"/>
+            </linearGradient>
+            <marker id="m13" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0,8 3,0 6" fill="#fb923c"/>
+            </marker>
+          </defs>
+          <text x="430" y="14" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">スライドの流れ: 導入 → Webルートと実パス → ../の仕組み → エンコードすり抜け → 発生箇所 → 攻撃4段 → OS差 → 対策×2 → 混同ゼロ → 試験 → まとめ</text>
+          <g transform="translate(6,32)" font-family="sans-serif">
+            <rect x="0" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#fb923c"/>
+            <text x="24" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">導入</text>
+            <path d="M52 23h8" stroke="url(#go13)" stroke-width="2" marker-end="url(#m13)"/>
+            <rect x="66" y="0" width="56" height="46" rx="6" fill="#243044" stroke="#38bdf8"/>
+            <text x="94" y="22" text-anchor="middle" fill="#e7edf4" font-size="7">Webルート</text>
+            <text x="94" y="32" text-anchor="middle" fill="#8b9cb3" font-size="6.5">と実パス</text>
+            <path d="M126 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="140" y="0" width="44" height="46" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="162" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">../</text>
+            <path d="M188 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="202" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#fbbf24"/>
+            <text x="228" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">エンコード</text>
+            <path d="M258 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="272" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#a78bfa"/>
+            <text x="298" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">発生箇所</text>
+            <path d="M328 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="342" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#4ade80"/>
+            <text x="366" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">4段階</text>
+            <path d="M394 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="408" y="0" width="44" height="46" rx="6" fill="#243044" stroke="#94a3b8"/>
+            <text x="430" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">OS差</text>
+            <path d="M456 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="470" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#22d3ee"/>
+            <text x="494" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策①</text>
+            <path d="M522 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="536" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#2dd4bf"/>
+            <text x="560" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策②</text>
+            <path d="M588 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="602" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#c084fc"/>
+            <text x="628" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">混同ゼロ</text>
+            <path d="M658 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="672" y="0" width="44" height="46" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="694" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">試験</text>
+            <path d="M720 23h8" stroke="url(#go13)" stroke-width="2"/>
+            <rect x="734" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#38bdf8"/>
+            <text x="760" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">まとめ</text>
+          </g>
+        </svg>
+      </div>
+      <p class="note">操作: <span class="kbd">→</span> <span class="kbd">←</span> <span class="kbd">Space</span>。下の2行目は <code style="font-family:var(--mono);font-size:0.8rem">s01-ep13-path-traversal.yaml</code> の <code style="font-family:var(--mono);font-size:0.8rem">scenes / id</code>。対応表は同 YAML 先頭のコメントを参照。</p>
+    </section>
+
+    <!-- 2 incident -->
+    <section class="slide" data-i="2" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入（incident）</span>
+      <h1>例：「資料ダウンロード」が <code style="color:#fdba74">../../../etc/passwd</code> を指したら？</h1>
+      <h2>見た目は「会社のPDF」のはずが、サーバの設定ファイルが返る</h2>
+      <p class="beginner-hint">オレンジ枠＝Web公開フォルダ（許された範囲）。赤い札＝本来見せたくないシステム領域。矢印は「パス結合の結果」。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 780 280" xmlns="http://www.w3.org/2000/svg" aria-label="導入シナリオ">
+          <defs>
+            <marker id="arrO" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#fb923c"/></marker>
+          </defs>
+          <text x="390" y="18" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">① ユーザーがファイル名パラメータに悪意のパスを入れる → ② アプリが検証なしで結合 → ③ OS は親ディレクトリへ登る</text>
+          <rect x="40" y="40" width="220" height="100" rx="10" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="150" y="68" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">ブラウザ（被害者）</text>
+          <text x="150" y="92" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">GET /download?name=</text>
+          <text x="150" y="112" text-anchor="middle" fill="#fecaca" font-size="8.5" font-family="monospace">../../../etc/passwd</text>
+          <path d="M 265 90 L 310 90" stroke="#fb923c" stroke-width="3" marker-end="url(#arrO)"/>
+          <text x="285" y="82" text-anchor="middle" fill="#fdba74" font-size="8">HTTP</text>
+          <rect x="320" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="420" y="68" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">Webアプリ</text>
+          <text x="420" y="92" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">base + 入力 をそのまま開く</text>
+          <text x="420" y="112" text-anchor="middle" fill="#f87171" font-size="8" font-family="sans-serif">検証なし ☓</text>
+          <rect x="550" y="35" width="200" height="210" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+          <text x="650" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="sans-serif">サーバのディスク（イメージ）</text>
+          <rect x="570" y="72" width="160" height="50" rx="4" fill="rgba(251,146,60,0.15)" stroke="#fb923c"/>
+          <text x="650" y="92" text-anchor="middle" fill="#fed7aa" font-size="8" font-family="sans-serif">/var/www/html（公開）</text>
+          <text x="650" y="104" text-anchor="middle" fill="#8b9cb3" font-size="7" font-family="sans-serif">docs/report.pdf …</text>
+          <path d="M 650 125 L 650 148" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="650" y="142" text-anchor="middle" fill="#64748b" font-size="8" font-family="sans-serif">../ で上へ</text>
+          <rect x="570" y="155" width="160" height="40" rx="4" fill="rgba(248,113,113,0.12)" stroke="#f87171"/>
+          <text x="650" y="178" text-anchor="middle" fill="#fca5a5" font-size="8" font-family="sans-serif">/etc/passwd など</text>
+          <path d="M 520 90 L 545 115" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,4"/>
+          <text x="530" y="108" fill="#7dd3fc" font-size="7.5" font-family="sans-serif">open()</text>
+          <rect x="40" y="165" width="490" height="95" rx="8" fill="rgba(127,29,29,0.15)" stroke="#f87171"/>
+          <text x="285" y="192" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="sans-serif">学習ポイント: 「ブラウザから見えるパス」と「OSが解釈する実パス」は別物</text>
+          <text x="285" y="218" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">試験では「入力がファイル名のつもり → 実際はパス全体」の穴が問われやすい</text>
+          <text x="285" y="240" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">対策のキーワード: 正規化のあと、必ず公開ルート配下に収まっているか検証</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 3 web root -->
+    <section class="slide" data-i="3" data-yaml-scene="concept_root" title="概念">
+      <span class="tag">仕組み①</span>
+      <h1>Webルート（公開フォルダ）と、OS上の絶対パス</h1>
+      <h2>URLの <code>/images/logo.png</code> は、サーバでは別の長いパスに対応している</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="30" width="300" height="160" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="180" y="55" text-anchor="middle" fill="#7dd3fc" font-size="12" font-weight="700" font-family="sans-serif">利用者が見る世界（URL）</text>
+          <text x="180" y="85" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">https://shop.example.com</text>
+          <text x="180" y="108" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="sans-serif">/static/manual.pdf</text>
+          <text x="180" y="135" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">↑ ここまでが「公開」と思っている範囲</text>
+          <text x="180" y="165" text-anchor="middle" fill="#fbbf24" font-size="8.5" font-family="sans-serif">パラメータで「ファイル名」を渡すと危ないことがある</text>
+          <path d="M 340 110 L 400 110" stroke="#fb923c" stroke-width="3"/>
+          <text x="370" y="104" text-anchor="middle" fill="#fdba74" font-size="9" font-family="sans-serif">変換</text>
+          <rect x="410" y="30" width="320" height="160" rx="10" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="570" y="55" text-anchor="middle" fill="#fdba74" font-size="12" font-weight="700" font-family="sans-serif">OSが開く実パス（例）</text>
+          <text x="570" y="85" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="monospace">/var/www/html/static/manual.pdf</text>
+          <text x="570" y="115" text-anchor="middle" fill="#fca5a5" font-size="8.5" font-family="sans-serif">結合ミスで /var や /etc 側へ…</text>
+          <text x="570" y="145" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">アプリの責務: 開いてよいディレクトリを決め、そこから外れないこと</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>相対パス成分</strong> <code>../</code> は「一つ上のフォルダへ」。連ねれば公開ルートの外へ出られる。</li>
+        <li>試験用語: <strong>ディレクトリトラバーサル</strong> / <strong>パストラバーサル</strong>（同系の話として出る）。</li>
+      </ul>
+    </section>
+
+    <!-- 4 ../ mechanism -->
+    <section class="slide" data-i="4" data-yaml-scene="dotdot" title="../">
+      <span class="tag">仕組み②</span>
+      <h1><code>../</code> が「階段を降りてから横に出る」イメージ</h1>
+      <h2>正規化前にチェックすると抜ける——だから「解決後のパス」で判定する、が定番の型</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg">
+          <text x="360" y="20" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">左: 意図したパス　／　右: <tspan fill="#f87171">../</tspan> で脱出</text>
+          <g font-family="sans-serif" font-size="9">
+            <rect x="40" y="40" width="280" height="180" rx="8" fill="#0f172a" stroke="#4ade80"/>
+            <text x="180" y="62" text-anchor="middle" fill="#86efac" font-weight="700">/var/www/html/docs/</text>
+            <rect x="60" y="75" width="100" height="40" rx="4" fill="#1e293b" stroke="#64748b"/>
+            <text x="110" y="98" text-anchor="middle" fill="#e7edf4">a.pdf</text>
+            <rect x="180" y="75" width="100" height="40" rx="4" fill="#1e293b" stroke="#64748b"/>
+            <text x="230" y="98" text-anchor="middle" fill="#e7edf4">b.pdf</text>
+            <text x="180" y="145" text-anchor="middle" fill="#8b9cb3" font-size="8">ここが「公開ルート」の内側（許容範囲）</text>
+            <rect x="400" y="40" width="280" height="180" rx="8" fill="#0f172a" stroke="#f87171"/>
+            <text x="540" y="62" text-anchor="middle" fill="#fca5a5" font-weight="700">入力: ../../secret.conf</text>
+            <rect x="420" y="85" width="240" height="50" rx="4" fill="rgba(248,113,113,0.15)" stroke="#f87171"/>
+            <text x="540" y="108" text-anchor="middle" fill="#fecaca" font-size="8">結合後に「docs」の外へ移動</text>
+            <text x="540" y="145" text-anchor="middle" fill="#fdba74" font-size="8.5">canonical path で実際の位置を取得してから判定</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 5 encoding -->
+    <section class="slide" data-i="5" data-yaml-scene="encoding" title="エンコード">
+      <span class="tag">すり抜け</span>
+      <h1>URLエンコード・二重デコードでフィルタをかわす</h1>
+      <h2><code>%2e%2e%2f</code> は <code>../</code> と同じ。検査と解釈の順序がずれると穴になる</h2>
+      <div class="grid-2">
+        <div class="diagram" style="min-height:140px">
+          <svg viewBox="0 0 340 130" xmlns="http://www.w3.org/2000/svg">
+            <text x="170" y="18" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="sans-serif">同義の表現（例）</text>
+            <text x="170" y="48" text-anchor="middle" fill="#fecaca" font-size="10" font-family="monospace">..%2f　..%5c　%2e%2e/</text>
+            <text x="170" y="78" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">WAF・入力チェックが「文字列一致」だけだと漏れる</text>
+            <text x="170" y="105" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="sans-serif">→ 禁止リストより、正規化後ホワイトリスト</text>
+          </svg>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">初心者メモ</div>
+          <div class="box-desc">「.<strong>.</strong> を禁止」だけでは、Unicode・正規化・別デリミタの変種で抜ける事例が試験に載りがち。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 where it happens -->
+    <section class="slide" data-i="6" data-yaml-scene="surfaces" title="発生箇所">
+      <span class="tag">どこで起きる？</span>
+      <h1>ファイル取得・テンプレ読込・ログ出力パス … 「文字列をそのまま結合」した所</h1>
+      <h2>図: 代表的な3カテゴリ</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 820 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="35" width="240" height="100" rx="10" fill="rgba(56,189,248,0.08)" stroke="#38bdf8"/>
+          <text x="140" y="62" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">① ダウンロード機能</text>
+          <text x="140" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">?file= で名前指定</text>
+          <text x="140" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">最頻出パターン</text>
+          <rect x="290" y="35" width="240" height="100" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c"/>
+          <text x="410" y="62" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">② 多言語テンプレ</text>
+          <text x="410" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">include( ユーザー由来の路)</text>
+          <text x="410" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">LFI と呼ばれる文脈も</text>
+          <rect x="560" y="35" width="240" height="100" rx="10" fill="rgba(167,139,250,0.1)" stroke="#a78bfa"/>
+          <text x="680" y="62" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="700" font-family="sans-serif">③ 画像・添付プレビュー</text>
+          <text x="680" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">相対パスをそのまま開く</text>
+          <text x="680" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">ZIPスリップは近親（別回）</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 7 attack flow -->
+    <section class="slide" data-i="7" data-yaml-scene="attack_flow" title="攻撃の流れ">
+      <span class="tag">攻撃4ステップ</span>
+      <h1>① 入力点を見つける → ② <code>../</code> を試す → ③ 正規化・エンコードを調整 → ④ 秘密ファイルを読む</h1>
+      <h2>「読む」が目的：ソース・設定・鍵・個人情報CSV など</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 780 120" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="sans-serif">
+            <rect x="10" y="35" width="130" height="55" rx="8" fill="#3f2d1d" stroke="#fb923c"/>
+            <text x="75" y="58" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">① 調査</text>
+            <text x="75" y="76" text-anchor="middle" fill="#fed7aa" font-size="8">パラメータ列挙</text>
+            <text x="155" y="68" fill="#fb923c" font-size="18">→</text>
+            <rect x="175" y="35" width="130" height="55" rx="8" fill="#3f1d2a" stroke="#f87171"/>
+            <text x="240" y="58" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">② ../ 投入</text>
+            <text x="240" y="76" text-anchor="middle" fill="#fecaca" font-size="8">親へ移動テスト</text>
+            <text x="320" y="68" fill="#fb923c" font-size="18">→</text>
+            <rect x="340" y="35" width="150" height="55" rx="8" fill="#2d2640" stroke="#a78bfa"/>
+            <text x="415" y="58" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">③ バイパス調整</text>
+            <text x="415" y="76" text-anchor="middle" fill="#ddd6fe" font-size="8">エンコード・長さ</text>
+            <text x="505" y="68" fill="#fb923c" font-size="18">→</text>
+            <rect x="525" y="35" width="130" height="55" rx="8" fill="#1a3d2d" stroke="#4ade80"/>
+            <text x="590" y="62" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">④ 取得成功</text>
+            <text x="590" y="78" text-anchor="middle" fill="#bbf7d0" font-size="8">機密の閲覧</text>
+            <text x="685" y="55" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-weight="700">実害イメージ</text>
+            <text x="685" y="78" text-anchor="middle" fill="#cbd5e1" font-size="8">設定・DB接続文字列</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 8 OS -->
+    <section class="slide" data-i="8" data-yaml-scene="os_diff" title="OS差">
+      <span class="tag">Unix / Windows</span>
+      <h1>区切り文字と「親」の表現が違う——試験は両方の例が出る</h1>
+      <h2><code>/</code> と <code>\</code> ・ドライブレター（C:）に注意</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="35" width="300" height="95" rx="8" fill="rgba(74,222,128,0.08)" stroke="#4ade80"/>
+          <text x="190" y="58" text-anchor="middle" fill="#86efac" font-size="11" font-weight="700" font-family="sans-serif">Linux / macOS 系</text>
+          <text x="190" y="82" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="monospace">/var/www/...　../ で / へ</text>
+          <text x="190" y="108" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">機密例: /etc/passwd（※試験の象徴）</text>
+          <rect x="420" y="35" width="300" height="95" rx="8" fill="rgba(56,189,248,0.08)" stroke="#38bdf8"/>
+          <text x="570" y="58" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">Windows 系</text>
+          <text x="570" y="82" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="monospace">..\ ..\\ 　C:\inetpub\...</text>
+          <text x="570" y="108" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">混在パス・UNC（\\server\share）</text>
+        </svg>
+      </div>
+      <p class="note">現場では「アプリがどのAPIでパスを開いているか」で挙動が変わる。試験では <strong>原理（正規化してから判定）</strong> が正解側になりやすい。</p>
+    </section>
+
+    <!-- 9 defense canonical -->
+    <section class="slide" data-i="9" data-yaml-scene="defense_canonical" title="対策①">
+      <span class="tag">対策① 正規化・固定ルート</span>
+      <h1>実パスを解決したうえで、「ベースディレクトリ配下か」を検証する</h1>
+      <h2>NG: 入力に「禁止文字」だけ — OK: <code>resolve()</code> 後にプレフィックス一致</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-ok">
+          <div class="box-title">やることの型</div>
+          <div class="box-desc">・公開ルートを1つ決める<br>・結合 → 正規化（.. 解消）<br>・結果がルートの<strong>子孫パス</strong>か確認<br>・そうでなければ拒否</div>
+        </div>
+        <div class="rich-box theme-danger">
+          <div class="box-title">よくある誤り</div>
+          <div class="box-desc">正規化<strong>前</strong>に <code>../</code> を文字列検索して安心する、→ エンコードで回避される。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 defense indirect -->
+    <section class="slide" data-i="10" data-yaml-scene="defense_indirect" title="対策②">
+      <span class="tag">対策② 間接参照</span>
+      <h1>パス文字列を受け取らない——内部IDだけ渡し、サーバが実ファイルを引く</h1>
+      <h2>第12回の「意図ID＋表」と考え方が似ている（外部文字列をそのまま使わない）</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 140" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="40" width="120" height="70" rx="8" fill="#1e293b" stroke="#fb923c"/>
+          <text x="100" y="68" text-anchor="middle" fill="#fdba74" font-size="10" font-weight="700" font-family="sans-serif">GET</text>
+          <text x="100" y="88" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="monospace">doc_id=42</text>
+          <path d="M 165 75 L 215 75" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="220" y="30" width="220" height="90" rx="8" fill="#1e293b" stroke="#4ade80"/>
+          <text x="330" y="55" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700" font-family="sans-serif">サーバ内部</text>
+          <text x="330" y="78" text-anchor="middle" fill="#cbd5e1" font-size="8" font-family="sans-serif">ID→許可リストから実パス決定</text>
+          <text x="330" y="98" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">ユーザーはパス文字列を知らない</text>
+          <path d="M 445 75 L 495 75" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="500" y="45" width="180" height="60" rx="6" fill="#0f172a" stroke="#64748b"/>
+          <text x="590" y="78" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="sans-serif">実ファイルは必ず許可範囲内</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 11 LFI RFI -->
+    <section class="slide" data-i="11" data-yaml-scene="compare_lfi" title="混同ゼロ">
+      <span class="tag">用語の整理</span>
+      <h1>LFI・RFI・パストラバーサル——試験では「効く場所」で切る</h1>
+      <h2>一枚の表で整理（矢印のラベルが命）</h2>
+      <div class="diagram" style="padding:0.75rem;">
+        <svg viewBox="0 0 880 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="440" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="700" font-family="sans-serif">横：何が「読み込まれるか」　縦：欠陥の名前</text>
+          <rect x="25" y="42" width="250" height="135" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c"/>
+          <text x="150" y="72" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="800" font-family="sans-serif">ディレクトリトラバーサル</text>
+          <text x="150" y="98" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif">パス操作で<strong>任意ファイル読取</strong></text>
+          <text x="150" y="122" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">（広い親概念として語られることも）</text>
+          <rect x="315" y="42" width="250" height="135" rx="10" fill="rgba(248,113,113,0.08)" stroke="#f87171"/>
+          <text x="440" y="72" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="800" font-family="sans-serif">LFI（ローカルファイルインクルージョン）</text>
+          <text x="440" y="98" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif">include/require が<strong>サーバ内のパス</strong>を開く</text>
+          <text x="440" y="122" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">PHP等の言語機能とセットで出題されやすい</text>
+          <rect x="605" y="42" width="250" height="135" rx="10" fill="rgba(167,139,250,0.1)" stroke="#a78bfa"/>
+          <text x="730" y="72" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="800" font-family="sans-serif">RFI（リモート〜）</text>
+          <text x="730" y="98" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>外部URL</strong>からコードを取り込む設定ミス</text>
+          <text x="730" y="122" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">第11回 SSRF は「サーバがHTTPで取りに行く」別軸</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 12 exam -->
+    <section class="slide" data-i="12" data-yaml-scene="exam_tips" title="試験">
+      <span class="tag">試験でつまずきやすい所</span>
+      <h1>対策の「文言」に騙されない——禁止リストだけ／正規化なし／Cloudでも発生</h1>
+      <h2>正しい記述は「解決後パスでの検証」「間接参照」「最小権限」寄り</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-warn">
+          <div class="box-title">① 「WAFがあれば安心」ではない</div>
+          <div class="box-desc">エンコード変種・アプリ層の結合ミスは別問題。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">② SSRF 対策との混同</div>
+          <div class="box-desc">SSRF＝外向きHTTPの届け先。本回＝ローカルパス開封。キーワードで切る。</div>
+        </div>
+        <div class="rich-box theme-warn" style="grid-column:1/-1;">
+          <div class="box-title">③ 第12回オープンリダイレクトとの混同</div>
+          <div class="box-desc">リダイレクト＝ブラウザのURL遷移。パストラバーサル＝サーバが開くファイルのパス。別カテゴリ。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 summary -->
+    <section class="slide" data-i="13" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第13回まとめ — ディレクトリトラバーサル</h1>
+      <h2>入力・結合・正規化・公開ルート — の4語で復習する</h2>
+      <div class="summary-pillars" role="list">
+        <div class="summary-pillar" role="listitem">
+          <b>柱①</b>
+          ユーザー入力をファイルパスに混ぜると、../ で公開範囲外へ出られる
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱②</b>
+          エンコードや順序のズレで単純フィルタは抜ける
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱③</b>
+          正規化後にベース配下か確認／パスを受けず ID で引く
+        </div>
+      </div>
+      <div class="summary-hero" role="region" aria-label="整理">
+        <p class="summary-hero__label">1行（口頭チェック）</p>
+        <p class="summary-hero__p">攻撃：<strong>パス結合の結果</strong>が意図した公開ディレクトリから外れ、秘密ファイルを読む。</p>
+        <p class="summary-hero__p">対策：<strong>resolve 後の絶対パス</strong>で開始ディレクトリの子か検証する。可能なら <strong>間接参照だけ</strong>。</p>
+      </div>
+      <p class="summary-section-h">自習</p>
+      <ul class="bullets">
+        <li>紙に「公開ルート」「入力」「結合後」「正規化後」の4段ボックスを描き、<code>../</code> を差し込んだときだけ赤くなるようにする。</li>
+        <li>第12回（Location）・第11回（SSRF）・第13回（ローカルパス）を、それぞれ「悪い文字列が効く場所」で一行ずつ書き比べる。</li>
+        <li>台本 <code style="color:#fdba74;font-family:var(--mono);font-size:0.85rem">s01-ep13-path-traversal.yaml</code> と一緒に再生。</li>
+      </ul>
+      <aside class="summary-prev" aria-label="前回">
+        <span class="summary-prev__tag">第12回との対比</span>
+        <code style="color:#fdba74;font-family:var(--mono)">オープンリダイレクト</code> — HTTPレスポンスの Location でブラウザが移動。今回はサーバ内部のファイルオープン経路。
+      </aside>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 13</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#fdba74; line-height:1.25; text-align:center; word-break:break-all;" title="s01-ep13-path-traversal.yaml">台本 id: opening</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          var human = sc ? sc.split(",").map(function (x) { return x.trim(); }).join(" ＋ ") : "";
+          sceneRef.textContent = sc ? "台本 id: " + human : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+title: "【登録セキスペ 第12回｜Season2】オープンリダイレクトを攻略——return先の乗っ取りとサーバ検証の試験ポイントなのだ！"
+# 学習スライド: s01-ep12-open-redirect-study-slides.html  動画: s01-ep12-open-redirect-reveal-slides.html（slideIndex 0〜11＝台本 scenes 順）
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/Movidrill.png"
+  slidesHtml: "./s01-ep12-open-redirect-reveal-slides.html"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "incident"
+    slideIndex: 0
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "大変なのだ！　社のログインのあと、どのページに行くかをURLで渡す仕組みがあって、それをメールに書いて教えたら……本物のログインのあとに、偽のログイン画面に行って、IDが抜かれたのだ！"
+        subtitle: "大変なのだ！　社のログインのあと、どのページに行くかをURLで渡す仕組みがあって、それをメールに書いて教えたら……本物のログインのあとに、偽のログイン画面に行って、IDが抜かれたのだ！"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "よくある形は、ログインが終わったあと、次の行き先を return や next というパラメータで渡すこと。Webサーバが、その文字列のとおり、ブラウザに移動先を教える。悪意のある外部のURLが通ると、オープンリダイレクトと呼ばれる問題になるわ。"
+        subtitle: "よくある形は、ログインが終わったあと、次の行き先を return や next というパラメータで渡すこと。Webサーバが、その文字列のとおり、ブラウザに移動先を教える。悪意のある外部のURLが通ると、オープンリダイレクトと呼ばれる問題になるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "前回のSSRFは、サーバが外のURLにアクセスしちゃう話だったのに、今回は違うのだ？"
+        subtitle: "前回のSSRFは、サーバが外のURLにアクセスしちゃう話だったのに、今回は違うのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "違う。第11回のSSRFは、サーバが悪意のURLに自分からアクセスしに行く、という流れ。今回のオープンリダイレクトは、サーバが送る次の行き先の指示に乗って、使っている人のブラウザが、悪意のURLへ移動する、という流れ。混同しないで。"
+        subtitle: "違う。第11回のSSRFは、サーバが悪意のURLに自分からアクセスしに行く、という流れ。今回のオープンリダイレクトは、サーバが送る次の行き先の指示に乗って、使っている人のブラウザが、悪意のURLへ移動する、という流れ。混同しないで。"
+
+  - id: "opening"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "では、第12回の本題に入るのだ。今回、何の話なのか、はっきりしたいのだ。"
+        subtitle: "では、第12回の本題に入るのだ。今回、何の話なのか、はっきりしたいのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今回扱うのはオープンリダイレクト。前回第11回のSSRFは、サーバが直接リクエストを送る方の弱点。今回は、本物のWebサイトが返す、次のページへの案内の行き先が、攻撃者の用意した偽のページを指す、という欠陥の話よ。"
+        subtitle: "今回扱うのはオープンリダイレクト。前回第11回のSSRFは、サーバが直接リクエストを送る方の弱点。今回は、本物のWebサイトが返す、次のページへの案内の行き先が、攻撃者の用意した偽のページを指す、という欠陥の話よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "つまり、次にどのURLに行くかのチェックが足りないと、利用者を危ないページに送ってしまう、ということなのだ？"
+        subtitle: "つまり、次にどのURLに行くかのチェックが足りないと、利用者を危ないページに送ってしまう、ということなのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。試験では、どこで弾くか、相対URLと絶対URLの違い、CSRF やSSRF との違い、が出る。図で、ブラウザの要求、サーバの返答、ブラウザの移動、の順に追うと整理しやすいわ。"
+        subtitle: "そう。試験では、どこで弾くか、相対URLと絶対URLの違い、CSRF やSSRF との違い、が出る。図で、ブラウザの要求、サーバの返答、ブラウザの移動、の順に追うと整理しやすいわ。"
+
+  - id: "what_is"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "スライドに 302 って出てきたのだ。まず、何が起きているのだ？"
+        subtitle: "スライドに 302 って出てきたのだ。まず、何が起きているのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "流れの骨格はこう。Webサーバが 302 などのステータスでリダイレクトを返し、Location という欄に、次に開くURLを書く。利用者のブラウザは、そのURLへ自動的に移動する。"
+        subtitle: "流れの骨格はこう。Webサーバが 302 などのステータスでリダイレクトを返し、Location という欄に、次に開くURLを書く。利用者のブラウザは、そのURLへ自動的に移動する。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "オープンって、行き先を厳しく絞らず、外のURLもそのまま通す、という意味なのだ？"
+        subtitle: "オープンって、行き先を厳しく絞らず、外のURLもそのまま通す、という意味なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "説明の仕方は文献で少し違うが、よく使われる考え方は、受け取った行き先のURLを、十分に確かめずに Location にそのまま載せ、結果として自社のドメイン以外のページに利用者を送ってしまう、という状況を指すわ。"
+        subtitle: "説明の仕方は文献で少し違うが、よく使われる考え方は、受け取った行き先のURLを、十分に確かめずに Location にそのまま載せ、結果として自社のドメイン以外のページに利用者を送ってしまう、という状況を指すわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "どういう画面で起きやすいのだ？"
+        subtitle: "どういう画面で起きやすいのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "例は、ログイン後の戻り先、SNS ログインのあとの戻り、メールに貼る公式サイトのURLの一歩手前、短縮URL 経由、など。パラメータの名前はサービスごとに違う。試験では、用語の暗記より、次の行き先がどこから来るか、のパターンを理解しているか、が問われやすいわ。"
+        subtitle: "例は、ログイン後の戻り先、SNS ログインのあとの戻り、メールに貼る公式サイトのURLの一歩手前、短縮URL 経由、など。パラメータの名前はサービスごとに違う。試験では、用語の暗記より、次の行き先がどこから来るか、のパターンを理解しているか、が問われやすいわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "便利な戻り先指定が、そのまま悪用されるのだ……！"
+        subtitle: "便利な戻り先指定が、そのまま悪用されるのだ……！"
+
+  - id: "not_ssrf"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "第7回のCSRF や、第11回のSSRF と、混ざりそうなのだ。"
+        subtitle: "第7回のCSRF や、第11回のSSRF と、混ざりそうなのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "整理する。CSRF は、攻撃者が、本人のブラウザから、本物のサイトに、本人が意図していない依頼を出させること。SSRF は、攻撃者が、サーバに、内側やメタデータ用のURLへアクセスさせること。オープンリダイレクトは、本物のサイトが、利用者のブラウザを、次の悪意のURLへ向けること。違いは、誰が動くか、と、何が悪用されるか、よ。"
+        subtitle: "整理する。CSRF は、攻撃者が、本人のブラウザから、本物のサイトに、本人が意図していない依頼を出させること。SSRF は、攻撃者が、サーバに、内側やメタデータ用のURLへアクセスさせること。オープンリダイレクトは、本物のサイトが、利用者のブラウザを、次の悪意のURLへ向けること。違いは、誰が動くか、と、何が悪用されるか、よ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "本物のサイトを一度通るから、悪意の次のURLが、より信じられてしまいやすいのだ。"
+        subtitle: "本物のサイトを一度通るから、悪意の次のURLが、より信じられてしまいやすいのだ。"
+
+  - id: "attack_flow"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "手順を、番号で教えてほしいのだ。"
+        subtitle: "手順を、番号で教えてほしいのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "一、攻撃者が、戻り先に悪意のURLを入れたリンクを配る。二、利用者は本物のサイトで、正しいログインを完了する。三、本物のサーバが、行き先を十分に確かめず、Location に悪意のURLを入れる。四、利用者のブラウザが、その悪意のURLへ行き、偽のログイン画面などに着く。四つが一まとまり。"
+        subtitle: "一、攻撃者が、戻り先に悪意のURLを入れたリンクを配る。二、利用者は本物のサイトで、正しいログインを完了する。三、本物のサーバが、行き先を十分に確かめず、Location に悪意のURLを入れる。四、利用者のブラウザが、その悪意のURLへ行き、偽のログイン画面などに着く。四つが一まとまり。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "本物でログインした直後に、偽のページに連れていかれるのだ……！"
+        subtitle: "本物でログインした直後に、偽のページに連れていかれるのだ……！"
+
+  - id: "abuse_phishing"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "さっきの四つの手順で、悪用の主な目的は、フィッシングだけなのだ？"
+        subtitle: "さっきの四つの手順で、悪用の主な目的は、フィッシングだけなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "多いのはフィッシング。本物のログインの直後に、本物に似た偽の画面に着かせ、もう一度 ID やパスワードを入力させる。利用者は、本物の流れの続きだと思いやすい。"
+        subtitle: "多いのはフィッシング。本物のログインの直後に、本物に似た偽の画面に着かせ、もう一度 ID やパスワードを入力させる。利用者は、本物の流れの続きだと思いやすい。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "別の出題のされ方で、XSS などの別の弱点と一緒に、トークンを奪いに行く導線の一部として、長文で書かれることもある。対策の種類を、問題ごとに分けて答える必要があるわ。"
+        subtitle: "別の出題のされ方で、XSS などの別の弱点と一緒に、トークンを奪いに行く導線の一部として、長文で書かれることもある。対策の種類を、問題ごとに分けて答える必要があるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "第6回の XSS の話と、第12回の、移動先の悪用の話は、ちゃんと分けるのだ。"
+        subtitle: "第6回の XSS の話と、第12回の、移動先の悪用の話は、ちゃんと分けるのだ。"
+
+  - id: "abuse_oauth"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "一つ前で OAuth も出たのだ。あれも、どこに戻るか、の話と関係するのだ？"
+        subtitle: "一つ前で OAuth も出たのだ。あれも、どこに戻るか、の話と関係するのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "関係する。OAuth では、認可の結果を返す redirect_uri を、あらかじめ登録したURLと、一字一句同じにする、などのルールで縛る。ここが弱いと、トークンが攻撃者のURLに送られる、という危険と一緒に、試験に出ることがあるわ。"
+        subtitle: "関係する。OAuth では、認可の結果を返す redirect_uri を、あらかじめ登録したURLと、一字一句同じにする、などのルールで縛る。ここが弱いと、トークンが攻撃者のURLに送られる、という危険と一緒に、試験に出ることがあるわ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "用語は違うが、どのURLに結果を送ってよいか、を先に決めて照合する、という発想は、同じ分野の話と並べて覚えてよいわ。"
+        subtitle: "用語は違うが、どのURLに結果を送ってよいか、を先に決めて照合する、という発想は、同じ分野の話と並べて覚えてよいわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "行き先の許可の仕方、いろいろな場面で通じるのだ。"
+        subtitle: "行き先の許可の仕方、いろいろな場面で通じるのだ。"
+
+  - id: "trust_theft"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "本物のサイトのURL が絡むと、なぜ悪用が助長されるのだ？"
+        subtitle: "本物のサイトのURL が絡むと、なぜ悪用が助長されるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "本物のドメインのURLを踏むと、メールの判定や、人の注意が、一瞬ゆるみやすい。攻撃者は、まず本物のURLで信頼を得て、次の悪意のURLへ、利用者をつなげる。"
+        subtitle: "本物のドメインのURLを踏むと、メールの判定や、人の注意が、一瞬ゆるみやすい。攻撃者は、まず本物のURLで信頼を得て、次の悪意のURLへ、利用者をつなげる。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "だから、悪意のURLだけを送るより、本物のURLを一緒に使う方が、危ないのだ……。"
+        subtitle: "だから、悪意のURLだけを送るより、本物のURLを一緒に使う方が、危ないのだ……。"
+
+  - id: "defense_validate"
+    slideIndex: 8
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "では、直し方を、試験でよく出る順で教えてほしいのだ。"
+        subtitle: "では、直し方を、試験でよく出る順で教えてほしいのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "一つ目、よしとする行き先の一覧を、あらかじめ決め、そこに入っているかだけを調べる。同じホスト名だけにする、など、文献に書かれた条件で照合する、という出方が多いわ。"
+        subtitle: "一つ目、よしとする行き先の一覧を、あらかじめ決め、そこに入っているかだけを調べる。同じホスト名だけにする、など、文献に書かれた条件で照合する、という出方が多いわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "二つ目、行き先は相対パスだけ受け取り、http で始まる完全なURL は受け取らない。外の世界のURL 文字列を、そもそも受け付けない、という作り方。"
+        subtitle: "二つ目、行き先は相対パスだけ受け取り、http で始まる完全なURL は受け取らない。外の世界のURL 文字列を、そもそも受け付けない、という作り方。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三つ目、// で始まる書き方、バックスラッシュ、javascript など、同じ行き先を、別の形に見せて通す例を、正規化の前後に注意して、文献で扱うことがあるわ。"
+        subtitle: "三つ目、// で始まる書き方、バックスラッシュ、javascript など、同じ行き先を、別の形に見せて通す例を、正規化の前後に注意して、文献で扱うことがあるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "通してよい行き先だけを、あらかじめ決めて、それ以外は弾く、のだ。"
+        subtitle: "通してよい行き先だけを、あらかじめ決めて、それ以外は弾く、のだ。"
+
+  - id: "defense_design"
+    slideIndex: 9
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "さっきの照合のほかに、戻り先にURL 文字列そのものを置かない方法もあるのだ？"
+        subtitle: "さっきの照合のほかに、戻り先にURL 文字列そのものを置かない方法もあるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ある。戻り先パラメータには、意図を表す短いID や番号だけを渡し、本当のURL はサーバのDB などでだけ保持し、こちらで決めたURL だけを Location に書く。利用者から、生のURL 文字列を受け取らない。"
+        subtitle: "ある。戻り先パラメータには、意図を表す短いID や番号だけを渡し、本当のURL はサーバのDB などでだけ保持し、こちらで決めたURL だけを Location に書く。利用者から、生のURL 文字列を受け取らない。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "同じサイト内の移動なら、相対パスにそろえる、もよく出る。試験では、アプリ層で文字列を確かめたか、設計でURL 直送をやめたか、のどちらの話か、を分けて問うわ。"
+        subtitle: "同じサイト内の移動なら、相対パスにそろえる、もよく出る。試験では、アプリ層で文字列を確かめたか、設計でURL 直送をやめたか、のどちらの話か、を分けて問うわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "利用者に、自由なURL を書かせないのが、安全側なのだ。"
+        subtitle: "利用者に、自由なURL を書かせないのが、安全側なのだ。"
+
+  - id: "exam_tips"
+    slideIndex: 10
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "試験の選択肢で、他の用語の対策と、混ぜて出されそうなのは、どれなのだ？"
+        subtitle: "試験の選択肢で、他の用語の対策と、混ぜて出されそうなのは、どれなのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "一つ、CSRF 対策のトークンは、行き先のURL が安全か、とは別の話。トークンがあれば全部安全、は誤答になりやすいわ。"
+        subtitle: "一つ、CSRF 対策のトークンは、行き先のURL が安全か、とは別の話。トークンがあれば全部安全、は誤答になりやすいわ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "二つ、CORS は、別のサイトのデータを、ブラウザに読ませるか、の制限。今回の話は、次にどのページに移るか、の話。違うわ。"
+        subtitle: "二つ、CORS は、別のサイトのデータを、ブラウザに読ませるか、の制限。今回の話は、次にどのページに移るか、の話。違うわ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "三つ、SSRF の対策は、主にサーバが外へ出す通信の話。今回は、利用者のブラウザの移動の話。同じ選択肢に乗らないで。"
+        subtitle: "三つ、SSRF の対策は、主にサーバが外へ出す通信の話。今回は、利用者のブラウザの移動の話。同じ選択肢に乗らないで。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "誰が、どの通信で、次に何をするか、を、取り違えないのだ。"
+        subtitle: "誰が、どの通信で、次に何をするか、を、取り違えないのだ。"
+
+  - id: "summary"
+    slideIndex: 11
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめ。オープンリダイレクトは、本物のサーバの正しい返答の中に、次の行き先として悪意のURLが入り、利用者のブラウザがそこへ移動する欠陥。悪用の例はフィッシング、OAuth まわり、など。対策の基本は、行き先の確認、と、生のURL文字列を渡さない設計、の二つに分けて考える。"
+        subtitle: "まとめ。オープンリダイレクトは、本物のサーバの正しい返答の中に、次の行き先として悪意のURLが入り、利用者のブラウザがそこへ移動する欠陥。悪用の例はフィッシング、OAuth まわり、など。対策の基本は、行き先の確認、と、生のURL文字列を渡さない設計、の二つに分けて考える。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "第11回はサーバのリクエスト、第12回はブラウザの移動。区別がはっきりしたのだ。"
+        subtitle: "第11回はサーバのリクエスト、第12回はブラウザの移動。区別がはっきりしたのだ。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "本番の長文は、次の行き先がどの応答のどの欄に書かれているか、を線で辿ると取り落としにくいわ。"
+        subtitle: "本番の長文は、次の行き先がどの応答のどの欄に書かれているか、を線で辿ると取り落としにくいわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "チャンネル登録と高評価も、よろしくなのだ。一緒にセキスペ合格を目指すのだ。"
+        subtitle: "チャンネル登録と高評価も、よろしくなのだ。一緒にセキスペ合格を目指すのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "コメント欄に、感想をどうぞ。復習では、行き先をどこで弾くか、を、自分の言葉で一行書けるか、を確認して。"
+        subtitle: "コメント欄に、感想をどうぞ。復習では、行き先をどこで弾くか、を、自分の言葉で一行書けるか、を確認して。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "また見てほしいのだ。バイバイなのだ。"
+        subtitle: "また見てほしいのだ。バイバイなのだ。"

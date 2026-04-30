@@ -33,6 +33,8 @@ export interface VideoManifest {
   /** publicDir 内の結合済み WAV ファイル名（相対） */
   audioFile: string;
   defaultBackground: string | undefined;
+  /** publicDir 内の教室フレーム画像（相対）。指定時は CLASSROOM レイアウト */
+  videoFrameFile?: string;
   /** キャラクター名 → 表示設定 */
   characters: Record<string, CharacterDisplayConfig>;
   lines: ManifestLine[];

@@ -48,7 +48,12 @@ function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoM
     defaultBackground = copyAsset(defaultBackground);
   }
 
-  return { ...manifest, audioFile, lines, characters, defaultBackground };
+  let videoFrameFile = manifest.videoFrameFile;
+  if (videoFrameFile) {
+    videoFrameFile = copyAsset(videoFrameFile);
+  }
+
+  return { ...manifest, audioFile, lines, characters, defaultBackground, videoFrameFile };
 }
 
 export interface RenderVideoOptions {

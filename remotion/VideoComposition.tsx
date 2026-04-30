@@ -5,6 +5,7 @@ import { SUBTITLE_BLOCK_HEIGHT_RATIO, TACHIE_SIDE_WIDTH_RATIO } from "../src/con
 import { Background } from "./components/Background";
 import { CharacterLayer } from "./components/CharacterLayer";
 import { SubtitleLayer } from "./components/SubtitleLayer";
+import { ClassroomVideoComposition } from "./ClassroomVideoComposition";
 
 interface Props {
   manifest: VideoManifest;
@@ -28,6 +29,10 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
         <Audio src={staticFile(manifest.audioFile)} />
       </div>
     );
+  }
+
+  if (manifest.videoFrameFile) {
+    return <ClassroomVideoComposition manifest={manifest} />;
   }
 
   const sideW = Math.round(width * TACHIE_SIDE_WIDTH_RATIO);
