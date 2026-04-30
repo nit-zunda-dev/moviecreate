@@ -1,0 +1,155 @@
+title: "【Engineer Skill Lab｜API設計ワークショップ】物流・配送APIをRESTで設計する——実装どおり5問を整理するのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  videoFrame: "./docs/generate_scene_illustrations/hikei.png"
+  slidesHtml: "./api_design_workshop_slides/logistics-delivery-study-slides.html"
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "opening"
+    slideIndex: 0
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！ ずんだもんなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。今日は API設計ワークショップの物流・配送API。アプリ実装どおり、5つの問題を順番に整理するわ。"
+
+  - id: "scenario_setup"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "このシナリオの前提は、出荷・追跡・イベント記録を関係者だけが呼ぶ設計。つまり全エンドポイント bearer 前提よ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "今回は public の行がないのだ！ Authorization を全部で使い分ける練習なのだ！"
+
+  - id: "endpoint_overview"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "全体図は5本。GET と POST を shipments に揃えて、tracking と events を子リソースで切るのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "最後に DELETE /shipments/{id} で取消。HTTPメソッドとボディ有無の切替を見ていきましょう。"
+
+  - id: "list_shipments"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "一問目は出荷依頼の一覧取得。GET /shipments、成功は200。認証付きGETなので Accept と Authorization を併用するのが実装どおりね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "リクエスト本文はなし、レスポンスはJSON。読み取り系の定石なのだ！"
+
+  - id: "create_shipment"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "二問目は新規登録。POST /shipments、成功は201。書き込みなので Content-Type と Authorization をセットにするわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "JSONボディあり、JSONレスポンスあり。作成系の基本パターンなのだ。"
+
+  - id: "tracking_status"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三問目は追跡取得。GET /shipments/{id}/tracking が基本解。こちらも bearer の読み取り系だから Accept と Authorization ね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "別解で GET /tracking/{id} もあるけど、荷物配下に tracking を置くほうが文脈は読みやすいのだ。"
+
+  - id: "record_event"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四問目は配送完了イベントの記録。POST /shipments/{id}/events、成功は201。書き込みなので Content-Type と Authorization を使う。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "別解として POST /deliveries/{id}/complete もあるのだ。イベント名をパスに出す設計も覚えておくのだ。"
+
+  - id: "cancel_shipment"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "五問目は取消。DELETE /shipments/{id}。定番は204 No Contentで本文なし、ヘッダは Authorization だけの構成。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "200でJSONを返す流儀も別解としてあるけど、まずは204定番を押さえるのだ。"
+
+  - id: "summary_table"
+    slideIndex: 8
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "最終整理。GET /shipments、POST /shipments、GET tracking、POST events、DELETE shipment の5本なのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "この課題は全 bearer 前提。読み取りは Accept、書き込みは Content-Type、保護リソースは Authorization を軸に選ぶのがポイントよ。"
+
+  - id: "outro"
+    slideIndex: 9
+    lines:
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "おつかれさま。次はこの5本にエラー設計と権限境界のテストケースを足して、実運用向けに広げていきましょう。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ずんだもんとめたんの API講座、今回もおつかれさまなのだ！ チャンネル登録と高評価よろしくなのだ！"

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>API設計ワークショップ：物流・配送API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .centered { text-align: center; }
+    .highlight-brand { color: #88DD44 !important; font-weight: bold; }
+    .highlight-accent { color: #FF88BB !important; font-weight: bold; }
+    .small { font-size: 0.72em; color: #aaa; }
+    .diagram {
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(136, 221, 68, 0.25);
+    }
+    .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .api-table { font-size: 0.54em; width: 100%; border-collapse: collapse; }
+    .api-table th, .api-table td { border: 1px solid #555; padding: 0.38em 0.45em; }
+    .api-table th { background: #444; }
+    .pill {
+      display: inline-block;
+      border-radius: 6px;
+      font-size: 0.75em;
+      padding: 0.2em 0.55em;
+      margin-right: 0.3em;
+      font-family: ui-monospace, Consolas, monospace;
+    }
+    .pill-bearer { background: rgba(255, 136, 187, 0.2); color: #ffaac8; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="centered">
+        <h2>【Engineer Skill Lab】<br>API設計ワークショップ</h2>
+        <h3 class="highlight-accent">物流・配送APIをRESTで設計する</h3>
+        <p>アプリ実装準拠：出荷・追跡・イベント記録・取消の5問を整理</p>
+      </section>
+
+      <section>
+        <h3>シナリオの前提（実装準拠）</h3>
+        <ul style="font-size: 0.84em; line-height: 1.5;">
+          <li>EC倉庫システムと配送キャリアをつなぐバックエンドAPI</li>
+          <li>出荷・追跡・イベント記録・取消は <span class="highlight-accent">関係者のみ</span> 実行可</li>
+          <li>この課題では <span class="highlight-brand">全エンドポイントが bearer</span> 前提</li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 760 190" width="100%" height="auto">
+            <rect x="70" y="26" width="620" height="130" rx="12" fill="#2a1a2a" stroke="#ff88bb" stroke-width="2"/>
+            <text x="380" y="58" text-anchor="middle" fill="#ffaac8" font-size="22" font-weight="bold">すべて bearer ゾーン</text>
+            <text x="380" y="90" text-anchor="middle" fill="#ddd" font-size="15">公開GETなし。Authorization を必ず持つ設計演習</text>
+            <text x="380" y="120" text-anchor="middle" fill="#88dd44" font-size="14" font-family="Consolas,monospace">GET /shipments, POST /shipments, GET /shipments/{id}/tracking ...</text>
+            <text x="380" y="175" text-anchor="middle" fill="#666" font-size="12">要点: 認証付きで Accept / Content-Type / body 有無を正しく切り替える</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>エンドポイント全体図（5本）</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 760 330" width="100%" height="auto">
+            <line x1="70" y1="26" x2="700" y2="26" stroke="#666" stroke-width="2"/>
+            <text x="70" y="18" fill="#88dd44" font-size="13" font-weight="bold">API base</text>
+
+            <rect x="55" y="42" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="205" y="68" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">GET /shipments</text>
+            <text x="205" y="96" text-anchor="middle" fill="#ffaac8" font-size="12">一覧取得（200 / bearer）</text>
+
+            <rect x="395" y="42" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="545" y="68" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">POST /shipments</text>
+            <text x="545" y="96" text-anchor="middle" fill="#ffaac8" font-size="12">新規登録（201 / bearer）</text>
+
+            <rect x="55" y="142" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="205" y="168" text-anchor="middle" fill="#dbe" font-size="13" font-family="Consolas,monospace">GET /shipments/{id}/tracking</text>
+            <text x="205" y="196" text-anchor="middle" fill="#ffaac8" font-size="12">追跡取得（200 / bearer）</text>
+
+            <rect x="395" y="142" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="545" y="168" text-anchor="middle" fill="#dbe" font-size="13" font-family="Consolas,monospace">POST /shipments/{id}/events</text>
+            <text x="545" y="196" text-anchor="middle" fill="#ffaac8" font-size="12">イベント記録（201 / bearer）</text>
+
+            <rect x="225" y="242" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="375" y="268" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">DELETE /shipments/{id}</text>
+            <text x="375" y="296" text-anchor="middle" fill="#ffaac8" font-size="12">取消（204 / bearer）</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>一覧取得：<span class="highlight-brand">GET /shipments</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：出荷依頼（荷物）の一覧を取得する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>200 OK</strong> + JSON</li>
+          <li>ヘッダ：<code>Accept</code> + <code>Authorization</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>新規登録：<span class="highlight-brand">POST /shipments</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：新しい出荷依頼を登録する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>201 Created</strong> + JSON</li>
+          <li>ヘッダ：<code>Content-Type</code> + <code>Authorization</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>追跡取得：<span class="highlight-brand">GET /shipments/{id}/tracking</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：追跡番号で配送ステータスを取得する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>200 OK</strong> + JSON</li>
+          <li>別解：<code>GET /tracking/{id}</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>イベント記録：<span class="highlight-brand">POST /shipments/{id}/events</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：配送完了などのイベントを記録する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>201 Created</strong> + JSON</li>
+          <li>別解：<code>POST /deliveries/{id}/complete</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>出荷取消：<span class="highlight-brand">DELETE /shipments/{id}</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：出荷依頼を取り消す（キャンセル）</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>定番：<strong>204 No Content</strong>（本文なし）</li>
+          <li>別解：<strong>200</strong> + JSON</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>ワークショップ回答例（実装準拠5本）</h3>
+        <table class="api-table">
+          <thead>
+            <tr><th>用途</th><th>Method</th><th>Path</th><th>Auth</th><th>Status</th><th>Headers</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>出荷一覧</td>
+              <td>GET</td>
+              <td><code>/shipments</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>200</td>
+              <td><code>Accept</code> + <code>Authorization</code></td>
+            </tr>
+            <tr>
+              <td>出荷登録</td>
+              <td>POST</td>
+              <td><code>/shipments</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>201</td>
+              <td><code>Content-Type</code> + <code>Authorization</code></td>
+            </tr>
+            <tr>
+              <td>追跡取得</td>
+              <td>GET</td>
+              <td><code>/shipments/{id}/tracking</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>200</td>
+              <td><code>Accept</code> + <code>Authorization</code></td>
+            </tr>
+            <tr>
+              <td>イベント記録</td>
+              <td>POST</td>
+              <td><code>/shipments/{id}/events</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>201</td>
+              <td><code>Content-Type</code> + <code>Authorization</code></td>
+            </tr>
+            <tr>
+              <td>取消</td>
+              <td>DELETE</td>
+              <td><code>/shipments/{id}</code></td>
+              <td><span class="pill pill-bearer">bearer</span></td>
+              <td>204</td>
+              <td><code>Authorization</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="centered">
+        <h3>おつかれさまなのだ！</h3>
+        <p>物流・配送APIは「全 bearer 前提」の切り替えを正確に扱うと、<br>ヘッダとボディ有無の設計ミスを減らせる。</p>
+        <p style="margin-top: 1rem;"><span class="highlight-brand" style="font-size: 1.15em;">実装の出題順で復習して、動画も同じ順で確認なのだ！</span></p>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "fade" });
+  </script>
+</body>
+</html>
