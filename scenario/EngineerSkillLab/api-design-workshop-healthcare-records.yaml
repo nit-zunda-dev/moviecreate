@@ -1,0 +1,155 @@
+title: "【Engineer Skill Lab｜API設計ワークショップ】ヘルスケア記録APIをRESTで設計する——全エンドポイントBearer前提の設計を固めるのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  videoFrame: "./docs/generate_scene_illustrations/hikei.png"
+  slidesHtml: "./api_design_workshop_slides/healthcare-records-study-slides.html"
+  defaultBackground: "./image/background/Movidrill.png"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "opening"
+    slideIndex: 0
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "みんな、こんにちはなのだ！ ずんだもんなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四国めたんよ。今日は API設計ワークショップ上級編、ヘルスケア記録APIを題材に、認証とヘッダーの設計を整理するわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "健康データは重要なのだ。今回は全部 bearer 前提って聞いて、気合いが入るのだ！"
+
+  - id: "scenario_setup"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "このシナリオはウェアラブル連携の健康アプリ。個人情報が中心だから、全エンドポイントで本人確認を前提にして設計するの。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "公開エンドポイントは無し、って割り切るのだ。全操作に Authorization を付ける設計なのだ。"
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "そう。あとは取得系なら Accept、書き込み系なら Content-Type の使い分けを崩さないことがポイントよ。"
+
+  - id: "records_list"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "一問目は自分の健康記録一覧。GET /records、成功は 200。読み取りなのでリクエスト本文はなし、レスポンス本文は JSON が基本。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ヘッダーは Accept と Authorization のセットなのだ。別解で GET /me/records も文脈が合えばありなのだ。"
+
+  - id: "create_vitals"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "二問目はバイタル記録の新規作成。POST /vitals、成功は 201 Created。JSONを送ってJSONを返す、典型的な作成系ね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "だから Content-Type と Authorization を付けるのだ。別解の POST /records/vitals も、リソース設計としては筋が通るのだ。"
+
+  - id: "update_consent"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "三問目は同意設定の更新。代表解は PUT /consents/{id} で 200。既存リソース更新だから JSON 本文あり、認証あり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "部分更新に寄せるなら PATCH /consents/{id} も別解なのだ。どちらでもチーム内で意味を統一するのが大事なのだ。"
+
+  - id: "providers_list"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "四問目は共有先の医療機関一覧。GET /providers、成功は 200。読み取り系なので Accept と Authorization、本文なしで整理するわ。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "共有文脈を強めるなら GET /sharing/providers も別解なのだ。命名の意図が伝われば設計として成立するのだ。"
+
+  - id: "delete_sharing"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "五問目は共有設定の取り消し。DELETE /sharing/{id}、成功は 204 No Content が定番。認証付きで、本文は送らず返さない形ね。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "別解として DELETE /consents/{id} もあり。200でJSONを返す流儀もあるけど、まずは 204 の型を覚えるのだ。"
+
+  - id: "summary"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "最終整理なのだ。GET /records、POST /vitals、PUT /consents/{id}、GET /providers、DELETE /sharing/{id} の5本なのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "全 bearer 前提だから Authorization は毎回必須。取得は Accept、書き込みは Content-Type を軸にすると、設計判断がぶれにくいわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "HTTPメソッド、パス、ステータス、認証、ヘッダー、ボディ有無を同時に決める訓練なのだ。"
+
+  - id: "outro"
+    slideIndex: 8
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "次はこの5本にエラー時のステータスと監査ログ設計を足して、実運用レベルに仕上げていきましょう。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ずんだもんとめたんの API講座、今回もおつかれさまなのだ！ チャンネル登録と高評価よろしくなのだ！"

