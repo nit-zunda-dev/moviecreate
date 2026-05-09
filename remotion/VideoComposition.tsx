@@ -71,59 +71,37 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
         position: "relative",
         width,
         height,
-        display: "flex",
-        flexDirection: "column",
         backgroundColor: "#0c0c14",
         overflow: "hidden",
       }}
     >
+      {/* 全画面背景：cover で左右上下とも隙間なく敷く（行ごとに切替） */}
       <div
         style={{
-          position: "relative",
-          flex: "0 0 auto",
-          minWidth: 0,
-          width: "100%",
-          height: mainH,
-          display: "flex",
-          flexDirection: "row",
-          backgroundColor: "#0c0c14",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width,
+          height,
+          zIndex: 0,
+          overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            width: sideW,
-            minWidth: sideW,
-            height: "100%",
-            backgroundColor: "#0c0c14",
-            overflow: "visible",
-          }}
-        />
-        <div
-          style={{
-            position: "relative",
-            width: centerW,
-            minWidth: 0,
-            height: "100%",
-            backgroundColor: "#12121a",
-          }}
-        >
-          <Background
-            backgroundPath={backgroundPath}
-            width={centerW}
-            height={0}
-            objectFit="contain"
-            fillColumn
-          />
-        </div>
-        <div
-          style={{
-            width: sideW,
-            minWidth: sideW,
-            height: "100%",
-            backgroundColor: "#0c0c14",
-            overflow: "visible",
-          }}
-        />
+        <Background backgroundPath={backgroundPath} width={width} height={height} objectFit="cover" />
+      </div>
+
+      {/* 立ち絵：背景の上にオーバーレイ（左右に大きめ配置） */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width,
+          height: mainH,
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      >
         <CharacterLayer
           manifest={manifest}
           frameHeight={height}
@@ -136,14 +114,18 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
           }}
         />
       </div>
+
+      {/* 下部字幕帯：半透明黒グラデーションで読みやすく、背景画像も透けて見える */}
       <div
         style={{
-          flex: "0 0 auto",
-          width: "100%",
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width,
           height: subtitleBlockH,
-          minHeight: subtitleBlockH,
-          backgroundColor: "#0a0a12",
-          zIndex: 2,
+          background:
+            "linear-gradient(0deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.0) 100%)",
+          zIndex: 3,
         }}
       >
         <SubtitleLayer

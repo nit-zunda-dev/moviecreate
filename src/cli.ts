@@ -11,6 +11,7 @@ import { renderVideo } from "./video/renderVideo";
 import { applyHtmlSlideBackgrounds } from "./slides/captureHtmlSlides";
 import { lintRetention, printLintReport } from "./lint/retentionLinter";
 import { generateYoutubeMetadata } from "./youtube/generateMetadata";
+// `generate-video` 完了後に自動でメタデータを書き出すため、上の import をそのまま再利用
 import { enrichLineResultsWithLipSync } from "./media/lipSync";
 import {
   deriveShortsScenario,
@@ -56,7 +57,7 @@ async function generateAudioCommand(
 
 async function generateVideoCommand(
   scenarioPath: string,
-  options: { out?: string; dryRun?: boolean; transparent?: boolean },
+  options: { out?: string; dryRun?: boolean; transparent?: boolean; noMetadata?: boolean },
 ) {
   const scenario = loadScenario(scenarioPath);
   const { outputDir } = getBasePaths();
@@ -101,6 +102,21 @@ async function generateVideoCommand(
   const videoOut = options.out || path.join(outputDir, `${safeTitle}${ext}`);
   await renderVideo(manifest, videoOut, { transparent: options.transparent });
   console.log("動画を出力しました:", videoOut);
+
+  // [5] YouTube メタデータ（タイトル候補・概要欄・画像プロンプト）を自動生成
+  if (!options.noMetadata) {
+    try {
+      const meta = generateYoutubeMetadata(scenario);
+      console.log("");
+      console.log("==== YouTube メタデータ + 画像プロンプトを生成しました ====");
+      console.log(`  出力: ${meta.outFile}`);
+      console.log(
+        `  タイトル候補: ${meta.titleCandidates.length} 件 / 画像プロンプト: ${meta.assetPromptCount} 点`,
+      );
+    } catch (err) {
+      console.warn("⚠ YouTube メタデータの自動生成に失敗しました:", err);
+    }
+  }
 }
 
 async function generateShortsCommand(
@@ -227,6 +243,7 @@ program
   .option("--out <path>", "出力動画ファイルパス（既定: output/{title}.mp4 / .mov）")
   .option("--transparent", "透過レンダリング（ProRes 4444 .mov 出力）", false)
   .option("--dry-run", "シナリオ読み込みのみ行う", false)
+  .option("--no-metadata", "完了後の YouTube メタデータ＋画像プロンプト自動生成をスキップ")
   .action((scenarioPath, opts) => {
     generateVideoCommand(scenarioPath, opts).catch((err) => {
       console.error("動画生成中にエラーが発生しました:", err);

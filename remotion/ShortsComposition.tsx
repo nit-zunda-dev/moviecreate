@@ -73,9 +73,9 @@ export const ShortsComposition: React.FC<Props> = ({ manifest }) => {
 
   return (
     <div style={{ width, height, position: "relative", overflow: "hidden", backgroundColor: "#0a0a14" }}>
-      {/* === 背景（active line の background or default、無ければ黒） === */}
+      {/* === 背景（active line の background or default、無ければ黒）。全画面 cover で隙間なく === */}
       {backgroundPath && (
-        <AbsoluteFill style={{ zIndex: 0, opacity: 0.55 }}>
+        <AbsoluteFill style={{ zIndex: 0 }}>
           <Background backgroundPath={backgroundPath} width={width} height={height} objectFit="cover" />
         </AbsoluteFill>
       )}

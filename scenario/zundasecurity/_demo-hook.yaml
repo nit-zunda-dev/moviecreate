@@ -1,8 +1,9 @@
 # =============================================================================
-# Sprint 1〜4 動作確認デモ
+# Sprint 1〜5 動作確認デモ
 # - Sprint 1: 冒頭 Hook / Line.emphasis / Line.callout (4スタイル)
 # - Sprint 3: global.bgm / scene.bgm / hook.bgm + hook.se / line.se
 # - Sprint 4: shorts: [...] で本編から派生 Shorts（縦長 1080×1920）を量産
+# - Sprint 5: シーン別背景（image/background/*.png）／末尾エンドスクリーン任意
 # 既存16本は触らず、このデモだけで全機能を体感できるようにしてある。
 # 必要素材（事前に ./bgm/ ./se/ に配置済み）:
 #   bgm/パステルハウス.mp3, intro_tense.mp3, main_serious.mp3, outro_warm.mp3
@@ -38,11 +39,20 @@ global:
   voice:
     speedScale: 1.2
     postPhonemeLength: 0.08
-  defaultBackground: "./image/background/Movidrill.png"
+  # Hook 区間は本編行が未開始のため defaultBackground がそのまま背景になる（警告・速報風）
+  defaultBackground: "./image/background/hook_alert.png"
   # === Sprint 3: 既定 BGM（シーン別 bgm が無い区間で流れる）===================
   bgm:
     default: "./bgm/パステルハウス.mp3"
     volume: 0.12  # セリフを邪魔しないよう、既定の 0.15 より少し控えめ
+  # === Sprint 5: 末尾エンドカード（任意・無効化する場合は enabled: false またはブロック削除）
+  endScreen:
+    enabled: true
+    durationMs: 6000
+    subscribeText: "チャンネル登録で次回も見逃さない！"
+    nextEpisode:
+      title: "次回：認可チェックの実装パターン"
+      thumbnail: "./image/background/endscreen_dark.png"
 
 output:
   fps: 30
@@ -72,6 +82,7 @@ hook:
 # === 本編シーン ============================================================
 scenes:
   - id: "incident"
+    background: "./image/background/scene_incident.png"
     chapter:
       label: "事件発生：URLいじりが招く事故"
     # 事件解説中はシリアスな BGM に切替（自動で 400ms クロスフェード）
@@ -98,6 +109,7 @@ scenes:
           style: "warn"
 
   - id: "concept"
+    background: "./image/background/scene_concept.png"
     chapter:
       label: "認証と認可の違い"
     # bgm 未指定 → global.bgm.default（パステルハウス）に自動で戻る
@@ -118,6 +130,7 @@ scenes:
         se: "./se/emphasis_chime.mp3"
 
   - id: "summary"
+    background: "./image/background/scene_summary.png"
     chapter:
       label: "まとめ"
     # まとめは温かい BGM に切替
