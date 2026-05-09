@@ -1,7 +1,11 @@
 import React from "react";
 import { Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import type { VideoManifest } from "../src/types/videoManifest";
-import { SUBTITLE_BLOCK_HEIGHT_RATIO, TACHIE_SIDE_WIDTH_RATIO } from "../src/config/videoLayout";
+import {
+  CLASSROOM_FRAME_LAYOUT,
+  SUBTITLE_BLOCK_HEIGHT_RATIO,
+  TACHIE_SIDE_WIDTH_RATIO,
+} from "../src/config/videoLayout";
 import { Background } from "./components/Background";
 import { CharacterLayer } from "./components/CharacterLayer";
 import { SubtitleLayer } from "./components/SubtitleLayer";
@@ -33,7 +37,11 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
   const activeLine = manifest.lines.find(
     (l) => l.startMs <= currentMs && currentMs < l.startMs + l.durationMs,
   );
-  const backgroundPath = activeLine?.backgroundFile ?? manifest.defaultBackground;
+  const defaultBg = manifest.defaultBackground;
+  const lineBg = activeLine?.backgroundFile ?? defaultBg;
+  /** 既定の黒板画像と異なるとき（Reveal キャプチャ等）は中央パネルに重ねる */
+  const slideOverlayPath =
+    lineBg && defaultBg && lineBg !== defaultBg ? lineBg : undefined;
 
   if (manifest.transparent) {
     return (
@@ -65,6 +73,14 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
   const subtitleBlockH = Math.round(height * SUBTITLE_BLOCK_HEIGHT_RATIO);
   const mainH = height - subtitleBlockH;
 
+  const L = CLASSROOM_FRAME_LAYOUT;
+  const slidePanel = {
+    left: Math.round(L.slide.x * width),
+    top: Math.round(L.slide.y * height),
+    width: Math.round(L.slide.w * width),
+    height: Math.round(L.slide.h * height),
+  };
+
   return (
     <div
       style={{
@@ -75,7 +91,7 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
         overflow: "hidden",
       }}
     >
-      {/* 全画面背景：cover で左右上下とも隙間なく敷く（行ごとに切替） */}
+      {/* 全面：常に既定の黒板画像（slideOverlayPath がある行でもベースは黒板） */}
       <div
         style={{
           position: "absolute",
@@ -87,8 +103,32 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
           overflow: "hidden",
         }}
       >
-        <Background backgroundPath={backgroundPath} width={width} height={height} objectFit="cover" />
+        <Background backgroundPath={defaultBg} width={width} height={height} objectFit="cover" />
       </div>
+
+      {/* HTMLスライドのキャプチャ PNG：黒板上段の中央に contain（強調テロップより下／立ち絵より手前でない／字幕より奥） */}
+      {slideOverlayPath && (
+        <div
+          style={{
+            position: "absolute",
+            left: slidePanel.left,
+            top: slidePanel.top,
+            width: slidePanel.width,
+            height: slidePanel.height,
+            zIndex: 1,
+            overflow: "hidden",
+            borderRadius: 6,
+          }}
+        >
+          <Background
+            backgroundPath={slideOverlayPath}
+            width={slidePanel.width}
+            height={slidePanel.height}
+            objectFit="contain"
+            fillColumn
+          />
+        </div>
+      )}
 
       {/* 立ち絵：背景の上にオーバーレイ（左右に大きめ配置） */}
       <div

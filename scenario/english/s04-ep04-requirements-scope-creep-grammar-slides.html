@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>シーズン4 第4話 — 顧客MTG・要件変更の英語（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220;
+      --panel: #141d2e;
+      --zunda: #88dd44;
+      --metan: #ff88bb;
+      --text: #e8f0f8;
+      --muted: #8fa3bc;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --accent: #7dd3fc;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: clamp(18px, 0.65vw + 15px, 28px); }
+    html, body {
+      margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1; display: none;
+      padding: clamp(0.85rem, 2vh, 1.75rem) clamp(1rem, 4.5vw, 5rem) calc(5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1820px); margin: 0 auto; width: 100%;
+      min-height: calc(100vh - 5.25rem); overflow-x: auto; overflow-y: auto;
+      animation: in 0.35s ease; font-size: 1.07rem;
+    }
+    .slide code { font-family: var(--mono); font-size: 0.94em; padding: 0.08em 0.28em; border-radius: 4px; background: rgba(15, 23, 42, 0.65); }
+    .slide.active { display: block; }
+    @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { font-size: clamp(1.35rem, 2.2vw + 0.6rem, 2.2rem); font-weight: 700; margin: 0 0 0.45rem; line-height: 1.28; color: #fef3c7; }
+    h2 { font-size: clamp(1.02rem, 1.05vw + 0.72rem, 1.48rem); font-weight: 500; color: var(--muted); margin: 0 0 1rem; line-height: 1.45; }
+    .tag {
+      display: inline-block; font-size: clamp(0.7rem, 0.55vw + 0.52rem, 0.92rem); letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--bg); background: linear-gradient(90deg, var(--zunda), var(--metan)); padding: 0.28rem 0.65rem; border-radius: 4px; margin-bottom: 0.65rem; font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel); border-radius: 14px; padding: clamp(1rem, 2.2vw, 2rem); margin: clamp(0.65rem, 1.5vh, 1.1rem) 0;
+      border: 1px solid rgba(136, 221, 68, 0.35); zoom: 1.08;
+    }
+    @media (max-width: 900px) { .diagram { zoom: 1; } .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; } html { font-size: clamp(16px, 2.5vw + 12px, 22px); } }
+    @media (min-width: 1600px) { .diagram { zoom: 1.14; } }
+    .diagram svg { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; } .bullets strong { color: var(--text); }
+    .note { font-size: 0.95em; color: var(--muted); border-left: 4px solid var(--accent); padding-left: 1.1rem; margin-top: 0.85rem; line-height: 1.55; }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem); background: rgba(12, 18, 32, 0.94); border-top: 1px solid rgba(139, 156, 179, 0.2); backdrop-filter: blur(8px); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text); border: 1px solid rgba(255, 136, 187, 0.45);
+      padding: 0.55rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 1.05rem; font-weight: 600;
+    }
+    .toolbar button:hover { background: #1c2840; } .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: var(--metan); font-size: 0.88em; max-width: 100%; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box {
+      padding: clamp(0.85rem, 1.8vw, 1.25rem); border-radius: 14px;
+      background: rgba(20, 29, 46, 0.65); border: 1px solid rgba(139, 156, 179, 0.22);
+    }
+    .box-title { font-size: clamp(0.95rem, 0.75vw + 0.72rem, 1.15rem); font-weight: 700; margin-bottom: 0.45rem; }
+    .box-desc { font-size: clamp(0.88rem, 0.45vw + 0.72rem, 1.02rem); color: var(--muted); line-height: 1.55; }
+    .theme-zunda { border-color: rgba(136, 221, 68, 0.45); background: rgba(136, 221, 68, 0.06); } .theme-zunda .box-title { color: var(--zunda); }
+    .theme-metan { border-color: rgba(255, 136, 187, 0.45); background: rgba(255, 136, 187, 0.06); } .theme-metan .box-title { color: #fbcfe8; }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.45); background: rgba(251, 191, 36, 0.06); } .theme-warn .box-title { color: var(--warn); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); background: rgba(248, 113, 113, 0.06); } .theme-danger .box-title { color: var(--danger); }
+    .slide-lead { font-size: clamp(1rem, 0.55vw + 0.82rem, 1.15rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.85rem; } .slide-lead strong { color: var(--text); }
+    .phrase-card {
+      font-family: var(--mono); font-size: clamp(0.92rem, 0.5vw + 0.78rem, 1.08rem); color: #fef9c3;
+      padding: 0.65rem 1rem; border-radius: 10px; background: rgba(15, 23, 42, 0.75); border: 1px dashed rgba(136, 221, 68, 0.4); margin: 0.5rem 0;
+    }
+    .hint-read {
+      font-size: clamp(0.88rem, 0.45vw + 0.72rem, 1rem); color: #a5b4c8; line-height: 1.58; margin: 0.45rem 0 0;
+      padding: 0.55rem 0.85rem; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px dashed rgba(125, 211, 252, 0.35);
+    }
+    .hint-read::before { content: "［図の見方］ "; color: var(--accent); font-weight: 600; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+    @media (max-width: 850px) { .grid-3 { grid-template-columns: 1fr; } }
+    .pill {
+      text-align: center; padding: 0.55rem 0.65rem; border-radius: 12px; font-weight: 700; font-size: clamp(0.82rem, 0.4vw + 0.7rem, 0.95rem);
+      background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(100, 116, 139, 0.35); color: #cbd5e1;
+    }
+    .pill b { display: block; color: var(--metan); margin-bottom: 0.2rem; font-size: 0.78em; }
+    .phrase-en-lg {
+      font-family: var(--mono); font-size: clamp(1.05rem, 0.9vw + 0.85rem, 1.35rem); font-weight: 800;
+      color: #fef9c3; line-height: 1.3; margin: 0.35rem 0 0.25rem;
+    }
+    .jp-mean { font-size: clamp(0.95rem, 0.55vw + 0.82rem, 1.12rem); color: #e2e8f0; line-height: 1.55; margin: 0.35rem 0; }
+    .word-note {
+      font-size: clamp(0.88rem, 0.45vw + 0.75rem, 1.02rem); color: #94a3b8; line-height: 1.5; margin-top: 0.45rem;
+      padding: 0.55rem 0.75rem; background: rgba(15, 23, 42, 0.65); border-radius: 8px;
+      border-left: 4px solid var(--accent);
+    }
+    .goal-box {
+      font-size: clamp(0.95rem, 0.5vw + 0.82rem, 1.08rem); color: #dbeafe; line-height: 1.55;
+      padding: 0.65rem 0.85rem; background: rgba(30, 58, 138, 0.35); border-radius: 10px; margin: 0.65rem 0;
+    }
+    .sum-stack-lg { display: flex; flex-direction: column; gap: 0.65rem; margin: 0.75rem 0; }
+    .sum-item-lg {
+      display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.65rem 0.85rem;
+      border-radius: 12px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+    .sum-item-lg .num {
+      flex-shrink: 0; width: 1.65rem; height: 1.65rem; line-height: 1.65rem; text-align: center;
+      border-radius: 50%; font-weight: 900; background: var(--metan); color: #0f172a; font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- シーズン4 第4話 — 解説スライド（台本: s04-ep04-requirements-scope-creep.yaml） docs/english/企画書.md 準拠 -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="—" title="表紙">
+      <span class="tag">現場English · シーズン4 第4話</span>
+      <h1>要件変更が急すぎるのだ<br /><span style="font-size:0.72em;font-weight:600;color:var(--muted)">顧客MTGで詰まらない英語フレーズ</span></h1>
+      <h2>締切直前の <strong style="color:#fecaca">追加要件</strong> を、短い英語で <strong style="color:var(--ok)">整理</strong> する</h2>
+      <div class="goal-box">
+        <strong>この回のゴール（初心者向け）</strong><br />
+        ① 相手の意図を一文で言い切って確認する　② どれが先か（優先順位）を聞く　③ 仕事の範囲（スコープ）をずらしてもらう交渉を始める
+      </div>
+      <div class="diagram">
+        <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="gBanner" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#88dd44"/><stop offset="1" stop-color="#ff88bb"/></linearGradient>
+          </defs>
+          <rect x="40" y="30" width="720" height="56" rx="12" fill="url(#gBanner)" opacity="0.92"/>
+          <text x="400" y="65" text-anchor="middle" fill="#0c1220" font-size="18" font-weight="800" font-family="sans-serif">ENGINEER ENGLISH LAB</text>
+          <rect x="80" y="120" width="160" height="120" rx="14" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="160" y="158" text-anchor="middle" fill="#bbf7d0" font-size="12" font-weight="700">ずんだもん</text>
+          <circle cx="130" cy="200" r="22" fill="#365314"/><circle cx="190" cy="200" r="22" fill="#365314"/>
+          <path d="M 145 215 Q 160 228 175 215" stroke="#fef08a" stroke-width="3" fill="none"/>
+          <rect x="320" y="120" width="360" height="120" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="500" y="152" text-anchor="middle" fill="#bae6fd" font-size="13" font-weight="700">顧客ミーティング（オンライン）</text>
+          <rect x="350" y="168" width="300" height="56" rx="8" fill="#0f172a" stroke="#64748b"/>
+          <text x="500" y="200" text-anchor="middle" fill="#e2e8f0" font-size="11">画面共有 · 翌日リリースの話題…</text>
+          <text x="500" y="248" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="700">＋ 追加の要望が飛んでくる場面</text>
+        </svg>
+      </div>
+      <p class="note">企画書テーマ：「<strong>要件変更が急すぎるのだ</strong>」／ 現場シーン：<strong>顧客との要件調整</strong></p>
+      <p class="word-note" style="border-left-color:var(--ok)"><strong>キーワード：</strong>confirm（確認）／ priority（優先順位）／ scope（仕事の範囲）</p>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="crisis" title="あるある">
+      <span class="tag">あるある（crisis）</span>
+      <h1>明日リリースなのに「それも入れて」</h1>
+      <h2>カレンダー・締切・新しい箱（追加タスク）が同時に襲うイメージ</h2>
+      <p class="hint-read">オレンジ＝締切・炎上感、緑の箱＝元のスコープ、ピンクの箱＝いきなり足された仕事。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" aria-label="締切と追加要件">
+          <rect x="480" y="24" width="280" height="90" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="620" y="58" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="700">RELEASE</text>
+          <text x="620" y="88" text-anchor="middle" fill="#fca5a5" font-size="22" font-weight="900">TOMORROW</text>
+          <text x="620" y="112" text-anchor="middle" fill="#94a3b8" font-size="11">リリース日が目前</text>
+          <rect x="60" y="160" width="200" height="100" rx="10" fill="#14532d" stroke="#4ade80" stroke-width="2" opacity="0.95"/>
+          <text x="160" y="200" text-anchor="middle" fill="#bbf7d0" font-size="12" font-weight="700">本体リリース</text>
+          <text x="160" y="228" text-anchor="middle" fill="#86efac" font-size="10">（もともとの約束）</text>
+          <path d="M 270 210 L 340 210" stroke="#f472b6" stroke-width="4" marker-end="url(#arrScope)"/>
+          <defs>
+            <marker id="arrScope" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#f472b6"/></marker>
+          </defs>
+          <rect x="350" y="150" width="200" height="120" rx="10" fill="#4c1d40" stroke="#ff88bb" stroke-width="2"/>
+          <text x="450" y="190" text-anchor="middle" fill="#fce7f3" font-size="12" font-weight="700">レポートも欲しい</text>
+          <text x="450" y="218" text-anchor="middle" fill="#fbcfe8" font-size="10">クライアント発言</text>
+          <text x="450" y="248" text-anchor="middle" fill="#fda4af" font-size="11" font-weight="700">scope creep 気味</text>
+          <text x="400" y="132" text-anchor="middle" fill="#94a3b8" font-size="11">「明日までに？」が頭の中でバグる…</text>
+        </svg>
+      </div>
+      <p class="jp-mean"><strong>状況の説明：</strong>締切が近いのに仕事が増える場面。ここからは「整理」の英語で切り返す。</p>
+      <p class="word-note"><strong>scope creep</strong>＝約束の範囲がじわじわ広がること（現場ではよく使う英語）。</p>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="stuck" title="詰み">
+      <span class="tag">詰み（stuck）</span>
+      <h1>「えっと… OK…？」だけだと後で揉める</h1>
+      <h2>表情だけ <strong>合意っぽく見える</strong> → 優先順位・締切が記録に残らない</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 820 260" xmlns="http://www.w3.org/2000/svg" aria-label="OKだけの危険">
+          <ellipse cx="180" cy="120" rx="90" ry="70" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="180" y="108" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="700">顔だけ OK</text>
+          <text x="180" y="136" text-anchor="middle" fill="#cbd5e1" font-size="10">（発話が薄い）</text>
+          <path d="M 280 120 L 380 120" stroke="#64748b" stroke-width="3" stroke-dasharray="8 6"/>
+          <rect x="400" y="70" width="360" height="100" rx="12" fill="#3f1d1d" stroke="#f87171" stroke-width="2"/>
+          <text x="580" y="108" text-anchor="middle" fill="#fecaca" font-size="13" font-weight="700">あとから「言ってない」問題</text>
+          <text x="580" y="138" text-anchor="middle" fill="#fca5a5" font-size="10">優先度・スコープがログに残っていない</text>
+        </svg>
+      </div>
+      <div class="grid-2">
+        <div class="rich-box theme-danger">
+          <div class="box-title">やりがち</div>
+          <div class="box-desc">曖昧な <code>OK</code> / 沈黙のうなずきだけ</div>
+        </div>
+        <div class="rich-box theme-zunda">
+          <div class="box-title">ここからの方針</div>
+          <div class="box-desc"><strong>確認 → 優先順位 → スコープ</strong> の3点を、短い英語で一気に出す</div>
+        </div>
+      </div>
+      <p class="jp-mean"><strong>なぜ英語が必要？</strong> うなずくだけだと「何を・いつまでに」が記録に残らず、後から揉めやすい。</p>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="lesson" title="フレーズ1">
+      <span class="tag">解説 · ①</span>
+      <div class="phrase-en-lg">To confirm, you mean ...?</div>
+      <p class="jp-mean"><strong>日本語の意味：</strong>「確認ですが、あなたの言っているのは〜という理解で合っていますか？」</p>
+      <p class="word-note"><strong>単語メモ：</strong> confirm＝確認する／ mean＝（ここでは）〜という意味だと取れる</p>
+      <p class="word-note" style="border-left-color:var(--ok)"><strong>トーン：</strong>責めずに<strong>確認</strong>する。相手は Yes / No で答えやすい。</p>
+      <h2 style="margin-top:0.75rem;font-size:clamp(0.95rem, 0.8vw + 0.75rem, 1.15rem)">直訳イメージ · 例文</h2>
+      <div class="phrase-card">例: To confirm, you mean we need the report by tomorrow?<br /><span style="font-size:0.88em;color:#cbd5e1">（明日までにレポートが必要、という理解で合ってる？）</span></div>
+      <div class="diagram">
+        <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" aria-label="確認の矢印">
+          <rect x="40" y="60" width="200" height="100" rx="12" fill="#1e293b" stroke="#94a3b8"/>
+          <text x="140" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="700">相手の発言</text>
+          <text x="140" y="128" text-anchor="middle" fill="#94a3b8" font-size="10">（バラバラな単語）</text>
+          <path d="M 250 110 L 310 110" stroke="#88dd44" stroke-width="4" marker-end="url(#arrG)"/>
+          <defs><marker id="arrG" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#88dd44"/></marker></defs>
+          <rect x="320" y="45" width="260" height="130" rx="14" fill="#14532d" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="85" text-anchor="middle" fill="#bbf7d0" font-size="13" font-weight="800">To confirm, you mean …?</text>
+          <text x="450" y="118" text-anchor="middle" fill="#86efac" font-size="11">自分の理解を一文で言い切る</text>
+          <text x="450" y="148" text-anchor="middle" fill="#fef08a" font-size="10">相手は YES / NO で答えやすい</text>
+          <path d="M 590 110 L 650 110" stroke="#ff88bb" stroke-width="4" marker-end="url(#arrP)"/>
+          <defs><marker id="arrP" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#ff88bb"/></marker></defs>
+          <rect x="660" y="60" width="120" height="100" rx="12" fill="#1e293b" stroke="#38bdf8"/>
+          <text x="720" y="105" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="700">認識</text>
+          <text x="720" y="128" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="700">すり合わせ</text>
+        </svg>
+      </div>
+      <p class="note">会議のログ・後からのメールにそのまま貼れる「確認文」になる。</p>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="lesson" title="フレーズ2">
+      <span class="tag">解説 · ②</span>
+      <div class="phrase-en-lg">What's the priority?</div>
+      <p class="jp-mean"><strong>日本語の意味：</strong>「いちばん優先することはどれですか？」</p>
+      <p class="word-note"><strong>単語メモ：</strong> priority＝優先順位／ What's＝What is の短くした言い方（口語）</p>
+      <h2 style="margin-top:0.5rem">仕事の現場で効く <strong>最短の優先順位ターン</strong></h2>
+      <div class="diagram">
+        <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg" aria-label="優先順位">
+          <text x="400" y="28" text-anchor="middle" fill="#94a3b8" font-size="12">どれを先に倒す？ を英語一発で聞く</text>
+          <path d="M 400 240 L 400 60" stroke="#64748b" stroke-width="3"/>
+          <polygon points="400,50 360,80 440,80" fill="#fbbf24"/>
+          <text x="400" y="76" text-anchor="middle" fill="#0c1220" font-size="11" font-weight="800">TOP</text>
+          <rect x="330" y="100" width="140" height="48" rx="8" fill="#1e3a5f" stroke="#38bdf8"/>
+          <text x="400" y="130" text-anchor="middle" fill="#e0f2fe" font-size="11">① メイン機能</text>
+          <rect x="300" y="165" width="200" height="48" rx="8" fill="#1e293b" stroke="#88dd44"/>
+          <text x="400" y="195" text-anchor="middle" fill="#bbf7d0" font-size="11">② レポート</text>
+          <rect x="270" y="230" width="260" height="40" rx="8" fill="#0f172a" stroke="#64748b"/>
+          <text x="400" y="256" text-anchor="middle" fill="#94a3b8" font-size="10">③ その他（フォローアップ可？）</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>Both needed?</strong> が続くなら、<code>What's the priority between A and B?</code> など具体名を足すとさらに安全。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="lesson" title="フレーズ3">
+      <span class="tag">解説 · ③</span>
+      <div class="phrase-en-lg">Could we scope this to ...?</div>
+      <p class="jp-mean"><strong>日本語の意味：</strong>「これを〜という範囲に絞れませんか？」（全部やるのは無理、というときの交渉の入口）</p>
+      <p class="word-note"><strong>単語メモ：</strong> scope＝（仕事・機能の）範囲／ Could we〜?＝丁寧な「〜してもらえませんか」</p>
+      <h2 style="margin-top:0.5rem">「範囲をこう絞れない？」— <strong>スコープ交渉の入口</strong>（エンジニア同士の語も使える）</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 820 260" xmlns="http://www.w3.org/2000/svg" aria-label="スコープを絞る">
+          <ellipse cx="220" cy="130" rx="160" ry="100" fill="none" stroke="#f87171" stroke-width="3" stroke-dasharray="10 8"/>
+          <text x="220" y="125" text-anchor="middle" fill="#fca5a5" font-size="13" font-weight="700">巨大な要求</text>
+          <text x="220" y="152" text-anchor="middle" fill="#fecaca" font-size="10">全部やると死ぬ…</text>
+          <text x="420" y="130" text-anchor="middle" fill="#94a3b8" font-size="22">⇒</text>
+          <ellipse cx="600" cy="130" rx="95" ry="75" fill="rgba(74,222,128,0.12)" stroke="#4ade80" stroke-width="3"/>
+          <text x="600" y="118" text-anchor="middle" fill="#bbf7d0" font-size="12" font-weight="800">scope を絞る</text>
+          <text x="600" y="148" text-anchor="middle" fill="#86efac" font-size="10">次スプリント / MVP / フォローアップ</text>
+        </svg>
+      </div>
+      <div class="phrase-card">Could we scope this to a follow-up next sprint?</div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="variants" title="言い換え">
+      <span class="tag">言い換え（variants）</span>
+      <h1>丁寧 · カジュアル · 緊急</h1>
+      <h2>場の空気と残り時間でトーンを切り替える</h2>
+      <div class="grid-3">
+        <div class="rich-box theme-metan">
+          <div class="box-title">丁寧</div>
+          <div class="box-desc"><code>Could you clarify the priority among these items?</code><br /><strong>意味：</strong>優先順位をはっきり教えてください。<br />項目が多いときに有効。</div>
+        </div>
+        <div class="rich-box theme-zunda">
+          <div class="box-title">カジュアル</div>
+          <div class="box-desc"><code>What's must-have vs nice-to-have?</code><br /><strong>意味：</strong>必須 vs あれば嬉しい、どっち？<br />軽いチーム向け。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">緊急・短く</div>
+          <div class="box-desc"><code>We can't ship everything by tomorrow.</code><br /><code>Which one is the blocker?</code><br /><strong>意味：</strong>明日までに全部は無理。ボトルネックはどれ？（blocker＝進捗を止める要因）</div>
+        </div>
+      </div>
+      <div class="diagram" style="margin-top:0.75rem;">
+        <svg viewBox="0 0 780 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="40" y="30" width="220" height="60" rx="10" fill="#3b0764" stroke="#e9d5ff"/>
+          <text x="150" y="58" text-anchor="middle" fill="#f5d0fe" font-size="11" font-weight="700">Polite</text>
+          <text x="150" y="78" text-anchor="middle" fill="#e9d5ff" font-size="10">長め・安全</text>
+          <rect x="280" y="30" width="220" height="60" rx="10" fill="#14532d" stroke="#bbf7d0"/>
+          <text x="390" y="58" text-anchor="middle" fill="#bbf7d0" font-size="11" font-weight="700">Casual</text>
+          <text x="390" y="78" text-anchor="middle" fill="#86efac" font-size="10">短く親しみ</text>
+          <rect x="520" y="30" width="220" height="60" rx="10" fill="#450a0a" stroke="#fecaca"/>
+          <text x="630" y="58" text-anchor="middle" fill="#fecaca" font-size="11" font-weight="700">Urgent</text>
+          <text x="630" y="78" text-anchor="middle" fill="#fca5a5" font-size="10">最小語数・ブロッカー特定</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="replay" title="実戦リプレイ">
+      <span class="tag">実戦リプレイ（replay）</span>
+      <h1>同じ場面を「3発」で言い切る</h1>
+      <h2>台本リプレイ例（字幕つき発話のイメージ）</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" aria-label="会話フロー">
+          <defs>
+            <marker id="arrF" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#88dd44"/></marker>
+          </defs>
+          <rect x="30" y="40" width="760" height="56" rx="10" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="410" y="78" text-anchor="middle" fill="#fef9c3" font-size="13" font-family="monospace">1. To confirm, you mean we need both in the release?</text>
+          <path d="M 410 110 L 410 130" stroke="#64748b" stroke-width="2" marker-end="url(#arrF)"/>
+          <rect x="30" y="140" width="760" height="56" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="410" y="178" text-anchor="middle" fill="#fef9c3" font-size="13" font-family="monospace">2. What's the priority?</text>
+          <path d="M 410 210 L 410 230" stroke="#64748b" stroke-width="2" marker-end="url(#arrF)"/>
+          <rect x="30" y="240" width="760" height="52" rx="10" fill="#1e293b" stroke="#ff88bb" stroke-width="2"/>
+          <text x="410" y="274" text-anchor="middle" fill="#fef9c3" font-size="12" font-family="monospace">3. Could we scope this to a follow-up next sprint?</text>
+        </svg>
+      </div>
+      <p class="note">この順番は「<strong>確認 → 優先度 → 代替スコープ</strong>」で、後から説明しやすい。</p>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">今日の3フレーズ（summary）</span>
+      <h1>持ち帰り：確認 · 優先順位 · スコープ</h1>
+      <h2>次回（第5話）予告：<code>Rough estimate</code> — 見積もりを聞かれたときの英語</h2>
+      <div class="sum-stack-lg">
+        <div class="sum-item-lg">
+          <span class="num">1</span>
+          <div>
+            <div class="phrase-en-lg" style="margin-top:0;font-size:clamp(1rem, 0.85vw + 0.8rem, 1.25rem)">To confirm, you mean …?</div>
+            <p class="jp-mean" style="margin:0.35rem 0 0;font-size:clamp(0.92rem, 0.5vw + 0.78rem, 1.05rem)"><strong>意味：</strong>確認ですが〜という理解で合いますか？／相手の意図を一文で言い切る。</p>
+          </div>
+        </div>
+        <div class="sum-item-lg">
+          <span class="num">2</span>
+          <div>
+            <div class="phrase-en-lg" style="margin-top:0;font-size:clamp(1rem, 0.85vw + 0.8rem, 1.25rem)">What's the priority?</div>
+            <p class="jp-mean" style="margin:0.35rem 0 0;font-size:clamp(0.92rem, 0.5vw + 0.78rem, 1.05rem)"><strong>意味：</strong>何がいちばん優先？／複数タスクの順番を決める。</p>
+          </div>
+        </div>
+        <div class="sum-item-lg">
+          <span class="num">3</span>
+          <div>
+            <div class="phrase-en-lg" style="margin-top:0;font-size:clamp(0.95rem, 0.8vw + 0.75rem, 1.2rem)">Could we scope this to …?</div>
+            <p class="jp-mean" style="margin:0.35rem 0 0;font-size:clamp(0.92rem, 0.5vw + 0.78rem, 1.05rem)"><strong>意味：</strong>範囲を〜に絞れませんか？／無理な全部入りをずらす交渉の入口。</p>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:0.65rem">台本 <code style="color:#f9a8d4">s04-ep04-requirements-scope-creep.yaml</code> と並べて復習すると、動画のシーンと一致しやすいです。</p>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 9</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#fda4af; line-height:1.25; text-align:center; word-break:break-all;" title="s04-ep04-requirements-scope-creep.yaml">台本 id: —</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

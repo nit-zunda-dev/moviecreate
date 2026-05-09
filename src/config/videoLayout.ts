@@ -3,13 +3,12 @@ export const DEFAULT_VIDEO_WIDTH = 1280;
 export const DEFAULT_VIDEO_HEIGHT = 720;
 
 /**
- * 全動画で常に使う背景画像（黒板）。
+ * 動画のベース背景（黒板）。全面に常に敷く既定画像。
  *
- * 運用方針：シーンごとの背景切替を廃止し、常にこの画像を背景として使う。
- * シナリオ YAML の `global.defaultBackground` や `scene.background` / `line.background`
- * が指定されていても、システム側でこのパスに上書きする。
- *
- * 解除したい場合は manifestBuilder.ts の上書きロジックを外せばよい。
+ * `scene.background`（Reveal キャプチャ等）や `line.background` がある行では、
+ * マニフェスト上は別画像が載るが、Remotion 側では黒板を全面に残し、
+ * 差分画像は `CLASSROOM_FRAME_LAYOUT.slide` の矩形に contain で重ねる（VideoComposition）。
+ * `global.videoFrame`（教室フレーム）指定時は ClassroomVideoComposition が `slide` 領域に表示。
  */
 export const FORCE_DEFAULT_BACKGROUND = "image/background/background.png";
 
@@ -39,8 +38,8 @@ export const CHARACTER_AND_SUBTITLE_RESERVE_BOTTOM_PX = 180;
  * 実際のイラストに合わせて微調整すること。値はフレーム幅・高さに対する 0〜1 の比率。
  */
 export const CLASSROOM_FRAME_LAYOUT = {
-  /** 上段の黒板（緑）に Reveal キャプチャを収める領域（中央寄せで少し下） */
-  slide: { x: 0.125, y: 0.045, w: 0.75, h: 0.55 },
+  /** 上段の黒板（緑）に Reveal キャプチャを収める領域（中央寄せで少し下）。字幕帯の上まで広げて文字を大きく見せる */
+  slide: { x: 0.065, y: 0.022, w: 0.87, h: 0.655 },
   /** 下段の黒板中央に字幕を配置（上段と重ならないよう下へ） */
   subtitle: { x: 0.07, y: 0.605, w: 0.86, h: 0.265 },
   /** 左の黒帯：下段黒板の少し上に大きめ立ち絵 */

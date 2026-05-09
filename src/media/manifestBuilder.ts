@@ -109,10 +109,13 @@ export function buildVideoManifest(
       imageFile = path.join(charDir, line.face + ".png");
     }
 
-    // 背景はシステム既定（黒板）に固定する運用方針。
-    // line.background / scene.background が指定されていても無視する。
-    void sceneBackground;
-    const backgroundFile = path.resolve(FORCE_DEFAULT_BACKGROUND);
+    // 背景: 行指定 > シーン指定（HTMLスライドキャプチャは scene.background に入る）> 既定の黒板
+    let backgroundFile = path.resolve(FORCE_DEFAULT_BACKGROUND);
+    if (line.background) {
+      backgroundFile = path.resolve(line.background);
+    } else if (sceneBackground) {
+      backgroundFile = path.resolve(sceneBackground);
+    }
 
     const lineStartMs = currentMs;
     const lineDurationMs = result.durationMs;
@@ -194,7 +197,6 @@ export function buildVideoManifest(
     currentMs = lineEndMs;
   }
 
-  // global.defaultBackground も常に固定の黒板背景に上書き
   void scenario.global?.defaultBackground;
   const defaultBackground = path.resolve(FORCE_DEFAULT_BACKGROUND);
 

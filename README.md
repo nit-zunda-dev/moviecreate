@@ -196,11 +196,15 @@ global:
 
 ### HTML スライド（Reveal）を背景に使う
 
-`global.videoFrame` **未指定**のとき、`generate-video` では **Reveal** のスライドを **中央列**に `object-fit: contain` で表示し、**左右列**に立ち絵、**下段**に字幕、という **縦方向 flex** です。下段の字幕は **`SUBTITLE_BLOCK_HEIGHT_RATIO`（既定で約3行分）**で高さ**固定**し、上段（スライド＋立ち絵）の高さを**常に同じ**にしています。長い字幕は `SUBTITLE_MAX_LINES` 行相当で打ち切り（はみ出し隠し）。行数・ブロック高さは `src/config/videoLayout.ts` で調整できます。立ち絵列は `TACHIE_SIDE_WIDTH_RATIO` 等。
+`global.videoFrame` **未指定**のとき、`generate-video` は次のレイアウトです。
 
-- **手順**（1）`global.slidesHtml` に HTML パス、または各シーンで `scenes[].slidesHtml` で HTML を指定（**シナリオ YAML ファイルを基準にした相対パス**が使えます）。（2）背景にしたいスライドの **横方向インデックス**（0 始まり）を `scenes[].slideIndex` に指定。
-- 該当シーンに **`slideIndex` があると `scene.background` の静的画像は使われず、キャプチャ画像で上書き**されます。HTML を使わないシーンは従来どおり `background` または `defaultBackground` です。
-- 通常の MP4（非 `--transparent`）は上記の**上下分割**です。`--transparent` では従来どおり、背景なし＋全画面下寄せの立ち絵・字幕向けのレイアウトです。
+- **全面**：既定の黒板画像（`src/config/videoLayout.ts` の **`FORCE_DEFAULT_BACKGROUND`**）
+- **その上・黒板上段の中央**：`slideIndex` があるシーンでは Playwright が撮った **Reveal キャプチャ PNG** を、`CLASSROOM_FRAME_LAYOUT.slide` の矩形（1280×720 基準の比率）に **`object-fit: contain`** で重ねる（強調テロップや教室 UI の赤帯の上に載せてもよい位置関係）
+- **左右列**：立ち絵（`TACHIE_SIDE_WIDTH_RATIO`）。**下段**：字幕帯（`SUBTITLE_BLOCK_HEIGHT_RATIO` で高さ固定、`SUBTITLE_MAX_LINES` で打ち切り）
+
+- **手順**（1）`global.slidesHtml` に HTML パス、または各シーンで `scenes[].slidesHtml` で HTML を指定（**シナリオ YAML ファイルを基準にした相対パス**が使えます）。（2）スライド番号（0 始まり）を `scenes[].slideIndex` に指定。`generate-video` がキャプチャ PNG を `scene.background` に設定し、マニフェストでは **黒板を全面・キャプチャを中央パネル**として再生します。
+- **`slideIndex` なし**のシーンは全面黒板のみ（YAML の `global.defaultBackground` は運用上ほぼ参照されず、既定黒板が優先）。
+- 通常の MP4（非 `--transparent`）が対象。`--transparent` では背景レイヤー無しの立ち絵・字幕向けです。
 - HTML は **`window.Reveal` が使える**こと（`Reveal.slide(horizontal, 0)` で切替）を前提にしています。社内の `*-study-slides.html`（Reveal 4 系＋ CDN）のような構成がそのまま使えます。
 
 ```yaml

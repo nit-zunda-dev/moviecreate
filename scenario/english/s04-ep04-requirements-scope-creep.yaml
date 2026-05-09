@@ -1,0 +1,321 @@
+# =============================================================================
+# シーズン4 第4話 — エンジニアの現場あるあるから学ぶ英会話
+# テーマ: 要件変更が急すぎるのだ（顧客との要件調整）
+# 持ち帰り3フレーズ:
+#   - To confirm, you mean ...?
+#   - What's the priority?
+#   - Could we scope this to ...?
+# スライド（動画キャプチャ用 Reveal）: s04-ep04-requirements-scope-creep-reveal-slides.html
+# 学習用HTML（ボタン操作）: s04-ep04-requirements-scope-creep-grammar-slides.html
+# slideIndex ⇔ scene.id :
+#   0 recap · 1 crisis · 2 stuck · 3 lesson_confirm · 4 lesson_priority · 5 lesson_scope · 6 variants · 7 replay · 8 summary
+# 動画生成例:
+#   node dist/cli.js lint-retention scenario/english/s04-ep04-requirements-scope-creep.yaml
+#   node dist/cli.js generate-video scenario/english/s04-ep04-requirements-scope-creep.yaml
+# BGM/SE は ./bgm/ ./se/ に素材を置いたときだけ有効（README の audio-assets 参照）
+# =============================================================================
+title: "【現場English】明日リリースなのに要件増えた…顧客MTGで詰まらない英語フレーズなのだ！"
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./s04-ep04-requirements-scope-creep-reveal-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+# --- 冒頭：離脱させない一言フック（要件変更あるある） ---
+hook:
+  durationMs: 5500
+  text: "明日リリースなのに『それも入れて』って言われた"
+  emphasis:
+    - "明日リリース"
+    - "それも入れて"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff4466"
+    durationMs: 220
+  zoom:
+    from: 1.0
+    to: 1.16
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  # 1) 前回の一滴（忘却防止）
+  - id: "recap"
+    slideIndex: 0
+    chapter:
+      label: "前回のワンフレーズ"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "前回は障害対応で『We're investigating now』って言えたら強い、って話だったわね。"
+        callout:
+          text: "♻️ おさらい"
+          style: "tip"
+          durationMs: 2800
+      - type: dialogue
+        character: zundamon
+        face: "照れ"
+        text: "今日はそっちじゃなくて、もっと普通に死ぬやつなのだ……。"
+
+  # 2) 現場あるある：顧客ミーティングで追加要件
+  - id: "crisis"
+    slideIndex: 1
+    bgm: "./bgm/main_serious.mp3"
+    chapter:
+      label: "あるある：締切直前の追加要件"
+    lines:
+      - type: narration
+        character: zundamon
+        face: "通常"
+        text: "場面は海外クライアントとの定例。明日がリリース日なのだ。"
+      - type: dialogue
+        character: zundamon
+        face: "悲しみ"
+        text: "画面共有がバグってカメラも挟まって、心も挟まってるのだ……。"
+        emphasis: ["心も挟まってる"]
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "画面は落ち着いて。クライアントが『レポートも欲しい』って言い出したわね。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ、明日までに？　翻訳ソフトが頭の中でバグったのだ！"
+        emphasis: ["明日までに"]
+        callout:
+          text: "🚨 締切直前"
+          style: "breaking"
+          durationMs: 3200
+
+  # 3) 詰まり：英語が出てこない
+  - id: "stuck"
+    slideIndex: 2
+    chapter:
+      label: "詰み：返しが英語で出ない"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "『えっと…オーケー…？』みたいな顔だけやって、優先順位も締切も聞けないのだ。"
+        emphasis: ["優先順位も締切も聞けない"]
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "それ、後で『言ってない』問題になるやつ。ここは短い英語で整理よ。"
+
+  # 4a) 解説：To confirm（スライドはシーン単位のため3分割）
+  - id: "lesson_confirm"
+    slideIndex: 3
+    chapter:
+      label: "解説：確認・優先順位・スコープ"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず『To confirm, you mean』。意味は『確認だけど、あなたの意図はこれで合ってる？』。"
+        emphasis: ["To confirm, you mean"]
+        se: "./se/emphasis_chime.mp3"
+        callout:
+          text: "✅ まず確認で事故を止める"
+          style: "exam"
+          durationMs: 4000
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "例えば、トゥ・コンファーム、ユー・ミーン、ウィー・ニード・ザ・レポート・バイ・トゥモロー？　明日までにレポート必要って理解で合ってる？って。"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "聞き返しが『攻撃』じゃなくて『確認』になるのだ！"
+
+  # 4b) 解説：優先順位
+  - id: "lesson_priority"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に『What's the priority?』。優先順位はどれ？って、仕事の現場で一番よく効く短句よ。"
+        emphasis: ["What's the priority"]
+
+  # 4c) 解説：スコープ
+  - id: "lesson_scope"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "最後に『Could we scope this to』。『これを範囲を絞って〜にできる？』。スコープの交渉の入口。"
+        emphasis: ["Could we scope this to"]
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "スコープって言うと、ちゃんとエンジニアの話になるのだ。"
+
+  # 5) 言い換え：丁寧・カジュアル・緊急
+  - id: "variants"
+    slideIndex: 6
+    chapter:
+      label: "言い換え：丁寧／カジュアル／緊急"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "丁寧なら『Could you clarify the priority among these items?』。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "カジュアルなら『What's must-have vs nice-to-have?』って聞けるわ。"
+      - type: dialogue
+        character: metan
+        face: "怒り"
+        text: "緊急なら短く『We can't ship everything by tomorrow』。"
+      - type: dialogue
+        character: metan
+        face: "怒り"
+        text: "続けて『Which one is blocker?』。ブロッカーはどれ？って狙い撃ち。"
+        emphasis: ["blocker"]
+        callout:
+          text: "⚡ 緊急時は短く"
+          style: "warn"
+          durationMs: 3500
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "nice-to-haveってなんか可愛い名前なのに、現場では凶器なのだ……。"
+
+  # 6) 実戦リプレイ（英語で言い直し）
+  - id: "replay"
+    slideIndex: 7
+    bgm: "./bgm/パステルハウス.mp3"
+    chapter:
+      label: "実戦リプレイ：同じ場面を英語で"
+    lines:
+      - type: narration
+        character: metan
+        face: "通常"
+        text: "同じミーティング、英語でやり直しよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "トゥ・コンファーム、ユー・ミーン、ウィー・ニード・ボス・レポート・イン・ザ・リリース？"
+        subtitle: "To confirm, you mean we need both in the release?"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ワッツ・ザ・プライオリティ？　レポートと本体、どっちが先なのだ。"
+        subtitle: "What's the priority?"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "クッド・ウィー・スコープ・ジス・トゥ・フォローアップ・ネクスト・スプリント？　次スプリントに回せる？"
+        subtitle: "Could we scope this to a follow-up next sprint?"
+      - type: dialogue
+        character: metan
+        face: "喜び"
+        text: "その返し方なら、後から揉めにくいわ。"
+
+  # 7) まとめ＆次回予告
+  - id: "summary"
+    slideIndex: 8
+    bgm: "./bgm/outro_warm.mp3"
+    chapter:
+      label: "今日の3フレーズ／次回予告"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "今日の3つ。ワン、トゥ・コンファーム、ユー・ミーン。ツー、ワッツ・ザ・プライオリティ。スリー、クッド・ウィー・スコープ・ジス・トゥ。"
+        emphasis:
+          - "To confirm, you mean"
+          - "What's the priority"
+          - "Could we scope this to"
+        se: "./se/correct_bell.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "次回は見積もりを聞かれて詰む話なのだ！　『ラフ・エスティメイト』とか出てくるやつ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。次は『Rough estimate』で逃げずに渡す英語よ。練習しておいてちょうだい。"
+
+shorts:
+  - id: "hook-crisis"
+    title: "明日リリースなのに追加要件…英語で詰まらない一言"
+    pickScenes: ["crisis", "stuck"]
+    overlayCaption: "📝 顧客MTGで即死しない英語"
+    cta: "👇 解説フルは本編（概要欄）"
+
+  - id: "three-phrases"
+    title: "優先順位を聞く英語：What's the priority?"
+    pickScenes: ["lesson_confirm", "lesson_priority", "lesson_scope"]
+    overlayCaption: "💬 To confirm / Priority / Scope"
+    cta: "続き・言い換えは本編へ"
+
+  - id: "replay-only"
+    title: "実戦リプレイ：要件変更を英語で切り返す"
+    pickScenes: ["replay"]
+    overlayCaption: "🔁 同じ場面を英語で言い直し"
+    cta: "チャンネル登録で次回も"
+
+youtube:
+  audience:
+    - "初級〜中級エンジニア"
+    - "英語会議が怖い開発者"
+    - "海外クライアント対応の学習者"
+  hookKeywords:
+    - "要件変更"
+    - "明日リリース"
+    - "優先順位 英語"
+    - "scope creep"
+  hashtags:
+    - "#エンジニア英語"
+    - "#ビジネス英語"
+    - "#英会話"
+    - "#ずんだもん"
+    - "#四国めたん"
+  relatedEpisodes:
+    - ep: 3
+      title: "障害対応で頭が真っ白なのだ"
+    - ep: 5
+      title: "見積もり聞かれて詰んだのだ"
+  titleHints:
+    - { style: "shock" }
+    - { style: "howto" }
+    - { style: "exam" }
+  imageStyle: "fun"
