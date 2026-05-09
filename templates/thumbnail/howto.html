@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Thumbnail (howto)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif; }
+
+    body {
+      position: relative;
+      background:
+        linear-gradient(135deg, #0e3a8a 0%, #1456c6 50%, #0a2a66 100%);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* グリッド装飾 */
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* 上部バナー */
+    .banner {
+      position: absolute;
+      top: 30px;
+      left: 36px;
+      padding: 8px 18px;
+      background: #22c2ff;
+      color: #002b50;
+      font-size: 30px;
+      font-weight: 900;
+      border-radius: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    /* メインコピー */
+    .main {
+      position: absolute;
+      top: 110px;
+      left: 40px;
+      right: 360px;
+      font-weight: 900;
+      line-height: 1.18;
+      color: #ffffff;
+      text-shadow: 4px 4px 0 #001a3a, 0 8px 18px rgba(0,0,0,0.65);
+    }
+    .main .l1 {
+      display: inline-block;
+      font-size: var(--main-fontsize);
+      padding: 0 4px;
+    }
+    .main .emphasis {
+      display: inline-block;
+      background: #fff;
+      color: #003e9c;
+      padding: 0 14px;
+      margin: 0 2px;
+      border-radius: 6px;
+      box-shadow: 0 6px 0 #ffd33a, 0 12px 24px rgba(0,0,0,0.5);
+    }
+
+    /* 下部の説明 */
+    .sub {
+      position: absolute;
+      bottom: 110px;
+      left: 40px;
+      right: 360px;
+      font-size: 38px;
+      font-weight: 800;
+      color: #b8e6ff;
+      text-shadow: 2px 2px 0 #001a3a;
+    }
+
+    /* 矢印（CTA風） */
+    .arrow {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 20px;
+      background: #ffd33a;
+      color: #002b50;
+      font-size: 28px;
+      font-weight: 900;
+      border-radius: 999px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+    }
+
+    /* 立ち絵（右下） */
+    .character {
+      position: absolute;
+      right: -10px;
+      bottom: 0;
+      height: 100%;
+      filter: drop-shadow(0 0 14px rgba(0,0,0,0.55)) drop-shadow(0 12px 28px rgba(0,0,0,0.5));
+    }
+    .character img {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="banner">{{BANNER_TEXT}}</div>
+
+  <div class="main" style="--main-fontsize: {{MAIN_FONTSIZE}}px;">
+    {{MAIN_HTML}}
+  </div>
+
+  <div class="sub">{{SUB_TEXT}}</div>
+
+  <div class="arrow">▶ {{CTA_TEXT}}</div>
+
+  <div class="character">
+    <img src="{{CHARACTER_IMAGE}}" alt="character" />
+  </div>
+</body>
+</html>

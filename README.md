@@ -320,6 +320,89 @@ global:
 
 ---
 
+### 視聴維持率を上げる演出（hook / emphasis / callout）
+
+YouTube は「最初の 5〜10 秒で視聴者が離脱しない」かどうかが再生数を大きく左右します。本ツールには次の 3 種類の演出ブロックがあり、台本側に書くだけで自動で動画に反映されます。**すべて任意・後方互換**で、未指定の既存シナリオは何も変わりません。
+
+#### 1. `hook`（動画冒頭の強制つかみ・1動画につき1つ）
+
+シナリオルートに 1 つだけ書ける、冒頭 5 秒に強制挿入される演出ブロック。
+
+```yaml
+hook:
+  durationMs: 5000                  # 既定 5000ms（推奨 4000〜7000）
+  text: "URLの数字いじるだけで他人の請求書が見えた"  # 大テロップで叩き付ける結論
+  emphasis:                         # text の中で特に強調する語句（赤バッジ＋黄文字）
+    - "数字いじるだけ"
+    - "他人の請求書"
+  character: zundamon               # 中央に大きく出す立ち絵のキャラ名
+  face: "驚き"                      # 表情（character の image と同じフォルダの 表情.png）
+  flash:                            # 0.1〜0.3秒の全画面フラッシュ
+    color: "#ff2244"
+    durationMs: 250
+  zoom: { from: 1.0, to: 1.18 }     # 立ち絵をジワッとズームイン
+  shake: true                       # 先頭 0.5秒だけ画面シェイク
+```
+
+**挙動**: 動画は冒頭 `hook.durationMs` ぶん HookIntro で占有され、本編音声と本編シーンはすべてその後ろにずれて再生されます。
+
+> **注意**: `hook.bgm` `hook.se` `hook.voiceOver` は型として受け付けますが配線は Sprint 3 で実装予定。Sprint 1 時点はビジュアル演出のみ反映。
+
+#### 2. `Line.emphasis`（行ごとの中央大ドカン）
+
+セリフ内のキーワードを画面中央に巨大テロップで叩き付けます。複数指定すると、その行の発話時間内で順送り表示されます。
+
+```yaml
+- type: dialogue
+  character: metan
+  text: "サーバが『そのデータを見ていいか』を毎回確認していないパターンよ。"
+  emphasis: ["毎回確認していない"]
+```
+
+#### 3. `Line.callout`（画面右上の常駐テロップ・4スタイル）
+
+行の発話と同期して、画面右上にバッジを表示します。
+
+```yaml
+- type: dialogue
+  character: zundamon
+  text: "URLの数字を変えたら、他人の請求書が見えたのだ……！"
+  callout:
+    text: "🔥 試験頻出"
+    style: "exam"        # exam / warn / tip / breaking
+    durationMs: 3000     # 省略時はその行の発話時間と同じ
+```
+
+| `style` | 色 | 用途 |
+|---------|----|------|
+| `exam` | 赤背景＋黄文字 | 試験頻出・重要ポイント |
+| `warn` | オレンジ背景 | 注意・落とし穴 |
+| `tip` | 水色背景 | 豆知識・補足 |
+| `breaking` | 黒背景＋赤文字 | 速報・衝撃 |
+
+#### 4. `Scene.chapter`（YouTube 概要欄チャプター）
+
+各シーンに付けると、Sprint 5 で実装予定の下三分の一バナー＋ Sprint 2 の YouTube 概要欄タイムスタンプ自動生成に使われます。
+
+```yaml
+scenes:
+  - id: "incident"
+    chapter:
+      label: "事件発生：URLいじりが招く事故"
+    lines: [...]
+```
+
+#### 完全なサンプル
+
+`scenario/zundasecurity/_demo-hook.yaml` を参照してください。動作確認は次の 2 コマンド：
+
+```bash
+node dist/cli.js lint-retention scenario/zundasecurity/_demo-hook.yaml
+node dist/cli.js generate-video scenario/zundasecurity/_demo-hook.yaml
+```
+
+---
+
 ### 完成形サンプル（2 キャラ会話）
 
 ```yaml
@@ -430,6 +513,58 @@ node dist/cli.js list-speakers
 ```
 
 接続中の VOICEVOX エンジンで利用できる話者とスタイルID を表示します。
+
+### generate-thumbnails（YouTube サムネ自動量産・3スタイル）
+
+```bash
+node dist/cli.js generate-thumbnails <scenario.yaml> [options]
+```
+
+`templates/thumbnail/{shock,howto,exam}.html` を読み、シナリオの `hook` / `youtube` / `characters` から自動でコピーと立ち絵を選び、**1280×720 PNG を 3 枚一括出力**します。出力先は既定で `output/thumbnails/{title}/`。**YouTube 公式の「サムネイルテスト」（A/B）に 3 案そのまま投入**できます。
+
+| オプション | 説明 |
+|-----------|------|
+| `--styles <list>` | 生成スタイルをカンマ区切りで指定（`shock,howto,exam`）。既定は全部 |
+| `--out-dir <path>` | 出力ディレクトリ（既定: `output/thumbnails/{title}/`） |
+
+3 スタイルの方向性：
+
+| スタイル | 主な訴求 | 主な視聴者層 |
+|---------|----------|--------------|
+| `shock` | 赤背景＋「衝撃ワード」叩き付け | 一般・新人エンジニア（CTR最大） |
+| `howto` | 青背景＋「5分で完全攻略」 | ハウツー検索流入 |
+| `exam` | 黒板背景＋「試験頻出」スタンプ | 受験者（既存ファン保持） |
+
+> **初回のみ**: Chromium が必要なので `npx playwright install chromium` を実行してください。
+
+### generate-youtube-metadata（タイトル候補・概要欄・チャプター自動生成）
+
+```bash
+node dist/cli.js generate-youtube-metadata <scenario.yaml> [--out <path>]
+```
+
+シナリオから次の 4 種類を自動生成し、`output/{title}-youtube-metadata.txt` 1 ファイルにまとめます：
+
+1. **タイトル候補3案**（`shock` / `howto` / `exam` の3スタイル、文字数チェック付き）
+2. **概要欄**（フック→対象→わかること→チャプター→関連回→CTA→ハッシュタグ）
+3. **チャプタータイムスタンプ**（`hook.durationMs` と各シーンの推定秒から自動算出）
+4. **ハッシュタグ**（`youtube.hashtags` から）
+
+> ※チャプター時刻は台本文字数からの**推定値**です。実音声に合わせて手動調整してください（`generate-video` の後にもう一度回すと、実音声から再計算する将来バージョンも検討中）。
+
+### lint-retention（視聴維持率リスクの静的解析）
+
+```bash
+node dist/cli.js lint-retention <scenario.yaml> [--strict]
+```
+
+「YouTube の再生数を伸ばすために台本段階で潰しておきたいリスク」を機械的に検出します（hook 未定義／字幕長すぎ／総尺長すぎ／演出マーカー不足など）。Sprint 1 時点では 8 ルール。
+
+| オプション | 説明 |
+|-----------|------|
+| `--strict` | warn も終了コード 1 にする（CI 向け） |
+
+`error`（🔴）が 1 件でもあると終了コード 1。`warn`（🟡）と `info`（🟢）は exit 0（`--strict` 時のみ warn も exit 1）。
 
 ```
 0    四国めたん    ノーマル

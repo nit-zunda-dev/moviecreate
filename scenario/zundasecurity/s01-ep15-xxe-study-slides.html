@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第15回 XML読み取りの穴（XXE）— 解説スライド</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #a78bfa;
+      --accent2: #38bdf8;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html {
+      font-size: clamp(17px, 0.55vw + 14px, 28px);
+    }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1;
+      display: none;
+      padding: clamp(0.85rem, 2vh, 1.75rem) clamp(1rem, 4.5vw, 5rem) calc(5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1820px);
+      margin: 0 auto;
+      width: 100%;
+      min-height: calc(100vh - 5.25rem);
+      overflow-x: auto;
+      overflow-y: auto;
+      animation: in 0.35s ease;
+      font-size: 1.07rem;
+    }
+    .slide code {
+      font-family: var(--mono);
+      font-size: 0.94em;
+      padding: 0.08em 0.28em;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.65);
+    }
+    .slide.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: clamp(1.45rem, 2.4vw + 0.65rem, 2.35rem);
+      font-weight: 700;
+      margin: 0 0 0.45rem;
+      line-height: 1.28;
+      color: #ddd6fe;
+    }
+    h2 {
+      font-size: clamp(1.08rem, 1.15vw + 0.75rem, 1.55rem);
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 0 1rem;
+      line-height: 1.45;
+    }
+    .tag {
+      display: inline-block;
+      font-size: clamp(0.72rem, 0.6vw + 0.55rem, 0.95rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: linear-gradient(90deg, #a78bfa, #38bdf8);
+      padding: 0.28rem 0.65rem;
+      border-radius: 4px;
+      margin-bottom: 0.65rem;
+      font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel);
+      border-radius: 14px;
+      padding: clamp(1rem, 2.2vw, 2rem);
+      margin: clamp(0.65rem, 1.5vh, 1.1rem) 0;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      zoom: 1.14;
+    }
+    @media (max-width: 900px) {
+      .diagram { zoom: 1.02; }
+    }
+    @media (min-width: 1600px) {
+      .diagram { zoom: 1.22; }
+    }
+    .diagram svg {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; }
+    .bullets strong { color: var(--text); }
+    .note { font-size: 0.95em; color: var(--muted); border-left: 4px solid var(--accent2); padding-left: 1.1rem; margin-top: 0.85rem; line-height: 1.55; }
+    .toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem);
+      background: rgba(15, 20, 25, 0.92);
+      border-top: 1px solid rgba(139, 156, 179, 0.2);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(167, 139, 250, 0.5);
+      padding: 0.55rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .toolbar button:hover { background: #243044; }
+    .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: #c4b5fd; font-size: 0.88em; max-width: 100%; }
+    .kbd { font-family: var(--mono); font-size: 0.85em; opacity: 0.88; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; }
+      html { font-size: clamp(16px, 2.5vw + 12px, 22px); }
+    }
+    .rich-box {
+      padding: clamp(1rem, 2vw, 1.45rem);
+      border-radius: 14px;
+      background: rgba(36, 48, 68, 0.4);
+      border: 1px solid rgba(139, 156, 179, 0.2);
+    }
+    .box-title { font-size: clamp(1rem, 0.8vw + 0.75rem, 1.2rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: clamp(0.92rem, 0.5vw + 0.75rem, 1.05rem); color: var(--muted); line-height: 1.58; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); }
+    .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); }
+    .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(167, 139, 250, 0.45); background: rgba(167, 139, 250, 0.06); }
+    .theme-accent .box-title { color: #ddd6fe; }
+    .slide-lead { font-size: clamp(1rem, 0.65vw + 0.8rem, 1.2rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.9rem; }
+    .slide-lead strong { color: var(--text); }
+    .summary-hero {
+      font-size: clamp(0.95rem, 0.5vw + 0.8rem, 1.12rem); color: var(--muted); line-height: 1.65;
+      margin: 0 0 0.85rem; padding: clamp(0.85rem, 2vw, 1.15rem) clamp(1rem, 2.5vw, 1.35rem);
+      background: linear-gradient(180deg, rgba(26, 35, 50, 0.9), rgba(20, 28, 40, 0.75));
+      border-radius: 12px; border: 1px solid rgba(167, 139, 250, 0.25);
+    }
+    .summary-hero__label { margin: 0 0 0.5rem; font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 800; letter-spacing: 0.04em; color: #c4b5fd; }
+    .summary-hero__p { margin: 0 0 0.65rem; }
+    .summary-hero__p:last-child { margin-bottom: 0; }
+    .summary-hero strong { color: var(--text); }
+    .summary-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.3rem 0 0.75rem; }
+    @media (max-width: 700px) { .summary-pillars { grid-template-columns: 1fr; } }
+    .summary-pillar {
+      font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1.02rem); font-weight: 600; line-height: 1.48; text-align: center; color: #a5b4c8;
+      padding: clamp(0.55rem, 1.2vw, 0.85rem); border-radius: 12px; background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b { display: block; font-size: clamp(0.78rem, 0.4vw + 0.62rem, 0.92rem); font-weight: 800; color: #c4b5fd; margin-bottom: 0.25rem; }
+    .summary-section-h { font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 700; color: #94a3b8; margin: 0.75rem 0 0.4rem; }
+    .summary-prev { border-left: 4px solid var(--accent2); padding: 0.7rem 0 0.7rem 1rem; margin-top: 0.8rem; background: rgba(30, 40, 55, 0.35); border-radius: 0 8px 8px 0; }
+    .summary-prev__tag { display: block; font-size: clamp(0.82rem, 0.45vw + 0.6rem, 0.95rem); font-weight: 800; color: #7dd3fc; margin-bottom: 0.35rem; }
+    .beginner-hint {
+      font-size: clamp(0.95rem, 0.5vw + 0.75rem, 1.1rem); color: #a5b4c8; line-height: 1.62; margin: 0.5rem 0 0;
+      padding: clamp(0.65rem, 1.5vw, 0.95rem) clamp(0.85rem, 2vw, 1.15rem); background: rgba(15, 23, 42, 0.55);
+      border-radius: 8px; border: 1px dashed rgba(167, 139, 250, 0.35);
+    }
+    .beginner-hint::before { content: "［図の読み方］ "; color: #c4b5fd; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <!--
+    第15回 XXE — 学習スライド（台本: s01-ep15-xxe.yaml）
+    Webアプリの弱点シリーズ・第14回（コマンド実行の穴）の続き。
+  -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入（incident）</span>
+      <h1>例：取引先向け「XMLインポート」で、冒頭の宣言から外のファイルやURLを指させた</h1>
+      <h2>読み取り処理が<strong>外へアクセス</strong>できる設定のままだと、秘密や内部通信につながる（通称 <strong>XXE</strong>）</h2>
+      <p class="beginner-hint">紫＝攻撃者入力の流れ、水色＝Webアプリ、右端＝読み取り処理が秘密／通信へつながる。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 780 260" xmlns="http://www.w3.org/2000/svg" aria-label="導入シナリオ">
+          <defs>
+            <marker id="arrO15" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#a78bfa"/></marker>
+          </defs>
+          <text x="390" y="18" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">① 届いたXML → ② 外への参照が許された読み取り → ③ 秘密が読まれる／サーバから通信</text>
+          <rect x="40" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <text x="140" y="68" text-anchor="middle" fill="#ddd6fe" font-size="11" font-weight="700" font-family="sans-serif">クライアント</text>
+          <text x="140" y="92" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">IMPORT XML</text>
+          <text x="140" y="112" text-anchor="middle" fill="#fecaca" font-size="8" font-family="sans-serif">「ここを読んで」と宣言…</text>
+          <path d="M 245 90 L 290 90" stroke="#a78bfa" stroke-width="3" marker-end="url(#arrO15)"/>
+          <text x="265" y="82" text-anchor="middle" fill="#c4b5fd" font-size="8">HTTP</text>
+          <rect x="300" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="400" y="68" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">Webアプリ</text>
+          <text x="400" y="92" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">安全な読み方にしてない</text>
+          <text x="400" y="112" text-anchor="middle" fill="#f87171" font-size="8" font-family="sans-serif">検証不足 ☓</text>
+          <path d="M 505 90 L 550 90" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrO15)"/>
+          <rect x="560" y="35" width="190" height="210" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+          <text x="655" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="sans-serif">XML読み取り / OS</text>
+          <rect x="575" y="75" width="160" height="45" rx="4" fill="rgba(248,113,113,0.12)" stroke="#f87171"/>
+          <text x="655" y="102" text-anchor="middle" fill="#fecaca" font-size="8" font-family="sans-serif">秘密ファイル読取</text>
+          <rect x="575" y="135" width="160" height="45" rx="4" fill="rgba(56,189,248,0.12)" stroke="#38bdf8"/>
+          <text x="655" y="162" text-anchor="middle" fill="#bae6fd" font-size="8" font-family="sans-serif">内部への通信…</text>
+          <rect x="40" y="165" width="500" height="80" rx="8" fill="rgba(91,33,182,0.12)" stroke="#a78bfa"/>
+          <text x="290" y="195" text-anchor="middle" fill="#e9d5ff" font-size="10" font-weight="700" font-family="sans-serif">学習ポイント: 注文データだけ見ていても、冒頭の宣言まわりで先に穴が開く</text>
+          <text x="290" y="220" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">第14回はコマンド実行／今回はXML読み取りの穴</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="冒頭">
+      <span class="tag">第15回 · 図解多め</span>
+      <h1>【登録セキスペ 第15回｜Season2】XMLで秘密が読まれる？（XXE）</h1>
+      <h2>XMLを読む処理が、<strong>外のファイルやURLまで取りにいってしまう</strong>欠陥</h2>
+      <p class="slide-lead">第14回は <strong>コマンドが実行される穴</strong>。第15回は <strong>読み取りが外まで広がる穴</strong>。試験では「外を見にいかない設定」が押さえどころ。</p>
+      <div class="grid-2" style="margin:0.5rem 0 0.75rem;">
+        <div class="rich-box theme-accent">
+          <div class="box-title">この回の立ち位置</div>
+          <div class="box-desc">Webの弱点 · Season2 第15回（全27回企画の第15回）。台本: <code style="font-family:var(--mono);font-size:0.78rem;color:#c4b5fd">s01-ep15-xxe.yaml</code></div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">第14回（コマンドの穴）との違い</div>
+          <div class="box-desc">第14回 ＝ <strong>コマンドが動く</strong>。今回 ＝ <strong>XMLの読み取りが外まで広がる</strong>。見え方は似ても、まず直す場所が違う。</div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li>学習目標①：なぜ「XMLを読むだけ」で秘密や通信が起きうるか、自分の言葉で説明できる。</li>
+        <li>学習目標②：ファイルが読まれるパターンと、サーバから通信するパターンを分けて考えられる。</li>
+        <li>学習目標③：安全な読み取り設定・XMLを使わない設計・重ねた対策を並べられる。</li>
+        <li>学習目標④：第5・11・13・14回と「どの処理に効いたか」を混同しない。</li>
+      </ul>
+      <div class="diagram" style="padding:0.85rem 1rem;">
+        <svg viewBox="0 0 860 108" xmlns="http://www.w3.org/2000/svg" aria-label="本編の流れ">
+          <defs>
+            <linearGradient id="go15" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#a78bfa"/><stop offset="100%" style="stop-color:#38bdf8"/>
+            </linearGradient>
+            <marker id="m15" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+              <polygon points="0 0,8 3,0 6" fill="#a78bfa"/>
+            </marker>
+          </defs>
+          <text x="430" y="14" text-anchor="middle" fill="#8b9cb3" font-size="10" font-family="sans-serif">流れ: 導入 → 3段 → しくみ → 被害の型 → 画面に出ない話 → どこで → 対策①②③ → 混同ゼロ → 試験 → まとめ</text>
+          <g transform="translate(6,32)" font-family="sans-serif">
+            <rect x="0" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#a78bfa"/>
+            <text x="24" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">導入</text>
+            <path d="M52 23h8" stroke="url(#go15)" stroke-width="2" marker-end="url(#m15)"/>
+            <rect x="66" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#c4b5fd"/>
+            <text x="92" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">3段</text>
+            <path d="M124 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="138" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="164" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">しくみ</text>
+            <path d="M194 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="208" y="0" width="44" height="46" rx="6" fill="#243044" stroke="#38bdf8"/>
+            <text x="230" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">被害</text>
+            <path d="M256 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="270" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#a78bfa"/>
+            <text x="296" y="28" text-anchor="middle" fill="#e7edf4" font-size="7">不出</text>
+            <path d="M328 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="342" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#4ade80"/>
+            <text x="368" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">どこで</text>
+            <path d="M398 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="412" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#22d3ee"/>
+            <text x="436" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策①</text>
+            <path d="M464 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="478" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#2dd4bf"/>
+            <text x="502" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策②</text>
+            <path d="M530 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="544" y="0" width="48" height="46" rx="6" fill="#243044" stroke="#c084fc"/>
+            <text x="568" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">対策③</text>
+            <path d="M596 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="610" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#94a3b8"/>
+            <text x="636" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">混同ゼロ</text>
+            <path d="M666 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="680" y="0" width="44" height="46" rx="6" fill="#243044" stroke="#f87171"/>
+            <text x="702" y="28" text-anchor="middle" fill="#e7edf4" font-size="8">試験</text>
+            <path d="M728 23h8" stroke="url(#go15)" stroke-width="2"/>
+            <rect x="742" y="0" width="52" height="46" rx="6" fill="#243044" stroke="#38bdf8"/>
+            <text x="768" y="28" text-anchor="middle" fill="#e7edf4" font-size="7.5">まとめ</text>
+          </g>
+        </svg>
+      </div>
+      <p class="note">操作: <span class="kbd">→</span> <span class="kbd">←</span> <span class="kbd">Space</span>。下段は <code style="font-family:var(--mono);font-size:0.8rem">s01-ep15-xxe.yaml</code> の <code style="font-family:var(--mono);font-size:0.8rem">scenes / id</code>。</p>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="concept_parser" title="概念">
+      <span class="tag">仕組み①</span>
+      <h1>届いたXML → 読み取り処理（外を許可）→ 被害（読まれる・通信）</h1>
+      <h2>穴は「このあとの処理」より、<strong>読み取りの時点</strong> に出ることが多い</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="50" width="160" height="90" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <text x="120" y="82" text-anchor="middle" fill="#ddd6fe" font-size="11" font-weight="700" font-family="sans-serif">① 入力</text>
+          <text x="120" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">冒頭の宣言など</text>
+          <path d="M 205 95 L 255 95" stroke="#94a3b8" stroke-width="3"/>
+          <polygon points="255,95 245,90 245,100" fill="#94a3b8"/>
+          <rect x="260" y="50" width="200" height="90" rx="10" fill="#1e293b" stroke="#c4b5fd" stroke-width="2"/>
+          <text x="360" y="82" text-anchor="middle" fill="#e9d5ff" font-size="11" font-weight="700" font-family="sans-serif">② 読み取り</text>
+          <text x="360" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">外部参照の解決</text>
+          <path d="M 465 95 L 515 95" stroke="#94a3b8" stroke-width="3"/>
+          <polygon points="515,95 505,90 505,100" fill="#94a3b8"/>
+          <rect x="520" y="50" width="200" height="90" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="620" y="82" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">③ 副作用</text>
+          <text x="620" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">秘密・勝手な通信</text>
+          <text x="380" y="175" text-anchor="middle" fill="#8b9cb3" font-size="9.5" font-family="sans-serif">対策の本命は ② の安全設定か、そもそもXMLを渡さない設計</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li><strong>設定の選び方</strong>：言語標準のXML APIでも、セキュアなファクトリ／プロパティが別にあることが多い。</li>
+        <li>試験では「タグを除去」より「<strong>外を見にいかない読み取り</strong>」が正解側になりやすい。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="doctype_entity" title="しくみ">
+      <span class="tag">欠陥の核</span>
+      <h1>「名前」の中身を <strong>外の場所</strong> にひも付ける — 読み取りがそこまで行く</h1>
+      <h2>作者は「注文XML」と思っていても、宣言が先に処理されうる</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-danger">
+          <div class="box-title">危険パターン（概念）</div>
+          <div class="box-desc">サーバ内の秘密ファイルを指す／内部のURLへサーバからアクセスする、など。</div>
+        </div>
+        <div class="rich-box theme-ok">
+          <div class="box-title">望ましい方向性</div>
+          <div class="box-desc">外から型定義を取らない・<strong>外への参照を禁止</strong>。マニュアルの安全設定を使う。</div>
+        </div>
+      </div>
+      <p class="note">記述問題では「入力エスケープ」より「<strong>危ない機能をオフにする</strong>」が高得点ラインになりやすい。</p>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="uri_axes" title="被害の型">
+      <span class="tag">被害のパターン</span>
+      <h1><strong>サーバ内のファイル</strong> が読まれる／<strong>サーバから内部へ通信</strong> される</h1>
+      <h2>第11回の「サーバが勝手に通信」と見え方が似ることがある。<strong>きっかけ</strong>がXMLの読み取りか、ふつうの通信かで仕分け</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 800 150" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="40" width="330" height="90" rx="10" fill="rgba(248,113,113,0.08)" stroke="#f87171"/>
+          <text x="205" y="72" text-anchor="middle" fill="#fecaca" font-size="11" font-weight="700" font-family="sans-serif">ファイル</text>
+          <text x="205" y="100" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">サーバ上の秘密が読まれる</text>
+          <rect x="430" y="40" width="330" height="90" rx="10" fill="rgba(56,189,248,0.08)" stroke="#38bdf8"/>
+          <text x="595" y="72" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">通信</text>
+          <text x="595" y="100" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">クラウドの内部操作URLなどへサーバから届く</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li>同一事象でもラベルは複数ありうる——<strong>問題文が動かしたコンポーネント</strong>をマーカーに。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="blind_oob" title="画面に出ない">
+      <span class="tag">応用</span>
+      <h1>画面に返ってこなくても、通信や時間差で狙いが当たったか分かることがある</h1>
+      <h2>OOB・DNS・時間差などで観測（試験は概念レベルで十分）</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="35" width="200" height="70" rx="8" fill="rgba(167,139,250,0.1)" stroke="#a78bfa"/>
+          <text x="140" y="62" text-anchor="middle" fill="#ddd6fe" font-size="10" font-weight="700" font-family="sans-serif">攻撃者</text>
+          <text x="140" y="88" text-anchor="middle" fill="#e7edf4" font-size="8.5" font-family="sans-serif">本文に出ない</text>
+          <path d="M 245 70 L 300 70" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="310" y="35" width="200" height="70" rx="8" fill="rgba(56,189,248,0.1)" stroke="#38bdf8"/>
+          <text x="410" y="62" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="sans-serif">外向き副作用</text>
+          <text x="410" y="88" text-anchor="middle" fill="#e7edf4" font-size="8.5" font-family="sans-serif">HTTP / DNS / 遅延</text>
+          <path d="M 515 70 L 570 70" stroke="#94a3b8" stroke-width="2"/>
+          <rect x="580" y="35" width="120" height="70" rx="8" fill="rgba(74,222,128,0.08)" stroke="#4ade80"/>
+          <text x="640" y="75" text-anchor="middle" fill="#86efac" font-size="9" font-weight="700" font-family="sans-serif">推測</text>
+        </svg>
+      </div>
+      <p class="note">対策の本質は同じ。<strong>外を見にいかせない</strong>。</p>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="surfaces" title="発生箇所">
+      <span class="tag">どこで起きる？</span>
+      <h1>「XMLをそのまま受ける」B2Bほど事故りやすい</h1>
+      <h2>SOAP・決済/物流・SAML・設定インポート など</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 820 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="35" width="250" height="100" rx="10" fill="rgba(167,139,250,0.08)" stroke="#a78bfa"/>
+          <text x="145" y="62" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="700" font-family="sans-serif">① B2B / SOAP</text>
+          <text x="145" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">形式が決まっているからと読み取り設定がおろそかに</text>
+          <text x="145" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">レガシー連携</text>
+          <rect x="285" y="35" width="250" height="100" rx="10" fill="rgba(56,189,248,0.08)" stroke="#38bdf8"/>
+          <text x="410" y="62" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">② 認証プロトコル</text>
+          <text x="410" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">SAML / WS-* 系のXML処理</text>
+          <text x="410" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">設定ミスが効く</text>
+          <rect x="550" y="35" width="250" height="100" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c"/>
+          <text x="675" y="62" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">③ 変換・読込</text>
+          <text x="675" y="88" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">Office/SVG 等のXML系も射程に</text>
+          <text x="675" y="112" text-anchor="middle" fill="#8b9cb3" font-size="8" font-family="sans-serif">ライブラリ依存</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="defense_parser" title="対策①">
+      <span class="tag">対策①</span>
+      <h1>読み取り設定：外への参照OFF・型定義を外から取らない・安全モード</h1>
+      <h2>「同じXMLを読む」でも、設定で安全性が変わる — 試験の定番</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-ok">
+          <div class="box-title">推奨イメージ</div>
+          <div class="box-desc">・外から型を取り込まない<br>・外への参照を無効化<br>・マニュアルの安全な使い方を選ぶ</div>
+        </div>
+        <div class="rich-box theme-danger">
+          <div class="box-title">避ける</div>
+          <div class="box-desc">とりあえず中身だけ取り出す、と設定を読まない実装。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="defense_design" title="対策②">
+      <span class="tag">対策②</span>
+      <h1>設計：JSON など XML を使わない／形の検証は安全な読み取りとセット</h1>
+      <h2>境界のWAFだけに賭けない</h2>
+      <ul class="bullets">
+        <li><strong>新規API</strong>：XML必須か再検討。JSONへ寄せるだけで攻撃面が変わる。</li>
+        <li><strong>どうしてもXML</strong>：許すタグを絞る——ただし<strong>名前の中身を広げる前</strong>の安全設定が先。</li>
+        <li>試験では「WAFがあれば十分」系の誘惑に注意。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="10" data-yaml-scene="defense_layers" title="対策③">
+      <span class="tag">対策③</span>
+      <h1>多層：権限最小化・ネットワーク分離・エラー露出の抑制</h1>
+      <h2>読み取り処理が触れるファイルを減らす／内部URLへ届かない経路</h2>
+      <ul class="bullets">
+        <li><strong>OSユーザー</strong>：必要以上の読み取り権限を渡さない。</li>
+        <li><strong>egress</strong>：XML経由のHTTPをクラウド制御プレーンへ届けない。</li>
+        <li><strong>エラーハンドリング</strong>：スタックトレースやファイル断片の露出を抑える（情報漏えいの点でも加点されうる）。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="11" data-yaml-scene="compare_axes" title="混同ゼロ">
+      <span class="tag">用語の整理</span>
+      <h1>入力が「どのエンジン」に効くかで分類する（表を更新）</h1>
+      <h2>XXE の行を足す</h2>
+      <div class="diagram" style="padding:0.75rem;">
+        <svg viewBox="0 0 900 230" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="700" font-family="sans-serif">効く先でラベルを貼る</text>
+          <rect x="25" y="42" width="200" height="95" rx="10" fill="rgba(167,139,250,0.1)" stroke="#a78bfa"/>
+          <text x="125" y="72" text-anchor="middle" fill="#e9d5ff" font-size="11" font-weight="800" font-family="sans-serif">XXE（今回）</text>
+          <text x="125" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>XML読み取り</strong>が外まで広がる</text>
+          <rect x="240" y="42" width="200" height="95" rx="10" fill="rgba(248,113,113,0.08)" stroke="#f87171"/>
+          <text x="340" y="72" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="800" font-family="sans-serif">第14回</text>
+          <text x="340" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>コマンド</strong>が実行される</text>
+          <rect x="455" y="42" width="200" height="95" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c"/>
+          <text x="555" y="72" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="800" font-family="sans-serif">第5回</text>
+          <text x="555" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>データベース</strong>への入力の穴</text>
+          <rect x="670" y="42" width="200" height="95" rx="10" fill="rgba(56,189,248,0.08)" stroke="#38bdf8"/>
+          <text x="770" y="72" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="800" font-family="sans-serif">第11回</text>
+          <text x="770" y="100" text-anchor="middle" fill="#e7edf4" font-size="9.5" font-family="sans-serif"><strong>サーバから勝手に通信</strong></text>
+          <rect x="25" y="155" width="420" height="70" rx="10" fill="rgba(148,163,184,0.12)" stroke="#94a3b8"/>
+          <text x="235" y="185" text-anchor="middle" fill="#e7edf4" font-size="10" font-weight="700" font-family="sans-serif">第13回＝フォルダの道の継ぎ足し</text>
+          <text x="235" y="208" text-anchor="middle" fill="#8b9cb3" font-size="8.5" font-family="sans-serif">XML読み取りとは別経路だが「読まれた」は重なるので問題文で切る</text>
+          <rect x="465" y="155" width="405" height="70" rx="10" fill="rgba(148,163,184,0.12)" stroke="#94a3b8"/>
+          <text x="667" y="185" text-anchor="middle" fill="#e7edf4" font-size="10" font-weight="700" font-family="sans-serif">整理のコツ</text>
+          <text x="667" y="208" text-anchor="middle" fill="#8b9cb3" font-size="8.5" font-family="sans-serif">「どのコンポーネントが動いたか」を1行メモ</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="12" data-yaml-scene="exam_tips" title="試験">
+      <span class="tag">試験でつまずきやすい所</span>
+      <h1>「タグを除いたから安全」系の誘惑に乗らない</h1>
+      <h2>正しい記述は「安全な読み取り」「外を見にいかせない」「XMLを使わない設計」寄り</h2>
+      <div class="grid-2">
+        <div class="rich-box theme-warn">
+          <div class="box-title">① タグ除去だけに頼る案</div>
+          <div class="box-desc">型宣言まわりは別の話。フィルタの盲点が教科書に載る。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">② WAF 万能論</div>
+          <div class="box-desc">根本は読み取り本体の設定。手前の機械だけに賭けない。</div>
+        </div>
+        <div class="rich-box theme-warn" style="grid-column:1/-1;">
+          <div class="box-title">③ 第11回の対策だけで今日の穴も消える、の短絡</div>
+          <div class="box-desc">きっかけが違うこともある。問題文で確認。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="13" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第15回まとめ — XML読み取りの穴（XXE）</h1>
+      <h2>「外を見にいかない」「XMLを使わない」「重ねた対策」— の3つで復習</h2>
+      <div class="summary-pillars" role="list">
+        <div class="summary-pillar" role="listitem">
+          <b>柱①</b>
+          宣言などから外を指させ、秘密が読まれたりサーバから内部へ通信したりしうる
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱②</b>
+          画面に出なくても痕跡が残る（対策の本質は同じ）
+        </div>
+        <div class="summary-pillar" role="listitem">
+          <b>柱③</b>
+          読み取りで危ない機能OFF／XMLを渡さない／権限とネットの重ね掛け
+        </div>
+      </div>
+      <div class="summary-hero" role="region" aria-label="整理">
+        <p class="summary-hero__label">1行（口頭チェック）</p>
+        <p class="summary-hero__p">攻撃：<strong>読み取りが外まで広がり</strong>、意図しないファイルや通信につながる。</p>
+        <p class="summary-hero__p">対策：<strong>外を見にいかない設定</strong>・<strong>XMLを使わない設計</strong>・重ねた対策。</p>
+      </div>
+      <p class="summary-section-h">自習</p>
+      <ul class="bullets">
+        <li>使っている言語のマニュアルで「XML」「安全」「外部」などと検索して読み取り設定を確認。</li>
+        <li>第5・11・13・14回と今日で「効くエンジン」表を完成させる。</li>
+        <li>台本 <code style="color:#c4b5fd;font-family:var(--mono);font-size:0.85rem">s01-ep15-xxe.yaml</code> と並べて再生。</li>
+      </ul>
+      <aside class="summary-prev" aria-label="前回">
+        <span class="summary-prev__tag">第14回との対比</span>
+        <code style="color:#fdba74;font-family:var(--mono)">コマンドの穴（第14回）</code> — <strong>実行</strong>が広がる。今回は<strong>XML読み取り</strong>が広がる。
+      </aside>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 13</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#c4b5fd; line-height:1.25; text-align:center; word-break:break-all;" title="s01-ep15-xxe.yaml">台本 id: incident</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          var human = sc ? sc.split(",").map(function (x) { return x.trim(); }).join(" ＋ ") : "";
+          sceneRef.textContent = sc ? "台本 id: " + human : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

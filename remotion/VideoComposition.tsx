@@ -1,10 +1,13 @@
 import React from "react";
-import { Audio, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import type { VideoManifest } from "../src/types/videoManifest";
 import { SUBTITLE_BLOCK_HEIGHT_RATIO, TACHIE_SIDE_WIDTH_RATIO } from "../src/config/videoLayout";
 import { Background } from "./components/Background";
 import { CharacterLayer } from "./components/CharacterLayer";
 import { SubtitleLayer } from "./components/SubtitleLayer";
+import { HookIntro } from "./components/HookIntro";
+import { EmphasisBurst } from "./components/EmphasisBurst";
+import { CalloutBadge } from "./components/CalloutBadge";
 import { ClassroomVideoComposition } from "./ClassroomVideoComposition";
 
 interface Props {
@@ -16,6 +19,13 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
   const frame = useCurrentFrame();
   const currentMs = frame * (1000 / fps);
 
+  // Hook 区間（任意）。本編音声と本編 lines の startMs は manifestBuilder で
+  // hookOffsetMs ぶん後ろにずらしてあるので、ここでは Audio を Sequence で
+  // hookFrames だけ後ろから再生開始するだけで時間軸が一致する。
+  const hookFrames = manifest.hook
+    ? Math.max(1, Math.round((manifest.hook.durationMs / 1000) * fps))
+    : 0;
+
   const activeLine = manifest.lines.find(
     (l) => l.startMs <= currentMs && currentMs < l.startMs + l.durationMs,
   );
@@ -26,7 +36,14 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
       <div style={{ width, height, position: "relative", overflow: "hidden" }}>
         <CharacterLayer manifest={manifest} frameHeight={height} />
         <SubtitleLayer manifest={manifest} />
-        <Audio src={staticFile(manifest.audioFile)} />
+        <EmphasisBurst emphases={manifest.emphases} width={width} height={height} />
+        <CalloutBadge callouts={manifest.callouts} width={width} />
+        <MainAudio audioFile={manifest.audioFile} hookFrames={hookFrames} />
+        {manifest.hook && (
+          <Sequence from={0} durationInFrames={hookFrames}>
+            <HookIntro hook={manifest.hook} width={width} height={height} />
+          </Sequence>
+        )}
       </div>
     );
   }
@@ -127,7 +144,32 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
           width={width}
         />
       </div>
-      <Audio src={staticFile(manifest.audioFile)} />
+
+      {/* 本編に重ねる演出オーバーレイ（Hook 区間中は startMs が hookOffsetMs 以降なので発火しない） */}
+      <EmphasisBurst emphases={manifest.emphases} width={width} height={height} />
+      <CalloutBadge callouts={manifest.callouts} width={width} />
+
+      {/* 本編音声は Hook 終了後から再生開始 */}
+      <MainAudio audioFile={manifest.audioFile} hookFrames={hookFrames} />
+
+      {/* 冒頭 Hook 区間：HookIntro を最前面に被せる */}
+      {manifest.hook && (
+        <Sequence from={0} durationInFrames={hookFrames}>
+          <HookIntro hook={manifest.hook} width={width} height={height} />
+        </Sequence>
+      )}
     </div>
   );
+};
+
+/** Hook 区間中は無音、Hook 終了直後から本編音声を再生する。 */
+const MainAudio: React.FC<{ audioFile: string; hookFrames: number }> = ({ audioFile, hookFrames }) => {
+  if (hookFrames > 0) {
+    return (
+      <Sequence from={hookFrames}>
+        <Audio src={staticFile(audioFile)} />
+      </Sequence>
+    );
+  }
+  return <Audio src={staticFile(audioFile)} />;
 };

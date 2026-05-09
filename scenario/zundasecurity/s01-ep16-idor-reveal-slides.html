@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第16回 IDOR（不適切な直接オブジェクト参照）— Reveal（generate-video 用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.12em; line-height: 1.22; margin-bottom: 0.32em; color: #fdba74; }
+    :root { --a: #fdba74; --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; --c: #38bdf8; }
+    .tag {
+      display: inline-block; font-size: 0.88em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #f472b6, #38bdf8);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.32em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.4em 0.5em; margin: 0.32em 0;
+      border: 1px solid rgba(244, 114, 182, 0.45);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.45em 0.5em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 0.98em; line-height: 1.42; }
+    .box-title { font-weight: 700; margin-bottom: 0.25em; font-size: 1.02em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); }
+    .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); }
+    .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.93em; color: var(--m); line-height: 1.48; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.93em; line-height: 1.48; color: #cbd5e1; margin: 0.32em 0 0; padding-left: 1.05em; }
+    .slide-bullets li { margin: 0.22em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.38em; font-size: 0.88em; margin: 0.38em 0; line-height: 1.38; }
+    code { font-family: ui-monospace, monospace; color: #fbcfe8; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- 0: incident -->
+      <section>
+        <span class="tag">導入</span>
+        <h3>請求書PDFの URL で <strong>orderId</strong> をいじったら、<span style="color:#fda4af">他人の宛名と金額</span> が返ってきた</h3>
+        <p class="ph">①ログイン済み → ②サーバが <strong>番号だけ信じて取得</strong> → ③<strong>認可</strong>（見ていいか）が抜けた（通称 <strong>IDOR</strong>）</p>
+        <div class="diagram">
+          <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="ar16" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f472b6"/></marker>
+            </defs>
+            <rect x="20" y="28" width="170" height="72" rx="8" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+            <text x="105" y="55" text-anchor="middle" fill="#fbcfe8" font-size="15" font-weight="700" font-family="sans-serif">利用者</text>
+            <text x="105" y="80" text-anchor="middle" fill="#fecaca" font-size="11" font-family="sans-serif">?orderId=10043 …</text>
+            <path d="M195 64h25" stroke="#f472b6" stroke-width="2.5" marker-end="url(#ar16)"/>
+            <rect x="230" y="28" width="170" height="72" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="315" y="55" text-anchor="middle" fill="#7dd3fc" font-size="15" font-weight="700" font-family="sans-serif">Webアプリ</text>
+            <text x="315" y="80" text-anchor="middle" fill="#fca5a5" font-size="11" font-family="sans-serif">持ち主チェックなし</text>
+            <path d="M405 64h25" stroke="#38bdf8" stroke-width="2" marker-end="url(#ar16)"/>
+            <rect x="440" y="22" width="300" height="88" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+            <text x="590" y="48" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="700" font-family="sans-serif">DB／ストレージ</text>
+            <text x="590" y="78" text-anchor="middle" fill="#bae6fd" font-size="11" font-family="sans-serif">他人のレコードを <tspan fill="#fecaca">そのまま返す</tspan></text>
+            <text x="380" y="130" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif">第15回 <tspan fill="#c4b5fd" font-weight="700">XML外参照</tspan>／今回 <tspan fill="#fda4af" font-weight="700">id と認可</tspan></text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 1: opening -->
+      <section>
+        <span class="tag">第16回</span>
+        <h3>【登録セキスペ 第16回】IDOR — 不適切な直接オブジェクト参照</h3>
+        <p class="ph">第15回は <strong>XML読み取りが外へ広がる穴</strong>。今回は <strong>オブジェクトIDを信じすぎて、他人のデータが返る穴</strong>。試験では「<strong>サーバ側の認可</strong>」が押さえどころ。</p>
+        <ul class="slide-bullets">
+          <li>見どころ：認証≠認可・間接参照・UUIDの限界・第7・12・13・15回との違い</li>
+          <li>図の見方：ログイン → 要求の id →（持ち主検証なし）→ 他人データ</li>
+        </ul>
+        <p class="ph" style="font-size:0.88em; margin-top:0.35em;">より詳しい図解: s01-ep16-idor-study-slides.html（同フォルダ）</p>
+      </section>
+
+      <!-- 2: concept_authz -->
+      <section>
+        <span class="tag">二段</span>
+        <h3><strong>認証</strong>（誰？）と <strong>認可</strong>（そのデータを見ていい？）は別</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 720 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+            <text x="110" y="48" text-anchor="middle" fill="#fbcfe8" font-size="15" font-weight="700" font-family="sans-serif">認証</text>
+            <text x="110" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">ログイン成功</text>
+            <text x="235" y="58" text-anchor="middle" fill="#94a3b8" font-size="20">+</text>
+            <rect x="270" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="370" y="48" text-anchor="middle" fill="#7dd3fc" font-size="15" font-weight="700" font-family="sans-serif">認可</text>
+            <text x="370" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">毎回サーバで検証</text>
+            <text x="495" y="58" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <rect x="510" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+            <text x="610" y="48" text-anchor="middle" fill="#86efac" font-size="15" font-weight="700" font-family="sans-serif">安全</text>
+            <text x="610" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">意図したデータだけ</text>
+          </svg>
+        </div>
+        <p class="ph" style="margin-top:0.3em;">HTTPS やログだけでは <strong>認可の穴は塞がらない</strong>。記述の本命は「取得直前の検証」。</p>
+      </section>
+
+      <!-- 3: direct_reference -->
+      <section>
+        <span class="tag">直接参照</span>
+        <h3>URL・API・ファイル名に <strong>連番や主キー</strong> がそのまま出ると、いじるだけで届く</h3>
+        <div class="grid-2" style="margin-top:0.35em;">
+          <div class="rich-box theme-danger"><div class="box-title">危ない</div> <code>/api/orders/10042</code> を <code>10043</code> に変えるだけ、など。</div>
+          <div class="rich-box theme-ok"><div class="box-title">望ましい</div> 返す前に <strong>テナント／所有者</strong> と突き合わせる。</div>
+        </div>
+      </section>
+
+      <!-- 4: horizontal_vertical -->
+      <section>
+        <span class="tag">権限の軸</span>
+        <h3>同格ユーザー横の越え（<strong>水平</strong>）／役割の越え（<strong>垂直</strong>に近いイメージ）</h3>
+        <p class="ph" style="margin-top:0.35em; font-size:0.95em;">試験では大枠 <strong>アクセス制御の不備</strong>。用語より「<strong>その操作をしていい主体か</strong>」を毎回確認できるか。</p>
+      </section>
+
+      <!-- 5: surfaces -->
+      <section>
+        <span class="tag">発生箇所</span>
+        <h3>請求・医療・学務・マルチテナント、<strong>モバイルAPI</strong>、バッチの署名なしリンク</h3>
+        <ul class="slide-bullets" style="font-size:0.92em;">
+          <li><strong>フロントでボタンを隠しただけ</strong>では防げない（直接叩かれる）</li>
+          <li><strong>GraphQL</strong> でも、リゾルバの根で認可が抜けると同じ</li>
+        </ul>
+      </section>
+
+      <!-- 6: defense_policy_engine -->
+      <section>
+        <span class="tag">対策①</span>
+        <h3>オブジェクト返却の直前に <strong>認可ゲート</strong>（中央ポリシーでもハンドラ内でも）</h3>
+        <div class="grid-2">
+          <div class="rich-box theme-ok"><div class="box-title">推奨</div> 「この利用者がこの id を読めるか」を必ず通す</div>
+          <div class="rich-box theme-danger"><div class="box-title">避ける</div> プロトタイプの「id で取って表示」がそのまま本番</div>
+        </div>
+      </section>
+
+      <!-- 7: defense_indirect_map -->
+      <section>
+        <span class="tag">対策②</span>
+        <h3><strong>間接参照</strong>・短寿命トークン・セッションに紐づくマップ</h3>
+        <ul class="slide-bullets">
+          <li>外部に出すのは推測困難な参照子、内部は主キーをサーバだけが持つ</li>
+          <li>第12回（リダイレクト先の許可）とは軸が違う——<strong>表を二列</strong>で整理</li>
+        </ul>
+      </section>
+
+      <!-- 8: defense_uuid_limit -->
+      <section>
+        <span class="tag">UUID</span>
+        <h3>ランダム id は <strong>推測対策の補助</strong>。横流しの URL では突破されうる</h3>
+        <p class="ph" style="margin-top:0.35em;">試験の「UUID だけで十分」は <strong>疑ってかかる</strong>。本命は認可の実装。</p>
+      </section>
+
+      <!-- 9: defense_logging -->
+      <section>
+        <span class="tag">対策③</span>
+        <h3>監査ログ・連続アクセスの検知・レート制限 — <strong>止めるのは認可</strong></h3>
+        <p class="ph">ログは証拠と改善材料。境界防御（WAF）だけに賭けないのは第15回と同じ考え方。</p>
+      </section>
+
+      <!-- 10: compare_axes -->
+      <section>
+        <span class="tag">混同ゼロ</span>
+        <h3>「どの欠陥か」で切る</h3>
+        <ul class="slide-bullets" style="font-size:0.92em;">
+          <li><strong>IDOR（今回）</strong>：id の空間で持ち主確認が抜ける</li>
+          <li><strong>第13回</strong>：パスを継ぎ足して OS 上の読み取り範囲をずらす</li>
+          <li><strong>第7回 CSRF</strong>：本人ブラウザを騙して依頼を送るのが主</li>
+          <li><strong>第15回 XXE</strong>：XML読み取りが外へ広がる</li>
+        </ul>
+      </section>
+
+      <!-- 11: exam_tips -->
+      <section>
+        <span class="tag">試験</span>
+        <h3>短絡しやすい誤答パターン</h3>
+        <ul class="slide-bullets" style="font-size:0.96em;">
+          <li>① ログインできていれば安全 — <strong>認可</strong>が別問題</li>
+          <li>② UUID なら完全 — <strong>URL 横流し</strong>で意味が薄い</li>
+          <li>③ フロント非表示で十分 — <strong>API 直叩き</strong></li>
+          <li>④ HTTPS＋WAF で完結 — <strong>アプリの検証</strong>が本体</li>
+        </ul>
+      </section>
+
+      <!-- 12: summary -->
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第16回: IDOR（不適切な直接オブジェクト参照）</h3>
+        <div class="sum-p3" style="color:#cbd5e1;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(244,114,182,0.35);"><b style="color:#fbcfe8;">1</b><br>返す直前に<br>認可検証</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(244,114,182,0.35);"><b style="color:#fbcfe8;">2</b><br>間接参照<br>短寿命トークン</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(244,114,182,0.35);"><b style="color:#fbcfe8;">3</b><br>UUIDだけに<br>頼らない</div>
+        </div>
+        <p style="font-size:0.88em; color:#e2e8f0; line-height:1.48; margin-top:0.35em;">第15回：XML外参照／第16回：id と認可。</p>
+        <p style="font-size:0.82em; color:#94a3b8;">詳しい図解: s01-ep16-idor-study-slides.html</p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>

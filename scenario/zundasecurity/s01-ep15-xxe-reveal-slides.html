@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第15回 XML読み取りの穴（XXE）— Reveal（generate-video 用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.12em; line-height: 1.22; margin-bottom: 0.32em; color: #fdba74; }
+    :root { --a: #fdba74; --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; --c: #38bdf8; }
+    .tag {
+      display: inline-block; font-size: 0.88em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #a78bfa, #38bdf8);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.32em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.4em 0.5em; margin: 0.32em 0;
+      border: 1px solid rgba(167, 139, 250, 0.45);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.45em 0.5em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 0.98em; line-height: 1.42; }
+    .box-title { font-weight: 700; margin-bottom: 0.25em; font-size: 1.02em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); }
+    .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); }
+    .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.93em; color: var(--m); line-height: 1.48; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.93em; line-height: 1.48; color: #cbd5e1; margin: 0.32em 0 0; padding-left: 1.05em; }
+    .slide-bullets li { margin: 0.22em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.38em; font-size: 0.88em; margin: 0.38em 0; line-height: 1.38; }
+    code { font-family: ui-monospace, monospace; color: #e9d5ff; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- 0: incident -->
+      <section>
+        <span class="tag">導入</span>
+        <h3>取引先向け「XML取込」で、<strong>冒頭の宣言</strong>から <span style="color:#c4b5fd">外のファイルやURL</span> を指させたら</h3>
+        <p class="ph">①届いたXML → ②読み取りが<strong>外への参照</strong>を許したまま → ③サーバが秘密ファイルや社内URLへアクセスしうる（通称 <strong>XXE</strong>）</p>
+        <div class="diagram">
+          <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="ar15" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#a78bfa"/></marker>
+            </defs>
+            <rect x="20" y="28" width="170" height="72" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+            <text x="105" y="55" text-anchor="middle" fill="#ddd6fe" font-size="15" font-weight="700" font-family="sans-serif">クライアント</text>
+            <text x="105" y="80" text-anchor="middle" fill="#fecaca" font-size="11" font-family="sans-serif">「ここを読んで」と宣言…</text>
+            <path d="M195 64h25" stroke="#a78bfa" stroke-width="2.5" marker-end="url(#ar15)"/>
+            <rect x="230" y="28" width="170" height="72" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="315" y="55" text-anchor="middle" fill="#7dd3fc" font-size="15" font-weight="700" font-family="sans-serif">Webアプリ</text>
+            <text x="315" y="80" text-anchor="middle" fill="#fca5a5" font-size="11" font-family="sans-serif">安全な読み方にしてない</text>
+            <path d="M405 64h25" stroke="#38bdf8" stroke-width="2" marker-end="url(#ar15)"/>
+            <rect x="440" y="22" width="300" height="88" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+            <text x="590" y="48" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="700" font-family="sans-serif">XML読み取り／OS</text>
+            <text x="590" y="78" text-anchor="middle" fill="#bae6fd" font-size="11" font-family="sans-serif">秘密ファイルや社内URLを <tspan fill="#fecaca">参照・展開</tspan> されうる</text>
+            <text x="380" y="130" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif">第14回は <tspan fill="#fdba74" font-weight="700">コマンド実行</tspan>／今回は <tspan fill="#c4b5fd" font-weight="700">XML読み取りの穴</tspan></text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 1: opening -->
+      <section>
+        <span class="tag">第15回</span>
+        <h3>【登録セキスペ 第15回】XMLで秘密が読まれる？（XXE）</h3>
+        <p class="ph">第14回は <strong>コマンドが実行される穴</strong>。今回は <strong>XMLを読むだけのつもりが、外のファイルやURLまで取りにいく穴</strong>。試験では「外を見にいかない設定」が押さえどころ。</p>
+        <ul class="slide-bullets">
+          <li>見どころ：安全な読み取り設定・XMLを使わない設計・第11回・13回・14回との違い</li>
+          <li>図の見方：届いたXML → 読み取り処理 → （秘密が読まれる／サーバから通信）</li>
+        </ul>
+        <p class="ph" style="font-size:0.88em; margin-top:0.35em;">より詳しい図解: s01-ep15-xxe-study-slides.html（同フォルダ）</p>
+      </section>
+
+      <!-- 2: concept_parser -->
+      <section>
+        <span class="tag">3段階</span>
+        <h3>届いた XML → <span style="color:#e9d5ff">読み取り処理</span>（外を許可）→ 被害（読まれる・通信）</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 720 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+            <text x="110" y="48" text-anchor="middle" fill="#ddd6fe" font-size="15" font-weight="700" font-family="sans-serif">① 入力</text>
+            <text x="110" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">冒頭の宣言など</text>
+            <text x="235" y="58" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <rect x="270" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#c4b5fd" stroke-width="2"/>
+            <text x="370" y="48" text-anchor="middle" fill="#e9d5ff" font-size="15" font-weight="700" font-family="sans-serif">② 読み取り</text>
+            <text x="370" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">外を取りにいく</text>
+            <text x="495" y="58" text-anchor="middle" fill="#94a3b8" font-size="20">→</text>
+            <rect x="510" y="18" width="200" height="70" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="610" y="48" text-anchor="middle" fill="#7dd3fc" font-size="15" font-weight="700" font-family="sans-serif">③ 副作用</text>
+            <text x="610" y="72" text-anchor="middle" fill="#e7edf4" font-size="11" font-family="sans-serif">秘密・勝手な通信</text>
+          </svg>
+        </div>
+        <p class="ph" style="margin-top:0.3em;">対策の本命は <strong>『外を見にいかない』読み取り設定</strong>、もしくは <strong>そもそもXMLを渡さない</strong>。「危ないタグを消しただけ」は短絡になりやすい。</p>
+      </section>
+
+      <!-- 3: doctype_entity -->
+      <section>
+        <span class="tag">欠陥の核</span>
+        <h3>「名前」の中身を <strong>外の場所</strong> にひも付ける — 読み取りがそこまで行く</h3>
+        <div class="grid-2" style="margin-top:0.35em;">
+          <div class="rich-box theme-danger"><div class="box-title">典型</div> サーバ内の秘密ファイルを指す／内部のURLへサーバからアクセスする、など。</div>
+          <div class="rich-box theme-ok"><div class="box-title">望ましい</div> <strong>外から型定義を取らない・外への参照を禁止</strong>。マニュアルの安全設定。</div>
+        </div>
+        <p class="ph" style="margin-top:0.35em; font-size:0.95em;">記述では「文字をごまかす」より「<strong>危ない機能をオフ</strong>」が高得点ラインになりやすい。</p>
+      </section>
+
+      <!-- 4: uri_axes -->
+      <section>
+        <span class="tag">被害のパターン</span>
+        <h3><strong>サーバ内のファイル</strong> が読まれる／<strong>サーバから内部へ通信</strong> される</h3>
+        <div class="diagram" style="padding:0.35em 0.5em;">
+          <p class="ph" style="margin:0;">第11回の「サーバが勝手に通信」と見え方が似ることがある。<strong>きっかけがXMLの読み取りか</strong>、ふつうの通信かで問題文を読み分ける。</p>
+          <p class="ph" style="margin:0.35em 0 0; font-size:0.92em;">「どの処理が動いたか」をメモ。</p>
+        </div>
+      </section>
+
+      <!-- 5: blind_oob -->
+      <section>
+        <span class="tag">画面に出ない場合</span>
+        <h3>返答に載らなくても — 通信の形や時間差で狙いが当たったか分かることがある</h3>
+        <ul class="slide-bullets">
+          <li>試験では<strong>細かい手口の名前</strong>だけ触れることもある（概念でOK）</li>
+          <li>対策の本質は同じ：<strong>外を見にいかせない</strong></li>
+        </ul>
+      </section>
+
+      <!-- 6: surfaces -->
+      <section>
+        <span class="tag">発生箇所</span>
+        <h3>会社同士のデータ連携・ログイン連携・設定の取込 — XMLをそのまま渡すほどハマりやすい</h3>
+        <ul class="slide-bullets" style="font-size:0.92em;">
+          <li><strong>古い連携形式</strong>：XMLが決まりきっているまま残っている</li>
+          <li><strong>昔の初期設定</strong>：危ない読み方がそのままのライブラリ</li>
+          <li><strong>変換まわり</strong>：表計算や画像まわりのXMLも注意</li>
+        </ul>
+      </section>
+
+      <!-- 7: defense_parser -->
+      <section>
+        <span class="tag">対策①</span>
+        <h3>読み取り設定 — <strong>外への参照OFF・型定義を外から取らない・安全モード</strong></h3>
+        <div class="grid-2">
+          <div class="rich-box theme-ok"><div class="box-title">推奨</div> マニュアルで「安全」「外部」の項目を確認</div>
+          <div class="rich-box theme-danger"><div class="box-title">避ける</div> 「とりあえず中身だけ取り出す」だけの実装</div>
+        </div>
+        <p class="ph" style="margin-top:0.35em;">同じ「XMLを読む」でも、設定で安全性が変わる — 試験の定番。</p>
+      </section>
+
+      <!-- 8: defense_design -->
+      <section>
+        <span class="tag">対策②</span>
+        <h3>設計 — JSON など<strong>XMLを使わない</strong>／形の検証は<strong>安全な読み取り</strong>とセット</h3>
+        <ul class="slide-bullets">
+          <li>どうしてもXMLなら、許すタグを絞る考え方とセットで語れると強い</li>
+          <li>手前の防御機械だけだと足りない、という選択肢が出やすい</li>
+        </ul>
+      </section>
+
+      <!-- 9: defense_layers -->
+      <section>
+        <span class="tag">対策③</span>
+        <h3>ネットワーク分離・最小権限・エラー露出の抑制</h3>
+        <p class="ph">読み取り処理が触れるファイルを減らす、クラウドの内部URLへ届かないようネットで区切る——工夫を<strong>重ねる</strong>と長い問題でも書きやすい。</p>
+      </section>
+
+      <!-- 10: compare_axes -->
+      <section>
+        <span class="tag">混同ゼロ</span>
+        <h3>「どの処理に効いたか」で切る</h3>
+        <ul class="slide-bullets" style="font-size:0.92em;">
+          <li><strong>XXE（今回）</strong>：XMLを読む処理が外まで取りにいく</li>
+          <li><strong>第5回</strong>：データベースへの入力の穴</li>
+          <li><strong>第11回</strong>：サーバから勝手に通信する穴（見え方が似る）</li>
+          <li><strong>第13回</strong>：フォルダの道の継ぎ足しでファイルが読まれる穴</li>
+          <li><strong>第14回</strong>：コマンドが実行される穴</li>
+        </ul>
+      </section>
+
+      <!-- 11: exam_tips -->
+      <section>
+        <span class="tag">試験</span>
+        <h3>短絡しやすい誤答パターン</h3>
+        <ul class="slide-bullets" style="font-size:0.96em;">
+          <li>① 危ないタグを消せば絶対安全 — 型宣言まわりは別の話</li>
+          <li>② 手前の防御機械があれば読み取り設定は不要 — 本体の設定が本命</li>
+          <li>③ 第11回の対策だけで今日の穴も消えるとは限らない</li>
+        </ul>
+      </section>
+
+      <!-- 12: summary -->
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第15回: XML読み取りの穴（XXE）</h3>
+        <div class="sum-p3" style="color:#cbd5e1;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(167,139,250,0.35);"><b style="color:#ddd6fe;">1</b><br>宣言などから<br>外を指させる</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(167,139,250,0.35);"><b style="color:#ddd6fe;">2</b><br>読み取りで<br>危ない機能OFF</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(167,139,250,0.35);"><b style="color:#ddd6fe;">3</b><br>XMLを使わない<br>＋重ねた対策</div>
+        </div>
+        <p style="font-size:0.88em; color:#e2e8f0; line-height:1.48; margin-top:0.35em;">第14回：コマンド実行／第15回：XML読み取りの穴。</p>
+        <p style="font-size:0.82em; color:#94a3b8;">詳しい図解: s01-ep15-xxe-study-slides.html</p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>

@@ -9,6 +9,9 @@ import { fetchSpeakers } from "./voicevox/client";
 import { buildVideoManifest, writeManifest, LineResultWithContext } from "./media/manifestBuilder";
 import { renderVideo } from "./video/renderVideo";
 import { applyHtmlSlideBackgrounds } from "./slides/captureHtmlSlides";
+import { lintRetention, printLintReport } from "./lint/retentionLinter";
+import { renderThumbnails, ALL_STYLES, type ThumbnailStyle } from "./thumbnails/renderThumbnails";
+import { generateYoutubeMetadata } from "./youtube/generateMetadata";
 
 const program = new Command();
 
@@ -152,6 +155,101 @@ program
       console.error("音声生成中にエラーが発生しました:", err);
       process.exit(1);
     });
+  });
+
+// サムネを 3 スタイル一括生成（CTR 改善・A/B 用）
+program
+  .command("generate-thumbnails")
+  .description(
+    "シナリオから 3 スタイル（shock/howto/exam）の YouTube サムネ（1280×720 PNG）を生成する",
+  )
+  .argument("<scenario>", "シナリオYAML/JSONファイルパス")
+  .option(
+    "--styles <styles>",
+    `生成するスタイル（カンマ区切り。既定: ${ALL_STYLES.join(",")}）`,
+  )
+  .option("--out-dir <path>", "出力ディレクトリ（既定: output/thumbnails/{title}/）")
+  .action(async (scenarioPath: string, opts: { styles?: string; outDir?: string }) => {
+    try {
+      const scenario = loadScenario(scenarioPath);
+      let styles: ThumbnailStyle[] | undefined;
+      if (opts.styles) {
+        const parts = opts.styles
+          .split(",")
+          .map((s) => s.trim().toLowerCase())
+          .filter(Boolean) as ThumbnailStyle[];
+        const invalid = parts.filter((s) => !ALL_STYLES.includes(s));
+        if (invalid.length > 0) {
+          throw new Error(
+            `不明なスタイル: ${invalid.join(", ")}。有効値: ${ALL_STYLES.join(", ")}`,
+          );
+        }
+        styles = parts;
+      }
+      const results = await renderThumbnails(scenario, scenarioPath, {
+        styles,
+        outDir: opts.outDir,
+      });
+      console.log("");
+      console.log("==== サムネを生成しました ====");
+      for (const r of results) {
+        console.log(`  [${r.style}] ${r.pngPath}`);
+      }
+    } catch (err) {
+      console.error("サムネ生成中にエラーが発生しました:", err);
+      process.exit(1);
+    }
+  });
+
+// YouTube タイトル候補・概要欄・チャプターを自動生成
+program
+  .command("generate-youtube-metadata")
+  .description(
+    "シナリオから YouTube のタイトル候補（3案）・概要欄・チャプタータイムスタンプ・ハッシュタグを生成し、テキストファイルとして出力する",
+  )
+  .argument("<scenario>", "シナリオYAML/JSONファイルパス")
+  .option("--out <path>", "出力ファイルパス（既定: output/{title}-youtube-metadata.txt）")
+  .action((scenarioPath: string, opts: { out?: string }) => {
+    try {
+      const scenario = loadScenario(scenarioPath);
+      const result = generateYoutubeMetadata(scenario, { outFile: opts.out });
+      console.log("");
+      console.log("==== YouTube メタデータを生成しました ====");
+      console.log(`  出力: ${result.outFile}`);
+      console.log(`  タイトル候補: ${result.titleCandidates.length} 件`);
+      for (const c of result.titleCandidates) {
+        const warn = c.warning ? "  ⚠️" : "";
+        console.log(`    [${c.style}] (${c.title.length}文字)${warn} ${c.title}`);
+      }
+    } catch (err) {
+      console.error("YouTube メタデータ生成中にエラーが発生しました:", err);
+      process.exit(1);
+    }
+  });
+
+// 視聴維持率リスクの静的解析（音声生成・動画生成前のチェックに使う）
+program
+  .command("lint-retention")
+  .description(
+    "シナリオを静的解析して、視聴維持率（YouTube再生数）を下げるリスクを警告する（hook 未定義、字幕長すぎ、総尺長すぎ等）",
+  )
+  .argument("<scenario>", "シナリオYAML/JSONファイルパス")
+  .option("--strict", "warn も終了コード 1 にする（CI 向け）", false)
+  .action((scenarioPath: string, opts: { strict?: boolean }) => {
+    try {
+      const scenario = loadScenario(scenarioPath);
+      const report = lintRetention(scenario);
+      printLintReport(report, scenarioPath);
+      if (report.errorCount > 0) {
+        process.exit(1);
+      }
+      if (opts.strict && report.warnCount > 0) {
+        process.exit(1);
+      }
+    } catch (err) {
+      console.error("lint-retention の実行中にエラーが発生しました:", err);
+      process.exit(1);
+    }
   });
 
 program.parse(process.argv);

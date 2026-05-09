@@ -1,0 +1,184 @@
+title: "【第3話】障害対応で頭が真っ白なのだ｜エンジニアの現場あるあるから学ぶ英会話"
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.22
+      intonationScale: 1.12
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.18
+      intonationScale: 1.04
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/bg_security_lesson.png"
+  videoFrame: "./docs/generate_scene_illustrations/hikei.png"
+  slidesHtml: "./s04-ep03-incident-grammar-slides.html"
+  voice:
+    speedScale: 1.15
+    postPhonemeLength: 0.08
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  - id: "intro"
+    slideIndex: 0
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "アラートが鳴って、英語のウォールームに放り込まれたのだ……頭が真っ白なのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日も3つだけ。状況が読めないときでも、初動で信頼を落とさない短い型を覚えるわよ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "レビューのときみたいに、短文のまま出せれば助かるのだ。"
+
+  - id: "drama_incident"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "海外のオンコールから聞かれたわ。What's the current status?"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "えっと……まだ原因は……言語が出てこないのだ……。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "まず1つ目。We're investigating now."
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ウィーアー インベスティゲイティング ナウ、なのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ここは文法で覚えるの。We are + 動詞ing で、チームとして今まさにやっていることを示す。I am だと一人っぽくなるから、ウォールームでは We が無難よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "We're triaging customer reports now. や We're rolling back now. みたいに、動詞を差し替えれば初動の幅が広がるわ。"
+
+  - id: "hypothesis_point"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次に聞かれがち。Any early hypothesis?"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "断定できないのに、英語で言っていいのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "2つ目。We believe this is related to the latest deployment."
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ウィー ビリーブ ディス イズ リレイテッド トゥ ザ レイテスト デプロイメント、なのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "We believe のあとに節を置いて、仮説のラベルを貼る。It is definitely だと強すぎるから、初動では believe が安全圏ね。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "We believe this is related to a traffic spike. も同じ型。related to のところだけ差し替えればいいわ。"
+
+  - id: "eta_mitigation_point"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "最後はタイムライン。When can you mitigate?"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ロールバックが通れば、って条件があるのだ……。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "3つ目。ETA for mitigation is about 30 minutes if rollback succeeds."
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "イーティーエー フォー ミティゲイション イズ アバウト サーティ ミニッツ イフ ロールバック サクシーズ、なのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "第1話の ETA is ... if ... と骨組みは同じ。for mitigation で目的を明示すると、障害対応っぽい響きになるの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "about で大まかさを出し、if で条件を添える。数字が曖昧でも、進行が見えると現場は落ち着くわ。"
+
+  - id: "replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "実戦リプレイいくわ。What's the current status?"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "We're investigating now."
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Any early hypothesis?"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "We believe this is related to the latest deployment."
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "When can you mitigate?"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "ETA for mitigation is about 30 minutes if rollback succeeds."
+
+  - id: "ending"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "今日の3フレーズは、進行中の作業・仮説の渡し方・条件つきの見込み。この順で短く返せば、真っ白でも会議は進むわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "パニックのときほど、型が効くのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回は、要件が急に変わる現場。To confirm, you mean ...? で意味を取りにいくわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "チャンネル登録と高評価、よろしくなのだ！"
+

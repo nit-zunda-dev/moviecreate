@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第16回 IDOR（不適切な直接オブジェクト参照）— 解説スライド</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #f472b6;
+      --accent2: #38bdf8;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: clamp(17px, 0.55vw + 14px, 28px); }
+    html, body {
+      margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1; display: none;
+      padding: clamp(0.85rem, 2vh, 1.75rem) clamp(1rem, 4.5vw, 5rem) calc(5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1820px); margin: 0 auto; width: 100%;
+      min-height: calc(100vh - 5.25rem); overflow-x: auto; overflow-y: auto;
+      animation: in 0.35s ease; font-size: 1.07rem;
+    }
+    .slide code { font-family: var(--mono); font-size: 0.94em; padding: 0.08em 0.28em; border-radius: 4px; background: rgba(15, 23, 42, 0.65); }
+    .slide.active { display: block; }
+    @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { font-size: clamp(1.45rem, 2.4vw + 0.65rem, 2.35rem); font-weight: 700; margin: 0 0 0.45rem; line-height: 1.28; color: #fce7f3; }
+    h2 { font-size: clamp(1.08rem, 1.15vw + 0.75rem, 1.55rem); font-weight: 500; color: var(--muted); margin: 0 0 1rem; line-height: 1.45; }
+    .tag {
+      display: inline-block; font-size: clamp(0.72rem, 0.6vw + 0.55rem, 0.95rem); letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--bg); background: linear-gradient(90deg, #f472b6, #38bdf8); padding: 0.28rem 0.65rem; border-radius: 4px; margin-bottom: 0.65rem; font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel); border-radius: 14px; padding: clamp(1rem, 2.2vw, 2rem); margin: clamp(0.65rem, 1.5vh, 1.1rem) 0;
+      border: 1px solid rgba(244, 114, 182, 0.35); zoom: 1.14;
+    }
+    @media (max-width: 900px) { .diagram { zoom: 1.02; } .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; } html { font-size: clamp(16px, 2.5vw + 12px, 22px); } }
+    @media (min-width: 1600px) { .diagram { zoom: 1.22; } }
+    .diagram svg { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; } .bullets strong { color: var(--text); }
+    .note { font-size: 0.95em; color: var(--muted); border-left: 4px solid var(--accent2); padding-left: 1.1rem; margin-top: 0.85rem; line-height: 1.55; }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem); background: rgba(15, 20, 25, 0.92); border-top: 1px solid rgba(139, 156, 179, 0.2); backdrop-filter: blur(8px); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text); border: 1px solid rgba(244, 114, 182, 0.5);
+      padding: 0.55rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 1.05rem; font-weight: 600;
+    }
+    .toolbar button:hover { background: #243044; } .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: #fda4af; font-size: 0.88em; max-width: 100%; }
+    .kbd { font-family: var(--mono); font-size: 0.85em; opacity: 0.88; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: clamp(1rem, 2vw, 1.45rem); border-radius: 14px; background: rgba(36, 48, 68, 0.4); border: 1px solid rgba(139, 156, 179, 0.2); }
+    .box-title { font-size: clamp(1rem, 0.8vw + 0.75rem, 1.2rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: clamp(0.92rem, 0.5vw + 0.75rem, 1.05rem); color: var(--muted); line-height: 1.58; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); } .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); } .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); } .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(244, 114, 182, 0.45); background: rgba(244, 114, 182, 0.06); } .theme-accent .box-title { color: #fce7f3; }
+    .slide-lead { font-size: clamp(1rem, 0.65vw + 0.8rem, 1.2rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.9rem; } .slide-lead strong { color: var(--text); }
+    .summary-hero {
+      font-size: clamp(0.95rem, 0.5vw + 0.8rem, 1.12rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.85rem;
+      padding: clamp(0.85rem, 2vw, 1.15rem) clamp(1rem, 2.5vw, 1.35rem);
+      background: linear-gradient(180deg, rgba(26, 35, 50, 0.9), rgba(20, 28, 40, 0.75)); border-radius: 12px; border: 1px solid rgba(244, 114, 182, 0.25);
+    }
+    .summary-hero__label { margin: 0 0 0.5rem; font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 800; letter-spacing: 0.04em; color: #fda4af; }
+    .summary-hero__p { margin: 0 0 0.65rem; } .summary-hero__p:last-child { margin-bottom: 0; } .summary-hero strong { color: var(--text); }
+    .summary-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.3rem 0 0.75rem; }
+    @media (max-width: 700px) { .summary-pillars { grid-template-columns: 1fr; } }
+    .summary-pillar {
+      font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1.02rem); font-weight: 600; line-height: 1.48; text-align: center; color: #a5b4c8;
+      padding: clamp(0.55rem, 1.2vw, 0.85rem); border-radius: 12px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b { display: block; font-size: clamp(0.78rem, 0.4vw + 0.62rem, 0.92rem); font-weight: 800; color: #fda4af; margin-bottom: 0.25rem; }
+    .summary-section-h { font-size: clamp(0.88rem, 0.5vw + 0.65rem, 1rem); font-weight: 700; color: #94a3b8; margin: 0.75rem 0 0.4rem; }
+    .summary-prev { border-left: 4px solid var(--accent2); padding: 0.7rem 0 0.7rem 1rem; margin-top: 0.8rem; background: rgba(30, 40, 55, 0.35); border-radius: 0 8px 8px 0; }
+    .summary-prev__tag { display: block; font-size: clamp(0.82rem, 0.45vw + 0.6rem, 0.95rem); font-weight: 800; color: #7dd3fc; margin-bottom: 0.35rem; }
+    .beginner-hint {
+      font-size: clamp(0.95rem, 0.5vw + 0.75rem, 1.1rem); color: #a5b4c8; line-height: 1.62; margin: 0.5rem 0 0;
+      padding: clamp(0.65rem, 1.5vw, 0.95rem) clamp(0.85rem, 2vw, 1.15rem); background: rgba(15, 23, 42, 0.55); border-radius: 8px; border: 1px dashed rgba(244, 114, 182, 0.35);
+    }
+    .beginner-hint::before { content: "［図の読み方］ "; color: #fda4af; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <!-- 第16回 IDOR — 学習スライド（台本: s01-ep16-idor.yaml） docs/series3/企画書.md 準拠 -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入（incident）</span>
+      <h1>例：請求書PDFの URL で <code>orderId</code> を隣の番号に変えたら、他人の宛名が返った</h1>
+      <h2><strong>認証</strong>は通っているのに、<strong>認可</strong>（そのデータを見ていいか）が抜けている典型（通称 <strong>IDOR</strong>）</h2>
+      <p class="beginner-hint">ピンク＝利用者が変えられる id の流れ、水色＝アプリ、右＝保存領域。今日の焦点は「番号を信じた取得」。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 780 240" xmlns="http://www.w3.org/2000/svg" aria-label="導入シナリオ">
+          <defs><marker id="arrI16" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#f472b6"/></marker></defs>
+          <text x="390" y="18" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">① ログイン済み → ② id だけで取得 → ③ 持ち主検証なしで他人データ</text>
+          <rect x="40" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+          <text x="140" y="68" text-anchor="middle" fill="#fbcfe8" font-size="11" font-weight="700" font-family="sans-serif">利用者</text>
+          <text x="140" y="92" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">?orderId=10043</text>
+          <text x="140" y="118" text-anchor="middle" fill="#fecaca" font-size="8" font-family="sans-serif">自分は 10042 のつもりが…</text>
+          <path d="M 245 90 L 290 90" stroke="#f472b6" stroke-width="3" marker-end="url(#arrI16)"/>
+          <rect x="300" y="40" width="200" height="100" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="400" y="68" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">Webアプリ</text>
+          <text x="400" y="92" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">認可チェックなしで SELECT</text>
+          <text x="400" y="118" text-anchor="middle" fill="#f87171" font-size="8" font-family="sans-serif">危険 ☓</text>
+          <path d="M 505 90 L 550 90" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrI16)"/>
+          <rect x="560" y="35" width="190" height="210" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+          <text x="655" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="sans-serif">DB / ストレージ</text>
+          <rect x="575" y="75" width="160" height="50" rx="4" fill="rgba(248,113,113,0.12)" stroke="#f87171"/>
+          <text x="655" y="105" text-anchor="middle" fill="#fecaca" font-size="8.5" font-family="sans-serif">他人の行が返る</text>
+          <rect x="40" y="165" width="500" height="72" rx="8" fill="rgba(244,114,182,0.1)" stroke="#f472b6"/>
+          <text x="290" y="195" text-anchor="middle" fill="#fce7f3" font-size="10" font-weight="700" font-family="sans-serif">学習ポイント: 「ログインできた」≠「どの id も読める」</text>
+          <text x="290" y="218" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="sans-serif">第15回は XML の外参照／今回は id と認可</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="冒頭">
+      <span class="tag">第16回 · 図解多め</span>
+      <h1>【登録セキスペ 第16回｜Season2】IDOR — 不適切な直接オブジェクト参照</h1>
+      <h2>オブジェクトを指す <strong>番号・名前</strong> を信じすぎて、<strong>他人のデータ</strong> が返る欠陥</h2>
+      <p class="slide-lead">第15回は <strong>XML読み取りが外へ広がる穴</strong>。第16回は <strong>認可が抜けて id 空間が横滑りする穴</strong>。試験では「<strong>サーバで毎回持ち主を検証</strong>」が高得点ライン。</p>
+      <div class="grid-2" style="margin:0.5rem 0 0.75rem;">
+        <div class="rich-box theme-accent">
+          <div class="box-title">この回の立ち位置</div>
+          <div class="box-desc">Webの弱点 · Season2 第16回（全27回企画）。台本: <code style="font-family:var(--mono);font-size:0.78rem;color:#fda4af">s01-ep16-idor.yaml</code></div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">第15回（XXE）との違い</div>
+          <div class="box-desc">第15回 ＝ <strong>読み取り処理が外へ広がる</strong>。今回 ＝ <strong>返すデータの権利確認が抜ける</strong>。まず直すレイヤーが違う。</div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li>学習目標①：<strong>認証</strong>と<strong>認可</strong>を言葉で分け、IDOR の説明に使える。</li>
+        <li>学習目標②：連番 URL・REST・バッチリンクなど<strong>表面</strong>を列挙できる。</li>
+        <li>学習目標③：認可ゲート・間接参照・UUID の限界を並べられる。</li>
+        <li>学習目標④：第7・12・13・15回と「<strong>どの欠陥か</strong>」を混同しない。</li>
+      </ul>
+      <p class="note">操作: <span class="kbd">→</span> <span class="kbd">←</span> <span class="kbd">Space</span>。下段は <code style="font-family:var(--mono);font-size:0.8rem">s01-ep16-idor.yaml</code> の <code style="font-family:var(--mono);font-size:0.8rem">scenes / id</code>。</p>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="concept_authz" title="認証と認可">
+      <span class="tag">仕組み①</span>
+      <h1>認証（誰？）＋ 認可（そのデータを見ていい？）— の二段</h1>
+      <h2>IDOR は多くの場合、<strong>後者</strong>が抜けている</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="50" width="200" height="90" rx="10" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+          <text x="130" y="82" text-anchor="middle" fill="#fbcfe8" font-size="11" font-weight="700" font-family="sans-serif">認証</text>
+          <text x="130" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">セッション確立</text>
+          <text x="280" y="100" text-anchor="middle" fill="#94a3b8" font-size="22">+</text>
+          <rect x="330" y="50" width="220" height="90" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="440" y="82" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">認可</text>
+          <text x="440" y="108" text-anchor="middle" fill="#e7edf4" font-size="9" font-family="sans-serif">オブジェクト毎に検証</text>
+          <text x="600" y="100" text-anchor="middle" fill="#94a3b8" font-size="22">→</text>
+          <rect x="630" y="50" width="100" height="90" rx="10" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+          <text x="680" y="100" text-anchor="middle" fill="#86efac" font-size="10" font-weight="700" font-family="sans-serif">OK</text>
+        </svg>
+      </div>
+      <div class="grid-2">
+        <div class="rich-box theme-danger"><div class="box-title">試験で紛らわしい</div><div class="box-desc">HTTPS、ログ、WAF だけ並べる答え — <strong>認可の実装</strong>が問われているか読み分ける。</div></div>
+        <div class="rich-box theme-ok"><div class="box-title">本命のキーワード</div><div class="box-desc"><strong>返却直前</strong>のチェック、<strong>テナント／所有者</strong>との突合。</div></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="direct_reference" title="直接参照">
+      <span class="tag">欠陥の核</span>
+      <h1>URL・API・ファイル名に、連番や主キーがそのまま出る</h1>
+      <h2>利用者が id を変えるだけで、<strong>別オブジェクト</strong> に届く</h2>
+      <ul class="bullets">
+        <li>例: <code>/api/invoices/10042</code> → <code>10043</code> に変更</li>
+        <li>添付ファイルが <code>/files/2025/12345.pdf</code> のように推測可能</li>
+        <li>GraphQL でも、リゾルバが「渡された id をそのまま信じる」と同型の穴</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="horizontal_vertical" title="水平・垂直">
+      <span class="tag">権限の軸</span>
+      <h1>同格ユーザーのデータ横断（水平）／役割の越え（垂直に近いイメージ）</h1>
+      <h2>試験では大枠 <strong>アクセス制御の不備</strong> — ラベルより「毎回サーバで検証」が書けるか</h2>
+      <div class="diagram" style="padding:1rem 1.2rem;">
+        <p style="margin:0;color:#cbd5e1;line-height:1.65;font-size:0.98rem;">IPA の文脈では <strong>Broken Access Control</strong> の代表例として IDOR が挙がることが多い。水平・垂直の厳密分類より、<strong>その主体がその操作をしてよいか</strong> を説明できることが重要。</p>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="surfaces" title="発生箇所">
+      <span class="tag">どこで</span>
+      <h1>マルチテナント SaaS、医療・学務、請求、モバイル API、バッチの一時 URL</h1>
+      <h2><strong>フロントで非表示</strong>にしただけでは防げない（直接 HTTP を叩かれる）</h2>
+      <ul class="bullets">
+        <li>管理者向けエンドポイントが一般トークンでも応答してしまうパターン（垂直寄り）</li>
+        <li>共有リンクの「署名なし・期限なし」トークン</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="defense_policy_engine" title="対策①">
+      <span class="tag">対策①</span>
+      <h1>オブジェクト返却の直前に、必ず通る認可ゲート</h1>
+      <h2>中央のポリシーエンジンでも、各ハンドラ内でもよい — <strong>抜け道が無いこと</strong></h2>
+      <div class="grid-2">
+        <div class="rich-box theme-ok"><div class="box-title">推奨</div><div class="box-desc">「この <code>tenant_id</code> / <code>owner_user_id</code> と要求 id は一致するか？」</div></div>
+        <div class="rich-box theme-danger"><div class="box-title">落とし穴</div><div class="box-desc">プロトタイプの「id で取って表示」が本番のまま残る。</div></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="defense_indirect_map" title="対策②">
+      <span class="tag">対策②</span>
+      <h1>間接参照マップ・短寿命トークン・セッション束ね</h1>
+      <h2>外部に出す参照子と内部主キーを分離 — URL 漏洩時に <strong>失効</strong> できる設計も加点されやすい</h2>
+      <p class="note">第12回オープンリダイレクトは「<strong>どこへ飛ばすか</strong>」の話。今回は「<strong>誰のデータか</strong>」— 表を二列で整理。</p>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="defense_uuid_limit" title="UUID">
+      <span class="tag">よくある誤解</span>
+      <h1>UUID やランダム id は推測対策の補助に過ぎない</h1>
+      <h2>メール・ログ・共有チャットに載った URL は <strong>そのまま横流し</strong> で突破されうる</h2>
+      <div class="rich-box theme-warn" style="margin-top:0.75rem;"><div class="box-title">試験のひっかけ</div><div class="box-desc">「ランダム化すればアクセス制御は不要」系の選択肢 — <strong>誤答</strong>になりやすい。</div></div>
+    </section>
+
+    <section class="slide" data-i="10" data-yaml-scene="defense_logging" title="対策③">
+      <span class="tag">対策③</span>
+      <h1>監査ログ・連続アクセス検知・レート制限</h1>
+      <h2><strong>止める</strong>のは認可。ログは検知とフォレンジックスの材料</h2>
+      <ul class="bullets">
+        <li>短時間に連番 id を列挙するアクセスの検知</li>
+        <li>WAF や境界防御だけに賭けない（第15回と同じ姿勢）</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="11" data-yaml-scene="compare_axes" title="混同ゼロ">
+      <span class="tag">混同ゼロ</span>
+      <h1>「どの欠陥か」で切る — 第7・12・13・15回との違い</h1>
+      <ul class="bullets">
+        <li><strong>IDOR（今回）</strong>：サーバが用意した <strong>id 空間</strong> で持ち主確認が抜ける</li>
+        <li><strong>第13回 パストラバーサル</strong>：パス文字列の継ぎ足しで <strong>OS 上の読み取り範囲</strong> をずらす</li>
+        <li><strong>第7回 CSRF</strong>：本人ブラウザを騙して <strong>依頼を送らせる</strong> のが主眼</li>
+        <li><strong>第15回 XXE</strong>：XML 読み取りが <strong>外ファイル・URL</strong> へ広がる</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="12" data-yaml-scene="exam_tips" title="試験">
+      <span class="tag">試験</span>
+      <h1>短絡しやすい誤答パターン</h1>
+      <ul class="bullets">
+        <li>① ログインできていれば安全 — <strong>認可</strong>が別問題</li>
+        <li>② UUID なら完全 — <strong>URL 横流し</strong>で突破</li>
+        <li>③ フロント非表示で十分 — <strong>API 直叩き</strong></li>
+        <li>④ HTTPS＋WAF でアクセス制御完結 — <strong>アプリ側検証</strong>が本体</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="13" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第16回まとめ — IDOR（不適切な直接オブジェクト参照）</h1>
+      <h2><strong>サーバ側認可</strong>・<strong>間接参照</strong>・<strong>UUID だけに頼らない</strong> — の3本柱</h2>
+      <div class="summary-pillars" role="list">
+        <div class="summary-pillar" role="listitem"><b>柱①</b>返却直前に、利用者とオブジェクトの関係を検証</div>
+        <div class="summary-pillar" role="listitem"><b>柱②</b>外部参照子と内部キーを分離、短寿命トークン</div>
+        <div class="summary-pillar" role="listitem"><b>柱③</b>ログ・検知は補助、根本は認可実装</div>
+      </div>
+      <div class="summary-hero" role="region" aria-label="整理">
+        <p class="summary-hero__label">1行（口頭チェック）</p>
+        <p class="summary-hero__p">攻撃：<strong>変えられる id</strong> を信じ、<strong>他人のオブジェクト</strong> を返す。</p>
+        <p class="summary-hero__p">対策：<strong>毎回の認可</strong>＋間接参照＋多層の検知。</p>
+      </div>
+      <p class="summary-section-h">自習</p>
+      <ul class="bullets">
+        <li>自社の「ダウンロード」「REST」「GraphQL」「バッチリンク」を洗い、認可ゲートを確認。</li>
+        <li>台本 <code style="color:#fda4af;font-family:var(--mono);font-size:0.85rem">s01-ep16-idor.yaml</code> と並べて再生。</li>
+      </ul>
+      <aside class="summary-prev" aria-label="前回">
+        <span class="summary-prev__tag">第15回との対比</span>
+        <code style="color:#c4b5fd;font-family:var(--mono)">XXE（第15回）</code> — 読み取りが<strong>外へ広がる</strong>。今回は<strong>id と認可</strong>。
+      </aside>
+    </section>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 13</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#fda4af; line-height:1.25; text-align:center; word-break:break-all;" title="s01-ep16-idor.yaml">台本 id: incident</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

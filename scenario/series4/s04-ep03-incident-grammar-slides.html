@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>第3話: 障害対応英会話 文法スライド</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .centered { text-align: center; }
+    .zunda { color: #88DD44; font-weight: 700; }
+    .metan { color: #FF88BB; font-weight: 700; }
+    .small { font-size: 0.68em; color: #bbb; }
+    .card {
+      background: rgba(0, 0, 0, 0.24);
+      border: 1px solid rgba(136, 221, 68, 0.28);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      margin: 0.5rem 0;
+    }
+    .formula {
+      font-family: ui-monospace, Consolas, monospace;
+      color: #ffd580;
+      background: rgba(255, 213, 128, 0.08);
+      border: 1px solid rgba(255, 213, 128, 0.25);
+      border-radius: 8px;
+      padding: 0.45rem 0.65rem;
+      display: inline-block;
+      margin: 0.25rem 0;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    .example {
+      font-size: 0.74em;
+      line-height: 1.5;
+    }
+    .example code { color: #9cdcfe; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="centered">
+        <h2>第3話</h2>
+        <h3>障害対応で頭が真っ白なのだ</h3>
+        <p><span class="zunda">現場あるある</span>から学ぶ、<span class="metan">インシデント初動の短い型</span></p>
+        <p class="small">対応シナリオ: scenario/series4/s04-ep03-incident-blank.yaml</p>
+      </section>
+
+      <section>
+        <h3>導入: 初動で詰まる理由</h3>
+        <div class="card">
+          <ul>
+            <li>原因が未確定でも、<strong>沈黙は最悪</strong>。短い進行報告が必要</li>
+            <li><strong>We</strong> でチームとして話すと、ウォールームで自然</li>
+            <li>今日は3フレーズを<strong>状況 → 仮説 → 条件つき見込み</strong>の順で覚える</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h3>型1: We're ...ing now.（初動の進行）</h3>
+        <div class="card">
+          <p class="formula">We are + V-ing + now</p>
+          <ul>
+            <li><strong>現在進行形</strong>で「今まさにやっている」を共有</li>
+            <li><strong>now</strong> で切迫感と鮮度を添える</li>
+          </ul>
+        </div>
+        <div class="example">
+          <p><code>We're investigating now.</code></p>
+          <p><code>We're triaging errors now.</code></p>
+          <p><code>We're rolling back now.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>型2: We believe ... is related to ...（仮説の渡し方）</h3>
+        <div class="card">
+          <p class="formula">We believe + this is related to + 要因</p>
+          <ul>
+            <li><strong>believe</strong> は断定より弱く、初動に向く</li>
+            <li><strong>related to</strong> で関連づけを短く示す</li>
+          </ul>
+        </div>
+        <div class="example">
+          <p><code>We believe this is related to the latest deployment.</code></p>
+          <p><code>We believe this is related to a traffic spike.</code></p>
+          <p><code>We believe this is related to a third-party outage.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>型3: ETA for mitigation is ... if ...（緩和の見込み）</h3>
+        <div class="card">
+          <p class="formula">ETA for mitigation is + だいたいの時間 + if + 条件</p>
+          <ul>
+            <li><strong>for mitigation</strong> で目的（被害抑止）を明示</li>
+            <li><strong>if節</strong>で条件付きの見込みを渡す</li>
+          </ul>
+        </div>
+        <div class="example">
+          <p><code>ETA for mitigation is about 30 minutes if rollback succeeds.</code></p>
+          <p><code>ETA for mitigation is one hour if we can disable the feature flag.</code></p>
+          <p><code>ETA for mitigation is roughly 45 minutes if caching recovers.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>応用マップ: 聞かれ方別</h3>
+        <div class="grid2">
+          <div class="card">
+            <h4>今何してる？</h4>
+            <p class="example"><code>We're collecting logs now.</code></p>
+          </div>
+          <div class="card">
+            <h4>影響範囲は？</h4>
+            <p class="example"><code>We believe impact is limited to checkout.</code></p>
+          </div>
+          <div class="card">
+            <h4>いつ収まる？</h4>
+            <p class="example"><code>ETA for mitigation is about 20 minutes if cache warms up.</code></p>
+          </div>
+          <div class="card">
+            <h4>次の更新は？</h4>
+            <p class="example"><code>We'll post another update in 15 minutes.</code></p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>ミニドリル: 日本語を英語に変える</h3>
+        <div class="card">
+          <ol>
+            <li>「今は原因を調査しています（チームで）」</li>
+            <li>「直近のリリースが関係している可能性が高いです」</li>
+            <li>「ロールバックが通れば、緩和の目安は30分くらいです」</li>
+          </ol>
+        </div>
+        <div class="card example">
+          <p>例: <code>We're investigating now.</code></p>
+          <p>例: <code>We believe this is related to the latest deployment.</code></p>
+          <p>例: <code>ETA for mitigation is about 30 minutes if rollback succeeds.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>第3話まとめ</h3>
+        <div class="card">
+          <p>パニックでも、<strong>短い順番</strong>で返す。</p>
+          <ul>
+            <li><code>We're investigating now.</code>（進行）</li>
+            <li><code>We believe this is related to ...</code>（仮説）</li>
+            <li><code>ETA for mitigation is ... if ...</code>（条件つき見込み）</li>
+          </ul>
+        </div>
+        <p class="small">次回: 要件変更のすり合わせ（To confirm, you mean ...? / What's the priority?）</p>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: false,
+      controls: true,
+      progress: true,
+      center: false,
+      transition: "slide"
+    });
+  </script>
+</body>
+</html>

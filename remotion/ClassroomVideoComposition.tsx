@@ -1,10 +1,13 @@
 import React from "react";
-import { Audio, Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { Audio, Img, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import type { VideoManifest } from "../src/types/videoManifest";
 import { CLASSROOM_FRAME_LAYOUT } from "../src/config/videoLayout";
 import { Background } from "./components/Background";
 import { CharacterLayer, type ClassroomZones } from "./components/CharacterLayer";
 import { SubtitleLayer } from "./components/SubtitleLayer";
+import { HookIntro } from "./components/HookIntro";
+import { EmphasisBurst } from "./components/EmphasisBurst";
+import { CalloutBadge } from "./components/CalloutBadge";
 
 interface Props {
   manifest: VideoManifest;
@@ -29,11 +32,15 @@ const SlideBackground: React.FC<{ manifest: VideoManifest; width: number; height
 
 /** global.videoFrame 指定時：フレーム全面イラストの上に、上段＝スライド・下段＝字幕・左右＝立ち絵 */
 export const ClassroomVideoComposition: React.FC<Props> = ({ manifest }) => {
-  const { width, height } = useVideoConfig();
+  const { width, height, fps } = useVideoConfig();
   const vf = manifest.videoFrameFile;
   if (!vf) {
     throw new Error("ClassroomVideoComposition: videoFrameFile が未定義です。");
   }
+
+  const hookFrames = manifest.hook
+    ? Math.max(1, Math.round((manifest.hook.durationMs / 1000) * fps))
+    : 0;
 
   const L = CLASSROOM_FRAME_LAYOUT;
   const slide = {
@@ -96,7 +103,26 @@ export const ClassroomVideoComposition: React.FC<Props> = ({ manifest }) => {
       </div>
       <CharacterLayer manifest={manifest} frameHeight={height} classroomZones={classroomZones} />
       <SubtitleLayer manifest={manifest} classroomEmbed={sub} storyWidth={width} />
-      <Audio src={staticFile(manifest.audioFile)} />
+
+      {/* 本編に重ねる演出オーバーレイ */}
+      <EmphasisBurst emphases={manifest.emphases} width={width} height={height} />
+      <CalloutBadge callouts={manifest.callouts} width={width} />
+
+      {/* 本編音声は Hook 終了後から再生開始 */}
+      {hookFrames > 0 ? (
+        <Sequence from={hookFrames}>
+          <Audio src={staticFile(manifest.audioFile)} />
+        </Sequence>
+      ) : (
+        <Audio src={staticFile(manifest.audioFile)} />
+      )}
+
+      {/* 冒頭 Hook 区間 */}
+      {manifest.hook && (
+        <Sequence from={0} durationInFrames={hookFrames}>
+          <HookIntro hook={manifest.hook} width={width} height={height} />
+        </Sequence>
+      )}
     </div>
   );
 };

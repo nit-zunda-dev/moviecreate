@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>シリーズ4 第2話: PRレビュー英会話 文法スライド</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme">
+  <style>
+    .reveal section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .centered { text-align: center; }
+    .zunda { color: #88DD44; font-weight: 700; }
+    .metan { color: #FF88BB; font-weight: 700; }
+    .small { font-size: 0.68em; color: #bbb; }
+    .card {
+      background: rgba(0, 0, 0, 0.24);
+      border: 1px solid rgba(136, 221, 68, 0.28);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      margin: 0.5rem 0;
+    }
+    .formula {
+      font-family: ui-monospace, Consolas, monospace;
+      color: #ffd580;
+      background: rgba(255, 213, 128, 0.08);
+      border: 1px solid rgba(255, 213, 128, 0.25);
+      border-radius: 8px;
+      padding: 0.45rem 0.65rem;
+      display: inline-block;
+      margin: 0.25rem 0;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    .example {
+      font-size: 0.74em;
+      line-height: 1.5;
+    }
+    .example code { color: #9cdcfe; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="centered">
+        <h2>シリーズ4 第2話</h2>
+        <h3>レビューコメントが怖いのだ</h3>
+        <p><span class="zunda">現場あるある</span>から学ぶ、<span class="metan">PRレビューの丁寧な型</span></p>
+        <p class="small">対応シナリオ: scenario/series4/s04-ep02-pr-review-scary.yaml</p>
+      </section>
+
+      <section>
+        <h3>導入: レビューで詰まる理由</h3>
+        <div class="card">
+          <ul>
+            <li>単語は分かっても、<strong>確認・提案・対応</strong>の型がないと返せない</li>
+            <li>曖昧なコメントは、まず<strong>意味のすり合わせ</strong>から</li>
+            <li>今日は3フレーズを<strong>そのまま差し替え可能な骨組み</strong>として覚える</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h3>型1: Could you clarify ...?（丁寧な確認）</h3>
+        <div class="card">
+          <p class="formula">Could you clarify + what you mean by + 相手の表現</p>
+          <ul>
+            <li><strong>Could you</strong> で依頼の柔らかさを担保</li>
+            <li><strong>what you mean by</strong> で、相手の言葉の定義を聞く</li>
+          </ul>
+        </div>
+        <div class="example">
+          <p><code>Could you clarify what you mean by fragile here?</code></p>
+          <p><code>Could you clarify which part looks risky?</code></p>
+          <p><code>Could you clarify the expected behavior?</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>型2: I suggest ...（提案の型）</h3>
+        <div class="card">
+          <p class="formula">I suggest + 動名詞（-ing） / 名詞句</p>
+          <ul>
+            <li><strong>suggest</strong> は「提案」で、命令より角が立ちにくい</li>
+            <li>動名詞で<strong>具体的な次アクション</strong>を示す</li>
+          </ul>
+        </div>
+        <div class="example">
+          <p><code>I suggest extracting this into a helper function.</code></p>
+          <p><code>I suggest adding a test for the edge case.</code></p>
+          <p><code>I suggest renaming this variable for clarity.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>型3: I'll address ...（対応表明）</h3>
+        <div class="card">
+          <p class="formula">I'll address + 対象 + （必要なら期限・条件）</p>
+          <ul>
+            <li><strong>address</strong> は「（問題・指摘に）対応する」</li>
+            <li>レビュアーの不安を<strong>言語化して減らす</strong></li>
+          </ul>
+        </div>
+        <div class="example">
+          <p><code>I'll address your feedback and push an update today.</code></p>
+          <p><code>I'll address this in a follow-up PR.</code></p>
+          <p><code>I'll address the naming concern in the next commit.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>応用マップ: 怖さのパターン別</h3>
+        <div class="grid2">
+          <div class="card">
+            <h4>意味が曖昧</h4>
+            <p class="example"><code>Could you clarify what "soon" means here?</code></p>
+          </div>
+          <div class="card">
+            <h4>代替案を出す</h4>
+            <p class="example"><code>I suggest handling errors at the boundary.</code></p>
+          </div>
+          <div class="card">
+            <h4>今日中に直す</h4>
+            <p class="example"><code>I'll address it and push by EOD.</code></p>
+          </div>
+          <div class="card">
+            <h4>後続で対応</h4>
+            <p class="example"><code>I'll address scope creep in a separate ticket.</code></p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>ミニドリル: 日本語を英語に変える</h3>
+        <div class="card">
+          <ol>
+            <li>「“過剰設計”って具体的にどういう意味ですか」</li>
+            <li>「ログ出力は設定ファイルにまとめた方がいいと思います」</li>
+            <li>「ご指摘は反映して、午後には更新をプッシュします」</li>
+          </ol>
+        </div>
+        <div class="card example">
+          <p>例: <code>Could you clarify what you mean by over-engineered?</code></p>
+          <p>例: <code>I suggest moving logging settings into a config file.</code></p>
+          <p>例: <code>I'll address your comments and push an update this afternoon.</code></p>
+        </div>
+      </section>
+
+      <section>
+        <h3>第2話まとめ</h3>
+        <div class="card">
+          <p>怖いコメントは、<strong>確認 → 提案 → 対応表明</strong>で分解する。</p>
+          <ul>
+            <li><code>Could you clarify ...?</code>（意味のすり合わせ）</li>
+            <li><code>I suggest ...</code>（角の立たない提案）</li>
+            <li><code>I'll address ...</code>（対応する意志の表示）</li>
+          </ul>
+        </div>
+        <p class="small">次回: 障害対応英会話（We're investigating now. / ETA を組み合わせる）</p>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: false,
+      controls: true,
+      progress: true,
+      center: false,
+      transition: "slide"
+    });
+  </script>
+</body>
+</html>
+

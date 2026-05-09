@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>Thumbnail (exam)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif; }
+
+    body {
+      position: relative;
+      background: #0c2a18;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 黒板風背景 */
+    .chalkboard {
+      position: absolute;
+      inset: 30px 30px 30px 30px;
+      background:
+        radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 60%),
+        repeating-linear-gradient(
+          45deg,
+          rgba(255,255,255,0.02) 0px,
+          rgba(255,255,255,0.02) 2px,
+          transparent 2px,
+          transparent 6px
+        ),
+        #1a4a2c;
+      border: 14px solid #6b3e1c;
+      border-radius: 6px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55), inset 0 0 60px rgba(0,0,0,0.5);
+    }
+
+    /* 上部：エピソードバッジ */
+    .episode {
+      position: absolute;
+      top: 60px;
+      left: 60px;
+      padding: 8px 22px;
+      background: #fff;
+      color: #b30000;
+      font-size: 30px;
+      font-weight: 900;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+    }
+
+    /* 試験頻出バッジ（右上） */
+    .stamp {
+      position: absolute;
+      top: 60px;
+      right: 100px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      border: 6px solid #ff4d4d;
+      color: #ff4d4d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      transform: rotate(-12deg);
+      background: rgba(255, 230, 230, 0.08);
+      text-align: center;
+      line-height: 1.05;
+    }
+    .stamp .top { font-size: 22px; letter-spacing: 0.1em; }
+    .stamp .mid { font-size: 38px; }
+    .stamp .bot { font-size: 18px; letter-spacing: 0.05em; margin-top: 4px; opacity: 0.85; }
+
+    /* メインコピー */
+    .main {
+      position: absolute;
+      top: 200px;
+      left: 60px;
+      right: 380px;
+      font-weight: 900;
+      line-height: 1.2;
+      color: #ffffff;
+      text-shadow: 3px 3px 0 #052810, 0 8px 16px rgba(0,0,0,0.6);
+    }
+    .main .l1 {
+      display: inline-block;
+      font-size: var(--main-fontsize);
+      padding: 0 4px;
+    }
+    .main .emphasis {
+      display: inline-block;
+      color: #fff200;
+      border-bottom: 6px dashed #fff200;
+      padding: 0 6px;
+      margin: 0 2px;
+    }
+
+    /* 下部チョーク風サブ */
+    .sub {
+      position: absolute;
+      bottom: 70px;
+      left: 60px;
+      right: 380px;
+      font-size: 36px;
+      font-weight: 700;
+      color: #cfeacb;
+      text-shadow: 2px 2px 0 #052810;
+      font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+    }
+
+    /* 立ち絵（右下） */
+    .character {
+      position: absolute;
+      right: 30px;
+      bottom: 30px;
+      height: calc(100% - 60px);
+      filter: drop-shadow(0 0 12px rgba(0,0,0,0.6)) drop-shadow(0 8px 20px rgba(0,0,0,0.5));
+    }
+    .character img {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="chalkboard"></div>
+  <div class="episode">{{EPISODE_TEXT}}</div>
+  <div class="stamp">
+    <div class="top">★★★</div>
+    <div class="mid">試験</div>
+    <div class="bot">頻出</div>
+  </div>
+
+  <div class="main" style="--main-fontsize: {{MAIN_FONTSIZE}}px;">
+    {{MAIN_HTML}}
+  </div>
+
+  <div class="sub">{{SUB_TEXT}}</div>
+
+  <div class="character">
+    <img src="{{CHARACTER_IMAGE}}" alt="character" />
+  </div>
+</body>
+</html>

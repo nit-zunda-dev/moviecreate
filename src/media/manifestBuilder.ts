@@ -1,7 +1,14 @@
 import fs from "fs";
 import path from "path";
-import { Scenario, Line } from "../types/scenario";
-import { VideoManifest, ManifestLine, CharacterDisplayConfig } from "../types/videoManifest";
+import { Scenario, Line, HookSettings } from "../types/scenario";
+import {
+  VideoManifest,
+  ManifestLine,
+  CharacterDisplayConfig,
+  ManifestHook,
+  ManifestEmphasis,
+  ManifestCallout,
+} from "../types/videoManifest";
 import { LineTimingResult } from "../voicevox/synthesizeLine";
 import { DEFAULT_VIDEO_HEIGHT, DEFAULT_VIDEO_WIDTH } from "../config/videoLayout";
 
@@ -12,6 +19,9 @@ export interface LineResultWithContext {
   lineIndex: number;
   sceneBackground?: string;
 }
+
+const DEFAULT_HOOK_DURATION_MS = 5000;
+const DEFAULT_CALLOUT_STYLE = "tip" as const;
 
 const DEFAULT_SUBTITLE_COLORS = [
   "#FF88BB", // 0: ピンク
@@ -53,8 +63,16 @@ export function buildVideoManifest(
     };
   }
 
-  let currentMs = 0;
+  // Hook ブロックの展開（任意）
+  // Sprint 1 ではビジュアル演出（flash/zoom/shake/text/emphasis/character）と durationMs だけ Manifest 化する。
+  // hook.bgm / hook.se / hook.voiceOver は受け入れるが配線は Sprint 3。
+  const hookManifest = buildHookManifest(scenario.hook, characters);
+  const hookOffsetMs = hookManifest?.durationMs ?? 0;
+
+  let currentMs = hookOffsetMs;
   const lines: ManifestLine[] = [];
+  const emphases: ManifestEmphasis[] = [];
+  const callouts: ManifestCallout[] = [];
 
   for (let i = 0; i < lineResults.length; i++) {
     const { result, line, sceneId, lineIndex, sceneBackground } = lineResults[i];
@@ -71,6 +89,10 @@ export function buildVideoManifest(
     const fromScene = sceneBackground ? path.resolve(sceneBackground) : undefined;
     const backgroundFile = fromLine ?? fromScene;
 
+    const lineStartMs = currentMs;
+    const lineDurationMs = result.durationMs;
+    const lineEndMs = lineStartMs + lineDurationMs;
+
     lines.push({
       globalIndex: i,
       sceneId,
@@ -82,11 +104,29 @@ export function buildVideoManifest(
       backgroundFile,
       speakerId: result.speakerId,
       wavFile: result.wavPath,
-      startMs: currentMs,
-      durationMs: result.durationMs,
+      startMs: lineStartMs,
+      durationMs: lineDurationMs,
     });
 
-    currentMs += result.durationMs;
+    if (line.emphasis && line.emphasis.length > 0) {
+      emphases.push({
+        startMs: lineStartMs,
+        endMs: lineEndMs,
+        texts: line.emphasis.slice(),
+      });
+    }
+
+    if (line.callout) {
+      const cdur = line.callout.durationMs ?? lineDurationMs;
+      callouts.push({
+        startMs: lineStartMs,
+        endMs: lineStartMs + cdur,
+        text: line.callout.text,
+        style: line.callout.style ?? DEFAULT_CALLOUT_STYLE,
+      });
+    }
+
+    currentMs = lineEndMs;
   }
 
   const defaultBackground = scenario.global?.defaultBackground
@@ -107,6 +147,48 @@ export function buildVideoManifest(
     characters,
     lines,
     generatedAt: new Date().toISOString(),
+    hook: hookManifest,
+    emphases: emphases.length > 0 ? emphases : undefined,
+    callouts: callouts.length > 0 ? callouts : undefined,
+  };
+}
+
+/**
+ * `Scenario.hook` を `ManifestHook` に展開する。
+ * 立ち絵パスはキャラの defaultImageFile と face から解決する。
+ * Sprint 1 では bgm/se/voiceOver は配線せず、ビジュアル系のみ。
+ */
+function buildHookManifest(
+  hook: HookSettings | undefined,
+  characters: Record<string, CharacterDisplayConfig>,
+): ManifestHook | undefined {
+  if (!hook) return undefined;
+
+  const durationMs = hook.durationMs ?? DEFAULT_HOOK_DURATION_MS;
+  let imageFile: string | undefined;
+  if (hook.character && characters[hook.character]?.defaultImageFile) {
+    const baseImage = characters[hook.character].defaultImageFile!;
+    if (hook.face) {
+      const charDir = path.dirname(baseImage);
+      imageFile = path.join(charDir, hook.face + ".png");
+    } else {
+      imageFile = baseImage;
+    }
+  }
+
+  return {
+    durationMs,
+    text: hook.text,
+    emphasis: hook.emphasis ?? [],
+    character: hook.character,
+    imageFile,
+    flash: hook.flash,
+    zoom: hook.zoom,
+    shake: hook.shake,
+    // Sprint 3 で配線:
+    bgmFile: undefined,
+    seFile: undefined,
+    voiceOver: undefined,
   };
 }
 
