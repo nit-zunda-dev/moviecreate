@@ -201,13 +201,63 @@ function buildDescription(scenario: Scenario): string {
 // 画像生成プロンプト（サムネ・各シーン背景・エンドスクリーン・Shorts サムネ）
 // =============================================================================
 
-/** 全プロンプト共通のベース指示（ロゴ・文字・人物の混入を防ぐ） */
-const BASE_STYLE_EN =
-  "anime style background art, soft cinematic lighting, painterly textures, " +
-  "no people, no text, no logos, no watermark, clean composition";
+type ImageStyle = "atmospheric" | "diagram" | "metaphor" | "fun";
+
+/** スタイル別のベース指示（ロゴ・文字・人物の混入を共通で防ぐ） */
+function baseStyleEn(style: ImageStyle): string {
+  switch (style) {
+    case "diagram":
+      // フラットインフォグラフィック／アイソメトリック寄り。教材として読みやすい背景。
+      return (
+        "flat infographic illustration, clean technical diagram aesthetic, " +
+        "isometric or top-down composition where appropriate, labeled BOXES and ARROWS as graphic shapes only " +
+        "(do NOT render any letters, numbers, or text labels — text will be added by editor later), " +
+        "muted educational color palette, slight grain, " +
+        "no people, no text, no logos, no watermark, " +
+        "center area kept simple to host overlay graphics, bottom area slightly darker for subtitle overlay, " +
+        "left and right lower thirds kept simple to host character standing illustrations"
+      );
+    case "metaphor":
+      return (
+        "anime style metaphor illustration, fairy-tale-like visual analogy of the topic " +
+        "(for example: castle walls, gates, soldiers in line, treasure chests, locked doors), " +
+        "soft cinematic lighting, painterly textures, slightly cartoonish proportions, " +
+        "no people in detailed close-up (small silhouettes are okay), no text, no logos, no watermark, " +
+        "clean composition with center focus and darker bottom area for subtitle"
+      );
+    case "fun":
+      return (
+        "bright cheerful anime style background, warm pastel palette, slightly chibi friendly atmosphere, " +
+        "clean lines, soft cinematic lighting, slight bokeh, " +
+        "no people, no text, no logos, no watermark, " +
+        "clean composition with center focus and darker bottom area for subtitle"
+      );
+    case "atmospheric":
+    default:
+      return (
+        "anime style background art, soft cinematic lighting, painterly textures, " +
+        "no people, no text, no logos, no watermark, clean composition"
+      );
+  }
+}
+
+/** Midjourney 用の追加スタイル文字列 */
+function baseStyleMj(style: ImageStyle): string {
+  switch (style) {
+    case "diagram":
+      return "flat infographic, isometric diagram, boxes and arrows as shapes only, muted educational palette";
+    case "metaphor":
+      return "anime metaphor illustration, fairy-tale visual analogy, painterly";
+    case "fun":
+      return "bright cheerful anime, pastel palette, chibi-friendly, painterly";
+    case "atmospheric":
+    default:
+      return "anime cinematic background, painterly, soft lighting";
+  }
+}
 
 const NEGATIVE_PROMPT =
-  "text, letters, words, watermark, logo, signature, person, people, face, " +
+  "text, letters, words, numbers, watermark, logo, signature, person, people, face, " +
   "character, hands, ui elements, frame border, low quality, blurry, distorted, jpeg artifacts";
 
 interface AssetPrompt {
@@ -235,31 +285,42 @@ function joinKeywords(parts: (string | undefined | null)[]): string {
 }
 
 /** シーン1つ分のプロンプトを組み立てる */
-function buildScenePrompt(scene: Scene, scenarioTitle: string): AssetPrompt {
+function buildScenePrompt(
+  scene: Scene,
+  scenarioTitle: string,
+  style: ImageStyle,
+): AssetPrompt {
   const chapter = scene.chapter?.label ?? scene.id;
   const firstLine = scene.lines.find((l) => (l.text ?? "").length > 0)?.text ?? "";
   const emphasisAll = scene.lines.flatMap((l) => l.emphasis ?? []).slice(0, 3);
   // セリフの冒頭 60 字までを「シーンの空気感」のヒントとして付ける
   const lineHint = firstLine.replace(/\s+/g, " ").slice(0, 60);
 
+  // diagram 寄りのときは「絵にしやすいヒント」を強めに与える
+  const styleHint =
+    style === "diagram"
+      ? "Render the scene as a SCHEMATIC ILLUSTRATION of the topic — boxes, arrows, layered stacks, " +
+        "isometric servers, network zones — using shapes and color blocks only (no readable text). "
+      : style === "metaphor"
+      ? "Render the scene as a visual METAPHOR of the topic (castle gates, walls, queues, locked treasure chests, etc). "
+      : style === "fun"
+      ? "Render the scene as a cheerful and friendly version of the topic (bright classroom, friendly server room, pastel office). "
+      : "";
+
   const sceneEn = joinKeywords([
-    `scene mood: ${chapter}`,
+    `scene topic: ${chapter}`,
     emphasisAll.length ? `keywords: ${emphasisAll.join(", ")}` : null,
     lineHint ? `narrative cue: ${lineHint}` : null,
-    "center area kept simple to host overlay graphics",
-    "bottom area slightly darker for subtitle overlay",
-    "left and right lower thirds kept simple to host character standing illustrations",
   ]);
 
   const promptEn =
     `Background art for an explainer video scene. ` +
     `Series context: "${scenarioTitle}". ` +
-    `${sceneEn}. ${BASE_STYLE_EN}. 16:9 aspect ratio, 1920x1080.`;
+    `${styleHint}${sceneEn}. ${baseStyleEn(style)}. 16:9 aspect ratio, 1920x1080.`;
 
   const promptMj =
     `${chapter}, ${emphasisAll.join(", ") || "explainer scene"}, ` +
-    `anime cinematic background, painterly, soft lighting, ` +
-    `no people, no text, dark bottom for subtitle ` +
+    `${baseStyleMj(style)}, no people, no text, dark bottom for subtitle ` +
     `--ar 16:9 --style raw --v 6`;
 
   return {
@@ -274,7 +335,7 @@ function buildScenePrompt(scene: Scene, scenarioTitle: string): AssetPrompt {
 }
 
 /** Hook（冒頭5秒）用の背景プロンプト */
-function buildHookBackgroundPrompt(scenario: Scenario): AssetPrompt | undefined {
+function buildHookBackgroundPrompt(scenario: Scenario, style: ImageStyle): AssetPrompt | undefined {
   const hook = scenario.hook;
   if (!hook) return undefined;
   const emphasis = (hook.emphasis ?? []).slice(0, 3).join(", ");
@@ -284,11 +345,11 @@ function buildHookBackgroundPrompt(scenario: Scenario): AssetPrompt | undefined 
     `${emphasis ? `Emphasis keywords: ${emphasis}. ` : ""}` +
     `Dramatic dark red and crimson glow, abstract digital warning patterns, ` +
     `subtle glitch at edges, vignette focusing the center, slightly desaturated. ` +
-    `${BASE_STYLE_EN}. Bottom area slightly darker for subtitle. 16:9 aspect ratio, 1920x1080.`;
+    `${baseStyleEn(style)}. Bottom area slightly darker for subtitle. 16:9 aspect ratio, 1920x1080.`;
 
   const promptMj =
     `breaking news alert background, dark crimson glow, abstract digital warning patterns, ` +
-    `${emphasis || "key alert"}, subtle glitch edges, anime cinematic, painterly, ` +
+    `${emphasis || "key alert"}, subtle glitch edges, ${baseStyleMj(style)}, ` +
     `no text, no people, dark bottom for subtitle --ar 16:9 --style raw --v 6`;
 
   return {
@@ -304,7 +365,7 @@ function buildHookBackgroundPrompt(scenario: Scenario): AssetPrompt | undefined 
 }
 
 /** エンドスクリーン用の背景プロンプト */
-function buildEndScreenPrompt(scenario: Scenario): AssetPrompt | undefined {
+function buildEndScreenPrompt(scenario: Scenario, style: ImageStyle): AssetPrompt | undefined {
   const es = scenario.global?.endScreen;
   if (!es?.enabled) return undefined;
   const promptEn =
@@ -313,13 +374,13 @@ function buildEndScreenPrompt(scenario: Scenario): AssetPrompt | undefined {
     `Dark navy gradient with soft bokeh particles, subtle radial vignette focusing the center, ` +
     `faint horizontal light streaks suggesting forward motion to the next episode, ` +
     `minimal and elegant, deep navy and indigo tones with a hint of warm orange highlights, ` +
-    `no detailed objects. ${BASE_STYLE_EN}. ` +
+    `no detailed objects. ${baseStyleEn(style)}. ` +
     `Fully clean center composition to host a 16:9 thumbnail and a CTA button. 16:9 aspect ratio, 1920x1080.`;
 
   const promptMj =
     `calm dark navy gradient end card, soft bokeh particles, radial vignette center, ` +
     `faint horizontal light streaks, deep navy indigo with warm orange highlights, ` +
-    `minimal elegant, anime cinematic, painterly, no people, no text, fully clean center ` +
+    `minimal elegant, ${baseStyleMj(style)}, no people, no text, fully clean center ` +
     `--ar 16:9 --v 6`;
 
   return {
@@ -336,7 +397,7 @@ function buildEndScreenPrompt(scenario: Scenario): AssetPrompt | undefined {
 }
 
 /** YouTube サムネ（クリック率最大化用） */
-function buildThumbnailPrompt(scenario: Scenario): AssetPrompt {
+function buildThumbnailPrompt(scenario: Scenario, style: ImageStyle): AssetPrompt {
   const hookText = scenario.hook?.text ?? "";
   const emphasis = (scenario.hook?.emphasis ?? []).slice(0, 3).join(", ");
   const audience = (scenario.youtube?.audience ?? []).slice(0, 2).join(", ");
@@ -352,13 +413,13 @@ function buildThumbnailPrompt(scenario: Scenario): AssetPrompt {
     `High-impact dramatic background that signals "you must click this". ` +
     `Strong color contrast (red / yellow accents on dark base), bold central focal point, ` +
     `negative space at the right side reserved for overlay text and at the lower-left for a character cutout. ` +
-    `${BASE_STYLE_EN}. 16:9 aspect ratio, 1280x720 (or 1920x1080).`;
+    `${baseStyleEn(style)}. 16:9 aspect ratio, 1280x720 (or 1920x1080).`;
 
   const promptMj =
     `youtube thumbnail background, high impact dramatic, ` +
     `${topic || "explainer topic"}, ${emphasis || "key shock"}, ` +
     `red and yellow accents on dark base, bold central focal point, ` +
-    `negative space on right for overlay text, anime cinematic, painterly, ` +
+    `negative space on right for overlay text, ${baseStyleMj(style)}, ` +
     `no text, no people --ar 16:9 --style raw --v 6`;
 
   return {
@@ -377,7 +438,11 @@ function buildThumbnailPrompt(scenario: Scenario): AssetPrompt {
 }
 
 /** Shorts 1本ぶんのサムネ（9:16） */
-function buildShortsThumbnailPrompt(spec: ShortsSpec, scenario: Scenario): AssetPrompt {
+function buildShortsThumbnailPrompt(
+  spec: ShortsSpec,
+  scenario: Scenario,
+  style: ImageStyle,
+): AssetPrompt {
   const caption = spec.overlayCaption ?? "";
   const promptEn =
     `Vertical short video thumbnail BACKGROUND ART for YouTube Shorts. ` +
@@ -386,11 +451,11 @@ function buildShortsThumbnailPrompt(spec: ShortsSpec, scenario: Scenario): Asset
     `Dramatic vertical background that grabs attention in 0.5 seconds while scrolling. ` +
     `Strong color contrast, central focal point, top 15% and bottom 40% reserved as relatively simple ` +
     `dark areas to host caption and subtitle overlays, middle reserved for a large character standing illustration. ` +
-    `${BASE_STYLE_EN}. 9:16 aspect ratio, 1080x1920.`;
+    `${baseStyleEn(style)}. 9:16 aspect ratio, 1080x1920.`;
 
   const promptMj =
     `vertical shorts background, ${caption || spec.title}, dramatic high contrast, ` +
-    `central focal point, dark top and bottom for captions, anime cinematic, painterly, ` +
+    `central focal point, dark top and bottom for captions, ${baseStyleMj(style)}, ` +
     `no text, no people --ar 9:16 --style raw --v 6`;
 
   return {
@@ -405,24 +470,26 @@ function buildShortsThumbnailPrompt(spec: ShortsSpec, scenario: Scenario): Asset
 
 /** すべての画像生成プロンプトを集める */
 function buildAllAssetPrompts(scenario: Scenario): AssetPrompt[] {
+  const style: ImageStyle = scenario.youtube?.imageStyle ?? "atmospheric";
   const prompts: AssetPrompt[] = [];
-  prompts.push(buildThumbnailPrompt(scenario));
-  const hookBg = buildHookBackgroundPrompt(scenario);
+  prompts.push(buildThumbnailPrompt(scenario, style));
+  const hookBg = buildHookBackgroundPrompt(scenario, style);
   if (hookBg) prompts.push(hookBg);
   for (const scene of scenario.scenes) {
-    prompts.push(buildScenePrompt(scene, scenario.title));
+    prompts.push(buildScenePrompt(scene, scenario.title, style));
   }
-  const es = buildEndScreenPrompt(scenario);
+  const es = buildEndScreenPrompt(scenario, style);
   if (es) prompts.push(es);
   for (const spec of scenario.shorts ?? []) {
-    prompts.push(buildShortsThumbnailPrompt(spec, scenario));
+    prompts.push(buildShortsThumbnailPrompt(spec, scenario, style));
   }
   return prompts;
 }
 
 /** プロンプト群をテキストブロックにフォーマット */
-function formatAssetPromptsBlock(prompts: AssetPrompt[]): string {
+function formatAssetPromptsBlock(prompts: AssetPrompt[], style: ImageStyle): string {
   const out: string[] = [];
+  out.push(`画像スタイル: ${style}（scenario.youtube.imageStyle で切替可）`);
   out.push(`画像は ${prompts.length} 点を想定しています。`);
   out.push(
     "各ブロックの「英語プロンプト」を DALL·E 3 / SDXL / Imagen / NovelAI 等にそのまま貼り付け、",
@@ -519,7 +586,9 @@ export function generateYoutubeMetadata(
   sections.push("【4】画像生成プロンプト（サムネ・各シーン背景・エンドカード・Shorts）");
   sections.push("=".repeat(76));
   sections.push("");
-  sections.push(formatAssetPromptsBlock(assetPrompts));
+  sections.push(
+    formatAssetPromptsBlock(assetPrompts, scenario.youtube?.imageStyle ?? "atmospheric"),
+  );
 
   sections.push("=".repeat(76));
   sections.push("【5】撮影後チェックリスト");

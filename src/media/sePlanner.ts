@@ -1,8 +1,8 @@
 import path from "path";
 import type { ManifestSeEvent } from "../types/videoManifest";
 
-/** 既定の SE 音量（BGM より大きく、セリフより小さい） */
-export const DEFAULT_SE_VOLUME = 0.7;
+/** 既定の SE 音量。セリフを邪魔しない控えめ設定（以前の 0.7 はキツかった） */
+export const DEFAULT_SE_VOLUME = 0.35;
 
 interface LineSeInput {
   /** 行の開始時刻（Hook オフセット込みの絶対 ms） */

@@ -1,5 +1,6 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { TACHIE_SIDE_WIDTH_RATIO } from "../../src/config/videoLayout";
 import type { ManifestEmphasis } from "../../src/types/videoManifest";
 
 interface Props {
@@ -9,12 +10,13 @@ interface Props {
 }
 
 /**
- * 行ごとの emphasis を画面中央に「ドカン！」と叩き付けるオーバーレイ。
+ * 行ごとの emphasis を画面上寄りに「ドカン！」と叩き付けるオーバーレイ。
  *
  * - 1行に複数語が含まれる場合は、行の発話時間内で順送りに切替
  * - 各語：spring で scale 0.7→1.05→1 / opacity 0→1
  * - 終了 0.2秒は opacity 1→0 でフェードアウト
- * - 字幕の上 30〜45% の位置に配置（既存字幕レイヤーを邪魔しない）
+ * - 配置は「画面上 12〜18% 付近 × 横は左右の立ち絵カラムを避けた中央 60%」
+ *   立ち絵が左右下から大きく出てくるレイアウトでも被らないようにしている。
  */
 export const EmphasisBurst: React.FC<Props> = ({ emphases, width, height }) => {
   const frame = useCurrentFrame();
@@ -55,18 +57,22 @@ export const EmphasisBurst: React.FC<Props> = ({ emphases, width, height }) => {
       : 1;
   const opacity = Math.min(opacityIn, opacityOut);
 
-  // フォントサイズ：文字数に応じて自動調整
-  const baseFontSize = Math.round(width * 0.075);
-  const lengthScale = word.length > 10 ? 10 / word.length : 1;
-  const fontSize = Math.max(36, Math.round(baseFontSize * lengthScale));
+  // 立ち絵カラム（左右各 20%）を避けて中央 60% に収める
+  const sideW = Math.round(width * TACHIE_SIDE_WIDTH_RATIO);
+  const centerW = width - 2 * sideW;
+
+  // フォントサイズ：文字数 + 中央領域の幅に応じて自動調整
+  const baseFontSize = Math.round(centerW * 0.11);
+  const lengthScale = word.length > 8 ? 8 / word.length : 1;
+  const fontSize = Math.max(32, Math.round(baseFontSize * lengthScale));
 
   return (
     <div
       style={{
         position: "absolute",
-        top: Math.round(height * 0.32),
-        left: 0,
-        right: 0,
+        top: Math.round(height * 0.12),
+        left: sideW,
+        width: centerW,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -81,6 +87,7 @@ export const EmphasisBurst: React.FC<Props> = ({ emphases, width, height }) => {
           color: "#fff200",
           fontSize,
           padding: "8px 20px",
+          maxWidth: centerW - 24,
           backgroundColor: "rgba(255, 34, 68, 0.95)",
           border: "4px solid #fff200",
           borderRadius: 10,
@@ -89,6 +96,8 @@ export const EmphasisBurst: React.FC<Props> = ({ emphases, width, height }) => {
           textShadow: "0 4px 8px rgba(0,0,0,0.95), 0 0 14px rgba(0,0,0,0.7)",
           boxShadow: "0 12px 24px rgba(0,0,0,0.55)",
           whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
           WebkitFontSmoothing: "antialiased",
         }}
       >

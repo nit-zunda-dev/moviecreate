@@ -3,6 +3,17 @@ export const DEFAULT_VIDEO_WIDTH = 1280;
 export const DEFAULT_VIDEO_HEIGHT = 720;
 
 /**
+ * 全動画で常に使う背景画像（黒板）。
+ *
+ * 運用方針：シーンごとの背景切替を廃止し、常にこの画像を背景として使う。
+ * シナリオ YAML の `global.defaultBackground` や `scene.background` / `line.background`
+ * が指定されていても、システム側でこのパスに上書きする。
+ *
+ * 解除したい場合は manifestBuilder.ts の上書きロジックを外せばよい。
+ */
+export const FORCE_DEFAULT_BACKGROUND = "image/background/background.png";
+
+/**
  * 字幕ブロックの高さ（フレーム高の割合）。約3行分を固定し、上段（スライド）高さを毎フレーム一定にする
  */
 export const SUBTITLE_BLOCK_HEIGHT_RATIO = 0.19;

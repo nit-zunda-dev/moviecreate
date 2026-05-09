@@ -211,4 +211,12 @@ export interface YoutubeMeta {
   hashtags?: string[];
   /** タイトル候補生成スタイル */
   titleHints?: { style: "shock" | "howto" | "exam" }[];
+  /**
+   * 画像生成プロンプトの作風（generate-youtube-metadata の【4】セクションに反映）。
+   * - "atmospheric": 既定。雰囲気重視の背景アート（ふんわり）
+   * - "diagram"    : フラットインフォグラフィック／アイソメトリック図解風（教材っぽく）
+   * - "metaphor"   : メタファー型イラスト（城・門・行列など、楽しい比喩）
+   * - "fun"        : 楽しいデフォルメ風（明るくポップな教室・カフェ・サーバルーム）
+   */
+  imageStyle?: "atmospheric" | "diagram" | "metaphor" | "fun";
 }

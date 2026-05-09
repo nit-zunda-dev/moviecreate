@@ -11,9 +11,14 @@ import {
   ManifestChapterBanner,
   ManifestEndScreen,
   ManifestLipKeyframe,
+  ManifestBgmSegment,
 } from "../types/videoManifest";
 import { LineTimingResult } from "../voicevox/synthesizeLine";
-import { DEFAULT_VIDEO_HEIGHT, DEFAULT_VIDEO_WIDTH } from "../config/videoLayout";
+import {
+  DEFAULT_VIDEO_HEIGHT,
+  DEFAULT_VIDEO_WIDTH,
+  FORCE_DEFAULT_BACKGROUND,
+} from "../config/videoLayout";
 import { planBgmSegments, toSceneTimeRanges, type SceneTimingInput } from "./bgmPlanner";
 import { planSeEvents } from "./sePlanner";
 
@@ -104,9 +109,10 @@ export function buildVideoManifest(
       imageFile = path.join(charDir, line.face + ".png");
     }
 
-    const fromLine = line.background ? path.resolve(line.background) : undefined;
-    const fromScene = sceneBackground ? path.resolve(sceneBackground) : undefined;
-    const backgroundFile = fromLine ?? fromScene;
+    // 背景はシステム既定（黒板）に固定する運用方針。
+    // line.background / scene.background が指定されていても無視する。
+    void sceneBackground;
+    const backgroundFile = path.resolve(FORCE_DEFAULT_BACKGROUND);
 
     const lineStartMs = currentMs;
     const lineDurationMs = result.durationMs;
@@ -188,9 +194,9 @@ export function buildVideoManifest(
     currentMs = lineEndMs;
   }
 
-  const defaultBackground = scenario.global?.defaultBackground
-    ? path.resolve(scenario.global.defaultBackground)
-    : undefined;
+  // global.defaultBackground も常に固定の黒板背景に上書き
+  void scenario.global?.defaultBackground;
+  const defaultBackground = path.resolve(FORCE_DEFAULT_BACKGROUND);
 
   const videoFrameFile = scenario.global?.videoFrame ? path.resolve(scenario.global.videoFrame) : undefined;
 
@@ -209,7 +215,14 @@ export function buildVideoManifest(
   const endDurationMs = endEnabled ? endCfg?.durationMs ?? DEFAULT_END_SCREEN_MS : 0;
   const totalDurationMs = bodyEndMs + endDurationMs;
 
-  const bgmSegments = planBgmSegments(scenario, hookOffsetMs, sceneRanges, totalDurationMs);
+  // BGM はシステムとして無効化（運用方針）。シナリオ YAML に bgm: 指定があっても出力しない。
+  // 将来 BGM を復活させる場合は、以下 1 行を有効化するだけで戻せる。
+  // const bgmSegments = planBgmSegments(scenario, hookOffsetMs, sceneRanges, totalDurationMs);
+  void planBgmSegments; // 未使用警告抑止
+  void sceneRanges;
+  void hookOffsetMs;
+  void totalDurationMs;
+  const bgmSegments: ManifestBgmSegment[] = [];
 
   // SE イベント（hook.se + 各行の line.se）
   const hookSeFile = scenario.hook?.se;
@@ -230,11 +243,11 @@ export function buildVideoManifest(
     };
   }
 
-  // Hook の bgm/se を ManifestHook 側にも反映（Sprint 1 で undefined にしていた箇所を上書き）
+  // Hook の SE のみ ManifestHook 側に反映（BGM は無効化方針のため bgmFile は載せない）
   const hookManifestWithAudio: ManifestHook | undefined = hookManifest
     ? {
         ...hookManifest,
-        bgmFile: scenario.hook?.bgm ? path.resolve(scenario.hook.bgm) : undefined,
+        bgmFile: undefined,
         seFile: scenario.hook?.se ? path.resolve(scenario.hook.se) : undefined,
       }
     : undefined;

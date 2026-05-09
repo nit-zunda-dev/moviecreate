@@ -1,0 +1,383 @@
+title: "【登録セキスペ 第17回】FW入れてるのに侵入された…ファイアウォールの『常識のウソ』なのだ！"
+
+# =============================================================================
+# Season 3 初回：鉄壁のネットワーク構築編 第1回
+# - 視聴維持率を最大化するため、Sprint1〜5 の機能をすべて投入：
+#   Hook / Emphasis / Callout / Chapter / シーン別背景 / シーン別BGM / SE
+#   / EndScreen / Shorts 派生 / YouTube メタ
+# - 素材は既に ./bgm/, ./se/, ./image/background/ に置かれているもののみを使用
+# =============================================================================
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  # Hook 区間（本編行が始まる前）の背景は警告風で「!?」を作る
+  defaultBackground: "./image/background/hook_alert.png"
+  # === Sprint 3: 既定 BGM（シーン別 bgm が無い区間で流れる）
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+  # === Sprint 5: 末尾エンドカード（次回予告＋登録誘導）
+  endScreen:
+    enabled: true
+    durationMs: 7000
+    subscribeText: "チャンネル登録で第18回も見逃さない！"
+    nextEpisode:
+      title: "次回：WAF の正体—FW では止まらない攻撃を止める仕組み"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+# === 冒頭5秒のフック演出（視聴維持率の生命線） =================================
+hook:
+  durationMs: 5000
+  text: "FW入ってるのに、なぜか侵入された"
+  emphasis:
+    - "FW入ってる"
+    - "侵入された"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.18
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se:  "./se/hook_impact.mp3"
+
+# === 本編シーン ============================================================
+scenes:
+  # ============================================================
+  # 1) インシデント導入：FW を入れていたのに侵入された
+  # ============================================================
+  - id: "incident"
+    background: "./image/background/scene_incident.png"
+    chapter:
+      label: "事件発生：FW入れてるのに侵入された"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "たすけて、FW入ってるのにWeb経由で社内まで入られたのだ……！"
+        emphasis: ["FW入ってる", "入られた"]
+        se: "./se/warn_buzz.mp3"
+        callout:
+          text: "🔥 試験頻出"
+          style: "exam"
+          durationMs: 4500
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "典型ね。FW は IP とポートしか見ない箱よ。"
+        emphasis: ["IP とポート"]
+        callout:
+          text: "FW＝アプリ層は見ない"
+          style: "warn"
+        se: "./se/emphasis_chime.mp3"
+
+  # ============================================================
+  # 2) オープニング：第17回の位置づけ
+  # ============================================================
+  - id: "opening"
+    background: "./image/background/scene_opening.png"
+    chapter:
+      label: "第17回の地図：FW を正しく理解する"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アプリの中身までは見ない。だから『FW を入れた＝全部安全』は完全にウソ。"
+        emphasis: ["アプリの中身", "完全にウソ"]
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "そういうことだったのだ……。じゃあ第17回、ネットワーク防御編のスタートなのだ！"
+        callout:
+          text: "💡 ネットワーク防御編 開幕"
+          style: "tip"
+          durationMs: 3500
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日は『ファイアウォール、略してFW』。やることは4つ。第一にFWが何を見て何を見ないか。第二にステートフルとパケットフィルタの違い。第三にDMZとセグメント分け。第四に運用の落とし穴と試験のひっかけよ。"
+        emphasis: ["何を見て何を見ないか", "ステートフル", "DMZ"]
+        se: "./se/emphasis_chime.mp3"
+
+  # ============================================================
+  # 3) FW の基本：何層を見るか
+  # ============================================================
+  - id: "layers"
+    background: "./image/background/scene_layers.png"
+    chapter:
+      label: "FW は何層まで見るのか"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "そもそもFWって、どの『層』を見てる箱なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "古典的なFWは、ネットワーク層と、トランスポート層——いわゆる第3層と第4層が主戦場。送り元と宛先のIP、それにポート番号で『通す・止める』を判断する。アプリ層、つまり第7層の中身までは原則見ないのよ。"
+        emphasis: ["第3層と第4層", "ポート番号", "第7層", "原則見ない"]
+        callout:
+          text: "🚨 FW=L3/L4、WAF/IPS=L7"
+          style: "breaking"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ということは、HTTPで来た攻撃の中身は、FWからは『ただの443番ポート通信』にしか見えないのだ……！"
+        emphasis: ["HTTPで来た攻撃", "443番ポート通信"]
+        se: "./se/emphasis_chime.mp3"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。だから『FWを入れたから XSS や SQLi も大丈夫』は試験で✕。アプリ層の攻撃を止めるのはWAFやIPS、もしくはアプリ自身の対策。FWはそこの責任者じゃないの。"
+        emphasis: ["XSS や SQLi", "WAFやIPS", "責任者じゃない"]
+        callout:
+          text: "アプリ攻撃は WAF の仕事"
+          style: "warn"
+
+  # ============================================================
+  # 4) ステートフルインスペクション
+  # ============================================================
+  - id: "stateful"
+    background: "./image/background/scene_stateful.png"
+    chapter:
+      label: "ステートフル：通信の状態を覚える"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ステートフルって、なんか強そうな響きなのだ。普通のFWと何が違うのだ？"
+        emphasis: ["ステートフル"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "昔ながらの『パケットフィルタ』は、1パケットずつ独立して許可・拒否を判断する。だから戻りの通信にもいちいち穴を開けないとならない。一方ステートフルは、いったん許可した通信のセッションを覚えて、その戻りパケットは自動で通す。"
+        emphasis: ["1パケットずつ独立", "セッションを覚えて", "戻りパケットは自動で通す"]
+        callout:
+          text: "💡 ステートフル＝双方向の自動穴あけ"
+          style: "tip"
+        se: "./se/emphasis_chime.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "試験では『内部から外部への HTTPS 通信を許可した。外部からの応答を許可するルールを別途追加するか』みたいな問いで、ステートフルなら追加不要、と答えさせる形が定番ね。"
+        emphasis: ["追加不要"]
+        callout:
+          text: "🔥 試験 鉄板パターン"
+          style: "exam"
+          durationMs: 4000
+        se: "./se/callout_pop.mp3"
+
+  # ============================================================
+  # 5) DMZ とセグメント分け
+  # ============================================================
+  - id: "dmz_segmentation"
+    background: "./image/background/scene_dmz_segmentation.png"
+    chapter:
+      label: "DMZ とセグメント分け"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "公開サーバを社内LANに直に置いたら危ない、って習った気がするのだ。あれが DMZ の話なのだ？"
+        emphasis: ["DMZ"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そう。DMZ は『公開サーバ』と『社内』の間に挟む隔離地帯。FW を二段か三脚構成で組むのが定番ね。"
+        emphasis: ["隔離地帯", "三脚構成"]
+        callout:
+          text: "⚠ DMZ＝公開と社内を隔離"
+          style: "warn"
+        se: "./se/emphasis_chime.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "外からは DMZ までしか届かない。DMZ から社内へは必要最小限だけ通す。これで公開サーバが乗っ取られても社内まで一気に届かせない、が狙いよ。"
+        emphasis: ["DMZ までしか届かない", "必要最小限", "社内まで一気に届かせない"]
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "FW 一台で『内 ↔ 外』を仕切るだけじゃ足りないのだ……！"
+        emphasis: ["FW 一台", "足りない"]
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "正解。さらに最近は、社内の中も『管理用』『業務用』『開発用』みたいに区切るのが当たり前。マイクロセグメンテーションね。FW はゾーンを切るための柱で、DMZ はその代表的な使い方、って覚えて。"
+        emphasis: ["マイクロセグメンテーション", "ゾーンを切る"]
+        callout:
+          text: "💡 内側もゾーンで切る"
+          style: "tip"
+
+  # ============================================================
+  # 6) 運用の落とし穴：ルール設計
+  # ============================================================
+  - id: "rules_pitfall"
+    background: "./image/background/scene_rules_pitfall.png"
+    chapter:
+      label: "運用の落とし穴：ルール順序と暗黙の deny"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "FW のルールは『上から順に評価して、最初にマッチしたものが勝ち』が基本。最後に暗黙の deny、つまり『書いてないものは全部拒否』が入る。順番を一つ間違えると、どんなに細かい禁止ルールを書いても、上の『any-any 許可』が全部ぶち抜くわ。"
+        emphasis: ["上から順に評価", "暗黙の deny", "any-any 許可", "全部ぶち抜く"]
+        callout:
+          text: "🚨 順序＝命"
+          style: "breaking"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "『とりあえず any 許可』で動作確認したまま本番に出ると、ぜんぶ通っちゃうのだ……！"
+        emphasis: ["any 許可", "ぜんぶ通っちゃう"]
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "そう。試験の記述でも『暫定対応の any 許可ルールが残っていた』『ルールの順序が逆だった』『不要ルールがレビューされていない』が定番のひっかけよ。設計と並んで運用の話が必ず聞かれるわ。"
+        emphasis: ["暫定対応の any 許可", "順序が逆", "レビューされていない"]
+        callout:
+          text: "🔥 試験 記述のド定番"
+          style: "exam"
+          durationMs: 4000
+
+  # ============================================================
+  # 7) 試験のひっかけ
+  # ============================================================
+  - id: "exam_tips"
+    background: "./image/background/scene_exam_tips.png"
+    chapter:
+      label: "試験で狙われる『FW あるある誤解』4選"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "試験で怪しい選択肢、まとめてくれなのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "一つ、FW を入れれば XSS や SQLi も全部防げる——アプリ層は見ないので✕。二つ、ステートフルでも戻りの通信に必ず逆向きルールが要る——自動で許可されるので✕。三つ、内部ネットワーク同士は信頼してよい——ゼロトラストの考えでは✕。四つ、FW のルールは作るのが正義で、消す必要はない——不要ルールが穴になるので✕。"
+        emphasis: ["XSS や SQLi", "戻りの通信", "ゼロトラスト", "不要ルールが穴"]
+        callout:
+          text: "🚨 誤解4選"
+          style: "breaking"
+          durationMs: 5000
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "正解側は『多層防御』『ステートフルなら戻り自動』『内部もゾーンで区切る』『定期レビューで不要ルール削除』なのだ！"
+        emphasis: ["多層防御", "ステートフルなら戻り自動", "内部もゾーンで区切る", "定期レビュー"]
+        se: "./se/emphasis_chime.mp3"
+
+  # ============================================================
+  # 8) まとめ
+  # ============================================================
+  - id: "summary"
+    background: "./image/background/scene_summary.png"
+    chapter:
+      label: "まとめ：FW は層と状態とゾーンで覚える"
+    bgm: "./bgm/outro_warm.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のまとめ。FW は第3層と第4層の門番。状態を覚えるステートフルが今や基本。DMZ とセグメント分けで『公開と社内』『社内同士』を切る。運用ではルール順序、暗黙の deny、定期レビューがそのまま試験のひっかけ。アプリ層の攻撃は WAF や IPS と組ませる、が結論よ。"
+        emphasis: ["第3層と第4層", "ステートフル", "DMZ", "ルール順序", "WAF や IPS と組ませる"]
+        callout:
+          text: "🚨 ここテスト出る"
+          style: "breaking"
+          durationMs: 4500
+        se: "./se/correct_bell.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "次回はその WAF を解剖するのだ！　チャンネル登録と高評価、よろしくなのだ！"
+        emphasis: ["WAF", "チャンネル登録"]
+        callout:
+          text: "次回：WAF の正体"
+          style: "tip"
+          durationMs: 4000
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "コメント欄で、あなたの会社の『FW 運用あるある』も教えてちょうだい。第18回でまたね。"
+
+# === Sprint 4: 本編から派生する Shorts（縦長 1080×1920）====================
+shorts:
+  - id: "fw-myth"
+    title: "FW入れてるのに侵入された理由"
+    # 60秒以内に収めるため、incident は最初の3行だけ抜粋し、exam_tips の結論行（line 2: 正解側まとめ）を末尾に当てる
+    pickLines:
+      - { sceneId: "incident",  from: 0, to: 3 }
+      - { sceneId: "exam_tips", from: 2, to: 3 }
+    overlayCaption: "🔥 FW で防げない攻撃"
+    cta: "👇 解説本編は概要欄から"
+
+  - id: "fw-rules"
+    title: "any 許可が残ってると詰む"
+    pickScenes: ["rules_pitfall"]
+    overlayCaption: "🚨 ルール順序＝命"
+    cta: "本編 5 分で完全マスター（概要欄）"
+
+# === YouTube メタデータ（タイトル候補・概要欄・画像プロンプトの自動生成に利用）
+youtube:
+  # 画像生成プロンプトの作風：図解寄り（フラットインフォグラフィック／アイソメトリック）
+  imageStyle: "diagram"
+  audience:
+    - "情報処理安全確保支援士の受験者"
+    - "Webアプリ・インフラ担当の新人エンジニア"
+    - "情シス・社内SE"
+  hookKeywords:
+    - "FW"
+    - "ファイアウォール"
+    - "侵入された"
+    - "ステートフル"
+    - "DMZ"
+  hashtags:
+    - "#情報処理安全確保支援士"
+    - "#セキスペ"
+    - "#ファイアウォール"
+    - "#ネットワークセキュリティ"
+    - "#ずんだもん"
+  relatedEpisodes:
+    - { ep: 16, title: "IDOR と認可" }
+    - { ep: 18, title: "WAF（次回）" }
+  titleHints:
+    - { style: "shock" }
+    - { style: "howto" }
+    - { style: "exam" }
