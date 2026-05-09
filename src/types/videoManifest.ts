@@ -75,6 +75,35 @@ export interface ManifestCallout {
   style: "exam" | "warn" | "tip" | "breaking";
 }
 
+/**
+ * BGM の1セグメント。同じファイルでも区間ごとに音量・フェードを変えるため複数本に分かれることがある。
+ * セグメント間は前後 fadeMs だけクロスフェードで重ねる前提で、
+ * Remotion 側はこの並びをそのまま `<Audio startFrom>` で並べる。
+ */
+export interface ManifestBgmSegment {
+  startMs: number;
+  endMs: number;
+  /** publicDir 内の相対ファイル名（renderVideo.ts でコピー後に書き換え） */
+  audioFile: string;
+  /** 0.0〜1.0。既定 0.15 程度（セリフを邪魔しない） */
+  volume: number;
+  /** クロスフェード時間（ms）。Sprint 3 初版は固定 400ms */
+  fadeInMs: number;
+  fadeOutMs: number;
+  /** ループ再生するか（短い BGM 用）。既定 true */
+  loop: boolean;
+}
+
+/** 行ごと・Hook ごとに発火する SE イベント */
+export interface ManifestSeEvent {
+  /** 発火時刻（ms）。Hook オフセットを含む絶対時刻 */
+  atMs: number;
+  /** publicDir 内の相対ファイル名 */
+  audioFile: string;
+  /** 0.0〜1.0。既定 0.7 */
+  volume: number;
+}
+
 export interface VideoManifest {
   title: string;
   totalDurationMs: number;
@@ -102,4 +131,11 @@ export interface VideoManifest {
   emphases?: ManifestEmphasis[];
   /** 行ごとに展開された常駐テロップイベント（右上バッジ） */
   callouts?: ManifestCallout[];
+  /**
+   * 全体に並ぶ BGM セグメント。Hook → 各シーン → 末尾 の順で時刻昇順。
+   * 連続するセグメントが同じファイルなら 1 本に統合済み。
+   */
+  bgmSegments?: ManifestBgmSegment[];
+  /** SE イベント（時刻昇順） */
+  seEvents?: ManifestSeEvent[];
 }

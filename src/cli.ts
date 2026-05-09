@@ -10,7 +10,6 @@ import { buildVideoManifest, writeManifest, LineResultWithContext } from "./medi
 import { renderVideo } from "./video/renderVideo";
 import { applyHtmlSlideBackgrounds } from "./slides/captureHtmlSlides";
 import { lintRetention, printLintReport } from "./lint/retentionLinter";
-import { renderThumbnails, ALL_STYLES, type ThumbnailStyle } from "./thumbnails/renderThumbnails";
 import { generateYoutubeMetadata } from "./youtube/generateMetadata";
 
 const program = new Command();
@@ -155,50 +154,6 @@ program
       console.error("音声生成中にエラーが発生しました:", err);
       process.exit(1);
     });
-  });
-
-// サムネを 3 スタイル一括生成（CTR 改善・A/B 用）
-program
-  .command("generate-thumbnails")
-  .description(
-    "シナリオから 3 スタイル（shock/howto/exam）の YouTube サムネ（1280×720 PNG）を生成する",
-  )
-  .argument("<scenario>", "シナリオYAML/JSONファイルパス")
-  .option(
-    "--styles <styles>",
-    `生成するスタイル（カンマ区切り。既定: ${ALL_STYLES.join(",")}）`,
-  )
-  .option("--out-dir <path>", "出力ディレクトリ（既定: output/thumbnails/{title}/）")
-  .action(async (scenarioPath: string, opts: { styles?: string; outDir?: string }) => {
-    try {
-      const scenario = loadScenario(scenarioPath);
-      let styles: ThumbnailStyle[] | undefined;
-      if (opts.styles) {
-        const parts = opts.styles
-          .split(",")
-          .map((s) => s.trim().toLowerCase())
-          .filter(Boolean) as ThumbnailStyle[];
-        const invalid = parts.filter((s) => !ALL_STYLES.includes(s));
-        if (invalid.length > 0) {
-          throw new Error(
-            `不明なスタイル: ${invalid.join(", ")}。有効値: ${ALL_STYLES.join(", ")}`,
-          );
-        }
-        styles = parts;
-      }
-      const results = await renderThumbnails(scenario, scenarioPath, {
-        styles,
-        outDir: opts.outDir,
-      });
-      console.log("");
-      console.log("==== サムネを生成しました ====");
-      for (const r of results) {
-        console.log(`  [${r.style}] ${r.pngPath}`);
-      }
-    } catch (err) {
-      console.error("サムネ生成中にエラーが発生しました:", err);
-      process.exit(1);
-    }
   });
 
 // YouTube タイトル候補・概要欄・チャプターを自動生成

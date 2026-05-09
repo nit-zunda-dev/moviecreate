@@ -8,6 +8,8 @@ import { SubtitleLayer } from "./components/SubtitleLayer";
 import { HookIntro } from "./components/HookIntro";
 import { EmphasisBurst } from "./components/EmphasisBurst";
 import { CalloutBadge } from "./components/CalloutBadge";
+import { BgmTrack } from "./components/BgmTrack";
+import { SeTrack } from "./components/SeTrack";
 
 interface Props {
   manifest: VideoManifest;
@@ -116,6 +118,10 @@ export const ClassroomVideoComposition: React.FC<Props> = ({ manifest }) => {
       ) : (
         <Audio src={staticFile(manifest.audioFile)} />
       )}
+
+      {/* BGM / SE トラック（Hook 区間も含めて全体に並ぶ） */}
+      <BgmTrack segments={manifest.bgmSegments} />
+      <SeTrack events={manifest.seEvents} />
 
       {/* 冒頭 Hook 区間 */}
       {manifest.hook && (

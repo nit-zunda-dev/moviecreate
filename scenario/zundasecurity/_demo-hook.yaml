@@ -1,9 +1,14 @@
 # =============================================================================
-# Sprint 1 動作確認デモ
-# - 冒頭 Hook（フラッシュ・ズーム・シェイク・大テロップ・立ち絵）
-# - 行レベル emphasis（中央大ドカン）
-# - 行レベル callout（右上常駐テロップ・4スタイル）
+# Sprint 1〜3 動作確認デモ
+# - Sprint 1: 冒頭 Hook（フラッシュ・ズーム・シェイク・大テロップ・立ち絵）
+#             行レベル emphasis（中央大ドカン）
+#             行レベル callout（右上常駐テロップ・4スタイル）
+# - Sprint 3: 全編 BGM（global.bgm）/ シーン別 BGM（scene.bgm）
+#             Hook 専用 BGM + 開幕 SE / 行ごとの SE
 # 既存16本は触らず、このデモだけで全機能を体感できるようにしてある。
+# 必要素材（事前に ./bgm/ ./se/ に配置済み）:
+#   bgm/パステルハウス.mp3, intro_tense.mp3, main_serious.mp3, outro_warm.mp3
+#   se/hook_impact.mp3, emphasis_chime.mp3, callout_pop.mp3, warn_buzz.mp3, correct_bell.mp3
 # 起動例:
 #   node dist/cli.js lint-retention scenario/zundasecurity/_demo-hook.yaml
 #   node dist/cli.js generate-video scenario/zundasecurity/_demo-hook.yaml
@@ -35,6 +40,10 @@ global:
     speedScale: 1.2
     postPhonemeLength: 0.08
   defaultBackground: "./image/background/Movidrill.png"
+  # === Sprint 3: 既定 BGM（シーン別 bgm が無い区間で流れる）===================
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12  # セリフを邪魔しないよう、既定の 0.15 より少し控えめ
 
 output:
   fps: 30
@@ -57,18 +66,24 @@ hook:
     from: 1.00
     to: 1.18
   shake: true
+  # === Sprint 3: Hook 専用 BGM + 開幕 SE ====================================
+  bgm: "./bgm/intro_tense.mp3"   # Hook 5秒だけ緊張感ある別BGM（音量は 0.35 に自動）
+  se:  "./se/hook_impact.mp3"    # Hook 開始 0ms に「ドンッ」を 1 発
 
 # === 本編シーン ============================================================
 scenes:
   - id: "incident"
     chapter:
       label: "事件発生：URLいじりが招く事故"
+    # 事件解説中はシリアスな BGM に切替（自動で 400ms クロスフェード）
+    bgm: "./bgm/main_serious.mp3"
     lines:
       - type: dialogue
         character: zundamon
         face: "驚き"
         text: "たすけてほしいのだ！URLの数字を変えたら、他人の請求書が見えたのだ……！"
         emphasis: ["他人の請求書"]
+        se: "./se/warn_buzz.mp3"   # 警告音で「事件感」を出す
         callout:
           text: "🔥 試験頻出"
           style: "exam"
@@ -78,6 +93,7 @@ scenes:
         face: "困り"
         text: "典型ね。サーバが『そのデータを見ていいか』を毎回確認していないパターンよ。"
         emphasis: ["毎回確認していない"]
+        se: "./se/emphasis_chime.mp3"   # キラーンで強調語を補強
         callout:
           text: "認可は毎回サーバ側"
           style: "warn"
@@ -85,11 +101,13 @@ scenes:
   - id: "concept"
     chapter:
       label: "認証と認可の違い"
+    # bgm 未指定 → global.bgm.default（パステルハウス）に自動で戻る
     lines:
       - type: dialogue
         character: zundamon
         face: "通常"
         text: "認証と認可って、何が違うのだ？"
+        se: "./se/callout_pop.mp3"   # バッジ出現に合わせてピンッ
         callout:
           text: "💡 認証 vs 認可"
           style: "tip"
@@ -98,16 +116,20 @@ scenes:
         face: "通常"
         text: "認証は『誰か』を確認、認可は『何をしていいか』を確認するの。別物よ。"
         emphasis: ["誰か", "何をしていいか"]
+        se: "./se/emphasis_chime.mp3"
 
   - id: "summary"
     chapter:
       label: "まとめ"
+    # まとめは温かい BGM に切替
+    bgm: "./bgm/outro_warm.mp3"
     lines:
       - type: dialogue
         character: metan
         face: "笑い"
         text: "ポイントは『認可は毎回サーバ側で確認』。これだけ覚えて帰ってちょうだい。"
         emphasis: ["認可は毎回サーバ側"]
+        se: "./se/correct_bell.mp3"   # 「これ覚えて」の決め音
         callout:
           text: "🚨 ここテスト出る"
           style: "breaking"

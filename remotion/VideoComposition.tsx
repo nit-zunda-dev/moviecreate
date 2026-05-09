@@ -8,6 +8,8 @@ import { SubtitleLayer } from "./components/SubtitleLayer";
 import { HookIntro } from "./components/HookIntro";
 import { EmphasisBurst } from "./components/EmphasisBurst";
 import { CalloutBadge } from "./components/CalloutBadge";
+import { BgmTrack } from "./components/BgmTrack";
+import { SeTrack } from "./components/SeTrack";
 import { ClassroomVideoComposition } from "./ClassroomVideoComposition";
 
 interface Props {
@@ -39,6 +41,8 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
         <EmphasisBurst emphases={manifest.emphases} width={width} height={height} />
         <CalloutBadge callouts={manifest.callouts} width={width} />
         <MainAudio audioFile={manifest.audioFile} hookFrames={hookFrames} />
+        <BgmTrack segments={manifest.bgmSegments} />
+        <SeTrack events={manifest.seEvents} />
         {manifest.hook && (
           <Sequence from={0} durationInFrames={hookFrames}>
             <HookIntro hook={manifest.hook} width={width} height={height} />
@@ -151,6 +155,10 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
 
       {/* 本編音声は Hook 終了後から再生開始 */}
       <MainAudio audioFile={manifest.audioFile} hookFrames={hookFrames} />
+
+      {/* BGM / SE トラック（Hook 区間も含めて全体に並ぶ） */}
+      <BgmTrack segments={manifest.bgmSegments} />
+      <SeTrack events={manifest.seEvents} />
 
       {/* 冒頭 Hook 区間：HookIntro を最前面に被せる */}
       {manifest.hook && (

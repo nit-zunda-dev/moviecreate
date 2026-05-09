@@ -2,7 +2,13 @@ import path from "path";
 import fs from "fs";
 import { bundle } from "@remotion/bundler";
 import { renderMedia, selectComposition } from "@remotion/renderer";
-import { VideoManifest, CharacterDisplayConfig, ManifestHook } from "../types/videoManifest";
+import {
+  VideoManifest,
+  CharacterDisplayConfig,
+  ManifestHook,
+  ManifestBgmSegment,
+  ManifestSeEvent,
+} from "../types/videoManifest";
 import { getBasePaths } from "../config/paths";
 
 /**
@@ -54,8 +60,6 @@ function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoM
   }
 
   // Hook ブロックの絶対パス資産も publicDir にコピーして相対名に書き換える。
-  // Sprint 1 時点で実際に使われるのは imageFile のみだが、Sprint 3 で配線予定の
-  // bgmFile / seFile / voiceOver.wavFile も先回りで対応しておく。
   let hook: ManifestHook | undefined = manifest.hook;
   if (hook) {
     hook = {
@@ -69,7 +73,33 @@ function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoM
     };
   }
 
-  return { ...manifest, audioFile, lines, characters, defaultBackground, videoFrameFile, hook };
+  // BGM セグメント / SE イベント の音源も publicDir にコピー
+  let bgmSegments: ManifestBgmSegment[] | undefined = manifest.bgmSegments;
+  if (bgmSegments) {
+    bgmSegments = bgmSegments.map((seg) => ({
+      ...seg,
+      audioFile: copyAsset(seg.audioFile),
+    }));
+  }
+  let seEvents: ManifestSeEvent[] | undefined = manifest.seEvents;
+  if (seEvents) {
+    seEvents = seEvents.map((ev) => ({
+      ...ev,
+      audioFile: copyAsset(ev.audioFile),
+    }));
+  }
+
+  return {
+    ...manifest,
+    audioFile,
+    lines,
+    characters,
+    defaultBackground,
+    videoFrameFile,
+    hook,
+    bgmSegments,
+    seEvents,
+  };
 }
 
 export interface RenderVideoOptions {

@@ -412,9 +412,34 @@ moviecreate/
 | 1.9 | デモ YAML（`scenario/zundasecurity/_demo-hook.yaml`）で動作確認 |
 | 1.10 | README に hook/emphasis/callout 書き方追記 |
 
-### 🎬 Sprint 2 — サムネ自動量産 + YouTubeメタデータ自動生成
+### 🎬 Sprint 2 — YouTubeメタデータ自動生成（サムネ自動量産は不採用）
 
-### 🔊 Sprint 3 — BGM + SE トラック
+> **更新（2026-05-09）**: サムネ自動量産はユーザー判断により**不採用**（手動作成方針）。
+> `generate-youtube-metadata`（タイトル候補・概要欄・チャプター・ハッシュタグ）のみ実装済み。
+> 旧サムネ実装（`templates/thumbnail/`、`src/thumbnails/`、`generate-thumbnails` CLI）は削除済み。
+
+### 🔊 Sprint 3 — BGM + SE トラック ✅ 完了（2026-05-09）
+
+実装内容:
+
+- **型**: `ManifestBgmSegment` / `ManifestSeEvent` を `videoManifest.ts` に追加
+- **planner**: `src/media/bgmPlanner.ts`（区間統合＋クロスフェード＋音量自動）／ `src/media/sePlanner.ts`（時刻昇順イベント化）
+- **manifestBuilder**: `global.bgm.default` / `Scene.bgm` / `hook.bgm` を統合し、`hook.se` と `Line.se` を時刻イベント化
+- **renderVideo**: BGM/SE 音源も publicDir にコピー（絶対パス→相対パス）
+- **Remotion**: `BgmTrack.tsx`（fadeIn/fadeOut 計算付き）／ `SeTrack.tsx` を追加。両 Composition に組み込み
+- **アセット**: `bgm/` `se/` ディレクトリと `docs/audio-assets.md`（推奨フリー素材5サイト＋命名規約＋音量目安）
+- **lint-retention**: R009（BGM 未指定 warn）／R010（Hook に SE 無し info）／R011（BGM 拡張子怪しい warn）を追加
+- **README**: 「BGM / SE トラック」セクション追記
+- **デモ**: `_demo-hook.yaml` に BGM/SE のコメント例を追記（素材を置けば即動く）
+
+音量バランス（既定）:
+
+| トラック | 音量 |
+|---|---|
+| VOICEVOX | 1.00 |
+| BGM 通常 | 0.15 |
+| BGM Hook | 0.35 |
+| SE | 0.70 |
 
 ### 📱 Sprint 4 — Shorts 派生
 

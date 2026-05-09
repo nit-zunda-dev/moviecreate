@@ -11,6 +11,8 @@ import {
 } from "../types/videoManifest";
 import { LineTimingResult } from "../voicevox/synthesizeLine";
 import { DEFAULT_VIDEO_HEIGHT, DEFAULT_VIDEO_WIDTH } from "../config/videoLayout";
+import { planBgmSegments, toSceneTimeRanges, type SceneTimingInput } from "./bgmPlanner";
+import { planSeEvents } from "./sePlanner";
 
 export interface LineResultWithContext {
   result: LineTimingResult;
@@ -73,6 +75,9 @@ export function buildVideoManifest(
   const lines: ManifestLine[] = [];
   const emphases: ManifestEmphasis[] = [];
   const callouts: ManifestCallout[] = [];
+  // BGM/SE planner 用の集計
+  const sceneInputsMap = new Map<string, SceneTimingInput>();
+  const seLineInputs: { startMs: number; seFile: string | undefined }[] = [];
 
   for (let i = 0; i < lineResults.length; i++) {
     const { result, line, sceneId, lineIndex, sceneBackground } = lineResults[i];
@@ -126,6 +131,22 @@ export function buildVideoManifest(
       });
     }
 
+    // BGM/SE planner 用にシーン時間と SE 行を集計
+    if (!sceneInputsMap.has(sceneId)) {
+      const sceneObj = scenario.scenes.find((s) => s.id === sceneId);
+      sceneInputsMap.set(sceneId, {
+        sceneId,
+        lineTimings: [],
+        bgmFile: sceneObj?.bgm ? path.resolve(sceneObj.bgm) : undefined,
+      });
+    }
+    sceneInputsMap.get(sceneId)!.lineTimings.push({ startMs: lineStartMs, durationMs: lineDurationMs });
+
+    seLineInputs.push({
+      startMs: lineStartMs,
+      seFile: line.se ? path.resolve(line.se) : undefined,
+    });
+
     currentMs = lineEndMs;
   }
 
@@ -135,9 +156,33 @@ export function buildVideoManifest(
 
   const videoFrameFile = scenario.global?.videoFrame ? path.resolve(scenario.global.videoFrame) : undefined;
 
+  // BGM セグメントの構築（global.bgm.default / scene.bgm / hook.bgm から）
+  // シーン順を Scenario 上の順序で揃えて planner に渡す
+  const orderedSceneInputs: SceneTimingInput[] = [];
+  for (const scene of scenario.scenes) {
+    const si = sceneInputsMap.get(scene.id);
+    if (si) orderedSceneInputs.push(si);
+  }
+  const sceneRanges = toSceneTimeRanges(orderedSceneInputs);
+  const totalDurationMs = currentMs;
+  const bgmSegments = planBgmSegments(scenario, hookOffsetMs, sceneRanges, totalDurationMs);
+
+  // SE イベント（hook.se + 各行の line.se）
+  const hookSeFile = scenario.hook?.se;
+  const seEvents = planSeEvents(hookSeFile, seLineInputs);
+
+  // Hook の bgm/se を ManifestHook 側にも反映（Sprint 1 で undefined にしていた箇所を上書き）
+  const hookManifestWithAudio: ManifestHook | undefined = hookManifest
+    ? {
+        ...hookManifest,
+        bgmFile: scenario.hook?.bgm ? path.resolve(scenario.hook.bgm) : undefined,
+        seFile: scenario.hook?.se ? path.resolve(scenario.hook.se) : undefined,
+      }
+    : undefined;
+
   return {
     title: scenario.title,
-    totalDurationMs: currentMs,
+    totalDurationMs,
     fps,
     width,
     height,
@@ -147,9 +192,11 @@ export function buildVideoManifest(
     characters,
     lines,
     generatedAt: new Date().toISOString(),
-    hook: hookManifest,
+    hook: hookManifestWithAudio,
     emphases: emphases.length > 0 ? emphases : undefined,
     callouts: callouts.length > 0 ? callouts : undefined,
+    bgmSegments: bgmSegments.length > 0 ? bgmSegments : undefined,
+    seEvents: seEvents.length > 0 ? seEvents : undefined,
   };
 }
 

@@ -346,7 +346,7 @@ hook:
 
 **挙動**: 動画は冒頭 `hook.durationMs` ぶん HookIntro で占有され、本編音声と本編シーンはすべてその後ろにずれて再生されます。
 
-> **注意**: `hook.bgm` `hook.se` `hook.voiceOver` は型として受け付けますが配線は Sprint 3 で実装予定。Sprint 1 時点はビジュアル演出のみ反映。
+> **Sprint 3 以降**: `hook.bgm`（Hook 専用 BGM）と `hook.se`（Hook 開幕の「ドンッ」）も配線済み。後述の「BGM / SE トラック」セクション参照。`hook.voiceOver`（Hook 区間で別収録の VOICEVOX を流す）はまだ未配線。
 
 #### 2. `Line.emphasis`（行ごとの中央大ドカン）
 
@@ -400,6 +400,73 @@ scenes:
 node dist/cli.js lint-retention scenario/zundasecurity/_demo-hook.yaml
 node dist/cli.js generate-video scenario/zundasecurity/_demo-hook.yaml
 ```
+
+---
+
+### BGM / SE トラック（Sprint 3）
+
+無音動画は離脱要因。BGM と効果音（SE）を YAML に書くだけで、音量バランスを自動制御しつつ動画に乗せられます。**素材ファイルそのものはリポジトリに含めない**ため、自分で `./bgm/` と `./se/` に配置してください。**推奨フリー素材サイトは [`docs/audio-assets.md`](./docs/audio-assets.md) を参照**。
+
+#### 1. `global.bgm`（既定 BGM・全区間で流す）
+
+```yaml
+global:
+  bgm:
+    default: "./bgm/main_calm.mp3"   # シーンで上書きが無い区間で流す
+    volume: 0.15                     # 既定 0.15（セリフを邪魔しない）
+```
+
+#### 2. `Scene.bgm`（シーンごとに切替）
+
+```yaml
+scenes:
+  - id: "incident"
+    bgm: "./bgm/main_serious.mp3"    # このシーン中はこれ
+    lines: [...]
+  - id: "summary"
+    bgm: "./bgm/outro_warm.mp3"      # ここで切り替え（自動クロスフェード 400ms）
+    lines: [...]
+```
+
+連続するシーンで同じファイルを指していれば、自動的に 1 本の Audio に統合されます（無駄なクロスフェードは入りません）。
+
+#### 3. `hook.bgm` / `hook.se`（Hook 区間専用）
+
+```yaml
+hook:
+  durationMs: 5000
+  text: "..."
+  bgm: "./bgm/intro_tense.mp3"       # Hook 区間だけは緊張感のある別 BGM（音量 0.35 で少し強め）
+  se:  "./se/hook_impact.mp3"        # Hook 開始 0ms に「ドンッ」を鳴らす
+```
+
+#### 4. `Line.se`（行ごとに効果音）
+
+セリフ開始と同時に SE を鳴らします。
+
+```yaml
+- type: dialogue
+  character: zundamon
+  text: "緊急インシデント発生！"
+  se: "./se/warn_buzz.mp3"           # 既定音量 0.7
+```
+
+#### 音量の優先順位（既定値）
+
+| トラック | 既定音量 | 備考 |
+|---------|---------|------|
+| 本編音声（VOICEVOX） | 1.00 | 基準 |
+| BGM（通常） | 0.15 | `global.bgm.volume` で上書き可 |
+| BGM（Hook 区間） | 0.35 | 少し強めに自動設定 |
+| SE | 0.70 | Hook の `se` も `Line.se` も同じ |
+
+#### 注意
+
+- BGM の素材が動画より短くても**自動でループ**されます（`loop: true` 既定）
+- ファイル拡張子は `.mp3` `.wav` `.ogg` `.m4a` `.aac` `.flac` を推奨
+- 全くの無音動画は `lint-retention` の `R009-no-bgm` で warn 表示されます
+- Hook に `se` が無い場合は `R010-hook-no-se` で info 表示されます
+- 配布時のクレジット表記が必要な素材は、`generate-youtube-metadata` で生成した概要欄末尾に追記してください
 
 ---
 
@@ -514,29 +581,6 @@ node dist/cli.js list-speakers
 
 接続中の VOICEVOX エンジンで利用できる話者とスタイルID を表示します。
 
-### generate-thumbnails（YouTube サムネ自動量産・3スタイル）
-
-```bash
-node dist/cli.js generate-thumbnails <scenario.yaml> [options]
-```
-
-`templates/thumbnail/{shock,howto,exam}.html` を読み、シナリオの `hook` / `youtube` / `characters` から自動でコピーと立ち絵を選び、**1280×720 PNG を 3 枚一括出力**します。出力先は既定で `output/thumbnails/{title}/`。**YouTube 公式の「サムネイルテスト」（A/B）に 3 案そのまま投入**できます。
-
-| オプション | 説明 |
-|-----------|------|
-| `--styles <list>` | 生成スタイルをカンマ区切りで指定（`shock,howto,exam`）。既定は全部 |
-| `--out-dir <path>` | 出力ディレクトリ（既定: `output/thumbnails/{title}/`） |
-
-3 スタイルの方向性：
-
-| スタイル | 主な訴求 | 主な視聴者層 |
-|---------|----------|--------------|
-| `shock` | 赤背景＋「衝撃ワード」叩き付け | 一般・新人エンジニア（CTR最大） |
-| `howto` | 青背景＋「5分で完全攻略」 | ハウツー検索流入 |
-| `exam` | 黒板背景＋「試験頻出」スタンプ | 受験者（既存ファン保持） |
-
-> **初回のみ**: Chromium が必要なので `npx playwright install chromium` を実行してください。
-
 ### generate-youtube-metadata（タイトル候補・概要欄・チャプター自動生成）
 
 ```bash
@@ -558,7 +602,7 @@ node dist/cli.js generate-youtube-metadata <scenario.yaml> [--out <path>]
 node dist/cli.js lint-retention <scenario.yaml> [--strict]
 ```
 
-「YouTube の再生数を伸ばすために台本段階で潰しておきたいリスク」を機械的に検出します（hook 未定義／字幕長すぎ／総尺長すぎ／演出マーカー不足など）。Sprint 1 時点では 8 ルール。
+「YouTube の再生数を伸ばすために台本段階で潰しておきたいリスク」を機械的に検出します（hook 未定義／字幕長すぎ／総尺長すぎ／演出マーカー不足／BGM 未指定など）。Sprint 3 時点で 11 ルール（R001〜R011）。
 
 | オプション | 説明 |
 |-----------|------|

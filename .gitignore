@@ -29,3 +29,10 @@ Thumbs.db
 logs/
 *.log
 
+# BGM / SE 音源（ライセンス・サイズ・配布権の都合で各自配置）
+# ディレクトリは追跡したいので .gitkeep だけ例外として残す
+bgm/*
+!bgm/.gitkeep
+se/*
+!se/.gitkeep
+

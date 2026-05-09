@@ -249,12 +249,8 @@ export function generateYoutubeMetadata(
   sections.push("=".repeat(76));
   sections.push("【サムネメモ】");
   sections.push("=".repeat(76));
-  sections.push(
-    "node dist/cli.js generate-thumbnails で 3 スタイル（shock/howto/exam）を一括生成できます。",
-  );
-  sections.push(
-    "YouTube 公式の「サムネイルテスト」（A/B）に 3 案そのまま投入してください。",
-  );
+  sections.push("サムネは手動作成。本ツールでは生成しません（A/B テスト時は YouTube 公式の");
+  sections.push("「サムネイルテスト」機能で 2〜3 案を切り替えて検証することを推奨します）。");
 
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, sections.join("\n"), "utf-8");

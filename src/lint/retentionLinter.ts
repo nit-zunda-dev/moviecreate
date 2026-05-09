@@ -149,6 +149,45 @@ export function lintRetention(scenario: Scenario): LintReport {
     });
   }
 
+  // R009: BGM が未指定（無音は離脱要因）
+  const hasGlobalBgm = !!scenario.global?.bgm?.default;
+  const sceneBgmCount = scenario.scenes.filter((s) => !!s.bgm).length;
+  const hasHookBgm = !!scenario.hook?.bgm;
+  if (!hasGlobalBgm && sceneBgmCount === 0 && !hasHookBgm) {
+    findings.push({
+      ruleId: "R009-no-bgm",
+      severity: "warn",
+      message:
+        "BGM が全く指定されていません（global.bgm.default も scene.bgm も hook.bgm も無し）。完全無音は離脱要因になりがちです。最低でも global.bgm.default に 1 本指定することを推奨。素材の選定は docs/audio-assets.md を参照。",
+    });
+  }
+
+  // R010: Hook に SE が無い（開幕の「ドンッ」が無いと弱い）
+  if (scenario.hook && !scenario.hook.se) {
+    findings.push({
+      ruleId: "R010-hook-no-se",
+      severity: "info",
+      message:
+        "hook に se が指定されていません。Hook 開幕の「ドンッ」「シャキーン」が無いと演出が弱くなりがちです。hook.se: \"./se/hook_impact.mp3\" のように 1 本入れると効果的です。",
+    });
+  }
+
+  // R011: BGM ファイルが拡張子的に怪しい
+  const bgmCandidates = [
+    scenario.global?.bgm?.default,
+    scenario.hook?.bgm,
+    ...scenario.scenes.map((s) => s.bgm),
+  ].filter((p): p is string => typeof p === "string");
+  for (const bgm of bgmCandidates) {
+    if (!/\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(bgm)) {
+      findings.push({
+        ruleId: "R011-bgm-bad-ext",
+        severity: "warn",
+        message: `BGM ファイル "${bgm}" の拡張子が音声形式ではない可能性があります（mp3/wav/ogg/m4a/aac/flac を推奨）。`,
+      });
+    }
+  }
+
   let errorCount = 0;
   let warnCount = 0;
   let infoCount = 0;
