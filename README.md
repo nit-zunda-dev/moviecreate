@@ -470,6 +470,77 @@ hook:
 
 ---
 
+### Shorts 派生（Sprint 4）
+
+1 本の本編 YAML から、**縦長 1080×1920 の YouTube Shorts / TikTok / Reels 用 MP4 を一括生成**できます。
+本編で使った Hook / BGM / SE / 立ち絵 / VOICEVOX 設定がすべて再利用されるため、**シナリオを1つ書けば本編＋Shorts複数本が回り続ける**運用ができます。
+
+#### 1. シナリオに `shorts: [...]` を書く
+
+```yaml
+shorts:
+  - id: "preview-incident"
+    title: "URLいじりで他人の請求書が見えた事件"
+    pickScenes: ["incident"]                  # incident シーンだけ抽出
+    overlayCaption: "🔥 試験頻出"             # 上部 12% に固定大テロップ
+    cta: "👇 続きは本編で（概要欄）"          # 末尾 2 秒に表示
+
+  - id: "deep-dive"
+    title: "認証 vs 認可の違い（30秒で）"
+    pickLines:                                # シーン中の特定行範囲だけ抽出
+      - { sceneId: "concept", from: 0, to: 2 }
+    overlayCaption: "💡 認証 vs 認可"
+    cta: "解説本編は概要欄から"
+```
+
+| フィールド | 必須 | 説明 |
+|----------|-----|------|
+| `id` | ✅ | 出力ファイル名のサフィックス |
+| `title` | ✅ | YouTube タイトル候補（manifest にも入る） |
+| `pickScenes` | - | 抽出シーンID リスト（順序保持） |
+| `pickLines` | - | より細かい行範囲指定（指定時は `pickScenes` より優先） |
+| `overlayCaption` | - | 上部固定の大テロップ（無音再生でも内容が伝わる） |
+| `cta` | - | 末尾 2 秒の本編誘導テキスト |
+
+> **どちらも未指定なら全シーンを Shorts 化**します。
+
+#### 2. コマンド
+
+```bash
+node dist/cli.js generate-shorts <scenario.yaml> [--ids id1,id2] [--out-dir <path>]
+```
+
+| オプション | 説明 |
+|----------|------|
+| `--ids` | カンマ区切りで生成対象 ShortsSpec を絞り込む（既定: 全部） |
+| `--out-dir` | 出力先ディレクトリ（既定: `output/shorts/`） |
+| `--dry-run` | 派生 scenario を表示するだけで動画は生成しない |
+
+#### 3. レイアウト
+
+縦に 3 段：
+
+```
+┌─────────────────────┐
+│ overlayCaption       │ ← 上部 12%（任意）
+├─────────────────────┤
+│   立ち絵（中央大）    │ ← 中央 48%
+├─────────────────────┤
+│   字幕（大フォント）  │ ← 下部 40%
+└─────────────────────┘
+```
+
+Hook / Emphasis / Callout / BGM / SE はそのまま縦長で再生されます。
+
+#### 4. 推奨運用
+
+- Shorts は **30〜45 秒**が最も伸びます。`R012-shorts-too-long` で 60 秒超えを警告
+- `cta` は必ず指定（`R013-shorts-no-cta` で info 警告）
+- `pickScenes` で「事件発生だけ」「結論だけ」など切り出すと尺管理しやすい
+- 1 本の本編から 2〜3 本派生して、伸びたものを増やす A/B 戦略が有効
+
+---
+
 ### 完成形サンプル（2 キャラ会話）
 
 ```yaml
@@ -602,7 +673,7 @@ node dist/cli.js generate-youtube-metadata <scenario.yaml> [--out <path>]
 node dist/cli.js lint-retention <scenario.yaml> [--strict]
 ```
 
-「YouTube の再生数を伸ばすために台本段階で潰しておきたいリスク」を機械的に検出します（hook 未定義／字幕長すぎ／総尺長すぎ／演出マーカー不足／BGM 未指定など）。Sprint 3 時点で 11 ルール（R001〜R011）。
+「YouTube の再生数を伸ばすために台本段階で潰しておきたいリスク」を機械的に検出します（hook 未定義／字幕長すぎ／総尺長すぎ／演出マーカー不足／BGM 未指定／Shorts 尺超えなど）。Sprint 4 時点で 13 ルール（R001〜R013）。
 
 | オプション | 説明 |
 |-----------|------|

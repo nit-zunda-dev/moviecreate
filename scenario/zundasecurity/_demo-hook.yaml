@@ -1,10 +1,8 @@
 # =============================================================================
-# Sprint 1〜3 動作確認デモ
-# - Sprint 1: 冒頭 Hook（フラッシュ・ズーム・シェイク・大テロップ・立ち絵）
-#             行レベル emphasis（中央大ドカン）
-#             行レベル callout（右上常駐テロップ・4スタイル）
-# - Sprint 3: 全編 BGM（global.bgm）/ シーン別 BGM（scene.bgm）
-#             Hook 専用 BGM + 開幕 SE / 行ごとの SE
+# Sprint 1〜4 動作確認デモ
+# - Sprint 1: 冒頭 Hook / Line.emphasis / Line.callout (4スタイル)
+# - Sprint 3: global.bgm / scene.bgm / hook.bgm + hook.se / line.se
+# - Sprint 4: shorts: [...] で本編から派生 Shorts（縦長 1080×1920）を量産
 # 既存16本は触らず、このデモだけで全機能を体感できるようにしてある。
 # 必要素材（事前に ./bgm/ ./se/ に配置済み）:
 #   bgm/パステルハウス.mp3, intro_tense.mp3, main_serious.mp3, outro_warm.mp3
@@ -12,6 +10,7 @@
 # 起動例:
 #   node dist/cli.js lint-retention scenario/zundasecurity/_demo-hook.yaml
 #   node dist/cli.js generate-video scenario/zundasecurity/_demo-hook.yaml
+#   node dist/cli.js generate-shorts scenario/zundasecurity/_demo-hook.yaml
 # =============================================================================
 title: "【デモ】Hook と Emphasis と Callout の動作確認"
 
@@ -137,6 +136,25 @@ scenes:
         character: zundamon
         face: "喜び"
         text: "覚えたのだ！"
+
+# === Sprint 4: 本編から派生する Shorts（縦長 1080×1920）====================
+# generate-shorts コマンドで output/shorts/ 以下に MP4 を一括生成。
+# - pickScenes: 抽出するシーンID（順序保持）。未指定なら全シーン。
+# - pickLines : シーンの一部行範囲だけ拾う場合（pickScenes より優先）
+# - overlayCaption: 動画上部に固定表示する大テロップ（無音再生でも内容が伝わる）
+# - cta: 末尾2秒に表示する本編誘導テキスト
+shorts:
+  - id: "preview-incident"
+    title: "URLいじりで他人の請求書が見えた事件"
+    pickScenes: ["incident"]
+    overlayCaption: "🔥 試験頻出"
+    cta: "👇 続きは本編で（概要欄）"
+
+  - id: "concept-only"
+    title: "認証 vs 認可（30秒で）"
+    pickScenes: ["concept"]
+    overlayCaption: "💡 認証 vs 認可"
+    cta: "解説本編は概要欄から"
 
 # === YouTube メタデータ（Sprint 2 で配線予定。先に書いておく）=================
 youtube:

@@ -10,6 +10,8 @@ import { EmphasisBurst } from "./components/EmphasisBurst";
 import { CalloutBadge } from "./components/CalloutBadge";
 import { BgmTrack } from "./components/BgmTrack";
 import { SeTrack } from "./components/SeTrack";
+import { ChapterLowerThird } from "./components/ChapterLowerThird";
+import { EndScreenOverlay } from "./components/EndScreenOverlay";
 import { ClassroomVideoComposition } from "./ClassroomVideoComposition";
 
 interface Props {
@@ -48,6 +50,8 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
             <HookIntro hook={manifest.hook} width={width} height={height} />
           </Sequence>
         )}
+        <ChapterLowerThird manifest={manifest} />
+        <EndScreenOverlay manifest={manifest} />
       </div>
     );
   }
@@ -64,6 +68,7 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
   return (
     <div
       style={{
+        position: "relative",
         width,
         height,
         display: "flex",
@@ -166,6 +171,8 @@ export const VideoComposition: React.FC<Props> = ({ manifest }) => {
           <HookIntro hook={manifest.hook} width={width} height={height} />
         </Sequence>
       )}
+      <ChapterLowerThird manifest={manifest} />
+      <EndScreenOverlay manifest={manifest} />
     </div>
   );
 };

@@ -110,11 +110,16 @@ export interface BgmTrack {
 }
 
 export interface EndScreenSettings {
+  /** true のとき末尾にエンドカード区間を追加（既定 false・既存シナリオ互換） */
   enabled?: boolean;
+  /** エンドカードの長さ（ms）。既定 20000 */
+  durationMs?: number;
   nextEpisode?: {
     title: string;
     thumbnail?: string;
   };
+  /** 登録誘導の見出し（省略時は既定文言） */
+  subscribeText?: string;
 }
 
 export interface OutputSettings {

@@ -1,30 +1,48 @@
-import fs from "fs";
 import path from "path";
+import fs from "fs";
+import { computeRmsEnvelope } from "./wavRmsEnvelope";
+import type { LineResultWithContext } from "./manifestBuilder";
 
 export interface LipSyncKeyFrame {
   timeSec: number;
   mouthOpen: boolean;
 }
 
+/** 口パク RMS バケット長（ms）。短いほど細かいが manifest が肥大化しやすい */
+export const LIP_SYNC_BUCKET_MS = 80;
+
 /**
- * 非同期で音声のラフな音量を解析し、口パク用のON/OFFキーフレームを生成する。
- * 実装簡略化のため、ここでは ffmpeg の volumedetect フィルタを利用したラッパの形にとどめる。
- * （必要になった段階で実際の解析処理を拡張できるようにしている）
+ * @deprecated 将来の互換用。実際のキーフレームは `enrichLineResultsWithLipSync` で行単位に埋め込む。
  */
 export async function analyzeLipSyncKeys(audioFile: string, frameIntervalSec = 0.1): Promise<LipSyncKeyFrame[]> {
-  const abs = path.resolve(audioFile);
-  if (!fs.existsSync(abs)) {
-    throw new Error(`音声ファイルが存在しません: ${abs}`);
-  }
-
-  // TODO: 実際のRMS計算などを行って mouthOpen を決めるロジックを実装する。
-  // ひとまずはダミーとして「常に閉じている」1フレームのみ返却しておき、
-  // 今後の拡張でここを差し替えられるようにする。
-  return [
-    {
-      timeSec: 0,
-      mouthOpen: false,
-    },
-  ];
+  const env = await computeRmsEnvelope(path.resolve(audioFile), Math.round(frameIntervalSec * 1000));
+  return env.map((o, i) => ({
+    timeSec: i * frameIntervalSec,
+    mouthOpen: o > 0.15,
+  }));
 }
 
+/**
+ * 各セリフ WAV から RMS エンベロープを取り、`LineResultWithContext` に付与する。
+ * `buildVideoManifest` が `lipKeyframes` に変換する。
+ */
+export async function enrichLineResultsWithLipSync(
+  lineResults: LineResultWithContext[],
+  bucketMs: number = LIP_SYNC_BUCKET_MS,
+): Promise<LineResultWithContext[]> {
+  const out: LineResultWithContext[] = [];
+  for (const lr of lineResults) {
+    const wav = lr.result.wavPath;
+    if (!fs.existsSync(wav)) {
+      out.push(lr);
+      continue;
+    }
+    const env = await computeRmsEnvelope(wav, bucketMs);
+    out.push({
+      ...lr,
+      lipEnvelope: env.length > 0 ? env : undefined,
+      lipBucketMs: env.length > 0 ? bucketMs : undefined,
+    });
+  }
+  return out;
+}

@@ -10,6 +10,8 @@ import { EmphasisBurst } from "./components/EmphasisBurst";
 import { CalloutBadge } from "./components/CalloutBadge";
 import { BgmTrack } from "./components/BgmTrack";
 import { SeTrack } from "./components/SeTrack";
+import { ChapterLowerThird } from "./components/ChapterLowerThird";
+import { EndScreenOverlay } from "./components/EndScreenOverlay";
 
 interface Props {
   manifest: VideoManifest;
@@ -129,6 +131,8 @@ export const ClassroomVideoComposition: React.FC<Props> = ({ manifest }) => {
           <HookIntro hook={manifest.hook} width={width} height={height} />
         </Sequence>
       )}
+      <ChapterLowerThird manifest={manifest} />
+      <EndScreenOverlay manifest={manifest} />
     </div>
   );
 };

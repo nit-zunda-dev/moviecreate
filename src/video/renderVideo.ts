@@ -89,6 +89,14 @@ function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoM
     }));
   }
 
+  let endScreenOut: VideoManifest["endScreen"] = manifest.endScreen;
+  if (endScreenOut?.nextThumbnailFile) {
+    endScreenOut = {
+      ...endScreenOut,
+      nextThumbnailFile: copyAsset(endScreenOut.nextThumbnailFile),
+    };
+  }
+
   return {
     ...manifest,
     audioFile,
@@ -99,12 +107,19 @@ function preparePublicAssets(manifest: VideoManifest, publicDir: string): VideoM
     hook,
     bgmSegments,
     seEvents,
+    endScreen: endScreenOut,
   };
 }
 
 export interface RenderVideoOptions {
   /** 透過レンダリング（ProRes 4444 / .mov 出力） */
   transparent?: boolean;
+  /**
+   * 使用する Remotion Composition ID。
+   * 既定: "VideoComposition"（本編・横長）
+   * Shorts 派生時は "ShortsComposition"（縦長 1080×1920）
+   */
+  compositionId?: string;
 }
 
 /**
@@ -139,14 +154,15 @@ export async function renderVideo(
   const fps = servedManifest.fps;
   const durationInFrames = Math.ceil((servedManifest.totalDurationMs / 1000) * fps);
 
+  const compositionId = options.compositionId ?? "VideoComposition";
   const composition = await selectComposition({
     serveUrl: bundled,
-    id: "VideoComposition",
+    id: compositionId,
     inputProps: { manifest: servedManifest },
   });
 
   const codec = options.transparent ? "prores" : "h264";
-  console.log(`[Remotion] レンダリング開始... (codec: ${codec})`);
+  console.log(`[Remotion] レンダリング開始... (composition: ${compositionId}, codec: ${codec})`);
 
   await renderMedia({
     composition,

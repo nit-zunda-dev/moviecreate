@@ -22,6 +22,11 @@ export interface ManifestLine {
   wavFile: string;
   startMs: number;
   durationMs: number;
+  /**
+   * 行頭からの相対時刻ごとの口の開き 0〜1（音声 RMS に基づく簡易口パク）。
+   * `generate-video` 時に各セリフ WAV から算出。
+   */
+  lipKeyframes?: ManifestLipKeyframe[];
 }
 
 /**
@@ -73,6 +78,30 @@ export interface ManifestCallout {
   endMs: number;
   text: string;
   style: "exam" | "warn" | "tip" | "breaking";
+}
+
+/** チャプター（シーン開始時の下三分の一バナー） */
+export interface ManifestChapterBanner {
+  startMs: number;
+  endMs: number;
+  label: string;
+}
+
+/** エンドスクリーン（次回予告・登録誘導）。本編末尾に追加される区間 */
+export interface ManifestEndScreen {
+  /** エンドカード開始時刻（ms）＝本編セリフ終了直後 */
+  startMs: number;
+  durationMs: number;
+  nextTitle?: string;
+  /** publicDir 内の相対パス（renderVideo でコピー後） */
+  nextThumbnailFile?: string;
+  subscribeText: string;
+}
+
+export interface ManifestLipKeyframe {
+  offsetMs: number;
+  /** 0〜1 */
+  openness: number;
 }
 
 /**
@@ -138,4 +167,25 @@ export interface VideoManifest {
   bgmSegments?: ManifestBgmSegment[];
   /** SE イベント（時刻昇順） */
   seEvents?: ManifestSeEvent[];
+  /**
+   * Sprint 4: Shorts 派生 manifest にだけ載る描画情報。
+   * 通常の本編 manifest では undefined のまま。
+   */
+  shorts?: ManifestShortsOverlay;
+  /** チャプター開始時の下三分の一バナー（Scene.chapter があるシーンの先頭行から） */
+  chapters?: ManifestChapterBanner[];
+  /** 末尾エンドスクリーン（global.endScreen.enabled） */
+  endScreen?: ManifestEndScreen;
+}
+
+/**
+ * Shorts 派生 manifest の描画オーバーレイ情報。
+ * - `overlayCaption` は動画全体の上部に固定表示する大テロップ
+ * - `ctaText` は末尾 `ctaDurationMs` ミリ秒だけ画面下半分に表示するCTA
+ */
+export interface ManifestShortsOverlay {
+  overlayCaption?: string;
+  ctaText?: string;
+  /** CTA 表示時間（ms）。既定 2000 */
+  ctaDurationMs?: number;
 }

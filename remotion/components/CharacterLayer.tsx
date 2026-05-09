@@ -1,7 +1,22 @@
 import React from "react";
 import { Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { FLANK_TACHIE_MAX_HEIGHT_FRAC, TACHIE_SIZE_CAP_FRAC } from "../../src/config/videoLayout";
-import type { VideoManifest } from "../../src/types/videoManifest";
+import type { VideoManifest, ManifestLipKeyframe } from "../../src/types/videoManifest";
+
+export function sampleLipOpenness(kf: ManifestLipKeyframe[] | undefined, relMs: number): number {
+  if (!kf?.length) return 0;
+  if (relMs <= kf[0].offsetMs) return kf[0].openness;
+  for (let i = 0; i < kf.length - 1; i++) {
+    const a = kf[i]!;
+    const b = kf[i + 1]!;
+    if (relMs >= a.offsetMs && relMs < b.offsetMs) {
+      const den = Math.max(1, b.offsetMs - a.offsetMs);
+      const t = (relMs - a.offsetMs) / den;
+      return a.openness * (1 - t) + b.openness * t;
+    }
+  }
+  return kf[kf.length - 1]!.openness;
+}
 
 export interface FlankLayout {
   mainHeight?: number;
@@ -57,6 +72,10 @@ export const CharacterLayer: React.FC<Props> = ({ manifest, flankLayout, classro
     if (!defaultImg) return null;
     const isActive = activeCharacter === charName;
     const imageFile = isActive && activeLine?.imageFile ? activeLine.imageFile : defaultImg;
+    const lipOpen =
+      isActive && activeLine ? sampleLipOpenness(activeLine.lipKeyframes, currentMs - activeLine.startMs) : 0;
+    const wobble = isActive ? Math.sin(frame * 0.11) * lipOpen * 6 : 0;
+    const lipScale = 1 + lipOpen * 0.038;
     // 教室モードは黒帯内に収め、下方向へのはみ出し（translateY）で黒板と被らないようにする
     const charH = classroom
       ? Math.min(
@@ -81,17 +100,28 @@ export const CharacterLayer: React.FC<Props> = ({ manifest, flankLayout, classro
           filter: "drop-shadow(0 0 6px rgba(0,0,0,0.5)) drop-shadow(0 4px 12px rgba(0,0,0,0.4))",
         }}
       >
-        <Img
-          src={staticFile(imageFile)}
+        <div
           style={{
-            width: "auto",
+            transform: `translateY(${wobble}px) scale(${lipScale})`,
+            transformOrigin: "bottom center",
             height: "100%",
-            maxWidth: classroom ? `${Math.round(area.width * 2.4)}px` : "100%",
-            objectFit: "contain",
-            display: "block",
-            margin: "0 auto",
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
           }}
-        />
+        >
+          <Img
+            src={staticFile(imageFile)}
+            style={{
+              width: "auto",
+              height: "100%",
+              maxWidth: classroom ? `${Math.round(area.width * 2.4)}px` : "100%",
+              objectFit: "contain",
+              display: "block",
+              margin: "0 auto",
+            }}
+          />
+        </div>
       </div>
     );
   };
@@ -230,6 +260,10 @@ export const CharacterLayer: React.FC<Props> = ({ manifest, flankLayout, classro
         if (!defaultImg) return null;
         const isActive = activeCharacter === charName;
         const imageFile = isActive && activeLine?.imageFile ? activeLine.imageFile : defaultImg;
+        const lipOpen =
+          isActive && activeLine ? sampleLipOpenness(activeLine.lipKeyframes, currentMs - activeLine.startMs) : 0;
+        const wobble = isActive ? Math.sin(frame * 0.11) * lipOpen * 6 : 0;
+        const lipScale = 1 + lipOpen * 0.038;
         const pos = config.position ?? "left";
         const horiz =
           pos === "left" ? { left: "3%" } : pos === "right" ? { right: "3%" } : { left: "50%", transform: "translateX(-50%)" as const };
@@ -244,15 +278,23 @@ export const CharacterLayer: React.FC<Props> = ({ manifest, flankLayout, classro
               ...horiz,
             }}
           >
-            <Img
-              src={staticFile(imageFile)}
+            <div
               style={{
-                width: "auto",
                 height: "100%",
-                objectFit: "contain",
-                display: "block",
+                transform: `translateY(${wobble}px) scale(${lipScale})`,
+                transformOrigin: "bottom center",
               }}
-            />
+            >
+              <Img
+                src={staticFile(imageFile)}
+                style={{
+                  width: "auto",
+                  height: "100%",
+                  objectFit: "contain",
+                  display: "block",
+                }}
+              />
+            </div>
           </div>
         );
       })}

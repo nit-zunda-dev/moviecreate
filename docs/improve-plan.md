@@ -441,7 +441,30 @@ moviecreate/
 | BGM Hook | 0.35 |
 | SE | 0.70 |
 
-### 📱 Sprint 4 — Shorts 派生
+### 📱 Sprint 4 — Shorts 派生 ✅ 完了（2026-05-09）
+
+実装内容:
+
+- **型**: `ManifestShortsOverlay`（overlayCaption / ctaText / ctaDurationMs）を `videoManifest.ts` に追加。`ShortsSpec`（既存）を活用
+- **派生ロジック**: `src/shorts/deriveShortsScenario.ts` で本編 Scenario から `pickScenes` / `pickLines` を切り出し → output を `1080×1920` に強制 → 既存 `buildVideoManifest` に流すだけで縦長派生 manifest が完成
+- **Composition**: `remotion/ShortsComposition.tsx`（縦 3 段：overlayCaption / 立ち絵中央大 / 字幕下部）+ `Hook / Emphasis / Callout / BGM / SE` 完全再利用 + 末尾 2 秒 CTA
+- **Root**: `Root.tsx` に 2 つの Composition を登録（`VideoComposition` / `ShortsComposition`）
+- **renderVideo**: `compositionId` 引数追加（既定 "VideoComposition"）
+- **CLI**: `generate-shorts <scenario>` を追加（`--ids` で絞り込み、`--out-dir`、`--dry-run` 対応）
+- **lint-retention**: R012（Shorts 尺超過）／R013（CTA 無し）追加
+- **デモ**: `_demo-hook.yaml` に `shorts: [preview-incident, concept-only]` を追加
+- **README**: 「Shorts 派生（Sprint 4）」セクション追記
+
+設計上の特徴:
+
+| 項目 | 値 |
+|---|---|
+| 解像度 | 1080×1920（縦長） |
+| 推奨尺 | 30〜60 秒（R012 で 60 秒超え警告） |
+| Hook 引き継ぎ | あり（本編と同じ HookIntro が冒頭 5 秒） |
+| BGM/SE 引き継ぎ | あり（音量バランス・クロスフェード含めて完全再利用） |
+| CTA 表示 | 末尾 2 秒に画面全体オーバーレイ |
+| 既存16本への影響 | ゼロ（`shorts: []` 未指定なら何も起こらない） |
 
 ### ✨ Sprint 5 — Chapter / EndScreen / 微モーション / 口パク
 
