@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第18回 WAF（Web Application Firewall）— Reveal（動画キャプチャ用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.12em; line-height: 1.22; margin-bottom: 0.32em; color: #a5f3fc; }
+    :root { --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; --c: #22d3ee; }
+    .tag {
+      display: inline-block; font-size: 0.88em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #22d3ee, #fb923c);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.32em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.4em 0.5em; margin: 0.32em 0;
+      border: 1px solid rgba(34, 211, 238, 0.45);
+    }
+    .diagram svg { display: block; max-width: 100%; height: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.45em 0.5em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 0.98em; line-height: 1.42; }
+    .box-title { font-weight: 700; margin-bottom: 0.25em; font-size: 1.02em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); }
+    .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); }
+    .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.93em; color: var(--m); line-height: 1.48; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.93em; line-height: 1.48; color: #cbd5e1; margin: 0.32em 0 0; padding-left: 1.05em; }
+    .slide-bullets li { margin: 0.22em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.38em; font-size: 0.88em; margin: 0.38em 0; line-height: 1.38; }
+    code { font-family: ui-monospace, monospace; color: #a5f3fc; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <span class="tag">導入</span>
+        <h3>FW は通したのに Web は攻撃される——<strong style="color:#67e8f9">HTTP の中身</strong>を見るのが <strong>WAF</strong></h3>
+        <p class="ph"><strong>ファイアウォール</strong>は IP／ポート中心。<strong>WAF（Web Application Firewall）</strong>は <strong>L7</strong> で URL・パラメータ等を検査し、SQLi／XSS などの<strong>典型的パターン</strong>をルールで抑える多層防御の一箱。</p>
+        <div class="diagram">
+          <svg viewBox="0 0 740 125" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="rw18a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#64748b"/></marker>
+              <marker id="rw18b" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#22d3ee"/></marker>
+            </defs>
+            <rect x="12" y="28" width="95" height="52" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+            <text x="59.5" y="56" text-anchor="middle" fill="#cbd5e1" font-size="12" font-weight="700" font-family="sans-serif">攻撃</text>
+            <path d="M110 54h35" stroke="#64748b" stroke-width="2.5" marker-end="url(#rw18a)"/>
+            <rect x="152" y="22" width="100" height="64" rx="8" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+            <text x="202" y="48" text-anchor="middle" fill="#cbd5e1" font-size="11" font-weight="700" font-family="sans-serif">FW</text>
+            <text x="202" y="68" text-anchor="middle" fill="#86efac" font-size="9" font-family="sans-serif">443通過</text>
+            <path d="M255 54h30" stroke="#22d3ee" stroke-width="2.5" marker-end="url(#rw18b)"/>
+            <path d="M305 22 L355 22 L330 85 Z" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="2"/>
+            <text x="330" y="58" text-anchor="middle" fill="#a5f3fc" font-size="12" font-weight="800" font-family="sans-serif">WAF</text>
+            <path d="M365 54h28" stroke="#22d3ee" stroke-width="2" marker-end="url(#rw18b)"/>
+            <rect x="400" y="28" width="110" height="52" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="455" y="56" text-anchor="middle" fill="#7dd3fc" font-size="11" font-weight="700" font-family="sans-serif">オリジン</text>
+            <text x="370" y="108" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">第17回 FW × 第18回 WAF（レイヤが違う）</text>
+          </svg>
+        </div>
+      </section>
+
+      <section>
+        <span class="tag">第18回</span>
+        <h3>WAF の正体 — <strong>FW では止まらない攻撃</strong>を止める仕組み（Season3）</h3>
+        <ul class="slide-bullets">
+          <li><strong>L3/L4 の FW</strong> と <strong>L7 の WAF</strong> を混同しない</li>
+          <li><strong>ルール／シグネチャ</strong>による検知と、<strong>誤検知・未知攻撃</strong>の限界</li>
+          <li><strong>セキュアコーディングの代替ではない</strong>（第5・6回と接続）</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">仕組み</span>
+        <h3>クライアントとオリジンの間で <strong>HTTP を解読</strong>し、遮断・ログ・レート制限など</h3>
+        <p class="ph">設置形態：<strong>リバースプロキシ型</strong>、<strong>クラウド WAF</strong>（CDN エッジ）など文献で並ぶ。試験は<strong>原理</strong>（何を見て何を止めるか）。</p>
+      </section>
+
+      <section>
+        <span class="tag">検知</span>
+        <h3>代表的 Web 攻撃の<strong>ペイロード</strong>が HTTP に現れる — 第5回 <strong>SQLi</strong>、第6回 <strong>XSS</strong></h3>
+        <div class="grid-2">
+          <div class="rich-box theme-danger">
+            <div class="box-title">SQLi っぽさ</div>
+            <div class="ph">クエリパラメータの記号連結などをパターン検知（教材では抽象化）</div>
+          </div>
+          <div class="rich-box theme-warn">
+            <div class="box-title">XSS っぽさ</div>
+            <div class="ph">タグ／イベントハンドラ等の典型的混入を検知</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="tag">限界</span>
+        <h3><strong>万能ではない</strong> — ビジネスロジック欠陥、巧妙なバイパス、<strong>誤検知</strong></h3>
+        <ul class="slide-bullets">
+          <li>例外ルールを増やすと<strong>緩む</strong>ジレンマ</li>
+          <li>TLS の<strong>終端位置</strong>によっては中身が見えない文脈が出る</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">試験</span>
+        <h3>誤答パターン</h3>
+        <ul class="slide-bullets" style="font-size:0.96em;">
+          <li>WAF があればアプリは<strong>完全に安全</strong> — ×</li>
+          <li>FW と WAF は<strong>同じ</strong> — ×（典型像ではレイヤが違う）</li>
+          <li>WAF＝<strong>入力検証の代替</strong> — ×（本体はアプリ側）</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第18回: WAF＝<strong>HTTP 攻撃を検査する柵</strong></h3>
+        <div class="sum-p3" style="color:#cbd5e1;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(34,211,238,0.35);"><b style="color:#67e8f9;">1</b><br>L7 で HTTP を見る</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(34,211,238,0.35);"><b style="color:#67e8f9;">2</b><br>FW とは役割が違う</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(34,211,238,0.35);"><b style="color:#67e8f9;">3</b><br>多層防御の一層</div>
+        </div>
+        <p style="font-size:0.82em; color:#94a3b8;">詳細図解: <code>s01-ep18-waf-study-slides.html</code></p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>

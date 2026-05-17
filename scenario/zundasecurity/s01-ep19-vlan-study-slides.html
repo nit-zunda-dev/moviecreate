@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第19回 VLAN（Virtual LAN）— 解説スライド</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #22d3ee;
+      --accent2: #fb923c;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: clamp(17px, 0.55vw + 14px, 28px); }
+    html, body {
+      margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1; display: none;
+      padding: clamp(0.85rem, 2vh, 1.75rem) clamp(1rem, 4.5vw, 5rem) calc(5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1820px); margin: 0 auto; width: 100%;
+      min-height: calc(100vh - 5.25rem); overflow-x: auto; overflow-y: auto;
+      animation: in 0.35s ease; font-size: 1.07rem;
+    }
+    .slide.active { display: block; }
+    .slide code { font-family: var(--mono); font-size: 0.94em; padding: 0.08em 0.28em; border-radius: 4px; background: rgba(15, 23, 42, 0.65); }
+    @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { font-size: clamp(1.45rem, 2.4vw + 0.65rem, 2.35rem); font-weight: 700; margin: 0 0 0.45rem; line-height: 1.28; color: #a5f3fc; }
+    h2 { font-size: clamp(1.08rem, 1.15vw + 0.75rem, 1.55rem); font-weight: 500; color: var(--muted); margin: 0 0 1rem; line-height: 1.45; }
+    .tag {
+      display: inline-block; font-size: clamp(0.72rem, 0.6vw + 0.55rem, 0.95rem); letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--bg); background: linear-gradient(90deg, #22d3ee, #fb923c); padding: 0.28rem 0.65rem; border-radius: 4px; margin-bottom: 0.65rem; font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel); border-radius: 14px; padding: clamp(1rem, 2.2vw, 2rem); margin: clamp(0.65rem, 1.5vh, 1.1rem) 0;
+      border: 1px solid rgba(34, 211, 238, 0.35); zoom: 1.14;
+    }
+    @media (max-width: 900px) { .diagram { zoom: 1.02; } .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; } html { font-size: clamp(16px, 2.5vw + 12px, 22px); } }
+    @media (min-width: 1600px) { .diagram { zoom: 1.22; } }
+    .diagram svg { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; } .bullets strong { color: var(--text); }
+    .slide-lead { font-size: clamp(1rem, 0.65vw + 0.8rem, 1.2rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.9rem; }
+    .slide-lead strong { color: var(--text); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: clamp(1rem, 2vw, 1.45rem); border-radius: 14px; background: rgba(36, 48, 68, 0.4); border: 1px solid rgba(139, 156, 179, 0.2); }
+    .box-title { font-size: clamp(1rem, 0.8vw + 0.75rem, 1.2rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: clamp(0.92rem, 0.5vw + 0.75rem, 1.05rem); color: var(--muted); line-height: 1.58; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); } .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); } .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); } .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(34, 211, 238, 0.45); background: rgba(34, 211, 238, 0.06); } .theme-accent .box-title { color: #a5f3fc; }
+    .summary-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.3rem 0 0.75rem; }
+    @media (max-width: 700px) { .summary-pillars { grid-template-columns: 1fr; } }
+    .summary-pillar {
+      font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1.02rem); font-weight: 600; line-height: 1.48; text-align: center; color: #a5b4c8;
+      padding: clamp(0.55rem, 1.2vw, 0.85rem); border-radius: 12px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b { display: block; font-size: clamp(0.78rem, 0.4vw + 0.62rem, 0.92rem); font-weight: 800; color: #67e8f9; margin-bottom: 0.25rem; }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem); background: rgba(15, 20, 25, 0.92); border-top: 1px solid rgba(139, 156, 179, 0.2); backdrop-filter: blur(8px); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text); border: 1px solid rgba(34, 211, 238, 0.5);
+      padding: 0.55rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 1.05rem; font-weight: 600;
+    }
+    .toolbar button:hover { background: #243044; } .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: #67e8f9; font-size: 0.88em; max-width: 100%; }
+  </style>
+</head>
+<body>
+  <!-- 第19回 VLAN — 学習スライド -->
+  <div class="deck" id="deck">
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入（incident）</span>
+      <h1>同じスイッチ配下でも、<strong>部署ごとに通信を分離</strong>したい——それが <strong>VLAN</strong></h1>
+      <h2>物理的にネットワークを分けなくても、論理的にブロードキャストドメインを分けることで、<strong>横展開リスク</strong>を抑えやすくする考え方</h2>
+      <div class="diagram">
+        <svg viewBox="0 0 840 250" xmlns="http://www.w3.org/2000/svg">
+          <rect x="30" y="45" width="780" height="165" rx="12" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+          <text x="420" y="32" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif">1台のL2スイッチ上で VLAN 10 / VLAN 20 を論理分割</text>
+          <rect x="70" y="70" width="300" height="120" rx="10" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="2"/>
+          <text x="220" y="95" text-anchor="middle" fill="#a5f3fc" font-size="11" font-weight="700" font-family="sans-serif">VLAN 10（開発）</text>
+          <circle cx="130" cy="130" r="16" fill="#1e293b" stroke="#22d3ee"/><text x="130" y="134" text-anchor="middle" fill="#cbd5e1" font-size="9">PC1</text>
+          <circle cx="220" cy="130" r="16" fill="#1e293b" stroke="#22d3ee"/><text x="220" y="134" text-anchor="middle" fill="#cbd5e1" font-size="9">PC2</text>
+          <circle cx="310" cy="130" r="16" fill="#1e293b" stroke="#22d3ee"/><text x="310" y="134" text-anchor="middle" fill="#cbd5e1" font-size="9">SV1</text>
+          <rect x="470" y="70" width="300" height="120" rx="10" fill="rgba(251,146,60,0.08)" stroke="#fb923c" stroke-width="2"/>
+          <text x="620" y="95" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">VLAN 20（総務）</text>
+          <circle cx="530" cy="130" r="16" fill="#1e293b" stroke="#fb923c"/><text x="530" y="134" text-anchor="middle" fill="#cbd5e1" font-size="9">PC3</text>
+          <circle cx="620" cy="130" r="16" fill="#1e293b" stroke="#fb923c"/><text x="620" y="134" text-anchor="middle" fill="#cbd5e1" font-size="9">PC4</text>
+          <circle cx="710" cy="130" r="16" fill="#1e293b" stroke="#fb923c"/><text x="710" y="134" text-anchor="middle" fill="#cbd5e1" font-size="9">SV2</text>
+          <text x="420" y="228" text-anchor="middle" fill="#64748b" font-size="10" font-family="sans-serif">VLAN 間通信はルータ／L3SW を経由（その点が試験でよく問われる）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="位置づけ">
+      <span class="tag">第19回（opening）</span>
+      <h1>【登録セキスペ 第19回】VLAN の基本 — 1つのネットワークを安全に区切る</h1>
+      <h2><strong>Season 3「鉄壁のネットワーク構築編」</strong>：FW・WAF に続いて、内部ネットワークの分離設計を押さえる</h2>
+      <p class="slide-lead"><strong>ゴール：</strong> VLAN の意味、<strong>アクセスポート／トランクポート</strong>、<strong>タグ（802.1Q）</strong>、VLAN 間通信の扱いを説明できる。</p>
+      <div class="grid-2">
+        <div class="rich-box theme-accent">
+          <div class="box-title">見どころ①</div>
+          <div class="box-desc">物理分離なしで <strong>論理分離</strong>を実現する狙い</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">見どころ②</div>
+          <div class="box-desc">設定ミス（誤VLAN収容・不要トランク）による <strong>迂回リスク</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="definition" title="定義">
+      <span class="tag">定義</span>
+      <h1>VLAN は <strong>L2 ネットワークの論理分割</strong></h1>
+      <h2>「同じスイッチなら全部同じセグメント」ではなく、ポート単位で別ネットワークに所属させることで、ブロードキャスト範囲を制御する</h2>
+      <ul class="bullets">
+        <li><strong>VLAN ID</strong> でセグメントを識別（一般に 1〜4094）。</li>
+        <li>通信分離により障害影響・不要通信・横移動の広がりを抑えやすくなる。</li>
+        <li>ただし <strong>VLAN は暗号化ではない</strong>。設計・設定・監視がセット。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="ports" title="ポート種別">
+      <span class="tag">アクセスポートとトランク</span>
+      <h1>端末向けは <strong>アクセスポート</strong>、スイッチ間は <strong>トランク</strong></h1>
+      <div class="diagram">
+        <svg viewBox="0 0 820 210" xmlns="http://www.w3.org/2000/svg">
+          <rect x="80" y="55" width="180" height="90" rx="10" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+          <text x="170" y="93" text-anchor="middle" fill="#a5f3fc" font-size="11" font-family="sans-serif">Access Port</text>
+          <text x="170" y="114" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">通常1つの VLAN</text>
+          <rect x="320" y="45" width="180" height="110" rx="10" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="410" y="88" text-anchor="middle" fill="#fdba74" font-size="11" font-family="sans-serif">Trunk Port</text>
+          <text x="410" y="112" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">複数 VLAN を中継</text>
+          <text x="410" y="132" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">802.1Q タグ付与</text>
+          <rect x="560" y="55" width="180" height="90" rx="10" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+          <text x="650" y="93" text-anchor="middle" fill="#a5f3fc" font-size="11" font-family="sans-serif">Access Port</text>
+          <text x="650" y="114" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">別 VLAN 端末</text>
+          <line x1="260" y1="100" x2="320" y2="100" stroke="#94a3b8" stroke-width="3"/>
+          <line x1="500" y1="100" x2="560" y2="100" stroke="#94a3b8" stroke-width="3"/>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="tagging" title="802.1Q">
+      <span class="tag">タグ付け（802.1Q）</span>
+      <h1>トランク区間ではフレームに <strong>VLAN タグ</strong>を付けて運ぶ</h1>
+      <h2>受信側スイッチはタグを見て所属 VLAN を判断。端末直結のアクセスポートでは通常タグなし運用</h2>
+      <ul class="bullets">
+        <li><strong>ネイティブ VLAN</strong> の扱いは製品・設計方針で差が出るため、試験問題の前提を読む。</li>
+        <li>不要 VLAN をトランクに通さない（<strong>許可 VLAN 制限</strong>）のが基本。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="inter_vlan" title="VLAN間通信">
+      <span class="tag">L3 境界</span>
+      <h1><strong>異なる VLAN 同士</strong>は、そのままでは通信できない</h1>
+      <div class="grid-2">
+        <div class="rich-box theme-danger">
+          <div class="box-title">L2だけでは不可</div>
+          <div class="box-desc">VLAN 10 と VLAN 20 は別ブロードキャストドメイン。直接通信はできない。</div>
+        </div>
+        <div class="rich-box theme-ok">
+          <div class="box-title">L3機器で中継</div>
+          <div class="box-desc">ルータ or L3スイッチでルーティングし、ACLで必要最小限だけ許可する。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="risks" title="運用リスク">
+      <span class="tag">限界と落とし穴</span>
+      <h1>VLAN は有効だが、<strong>設定ミスに弱い</strong></h1>
+      <ul class="bullets">
+        <li>誤って端末を高権限 VLAN に収容すると分離が崩れる。</li>
+        <li>トランクの許可 VLAN が広すぎると、不要な到達性が残る。</li>
+        <li>運用では構成管理・命名規約・定期棚卸しが重要。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="exam_traps" title="試験の誤答">
+      <span class="tag">試験ひっかけ</span>
+      <h1>短絡しやすい誤答（VLAN 編）</h1>
+      <div class="grid-2">
+        <div class="rich-box theme-danger">
+          <div class="box-title">× VLAN = 暗号化</div>
+          <div class="box-desc">VLAN は分離技術。暗号化とは目的が違う。</div>
+        </div>
+        <div class="rich-box theme-danger">
+          <div class="box-title">× VLAN 間通信はL2で可能</div>
+          <div class="box-desc">VLAN 間はL3ルーティングが必要。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">△ トランクは何でも通して良い</div>
+          <div class="box-desc">許可 VLAN を絞るのが基本。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">△ 物理分離は不要になる</div>
+          <div class="box-desc">要件次第では物理分離が必要な領域もある。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第19回まとめ：VLAN は「内部を論理的に区切る基本技術」</h1>
+      <div class="summary-pillars">
+        <div class="summary-pillar"><b>① 目的</b>ブロードキャスト範囲の分離</div>
+        <div class="summary-pillar"><b>② 仕組み</b>Access / Trunk / 802.1Q</div>
+        <div class="summary-pillar"><b>③ 実務</b>L3制御と運用設計が鍵</div>
+      </div>
+      <ul class="bullets">
+        <li>台本と接続するときは <code>s01-ep19-vlan-*.yaml</code> の scene id をこのHTMLに合わせる。</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 9</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#67e8f9; line-height:1.25; text-align:center; word-break:break-all;">台本 id: incident</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

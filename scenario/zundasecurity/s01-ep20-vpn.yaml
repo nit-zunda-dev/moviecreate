@@ -1,0 +1,324 @@
+title: "【登録セキスペ 第20回｜Season3】VPNで拠点間を安全に接続—公衆回線の上に私設通路を張るのだ！"
+
+# =============================================================================
+# Season 3 第4回：VPN（Virtual Private Network）
+# - 詳細図: s01-ep20-vpn-study-slides.html ← global.slidesHtml
+# - 要約版 Reveal: s01-ep20-vpn-reveal-slides.html
+# -----------------------------------------------------------------------------
+# 台本 id (scenes)   | slideIndex | study スライド
+# -------------------|------------|------------------
+# incident           | 0          | 導入
+# opening            | 1          | 第20回・ゴール
+# definition         | 2          | 定義（CIA）
+# tunnel             | 3          | トンネル・カプセル化
+# types              | 4          | サイト間／リモート
+# ipsec_ssl          | 5          | IPsec と SSL-VPN
+# site_to_site       | 6          | サイト間トポロジ
+# remote_split       | 7          | フル／スプリットトンネル
+# risks              | 8          | 限界・運用
+# exam_traps         | 9          | 試験の誤答
+# summary            | 10         | まとめ
+# =============================================================================
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/hook_alert.png"
+  slidesHtml: "./s01-ep20-vpn-study-slides.html"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+  endScreen:
+    enabled: true
+    durationMs: 7000
+    subscribeText: "チャンネル登録で次回も見逃さない！"
+    nextEpisode:
+      title: "次回：Season4 暗号編へ—公開鍵（PKI）と証明書の基本"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5000
+  text: "在宅から社内ファイルに触ったら、通信が丸見えだった"
+  emphasis:
+    - "丸見え"
+    - "社内ファイル"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.18
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "incident"
+    slideIndex: 0
+    chapter:
+      label: "導入：インターネットは他人の道路"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "在宅で社内ファイルサーバに繋いだら、通信がそのままインターネットを流れてるって指摘されたのだ。平文は危ないのだ……！"
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "公衆回線の上に暗号化と認証で閉じた通路を作る。VPNよ。FWやVLANと並べて遠隔接続の定番。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "opening"
+    slideIndex: 1
+    chapter:
+      label: "第20回の地図：VPNで押さえる論点"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のゴールは三つ。VPNの目的、サイト間とリモートの違い、IPsecとSSL-VPNの典型像。あわせてVPNは万能ではない、まで言えることよ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "VLANが社内の区画整理なら、VPNは拠点や在宅をつなぐ橋なのだ！ Season3の締めくくり感があるのだ！"
+        se: "./se/callout_pop.mp3"
+
+  - id: "definition"
+    slideIndex: 2
+    chapter:
+      label: "定義：仮想私設網とCIA"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "VPNって、ファイアウォールの別名なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "違うわ。FWは境界で通す／止める。VPNは公衆網上で私設網のように通信する経路を張る技術よ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "機密性、認証、整合性——試験ではこのセットで語られることが多いの。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "tunnel"
+    slideIndex: 3
+    chapter:
+      label: "仕組み：カプセル化とトンネル"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "トンネルって、パケットを別の封筒に入れて運ぶってことなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その理解で十分よ。外側はインターネット向けヘッダ、内側に社内通信。第三者には暗号化トラフィックに見える——オニオン図のイメージね。"
+        se: "./se/callout_pop.mp3"
+
+  - id: "types"
+    slideIndex: 4
+    chapter:
+      label: "接続の型：サイト間とリモート"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "サイト間VPNは拠点のゲートウェイ同士が常時トンネルを張る型。リモートは在宅PCが社内の concentrator へ入る型。試験ではこの切り分けが頻出よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "拠点の橋と、個人の入り口、で覚えるのだ！"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "ipsec_ssl"
+    slideIndex: 5
+    chapter:
+      label: "方式：IPsecとSSL-VPN"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "IPsecとSSL-VPN、どっちが正解なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "どちらも正解の場面があるわ。IPsecはネットワーク層でパケットを守る説明が典型。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "SSL-VPNはTLS上でブラウザから社内アプリへ、が典型。IKEで鍵交換してからIPsec、という流れも覚えて。"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "選択肢の語句に合わせて、主役の方式を選ぶのだ！"
+
+  - id: "site_to_site"
+    slideIndex: 6
+    chapter:
+      label: "サイト間：拠点GWがトンネルを張る"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "東京と大阪の拠点LANを、インターネット越しに一つの私設網のように見せるのがサイト間VPN。ルーティング設計とセットで、試験の図解問題にもなりやすいわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "VLANが拠点の中を分けるなら、VPNは拠点と拠点をつなぐ、なのだ！"
+
+  - id: "remote_split"
+    slideIndex: 7
+    chapter:
+      label: "リモート設計：フルとスプリットトンネル"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "在宅のとき、全部VPN経由にすると重いのだ。社内だけトンネルにできないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "スプリットトンネルね。社内宛てだけVPN、それ以外は直インターネット。利便性とセキュリティのトレードオフで試験に出るわ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "VPN接続＝社内は全部信頼、は誤り。ゼロトラストと併記されることも多いのよ。"
+        se: "./se/warn_buzz.mp3"
+
+  - id: "risks"
+    slideIndex: 8
+    chapter:
+      label: "限界：通路を守っても中身は別問題"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "VPNさえあれば、在宅も鉄壁なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこが落とし穴。盗まれたID、マルウェア端末、過剰な社内到達——トンネルに入ったあとも攻撃は続くの。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "多要素認証、端末健全性、最小権限、ログ監視。FWやVLANと合わせた多層防御で語るのが正解よ。"
+        se: "./se/warn_buzz.mp3"
+
+  - id: "exam_traps"
+    slideIndex: 9
+    chapter:
+      label: "試験で狙われる誤答パターン"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけ、来るのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "VPNはウイルス対策、は誤り。VPNがあれば社内は全部安全、も誤り。"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "VLANとVPNの同一視も誤り。IPsecとSSL-VPNは層と利用シーンが違う、と整理して選ぶのよ。"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "トンネル＋型＋多層防御。この3点で選ぶのだ！"
+        emphasis: ["トンネル", "型", "多層防御"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "summary"
+    slideIndex: 10
+    chapter:
+      label: "まとめ：VPNは遠隔接続の基礎技術"
+    bgm: "./bgm/outro_warm.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめよ。VPNは公衆回線上の仮想私設網。サイト間とリモート、IPsecとSSL-VPN、トンネルとカプセル化。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "接続後も認証と最小権限が要る。Season3はここまで。次は暗号と認証の世界よ。"
+        se: "./se/correct_bell.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "Season3クリア感があるのだ！ チャンネル登録と高評価、よろしくなのだ！"
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "vpn-basics"
+    title: "VPNって何？30秒で理解"
+    pickLines:
+      - { sceneId: "opening", from: 0, to: 1 }
+      - { sceneId: "tunnel", from: 0, to: 1 }
+    overlayCaption: "⚡ VPN基礎"
+    cta: "👇 本編で全体像を確認"
+
+  - id: "vpn-traps"
+    title: "VPNの誤答3選"
+    pickScenes: ["exam_traps", "summary"]
+    overlayCaption: "🚨 試験ひっかけ"
+    cta: "本編で完全マスター（概要欄）"
+
+youtube:
+  imageStyle: "diagram"
+  audience:
+    - "情報処理安全確保支援士の受験者"
+    - "在宅接続・拠点間ネットワークを学ぶエンジニア"
+  hookKeywords:
+    - "VPN"
+    - "IPsec"
+    - "SSL-VPN"
+    - "サイト間VPN"
+    - "リモートアクセス"
+  hashtags:
+    - "#情報処理安全確保支援士"
+    - "#セキスペ"
+    - "#VPN"
+    - "#IPsec"
+    - "#ずんだもん"
+  relatedEpisodes:
+    - { ep: 17, title: "ファイアウォールの正体" }
+    - { ep: 19, title: "VLANで社内を分離" }
+  titleHints:
+    - { style: "shock" }
+    - { style: "howto" }
+    - { style: "exam" }

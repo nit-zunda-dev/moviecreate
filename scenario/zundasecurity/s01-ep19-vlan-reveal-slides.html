@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第19回 VLAN（Virtual LAN）— Reveal（動画キャプチャ用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.12em; line-height: 1.22; margin-bottom: 0.32em; color: #a5f3fc; }
+    :root { --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; --c: #22d3ee; }
+    .tag {
+      display: inline-block; font-size: 0.88em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #22d3ee, #fb923c);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.32em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.4em 0.5em; margin: 0.32em 0;
+      border: 1px solid rgba(34, 211, 238, 0.45);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.45em 0.5em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 0.98em; line-height: 1.42; }
+    .box-title { font-weight: 700; margin-bottom: 0.25em; font-size: 1.02em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); }
+    .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); }
+    .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); }
+    .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.93em; color: var(--m); line-height: 1.48; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.93em; line-height: 1.48; color: #cbd5e1; margin: 0.32em 0 0; padding-left: 1.05em; }
+    .slide-bullets li { margin: 0.22em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.38em; font-size: 0.88em; margin: 0.38em 0; line-height: 1.38; }
+    code { font-family: ui-monospace, monospace; color: #a5f3fc; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <span class="tag">導入</span>
+        <h3>社内ネットワークは平らすぎると危ない——<strong style="color:#67e8f9">論理分離</strong>を作るのが <strong>VLAN</strong></h3>
+        <p class="ph">同じ物理スイッチでも、部署や用途ごとに通信を区切れる。<strong>横移動リスクの縮小</strong>、障害影響範囲の限定、管理性向上に効く。</p>
+      </section>
+
+      <section>
+        <span class="tag">第19回</span>
+        <h3>VLAN の基本 — Access / Trunk / 802.1Q を押さえる</h3>
+        <ul class="slide-bullets">
+          <li><strong>VLAN</strong>は L2 の論理分割</li>
+          <li>端末向けは <strong>アクセスポート</strong>、スイッチ間は <strong>トランクポート</strong></li>
+          <li>VLAN 間通信には <strong>L3ルーティング</strong>が必要</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">仕組み</span>
+        <h3><strong>802.1Q タグ</strong>でフレームの所属 VLAN を運ぶ</h3>
+        <p class="ph">トランクで複数 VLAN を中継し、受信側でタグに基づいて振り分ける。アクセスポート接続端末は通常タグを意識しない。</p>
+      </section>
+
+      <section>
+        <span class="tag">要点</span>
+        <h3>VLAN 間はそのままでは通信不可。<strong>L3機器</strong>で中継し、ACLで制御</h3>
+        <div class="grid-2">
+          <div class="rich-box theme-danger">
+            <div class="box-title">L2だけでは到達不可</div>
+            <div class="ph">別 VLAN は別セグメントとして扱う</div>
+          </div>
+          <div class="rich-box theme-ok">
+            <div class="box-title">L3で必要最小限許可</div>
+            <div class="ph">ルーティング + フィルタで境界を設計</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="tag">限界</span>
+        <h3>VLAN は万能ではない——<strong>設定ミス</strong>で分離は簡単に崩れる</h3>
+        <ul class="slide-bullets">
+          <li>誤VLAN収容、不要トランク、許可VLAN過多</li>
+          <li>命名規約・構成管理・定期棚卸しが運用品質を左右</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">試験</span>
+        <h3>誤答パターン</h3>
+        <ul class="slide-bullets" style="font-size:0.96em;">
+          <li>VLAN = <strong>暗号化</strong> — ×（目的が違う）</li>
+          <li>VLAN 間通信は <strong>L2だけで可能</strong> — ×</li>
+          <li>トランクは <strong>全部通せば安心</strong> — ×（最小化が基本）</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第19回: VLAN＝<strong>内部ネットワークを論理的に区切る基礎</strong></h3>
+        <div class="sum-p3" style="color:#cbd5e1;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(34,211,238,0.35);"><b style="color:#67e8f9;">1</b><br>分離で横移動を抑制</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(34,211,238,0.35);"><b style="color:#67e8f9;">2</b><br>Access / Trunk / Tag</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(34,211,238,0.35);"><b style="color:#67e8f9;">3</b><br>L3と運用設計が必要</div>
+        </div>
+        <p style="font-size:0.82em; color:#94a3b8;">詳細図解: <code>s01-ep19-vlan-study-slides.html</code></p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>

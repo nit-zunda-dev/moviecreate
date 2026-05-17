@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>現場English 第6話 — Reveal（generate-video 用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 44px; line-height: 1.32; }
+    .reveal .slides section { padding: 0.06em 0.14em; }
+    .reveal .slides h3 { font-size: 1.15em; line-height: 1.2; margin: 0 0 0.2em; color: #fef3c7; font-weight: 800; }
+    :root { --z: #88dd44; --m: #ff88bb; }
+    .tag { display: inline-block; font-size: 0.58em; font-weight: 800; letter-spacing: 0.06em; color: #0c1220; background: linear-gradient(90deg, var(--z), var(--m)); padding: 0.12em 0.38em; border-radius: 4px; margin-bottom: 0.15em; }
+    .phrase-en { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 1.03em; font-weight: 800; color: #fef9c3; line-height: 1.22; margin: 0.06em 0 0.08em; }
+    .jp-mean { font-size: 0.75em; color: #e2e8f0; line-height: 1.38; margin: 0.08em 0; }
+    .word-note { font-size: 0.64em; color: #94a3b8; line-height: 1.34; margin-top: 0.08em; padding: 0.1em 0.16em; background: rgba(15,23,42,0.65); border-radius: 6px; border-left: 3px solid #38bdf8; }
+    .sum-stack { display: flex; flex-direction: column; gap: 0.16em; margin-top: 0.1em; }
+    .sum-item { display: flex; align-items: flex-start; gap: 0.35em; padding: 0.2em 0.25em; border-radius: 10px; background: rgba(30,41,59,0.85); border: 1px solid rgba(148,163,184,0.35); }
+    .sum-item .num { flex-shrink: 0; width: 1.05em; height: 1.05em; line-height: 1.05em; text-align: center; border-radius: 50%; font-weight: 900; font-size: 0.68em; background: #ff88bb; color: #0f172a; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <span class="tag">現場English · S4 #06</span>
+        <h3>オンボーディングが早口すぎるのだ</h3>
+        <p class="jp-mean">初日の説明で置いていかれないための3フレーズ</p>
+        <p class="word-note"><strong>ゴール：</strong>段階説明を頼む → ドキュメントを確認 → 非同期でフォロー</p>
+      </section>
+      <section>
+        <span class="tag">あるある</span>
+        <h3>「Repo, CI, deploy…」が一気に来る</h3>
+        <p class="jp-mean">初日のキックオフで、用語と手順が畳みかけられる。</p>
+      </section>
+      <section>
+        <span class="tag">詰み</span>
+        <h3>うなずくだけだと後で詰む</h3>
+        <p class="jp-mean"><strong>NG:</strong> Yeah, got it. (理解していないのに)</p>
+        <p class="jp-mean"><strong>OK:</strong> walk me through + documented + follow up</p>
+      </section>
+      <section>
+        <span class="tag">解説 ①</span>
+        <div class="phrase-en">Could you walk me through the local setup?</div>
+        <p class="jp-mean">ローカル環境の構築手順を順番に教えてもらえますか。</p>
+        <p class="word-note">walk me through = 手順を一緒に追いながら説明してほしい</p>
+      </section>
+      <section>
+        <span class="tag">解説 ②</span>
+        <div class="phrase-en">Where is the architecture overview documented?</div>
+        <p class="jp-mean">アーキテクチャ概要はどこにドキュメントがありますか。</p>
+        <p class="word-note">documented = 文書化されている（Notion / wiki / README など）</p>
+      </section>
+      <section>
+        <span class="tag">解説 ③</span>
+        <div class="phrase-en">I'll follow up async after I review the doc.</div>
+        <p class="jp-mean">資料を読んだあと、非同期でフォローします。</p>
+        <p class="word-note">follow up async = その場で全部理解しなくても、あとで質問する宣言</p>
+      </section>
+      <section>
+        <span class="tag">言い換え</span>
+        <p class="phrase-en" style="font-size:0.86em">Would you mind walking me through the release process?</p>
+        <p class="phrase-en" style="font-size:0.86em">Can you point me to the onboarding runbook?</p>
+        <p class="phrase-en" style="font-size:0.8em">Could we focus on just the deploy flow for now?</p>
+      </section>
+      <section>
+        <span class="tag">実戦リプレイ</span>
+        <p class="phrase-en" style="font-size:0.82em">1. Could you walk me through the local setup?</p>
+        <p class="phrase-en" style="font-size:0.82em">2. Where is the architecture overview documented?</p>
+        <p class="phrase-en" style="font-size:0.78em">3. I'll follow up async after I review the doc.</p>
+      </section>
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>今日の3フレーズ</h3>
+        <div class="sum-stack">
+          <div class="sum-item"><span class="num">1</span><div><div class="phrase-en" style="font-size:0.86em">Could you walk me through the local setup?</div></div></div>
+          <div class="sum-item"><span class="num">2</span><div><div class="phrase-en" style="font-size:0.86em">Where is the architecture overview documented?</div></div></div>
+          <div class="sum-item"><span class="num">3</span><div><div class="phrase-en" style="font-size:0.78em">I'll follow up async after I review the doc.</div></div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.02 });
+  </script>
+</body>
+</html>

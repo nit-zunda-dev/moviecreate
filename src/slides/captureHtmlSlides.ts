@@ -74,6 +74,106 @@ type RevealWindow = {
   };
 };
 
+type SlideRuntimeMode = "reveal" | "generic-slides";
+
+const CAPTURE_STYLE_ID = "mc-slide-capture-style";
+
+/** Playwright キャプチャ用: ツールバー非表示・動画向けの読みやすい字サイズ・はみ出し時は図を優先縮小 */
+const CAPTURE_PREPARE_SCRIPT = `
+(function () {
+  var STYLE_ID = ${JSON.stringify(CAPTURE_STYLE_ID)};
+  if (!document.getElementById(STYLE_ID)) {
+    var style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = [
+      "body.mc-slide-capture { overflow: hidden !important; }",
+      "body.mc-slide-capture html { font-size: 26px !important; }",
+      "body.mc-slide-capture .toolbar { display: none !important; }",
+      "body.mc-slide-capture .deck { height: 100vh !important; max-height: 100vh !important; }",
+      "body.mc-slide-capture .slide {",
+      "  display: none !important;",
+      "  padding: 0.65rem 2rem 0.5rem !important; max-width: 100% !important; width: 100% !important;",
+      "  min-height: 0 !important; max-height: 100vh !important;",
+      "  overflow: hidden !important; box-sizing: border-box !important;",
+      "}",
+      "body.mc-slide-capture .slide.active { display: block !important; }",
+      "body.mc-slide-capture .slide.active:not(:has(.diagram)) {",
+      "  display: flex !important; flex-direction: column !important; justify-content: center !important;",
+      "}",
+      "body.mc-slide-capture .diagram { zoom: 1 !important; margin: 0.45rem 0 !important; padding: 0.65rem !important; }",
+      "body.mc-slide-capture h1 { font-size: 2rem !important; margin: 0 0 0.4rem !important; line-height: 1.25 !important; }",
+      "body.mc-slide-capture h2 { font-size: 1.28rem !important; margin: 0 0 0.6rem !important; line-height: 1.4 !important; }",
+      "body.mc-slide-capture .tag { margin-bottom: 0.5rem !important; font-size: 0.85rem !important; }",
+      "body.mc-slide-capture .slide.active:not(:has(.diagram)) {",
+      "  min-height: 100vh !important; padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;",
+      "}",
+      "body.mc-slide-capture .bullets { font-size: 1.12rem !important; line-height: 1.55 !important; margin-top: 0.5rem !important; }",
+      "body.mc-slide-capture .bullets li { margin: 0.35rem 0 !important; }",
+      "body.mc-slide-capture .slide-lead { font-size: 1.05rem !important; line-height: 1.55 !important; }",
+      "body.mc-slide-capture .note { font-size: 0.98rem !important; line-height: 1.5 !important; margin-top: 0.5rem !important; }",
+      "body.mc-slide-capture .beginner-hint { font-size: 0.95rem !important; padding: 0.55rem 0.75rem !important; }",
+      "body.mc-slide-capture .encap-layer { padding: 0.45rem 0.75rem !important; font-size: 0.92rem !important; }",
+      "body.mc-slide-capture .flow-step { min-height: 0 !important; padding: 0.45rem !important; font-size: 0.88rem !important; }",
+      "body.mc-slide-capture .cmp-table { font-size: 0.88rem !important; }",
+      "body.mc-slide-capture .cmp-table th, body.mc-slide-capture .cmp-table td { padding: 0.4rem 0.5rem !important; }",
+      "body.mc-slide-capture .rich-box { padding: 0.65rem !important; }",
+      "body.mc-slide-capture .box-title { font-size: 1.05rem !important; }",
+      "body.mc-slide-capture .box-desc { font-size: 0.95rem !important; }",
+      "body.mc-slide-capture .phrase-en-lg { font-size: 1.2rem !important; line-height: 1.35 !important; margin: 0.35rem 0 !important; }",
+      "body.mc-slide-capture .jp-mean { font-size: 1rem !important; line-height: 1.5 !important; margin: 0.35rem 0 !important; }",
+      "body.mc-slide-capture .word-note { font-size: 0.92rem !important; padding: 0.45rem 0.65rem !important; margin-top: 0.35rem !important; }",
+      "body.mc-slide-capture .goal-box { font-size: 0.98rem !important; padding: 0.55rem 0.75rem !important; margin: 0.45rem 0 !important; }",
+      "body.mc-slide-capture .sum-stack-lg { gap: 0.45rem !important; margin: 0.45rem 0 !important; }",
+      "body.mc-slide-capture .sum-item-lg { padding: 0.5rem 0.65rem !important; gap: 0.55rem !important; }",
+      "body.mc-slide-capture .summary-pillar { font-size: 0.95rem !important; }",
+      "body.mc-slide-capture .reveal .slides { font-size: 1em !important; }",
+      "body.mc-slide-capture .reveal .slides h3 { font-size: 1.35em !important; }",
+      "body.mc-slide-capture .reveal .progress, body.mc-slide-capture .reveal .controls,",
+      "body.mc-slide-capture .reveal .slide-number { display: none !important; }",
+    ].join("\\n");
+    document.head.appendChild(style);
+  }
+  document.body.classList.add("mc-slide-capture");
+
+  var slide =
+    document.querySelector(".slide.active") ||
+    document.querySelector(".reveal .slides section.present");
+  if (!slide) return;
+
+  document.querySelectorAll(".slide").forEach(function (s) {
+    s.style.zoom = "1";
+    s.style.transform = "none";
+    s.style.width = "";
+    s.style.marginLeft = "";
+    s.querySelectorAll(".diagram").forEach(function (d) { d.style.zoom = "1"; });
+  });
+
+  var maxH = window.innerHeight * 0.96;
+  var maxW = window.innerWidth * 0.98;
+
+  function overflow() {
+    return slide.scrollHeight > maxH || slide.scrollWidth > maxW;
+  }
+
+  if (overflow()) {
+    slide.querySelectorAll(".diagram").forEach(function (d) {
+      var dh = d.scrollHeight;
+      var budget = maxH * 0.52;
+      if (dh > budget) {
+        d.style.zoom = String(Math.max(0.72, budget / dh));
+      }
+    });
+  }
+
+  if (overflow()) {
+    var h = slide.scrollHeight;
+    var w = slide.scrollWidth;
+    var scale = Math.min(maxH / h, maxW / w);
+    slide.style.zoom = String(Math.max(0.9, Math.min(1, scale)));
+  }
+})();
+`;
+
 /**
  * 同一 HTML 内の複数スライド index をまとめてキャプチャ（同一ファイルはサーバ1回）
  */
@@ -101,28 +201,63 @@ export async function captureRevealSlides(
     await page.setViewportSize({ width, height });
     await page.goto(pageUrl, { waitUntil: "load", timeout: 120_000 });
 
-    await page.waitForFunction(
+    const runtimeMode = await page.waitForFunction(
       () => {
         const w = window as unknown as { Reveal?: RevealWindow["Reveal"] };
-        if (!w.Reveal) return false;
-        if (typeof w.Reveal.isReady === "function" && !w.Reveal.isReady()) return false;
-        return true;
+        if (w.Reveal) {
+          if (typeof w.Reveal.isReady === "function" && !w.Reveal.isReady()) return null;
+          return "reveal";
+        }
+        if (document.querySelectorAll(".slide").length > 0) {
+          return "generic-slides";
+        }
+        return null;
       },
       { timeout: 60_000 },
     );
+    const mode = (await runtimeMode.jsonValue()) as SlideRuntimeMode;
 
     const baseStem = path.basename(fileName, path.extname(fileName)).replace(/[^a-zA-Z0-9._-]+/g, "_");
     for (const hIndex of sortedUnique) {
-      await page.evaluate(
-        (idx: number) => {
-          const w = window as unknown as RevealWindow;
-          w.Reveal.slide(idx, 0);
-          w.Reveal.layout();
-          w.Reveal.sync();
-        },
-        hIndex,
-      );
-      await new Promise<void>((r) => setTimeout(r, 450));
+      if (mode === "reveal") {
+        await page.evaluate(
+          (idx: number) => {
+            const w = window as unknown as RevealWindow;
+            w.Reveal.slide(idx, 0);
+            w.Reveal.layout();
+            w.Reveal.sync();
+          },
+          hIndex,
+        );
+      } else {
+        await page.evaluate(
+          (idx: number) => {
+            const slides = Array.from(document.querySelectorAll<HTMLElement>(".slide"));
+            if (slides.length === 0) return;
+            const clamped = Math.max(0, Math.min(idx, slides.length - 1));
+            slides.forEach((s, i) => s.classList.toggle("active", i === clamped));
+
+            const prog = document.getElementById("prog");
+            if (prog) prog.textContent = `${clamped + 1} / ${slides.length}`;
+
+            const sceneRef = document.getElementById("scene-ref");
+            if (sceneRef) {
+              const scene = slides[clamped].getAttribute("data-yaml-scene");
+              sceneRef.textContent = scene ? `台本 id: ${scene}` : "";
+            }
+
+            const prev = document.getElementById("prev") as HTMLButtonElement | null;
+            const next = document.getElementById("next") as HTMLButtonElement | null;
+            if (prev) prev.disabled = clamped === 0;
+            if (next) next.disabled = clamped === slides.length - 1;
+
+            window.dispatchEvent(new Event("resize"));
+          },
+          hIndex,
+        );
+      }
+      await page.evaluate(CAPTURE_PREPARE_SCRIPT);
+      await new Promise<void>((r) => setTimeout(r, 120));
       const outName = `slidecap_${baseStem}_${hIndex}.png`;
       const outPath = path.join(outputDir, outName);
       await page.screenshot({ path: outPath, type: "png", fullPage: false });
@@ -203,6 +338,6 @@ export async function applyHtmlSlideBackgrounds(
   }
 
   console.log(
-    `[Slides] Reveal スライドを ${width}x${height} で ${tasks.length} シーン分キャプチャしました（temp/slide_captures）`,
+    `[Slides] HTML スライドを ${width}x${height} で ${tasks.length} シーン分キャプチャしました（temp/slide_captures）`,
   );
 }

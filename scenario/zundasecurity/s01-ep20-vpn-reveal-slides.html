@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第20回 VPN — Reveal（動画キャプチャ用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.82em; }
+    .reveal .slides section { padding: 0.15em 0.3em; }
+    .reveal .slides h3 { font-size: 1.12em; line-height: 1.22; margin-bottom: 0.32em; color: #a5f3fc; }
+    :root { --m: #a8b7cc; --ok: #4ade80; --ng: #f87171; --w: #fbbf24; --c: #22d3ee; --p: #a78bfa; }
+    .tag {
+      display: inline-block; font-size: 0.88em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0f1419; background: linear-gradient(90deg, #22d3ee, #a78bfa);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.32em;
+    }
+    .diagram {
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 0.4em 0.5em; margin: 0.32em 0;
+      border: 1px solid rgba(167, 139, 250, 0.45);
+    }
+    .diagram svg { display: block; width: 100%; max-width: 100%; height: auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    .rich-box { padding: 0.45em 0.5em; border-radius: 8px; background: rgba(36, 48, 68, 0.55); border: 1px solid rgba(139, 156, 179, 0.3); font-size: 0.98em; line-height: 1.42; }
+    .box-title { font-weight: 700; margin-bottom: 0.25em; font-size: 1.02em; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.45); } .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.45); } .theme-danger .box-title { color: var(--ng); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); } .theme-warn .box-title { color: var(--w); }
+    .ph { font-size: 0.93em; color: var(--m); line-height: 1.48; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.93em; line-height: 1.48; color: #cbd5e1; margin: 0.32em 0 0; padding-left: 1.05em; }
+    .slide-bullets li { margin: 0.22em 0; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.38em; font-size: 0.88em; margin: 0.38em 0; line-height: 1.38; }
+    code { font-family: ui-monospace, monospace; color: #a5f3fc; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <span class="tag">導入</span>
+        <h3>在宅から社内へ——公衆回線の上に <strong style="color:#c4b5fd">VPN トンネル</strong>で私設通路を張る</h3>
+        <p class="ph">インターネットは他人の道路。平文のまま社内通信を流すと盗聴・改ざんリスク。暗号化と認証で「論理的に閉じた経路」を作る。</p>
+      </section>
+
+      <section>
+        <span class="tag">第20回</span>
+        <h3>VPN の基本 — サイト間／リモート・IPsec／SSL-VPN</h3>
+        <ul class="slide-bullets">
+          <li><strong>VPN</strong>＝ Virtual Private Network（仮想私設網）</li>
+          <li><strong>サイト間</strong>：拠点 GW 同士が常時トンネル</li>
+          <li><strong>リモート</strong>：個人端末から社内 concentrator へ</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">仕組み</span>
+        <h3>カプセル化 — 元パケットを <strong>暗号化トンネル</strong>で運ぶ</h3>
+        <div class="diagram">
+          <svg viewBox="0 0 700 70" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="rvpn_t" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+            <rect x="40" y="22" width="620" height="28" rx="14" fill="url(#rvpn_t)"/>
+            <text x="350" y="41" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700" font-family="sans-serif">トンネル区間（第三者には中身が見えにくい）</text>
+          </svg>
+        </div>
+        <p class="ph">IKE で鍵交換 → IPsec 等で暗号化通信、という流れが試験で説明されやすい。</p>
+      </section>
+
+      <section>
+        <span class="tag">方式</span>
+        <h3><strong>IPsec</strong>（ネットワーク層）と <strong>SSL-VPN</strong>（HTTPS/TLS）の典型像</h3>
+        <div class="grid-2">
+          <div class="rich-box" style="border-color:rgba(167,139,250,0.5)">
+            <div class="box-title" style="color:var(--p)">IPsec VPN</div>
+            <div class="ph">拠点間・専用クライアント。ESP/IKE などの語句。</div>
+          </div>
+          <div class="rich-box theme-ok">
+            <div class="box-title">SSL-VPN</div>
+            <div class="ph">ブラウザから社内アプリ。TLS・証明書。</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="tag">限界</span>
+        <h3>VPN は通路の保護——<strong>接続後の侵害</strong>までは防げない</h3>
+        <ul class="slide-bullets">
+          <li>盗まれた ID・マルウェア端末・過剰な社内到達</li>
+          <li>MFA・端末健全性・最小権限・ログ監視がセット</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">試験</span>
+        <h3>誤答パターン</h3>
+        <ul class="slide-bullets" style="font-size:0.96em;">
+          <li>VPN ＝ <strong>ウイルス対策</strong> — ×</li>
+          <li>VPN があれば <strong>社内は全部安全</strong> — ×</li>
+          <li><strong>VLAN</strong> と VPN を同一視 — ×（L2分離 vs 公衆網上の私設接続）</li>
+        </ul>
+      </section>
+
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>第20回: VPN＝<strong>公衆回線上の仮想私設網</strong></h3>
+        <div class="sum-p3" style="color:#cbd5e1;">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(167,139,250,0.35);"><b style="color:#c4b5fd;">1</b><br>トンネル＋暗号化</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(167,139,250,0.35);"><b style="color:#c4b5fd;">2</b><br>サイト間／リモート</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(167,139,250,0.35);"><b style="color:#c4b5fd;">3</b><br>多層防御で運用</div>
+        </div>
+        <p style="font-size:0.82em; color:#94a3b8;">詳細図解: <code>s01-ep20-vpn-study-slides.html</code></p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ hash: true, slideNumber: "c/t", transition: "none", width: 1280, height: 720, margin: 0.04 });
+  </script>
+</body>
+</html>

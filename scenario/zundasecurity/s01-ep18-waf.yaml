@@ -1,0 +1,263 @@
+title: "【登録セキスペ 第18回｜Season3】WAFの正体—FWでは止まらないHTTP攻撃を止める仕組みなのだ！"
+
+# =============================================================================
+# 演出：中央 emphasis／右上 callout はスライドと競合しやすいため、本編は締めの emphasis のみ等・最小限。
+# Season 3 第2回：鉄壁のネットワーク構築編 — WAF（Web Application Firewall）
+# - 詳細図: s01-ep18-waf-study-slides.html
+# - generate-video 用 Reveal: s01-ep18-waf-reveal-slides.html ← global.slidesHtml
+# -----------------------------------------------------------------------------
+# 台本 id (scenes)  | slideIndex | Reveal セクション（0始まり）
+# -----------------|------------|------------------------------------------
+# incident         | 0          | 導入（FWとWAFの位置）
+# opening          | 1          | 第18回・ゴール
+# mechanism        | 2          | 仕組み（リバプロ）
+# detection        | 3          | 検知（SQLi/XSS）
+# limits           | 4          | 限界
+# exam_tips        | 5          | 試験の誤答
+# summary          | 6          | まとめ
+# =============================================================================
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/hook_alert.png"
+  slidesHtml: "./s01-ep18-waf-reveal-slides.html"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+  endScreen:
+    enabled: true
+    durationMs: 7000
+    subscribeText: "チャンネル登録で次回も見逃さない！"
+    nextEpisode:
+      title: "次回：VLAN でネットワークを区切る—横移動を遅らせる設計"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5000
+  text: "FWは通ったのに、SQLインジェクションが止まらない"
+  emphasis:
+    - "FWは通った"
+    - "止まらない"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.18
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "incident"
+    slideIndex: 0
+    chapter:
+      label: "導入：FWの向こうで起きるHTTP攻撃"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "たすけてほしいのだ！　境界のファイアウォールはちゃんと入ってて、HTTPS の 443 も会社として許可してるのに……ログに変なクエリが並んで、データベースがおかしいことになってるのだ……！"
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: metan
+        face: "困り"
+        text: "FW はだいたい IP とポートまで。パケットが『HTTPS の穴』として届いたあと、URL のクエリや POST の中身——つまりアプリケーション層のペイロードまでは原則見ないのよ。"
+        se: "./se/emphasis_chime.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ということは第17回で習った FW だけじゃ、HTTP の中に混ざった攻撃は見えないまま通っちゃうのだ……？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "そこで登場するのが WAF、Web Application Firewall。HTTP を解釈して、SQLインジェクションやクロスサイトスクリプティングみたいな典型的パターンをルールで検査する——多層防御の一箱として試験でも名前が飛び交うわ。"
+        se: "./se/callout_pop.mp3"
+
+  - id: "opening"
+    slideIndex: 1
+    chapter:
+      label: "第18回の地図：WAFで押さえる論点"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "今日のゴールは三つ。第一に、FW と WAF で見ているレイヤが違うと説明できること。第二に、リバースプロキシの前段やクラウドエッジで動く、という設置イメージ。第三に、万能ではなく誤検知や未知の攻撃がある——セキュアコーディングの代替にならない、まで言えることよ。"
+        se: "./se/emphasis_chime.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "第17回が FW で、今回がその『アプリの手前』なのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "その理解でいい。第5回の SQL インジェクション、第6回の XSS——ああいうペイロードが『HTTP のテキスト』として現れるのを、入口で抑えるイメージね。"
+
+  - id: "mechanism"
+    slideIndex: 2
+    chapter:
+      label: "仕組み：クライアントとオリジンの間で検査"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "WAF って、物理的にはどこに置くのだ？　魔法の箱みたいなイメージしかないのだ。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "典型は『クライアントとオリジンサーバの間』。リバースプロキシとして動いて、リクエストを一度 WAF が受け取り、ルールに照らしてブロックするか通すか——ログだけ残すか、という製品が多いわ。"
+        se: "./se/emphasis_chime.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "クラウドでは CDN のエッジで無効化するタイプも説明される。試験は『HTTPS を終端して中身を見るには、その位置関係が要る』という文脈で、TLS の話とセットで出ることがあるわ。"
+
+  - id: "detection"
+    slideIndex: 3
+    chapter:
+      label: "何を検知するか：代表的Web攻撃のパターン"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "じゃあ具体的に、何を『攻撃っぽい』って判断するのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "代表的には、クエリパラメータに現れるクォート連結っぽい連続や、スクリプトタグっぽい文字列——文献ではシグネチャやルールセット、スコアリングなんて呼び方もされる。SQLインジェクションや XSS は第5回・第6回で勉強した『攻撃の形』そのものが HTTP に載ってくる、ってつなげば覚えやすいわ。"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "もちろん製品ごとに賢さは違うけど、試験では『HTTP を見てフィルタする装置』という位置づけが本体よ。"
+
+  - id: "limits"
+    slideIndex: 4
+    chapter:
+      label: "限界：万能ではない"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "WAF を入れたからって、アプリは安心ってわけじゃないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その通り。未知の攻撃、巧妙なエンコーディング、そもそもルールが緩すぎる設定——それにビジネスロジックの欠陥みたいに『HTTP がきれいでもおかしいことが起きる』穴は、WAF だけでは弱いことが多いわ。"
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正当な通信まで止める誤検知には例外ルールが必要になるけど、緩めすぎると意味が薄れる——このジレンマも試験の記述で語られることがあるわ。"
+
+  - id: "exam_tips"
+    slideIndex: 5
+    chapter:
+      label: "試験で狙われる誤答パターン"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ひっかけ選択肢、まとめてほしいのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "一つ、WAF があればアプリの入力検証は不要——✕、本体はアプリ側。二つ、FW と WAF は同じ——✕、典型像では見るレイヤが違う。三つ、WAF は CORS と同じ——✕、CORS はブラウザがサーバの許可を見る話で別物よ。"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "正解は『多層防御の一層』ってことなのだ！"
+        emphasis: ["多層防御の一層"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "summary"
+    slideIndex: 6
+    chapter:
+      label: "まとめ：WAFはHTTP攻撃を検査する柵"
+    bgm: "./bgm/outro_warm.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめよ。WAF はアプリケーション層で HTTP を検査し、代表的な Web 攻撃をルールで抑える。FW の代替ではなく、FW・IDS／IPS・アプリの対策と組み合わせるのが基本。誤検知と運用コストもセットで覚えなさい。"
+        se: "./se/correct_bell.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "次回は VLAN でネットワークを区切る話なのだ！　チャンネル登録と高評価、よろしくなのだ！"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "コメント欄で『うちの WAF あるある』も教えてちょうだい。第19回でまたね。"
+
+shorts:
+  - id: "waf-vs-fw"
+    title: "FW通ってるのに攻撃される理由"
+    pickLines:
+      - { sceneId: "incident", from: 0, to: 4 }
+    overlayCaption: "🔥 FWとWAFの違い"
+    cta: "👇 解説本編は概要欄から"
+
+  - id: "waf-myth"
+    title: "WAFあればアプリは安全はウソ"
+    pickScenes: ["exam_tips", "summary"]
+    overlayCaption: "🚨 試験ひっかけ"
+    cta: "本編で完全マスター（概要欄）"
+
+youtube:
+  imageStyle: "diagram"
+  audience:
+    - "情報処理安全確保支援士の受験者"
+    - "Webアプリ・インフラ担当の新人エンジニア"
+  hookKeywords:
+    - "WAF"
+    - "ファイアウォール"
+    - "SQLインジェクション"
+    - "HTTP"
+    - "アプリケーション層"
+  hashtags:
+    - "#情報処理安全確保支援士"
+    - "#セキスペ"
+    - "#WAF"
+    - "#Webセキュリティ"
+    - "#ずんだもん"
+  relatedEpisodes:
+    - { ep: 17, title: "ファイアウォールの常識のウソ" }
+    - { ep: 19, title: "VLAN（次回）" }
+  titleHints:
+    - { style: "shock" }
+    - { style: "howto" }
+    - { style: "exam" }

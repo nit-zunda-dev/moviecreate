@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>第21回 PKI・証明書 — 解説スライド（動画向け）</title>
+  <style>
+    :root {
+      --bg: #0c1018;
+      --panel: #151d2e;
+      --gold: #fbbf24;
+      --cyan: #38bdf8;
+      --violet: #a78bfa;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --ok: #4ade80;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body {
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; max-height: 720px; margin: 0 auto; }
+
+    /* 1スライド = 1画面。見出し＋図のみ（箇条書き最小） */
+    .slide {
+      display: none;
+      height: 100vh;
+      max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 0.45rem;
+      overflow: hidden;
+    }
+    .slide.active { display: grid; }
+
+    .tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;
+      color: #0c1018; background: linear-gradient(90deg, var(--gold), var(--cyan));
+      padding: 0.2rem 0.55rem; border-radius: 4px;
+    }
+    h1 {
+      font-size: 1.55rem; font-weight: 800; line-height: 1.22;
+      color: #fde68a;
+    }
+    h1 em { font-style: normal; color: var(--cyan); }
+    .lead {
+      font-size: 1.05rem; line-height: 1.35; color: var(--muted); font-weight: 500;
+    }
+    .lead strong { color: var(--text); }
+
+    .diagram {
+      min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      padding: 0.5rem 0.75rem;
+    }
+    .diagram svg {
+      display: block; width: 100%; max-width: 1180px;
+      height: auto; max-height: min(52vh, 380px);
+    }
+
+    .fig-caption {
+      font-size: 0.95rem; font-weight: 600; color: var(--cyan);
+      text-align: center; line-height: 1.3;
+    }
+
+    /* 2×2 誤答（試験）— 図と同じ高さ帯に収める */
+    .trap-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      min-height: 0; height: 100%; align-content: stretch;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      padding: 0.5rem;
+    }
+    .trap {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0.65rem 0.75rem; border-radius: 12px;
+      background: rgba(248, 113, 113, 0.08); border: 2px solid rgba(248, 113, 113, 0.45);
+    }
+    .trap b { font-size: 1.05rem; color: var(--danger); margin-bottom: 0.25rem; }
+    .trap span { font-size: 0.92rem; color: var(--muted); line-height: 1.35; }
+
+    .sum-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;
+      min-height: 0;
+    }
+    .sum-card {
+      text-align: center; padding: 0.75rem 0.5rem; border-radius: 12px;
+      background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.4);
+      font-size: 1rem; font-weight: 600; line-height: 1.35;
+    }
+    .sum-card i {
+      display: block; font-style: normal; font-size: 0.78rem; font-weight: 800;
+      color: var(--gold); margin-bottom: 0.3rem;
+    }
+
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem; background: rgba(12, 16, 24, 0.95);
+      border-top: 1px solid rgba(167, 139, 250, 0.25); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600;
+    }
+    .toolbar button:disabled { opacity: 0.35; }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    #scene-ref { font-size: 0.75rem; color: var(--violet); }
+
+    /* Playwright キャプチャ（captureHtmlSlides.ts） */
+    body.mc-slide-capture { overflow: hidden !important; }
+    body.mc-slide-capture html { font-size: 24px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .deck { height: 100vh !important; max-height: none !important; }
+    body.mc-slide-capture .slide {
+      display: none !important; padding: 0.85rem 2rem 0.65rem !important;
+      max-height: 100vh !important; height: 100vh !important;
+    }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture h1 { font-size: 1.65rem !important; }
+    body.mc-slide-capture .lead { font-size: 1.08rem !important; }
+    body.mc-slide-capture .diagram svg { max-height: 400px !important; }
+    body.mc-slide-capture .fig-caption { font-size: 1rem !important; }
+    body.mc-slide-capture .trap b { font-size: 1.08rem !important; }
+    body.mc-slide-capture .trap span { font-size: 0.95rem !important; }
+    body.mc-slide-capture .trap-grid { padding: 0.45rem !important; }
+  </style>
+</head>
+<body>
+  <!-- 第21回 PKI — study スライド（動画 1280×720 想定）
+       s01-ep21-pki.yaml の slideIndex 0〜10（全11枚） -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入 · Season4</span>
+      <h1>社内サイトが<em>「証明書が無効」</em>で開けない</h1>
+      <p class="lead">期限切れ・名前不一致・信頼できない発行者——<strong>PKI と証明書</strong>の話</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="ブラウザ警告">
+          <rect x="80" y="30" width="740" height="260" rx="16" fill="#1e293b" stroke="#64748b" stroke-width="3"/>
+          <rect x="80" y="30" width="740" height="48" rx="16" fill="#334155"/>
+          <circle cx="110" cy="54" r="8" fill="#f87171"/><circle cx="135" cy="54" r="8" fill="#fbbf24"/><circle cx="160" cy="54" r="8" fill="#4ade80"/>
+          <text x="450" y="62" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" font-family="sans-serif">https://intra.example.local</text>
+          <rect x="140" y="110" width="620" height="150" rx="12" fill="#450a0a" stroke="#f87171" stroke-width="3"/>
+          <text x="450" y="155" text-anchor="middle" fill="#fecaca" font-size="26" font-weight="800" font-family="sans-serif">⚠ 接続はプライベートではありません</text>
+          <text x="450" y="195" text-anchor="middle" fill="#fca5a5" font-size="18" font-family="sans-serif">証明書の有効期限切れ / 名前不一致</text>
+          <text x="450" y="235" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">→ 第21回：誰が「本物」と認めるか（PKI）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="ゴール">
+      <span class="tag">第21回</span>
+      <h1>公開鍵暗号と<em>PKI</em>——証明書で「相手を信じる」</h1>
+      <p class="lead">Season3（ネットワーク）の次は<strong>暗号と認証</strong>。今日は土台の PKI</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="学習ロードマップ">
+          <rect x="40" y="120" width="200" height="90" rx="12" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+          <text x="140" y="158" text-anchor="middle" fill="#94a3b8" font-size="16" font-weight="700" font-family="sans-serif">Season3</text>
+          <text x="140" y="188" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">FW·WAF·VLAN·VPN</text>
+          <path d="M 250 165 L 310 165" stroke="#fbbf24" stroke-width="4" marker-end="url(#ep21ar)"/>
+          <rect x="320" y="95" width="260" height="140" rx="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
+          <text x="450" y="140" text-anchor="middle" fill="#fde68a" font-size="22" font-weight="800" font-family="sans-serif">第21回 PKI</text>
+          <text x="450" y="175" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">公開鍵 / 署名 / 証明書</text>
+          <text x="450" y="210" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">次回以降：ハッシュ·TLS·認証連携</text>
+          <path d="M 590 165 L 650 165" stroke="#38bdf8" stroke-width="4"/>
+          <rect x="660" y="120" width="200" height="90" rx="12" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="760" y="168" text-anchor="middle" fill="#7dd3fc" font-size="16" font-weight="700" font-family="sans-serif">HTTPS の信頼</text>
+          <text x="450" y="285" text-anchor="middle" fill="#38bdf8" font-size="16" font-weight="600" font-family="sans-serif">覚える軸：①鍵の役割　②署名　③CAと証明書チェーン</text>
+          <defs>
+            <marker id="ep21ar" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#fbbf24"/></marker>
+          </defs>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="symmetric_vs_asymmetric" title="鍵の種類">
+      <span class="tag">鍵の種類</span>
+      <h1><em>共通鍵</em>は速い／<em>公開鍵</em>は鍵配送が楽</h1>
+      <p class="lead">試験では「何に使うか」で選ぶ（混同しない）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" aria-label="共通鍵と公開鍵の比較">
+          <rect x="40" y="40" width="380" height="260" rx="14" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <text x="230" y="85" text-anchor="middle" fill="#c4b5fd" font-size="22" font-weight="800" font-family="sans-serif">共通鍵（対称鍵）</text>
+          <rect x="120" y="110" width="220" height="70" rx="10" fill="#0f172a" stroke="#a78bfa"/>
+          <text x="230" y="155" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" font-family="sans-serif">同じ鍵 K</text>
+          <text x="230" y="210" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">暗号化·復号に同じ鍵</text>
+          <text x="230" y="250" text-anchor="middle" fill="#4ade80" font-size="16" font-weight="600" font-family="sans-serif">高速（大量データ向き）</text>
+          <text x="230" y="280" text-anchor="middle" fill="#f87171" font-size="15" font-family="sans-serif">鍵の配布·管理が課題</text>
+
+          <rect x="480" y="40" width="380" height="260" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="670" y="85" text-anchor="middle" fill="#7dd3fc" font-size="22" font-weight="800" font-family="sans-serif">公開鍵（非対称鍵）</text>
+          <rect x="530" y="110" width="130" height="55" rx="8" fill="#0f172a" stroke="#38bdf8"/>
+          <text x="595" y="145" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="700" font-family="sans-serif">公開鍵</text>
+          <rect x="680" y="110" width="130" height="55" rx="8" fill="#0f172a" stroke="#fbbf24"/>
+          <text x="745" y="145" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="700" font-family="sans-serif">秘密鍵</text>
+          <text x="670" y="210" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">ペアで数学的に対応</text>
+          <text x="670" y="250" text-anchor="middle" fill="#4ade80" font-size="16" font-weight="600" font-family="sans-serif">鍵配送·署名·証明書の基盤</text>
+          <text x="670" y="280" text-anchor="middle" fill="#fbbf24" font-size="15" font-family="sans-serif">処理は重い→TLSはハイブリッド</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="encrypt_flow" title="暗号化">
+      <span class="tag">暗号化の向き</span>
+      <h1>相手に送る：<em>公開鍵で暗号化</em>→ 相手の秘密鍵で復号</h1>
+      <p class="lead">「公開鍵はみんなに配る／秘密鍵は本人だけ」</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="公開鍵暗号の流れ">
+          <rect x="60" y="100" width="140" height="100" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="130" y="145" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" font-family="sans-serif">送信者 A</text>
+          <text x="130" y="175" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">平文 M</text>
+          <path d="M 210 150 L 280 150" stroke="#38bdf8" stroke-width="4"/>
+          <polygon points="275,145 290,150 275,155" fill="#38bdf8"/>
+          <rect x="295" y="115" width="180" height="70" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="385" y="158" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">B の公開鍵で暗号化</text>
+          <path d="M 485 150 L 555 150" stroke="#a78bfa" stroke-width="4"/>
+          <polygon points="550,145 565,150 550,155" fill="#a78bfa"/>
+          <rect x="570" y="100" width="140" height="100" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="640" y="145" text-anchor="middle" fill="#fde68a" font-size="18" font-weight="700" font-family="sans-serif">受信者 B</text>
+          <text x="640" y="175" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">暗号文 C</text>
+          <rect x="295" y="220" width="310" height="65" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="258" text-anchor="middle" fill="#fde68a" font-size="18" font-weight="700" font-family="sans-serif">B の秘密鍵だけが復号できる</text>
+          <text x="450" y="55" text-anchor="middle" fill="#f87171" font-size="16" font-weight="600" font-family="sans-serif">× 秘密鍵で暗号化＝署名の話（次スライド）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="signature_flow" title="署名">
+      <span class="tag">電子署名</span>
+      <h1>本人証明：<em>秘密鍵で署名</em>→ 相手は公開鍵で検証</h1>
+      <p class="lead">改ざん検知＋「誰が書いたか」の非否認（試験の定番）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="デジタル署名">
+          <rect x="60" y="90" width="150" height="110" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="135" y="135" text-anchor="middle" fill="#fde68a" font-size="18" font-weight="700" font-family="sans-serif">送信者</text>
+          <text x="135" y="168" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">ハッシュ H(M)</text>
+          <rect x="250" y="105" width="200" height="80" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="350" y="140" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">秘密鍵で署名</text>
+          <text x="350" y="168" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">署名データ S</text>
+          <path d="M 460 145 L 520 145" stroke="#4ade80" stroke-width="4"/>
+          <polygon points="515,140 530,145 515,150" fill="#4ade80"/>
+          <rect x="540" y="90" width="150" height="110" rx="12" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="615" y="135" text-anchor="middle" fill="#7dd3fc" font-size="18" font-weight="700" font-family="sans-serif">受信者</text>
+          <text x="615" y="168" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">公開鍵で検証</text>
+          <rect x="250" y="220" width="440" height="65" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="470" y="258" text-anchor="middle" fill="#86efac" font-size="18" font-weight="700" font-family="sans-serif">一致 → 改ざんなし／不一致 → 拒否</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="pki_chain" title="PKI">
+      <span class="tag">PKI</span>
+      <h1><em>認証局（CA）</em>が証明書を発行——信頼の鎖</h1>
+      <p class="lead">ルート CA → 中間 CA → サーバ証明書（チェーン検証）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" aria-label="証明書チェーン">
+          <rect x="340" y="25" width="220" height="75" rx="12" fill="#422006" stroke="#fbbf24" stroke-width="3"/>
+          <text x="450" y="58" text-anchor="middle" fill="#fde68a" font-size="20" font-weight="800" font-family="sans-serif">ルート CA</text>
+          <text x="450" y="82" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">端末に事前信頼（トラストストア）</text>
+          <line x1="450" y1="100" x2="450" y2="130" stroke="#fbbf24" stroke-width="3"/>
+          <polygon points="445,125 450,140 455,125" fill="#fbbf24"/>
+          <rect x="310" y="140" width="280" height="75" rx="12" fill="#1e3a5f" stroke="#38bdf8" stroke-width="2"/>
+          <text x="450" y="173" text-anchor="middle" fill="#7dd3fc" font-size="20" font-weight="800" font-family="sans-serif">中間 CA</text>
+          <text x="450" y="198" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">ルートが中間に署名</text>
+          <line x1="450" y1="215" x2="450" y2="245" stroke="#38bdf8" stroke-width="3"/>
+          <polygon points="445,240 450,255 455,240" fill="#38bdf8"/>
+          <rect x="280" y="255" width="340" height="75" rx="12" fill="#0f172a" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="288" text-anchor="middle" fill="#86efac" font-size="20" font-weight="800" font-family="sans-serif">エンドエンティティ証明書</text>
+          <text x="450" y="315" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">www.example.com の公開鍵を CA が保証</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="cert_fields" title="証明書の中身">
+      <span class="tag">証明書</span>
+      <h1>証明書＝<em>公開鍵＋所有者情報</em>を CA が署名したもの</h1>
+      <p class="lead">試験で名前が出やすい項目を図で押さえる</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" aria-label="証明書のフィールド">
+          <rect x="220" y="25" width="460" height="280" rx="14" fill="#0f172a" stroke="#a78bfa" stroke-width="3"/>
+          <text x="450" y="65" text-anchor="middle" fill="#c4b5fd" font-size="22" font-weight="800" font-family="sans-serif">X.509 証明書（イメージ）</text>
+          <line x1="250" y1="85" x2="650" y2="85" stroke="#334155" stroke-width="2"/>
+          <text x="270" y="115" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">Subject（CN / SAN）</text>
+          <text x="560" y="115" fill="#94a3b8" font-size="16" font-family="sans-serif">= 誰の鍵か</text>
+          <text x="270" y="155" fill="#7dd3fc" font-size="17" font-weight="700" font-family="sans-serif">Issuer</text>
+          <text x="560" y="155" fill="#94a3b8" font-size="16" font-family="sans-serif">= 誰が署名したか</text>
+          <text x="270" y="195" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">Validity（Not Before / After）</text>
+          <text x="270" y="235" fill="#f472b6" font-size="17" font-weight="700" font-family="sans-serif">公開鍵</text>
+          <text x="560" y="235" fill="#94a3b8" font-size="16" font-family="sans-serif">+ 署名アルゴリズム</text>
+          <text x="270" y="275" fill="#fbbf24" font-size="17" font-weight="700" font-family="sans-serif">CRL / OCSP</text>
+          <text x="560" y="275" fill="#94a3b8" font-size="16" font-family="sans-serif">= 失効確認</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="tls_https_meaning" title="HTTPSの意味">
+      <span class="tag">HTTPS · まずここ</span>
+      <h1>🔒は<em>「路上を守る」</em>話——ログインとは別</h1>
+      <p class="lead">HTTPS ＝ HTTP の中身を TLS で包む（試験の定番整理）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="HTTPSとTLSの関係">
+          <text x="450" y="38" text-anchor="middle" fill="#fde68a" font-size="22" font-weight="800" font-family="sans-serif">HTTPS ＝ HTTP ＋ TLS（暗号化の隧道）</text>
+          <rect x="200" y="55" width="500" height="95" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+          <rect x="220" y="72" width="460" height="32" rx="6" fill="#1e3a5f"/>
+          <text x="450" y="94" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">TLS … 盗聴・改ざんを防ぐ「鎧」</text>
+          <rect x="220" y="110" width="460" height="32" rx="6" fill="#334155"/>
+          <text x="450" y="132" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="sans-serif">HTTP … ページ・API のデータ本体</text>
+          <rect x="80" y="175" width="360" height="115" rx="12" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="260" y="210" text-anchor="middle" fill="#86efac" font-size="18" font-weight="800" font-family="sans-serif">🔒 で守れること</text>
+          <text x="260" y="242" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="sans-serif">路上の盗聴・改ざんを困難に</text>
+          <text x="260" y="272" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">「どのサーバと話してるか」も証明書で確認</text>
+          <rect x="460" y="175" width="360" height="115" rx="12" fill="#450a0a" stroke="#f87171" stroke-width="2"/>
+          <text x="640" y="210" text-anchor="middle" fill="#fca5a5" font-size="18" font-weight="800" font-family="sans-serif">🔒 だけでは守れない</text>
+          <text x="640" y="242" text-anchor="middle" fill="#fecaca" font-size="16" font-family="sans-serif">パスワード入力・ログイン状態</text>
+          <text x="640" y="272" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">＝ 別の仕組み（セッション等）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="tls_handshake" title="TLS握手">
+      <span class="tag">TLS 握手</span>
+      <h1>最初だけ<em>証明書で確認</em>→ あとは共通鍵で高速通信</h1>
+      <p class="lead">ここで第21回の PKI（CA・チェーン）が効く</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" aria-label="TLS握手の流れ">
+          <rect x="40" y="55" width="150" height="80" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="115" y="100" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" font-family="sans-serif">ブラウザ</text>
+          <rect x="710" y="55" width="150" height="80" rx="12" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="785" y="100" text-anchor="middle" fill="#7dd3fc" font-size="18" font-weight="700" font-family="sans-serif">サーバ</text>
+          <path d="M 200 75 L 700 75" stroke="#fbbf24" stroke-width="3" marker-end="url(#tls_ar)"/>
+          <text x="450" y="68" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="700" font-family="sans-serif">① 証明書を渡す</text>
+          <rect x="250" y="95" width="400" height="42" rx="8" fill="#422006" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="450" y="122" text-anchor="middle" fill="#fde68a" font-size="15" font-weight="600" font-family="sans-serif">② CAチェーン・期限・名前・失効を検証（PKI）</text>
+          <path d="M 200 155 L 700 155" stroke="#38bdf8" stroke-width="3" marker-end="url(#tls_ar2)"/>
+          <path d="M 700 175 L 200 175" stroke="#38bdf8" stroke-width="3" marker-end="url(#tls_ar3)"/>
+          <text x="450" y="148" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="700" font-family="sans-serif">③ 共通鍵（対称鍵）を決める</text>
+          <rect x="120" y="195" width="660" height="55" rx="12" fill="#052e16" stroke="#4ade80" stroke-width="3"/>
+          <text x="450" y="230" text-anchor="middle" fill="#86efac" font-size="18" font-weight="800" font-family="sans-serif">本番通信 … 共通鍵で暗号化（高速・ずっと続く）</text>
+          <text x="450" y="295" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">握手は最初だけ／データ転送は共通鍵が主役（ハイブリッド）</text>
+          <defs>
+            <marker id="tls_ar" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#fbbf24"/></marker>
+            <marker id="tls_ar2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#38bdf8"/></marker>
+            <marker id="tls_ar3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#38bdf8"/></marker>
+          </defs>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="10" data-yaml-scene="exam_traps" title="試験">
+      <span class="tag">試験ひっかけ</span>
+      <h1>短絡しやすい<em>誤答</em>（PKI 編）</h1>
+      <p class="lead">語句の主語を確認して選ぶ</p>
+      <div class="trap-grid">
+        <div class="trap"><b>× 公開鍵で暗号＝署名</b><span>暗号化と署名は<strong>鍵の向きが逆</strong></span></div>
+        <div class="trap"><b>× 証明書＝秘密鍵</b><span>配るのは<strong>公開鍵入り証明書</strong>。秘密鍵は漏らさない</span></div>
+        <div class="trap"><b>× HTTPS＝本人ログイン</b><span>まずは<strong>サーバ認証</strong>。クライアント証明書は別話題</span></div>
+        <div class="trap"><b>× 自己署名＝誰でも信頼</b><span>社内 CA は<strong>ルートを配布</strong>しないと警告のまま</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="11" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第21回：<em>PKI</em>で「本物の公開鍵」を配布する</h1>
+      <p class="lead">Season4 の土台——次回はハッシュと完全性</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="まとめ">
+          <rect x="40" y="30" width="250" height="130" rx="14" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="165" y="70" text-anchor="middle" fill="#fde68a" font-size="20" font-weight="800" font-family="sans-serif">① 鍵</text>
+          <text x="165" y="105" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">公開鍵暗号</text>
+          <text x="165" y="135" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">暗号と署名の向き</text>
+          <rect x="325" y="30" width="250" height="130" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="450" y="70" text-anchor="middle" fill="#7dd3fc" font-size="20" font-weight="800" font-family="sans-serif">② 信頼</text>
+          <text x="450" y="105" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">CA·証明書チェーン</text>
+          <text x="450" y="135" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">失効確認（CRL/OCSP）</text>
+          <rect x="610" y="30" width="250" height="130" rx="14" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+          <text x="735" y="70" text-anchor="middle" fill="#86efac" font-size="20" font-weight="800" font-family="sans-serif">③ 実務</text>
+          <text x="735" y="105" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">HTTPS / TLS</text>
+          <text x="735" y="135" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">ハイブリッド構成</text>
+          <rect x="120" y="190" width="660" height="65" rx="12" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="230" text-anchor="middle" fill="#fde68a" font-size="18" font-weight="700" font-family="sans-serif">次回：ハッシュ関数 — 改ざんを検知する仕組み</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="text-align:center;">
+      <span class="progress" id="prog">1 / 11</span><br />
+      <span id="scene-ref"></span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        var sc = slides[idx].getAttribute("data-yaml-scene");
+        sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>

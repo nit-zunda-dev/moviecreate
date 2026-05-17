@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第20回 VPN（Virtual Private Network）— 解説スライド</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --accent: #22d3ee;
+      --accent2: #fb923c;
+      --accent3: #a78bfa;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: clamp(17px, 0.55vw + 14px, 28px); }
+    html, body {
+      margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; display: flex; flex-direction: column; }
+    .slide {
+      flex: 1; display: none;
+      padding: clamp(0.55rem, 1.5vh, 1rem) clamp(0.85rem, 3vw, 2.5rem) calc(4.5rem + env(safe-area-inset-bottom, 0px));
+      max-width: min(98vw, 1200px); margin: 0 auto; width: 100%;
+      min-height: 0; max-height: calc(100vh - 4.5rem); overflow-x: hidden; overflow-y: auto;
+      animation: in 0.35s ease; font-size: 1rem;
+    }
+    .slide.active { display: block; }
+    .slide code { font-family: var(--mono); font-size: 0.94em; padding: 0.08em 0.28em; border-radius: 4px; background: rgba(15, 23, 42, 0.65); }
+    @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { font-size: clamp(1.45rem, 2.4vw + 0.65rem, 2.35rem); font-weight: 700; margin: 0 0 0.45rem; line-height: 1.28; color: #a5f3fc; }
+    h2 { font-size: clamp(1.08rem, 1.15vw + 0.75rem, 1.55rem); font-weight: 500; color: var(--muted); margin: 0 0 1rem; line-height: 1.45; }
+    .tag {
+      display: inline-block; font-size: clamp(0.72rem, 0.6vw + 0.55rem, 0.95rem); letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--bg); background: linear-gradient(90deg, #22d3ee, #a78bfa); padding: 0.28rem 0.65rem; border-radius: 4px; margin-bottom: 0.65rem; font-weight: 700;
+    }
+    .diagram {
+      background: var(--panel); border-radius: 14px; padding: clamp(0.65rem, 1.5vw, 1.25rem); margin: clamp(0.4rem, 1vh, 0.75rem) 0;
+      border: 1px solid rgba(167, 139, 250, 0.35); zoom: 1;
+    }
+    /* 動画キャプチャ解像度（1280×720）— 黒板内でも読みやすいサイズ */
+    @media (max-height: 720px) {
+      html { font-size: 26px; }
+      .slide {
+        padding: 0.65rem 2rem 0.5rem;
+        max-width: 100%;
+        min-height: 0;
+        max-height: 100vh;
+        overflow: hidden;
+      }
+      .slide.active:not(:has(.diagram)) {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      h1 { font-size: 2rem; margin-bottom: 0.4rem; }
+      h2 { font-size: 1.28rem; margin-bottom: 0.6rem; }
+      .bullets { font-size: 1.12rem; line-height: 1.55; }
+      .note { font-size: 1.05rem; }
+      .diagram { zoom: 1; padding: 0.65rem; margin: 0.45rem 0; }
+    }
+    @media (max-width: 900px) { .slide { padding: 1.1rem clamp(0.85rem, 3vw, 1.5rem) 4.75rem; min-height: auto; } html { font-size: clamp(16px, 2.5vw + 12px, 22px); } }
+    /* Playwright キャプチャ時（captureHtmlSlides.ts と同系） */
+    body.mc-slide-capture html { font-size: 26px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .slide { overflow: hidden !important; max-width: 100% !important; padding: 0.65rem 2rem 0.5rem !important; }
+    body.mc-slide-capture .slide { display: none !important; }
+    body.mc-slide-capture .slide.active { display: block !important; }
+    body.mc-slide-capture .slide.active:not(:has(.diagram)) {
+      display: flex !important; flex-direction: column !important; justify-content: center !important; min-height: 100vh !important;
+    }
+    body.mc-slide-capture h1 { font-size: 2rem !important; }
+    body.mc-slide-capture h2 { font-size: 1.28rem !important; }
+    body.mc-slide-capture .bullets { font-size: 1.12rem !important; }
+    body.mc-slide-capture .diagram { zoom: 1 !important; }
+    .diagram svg { display: block; width: 100%; max-width: 100%; height: auto; overflow: visible; }
+    .bullets { margin: 0.55rem 0 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.72; font-size: 1.02em; }
+    .bullets li { margin: 0.42rem 0; } .bullets strong { color: var(--text); }
+    .slide-lead { font-size: clamp(1rem, 0.65vw + 0.8rem, 1.2rem); color: var(--muted); line-height: 1.65; margin: 0 0 0.9rem; }
+    .slide-lead strong { color: var(--text); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.85rem, 2vw, 1.4rem); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.65rem, 1.5vw, 1rem); }
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    .rich-box { padding: clamp(1rem, 2vw, 1.45rem); border-radius: 14px; background: rgba(36, 48, 68, 0.4); border: 1px solid rgba(139, 156, 179, 0.2); }
+    .box-title { font-size: clamp(1rem, 0.8vw + 0.75rem, 1.2rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+    .box-desc { font-size: clamp(0.92rem, 0.5vw + 0.75rem, 1.05rem); color: var(--muted); line-height: 1.58; }
+    .theme-ok { border-color: rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); } .theme-ok .box-title { color: var(--ok); }
+    .theme-danger { border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.05); } .theme-danger .box-title { color: var(--danger); }
+    .theme-warn { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.05); } .theme-warn .box-title { color: var(--warn); }
+    .theme-accent { border-color: rgba(34, 211, 238, 0.45); background: rgba(34, 211, 238, 0.06); } .theme-accent .box-title { color: #a5f3fc; }
+    .theme-purple { border-color: rgba(167, 139, 250, 0.45); background: rgba(167, 139, 250, 0.06); } .theme-purple .box-title { color: #c4b5fd; }
+    .beginner-hint {
+      font-size: clamp(0.95rem, 0.5vw + 0.75rem, 1.1rem); color: #a5b4c8; line-height: 1.62; margin: 0.5rem 0 0;
+      padding: clamp(0.65rem, 1.5vw, 0.95rem) clamp(0.85rem, 2vw, 1.15rem); background: rgba(15, 23, 42, 0.55); border-radius: 8px; border: 1px dashed rgba(167, 139, 250, 0.4);
+    }
+    .beginner-hint::before { content: "［図の読み方］ "; color: #c4b5fd; font-weight: 600; }
+    .note { font-size: 0.95em; color: var(--muted); border-left: 4px solid var(--accent3); padding-left: 1.1rem; margin-top: 0.85rem; line-height: 1.55; }
+    .summary-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.3rem 0 0.75rem; }
+    @media (max-width: 700px) { .summary-pillars { grid-template-columns: 1fr; } }
+    .summary-pillar {
+      font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1.02rem); font-weight: 600; line-height: 1.48; text-align: center; color: #a5b4c8;
+      padding: clamp(0.55rem, 1.2vw, 0.85rem); border-radius: 12px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(100, 116, 139, 0.35);
+    }
+    .summary-pillar b { display: block; font-size: clamp(0.78rem, 0.4vw + 0.62rem, 0.92rem); font-weight: 800; color: #67e8f9; margin-bottom: 0.25rem; }
+
+    /* CSS-only: カプセル化スタック（オニオン図） */
+    .encap-stack { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin: 0.5rem 0; }
+    .encap-layer {
+      width: min(92%, 520px); padding: 0.55rem 1rem; border-radius: 10px; text-align: center; font-size: clamp(0.88rem, 0.45vw + 0.7rem, 1rem); font-weight: 600;
+      border: 2px solid; position: relative;
+    }
+    .encap-layer::after {
+      content: "▼"; position: absolute; left: 50%; bottom: -0.65rem; transform: translateX(-50%);
+      color: #64748b; font-size: 0.75rem; line-height: 1;
+    }
+    .encap-layer:last-child::after { display: none; }
+    .encap-outer { background: rgba(100, 116, 139, 0.15); border-color: #64748b; color: #94a3b8; }
+    .encap-mid { background: rgba(167, 139, 250, 0.12); border-color: #a78bfa; color: #ddd6fe; width: min(78%, 440px); }
+    .encap-inner { background: rgba(34, 211, 238, 0.1); border-color: #22d3ee; color: #a5f3fc; width: min(62%, 360px); }
+
+    /* CSS-only: フロー（IKE 手順） */
+    .flow-row { display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center; gap: 0.35rem; margin: 0.65rem 0; }
+    .flow-step {
+      flex: 1 1 120px; max-width: 155px; min-height: 72px; padding: 0.55rem 0.45rem; border-radius: 10px;
+      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(34, 211, 238, 0.4); text-align: center;
+      font-size: clamp(0.82rem, 0.4vw + 0.65rem, 0.95rem); line-height: 1.35; color: #cbd5e1;
+    }
+    .flow-step b { display: block; color: #67e8f9; font-size: 0.92em; margin-bottom: 0.2rem; }
+    .flow-arrow { align-self: center; color: #64748b; font-size: 1.25rem; font-weight: 700; flex: 0 0 auto; }
+
+    /* CSS-only: 比較表 */
+    .cmp-table { width: 100%; border-collapse: collapse; font-size: clamp(0.85rem, 0.4vw + 0.7rem, 0.98rem); margin-top: 0.5rem; }
+    .cmp-table th, .cmp-table td { padding: 0.55rem 0.65rem; border: 1px solid rgba(100, 116, 139, 0.35); text-align: left; line-height: 1.45; }
+    .cmp-table th { background: rgba(34, 211, 238, 0.12); color: #a5f3fc; font-weight: 700; }
+    .cmp-table td { color: var(--muted); background: rgba(15, 23, 42, 0.45); }
+    .cmp-table td strong { color: var(--text); }
+    .cmp-table tr:nth-child(even) td { background: rgba(26, 35, 50, 0.55); }
+
+    /* スプリットトンネル：左右対比 */
+    .split-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 700px) { .split-compare { grid-template-columns: 1fr; } }
+    .split-col { border-radius: 12px; padding: 0.85rem; border: 2px solid; min-height: 140px; }
+    .split-col h4 { margin: 0 0 0.5rem; font-size: 1em; }
+    .split-col ul { margin: 0; padding-left: 1.1rem; font-size: 0.92em; color: var(--muted); line-height: 1.5; }
+    .split-full { border-color: rgba(74, 222, 128, 0.5); background: rgba(74, 222, 128, 0.05); }
+    .split-full h4 { color: var(--ok); }
+    .split-partial { border-color: rgba(251, 191, 36, 0.5); background: rgba(251, 191, 36, 0.05); }
+    .split-partial h4 { color: var(--warn); }
+    .route-line { height: 6px; border-radius: 3px; margin: 0.35rem 0; }
+    .route-vpn { background: linear-gradient(90deg, #a78bfa, #22d3ee); }
+    .route-direct { background: repeating-linear-gradient(90deg, #64748b 0 8px, #475569 8px 16px); }
+
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.85rem clamp(1rem, 3vw, 2.5rem); background: rgba(15, 20, 25, 0.92); border-top: 1px solid rgba(139, 156, 179, 0.2); backdrop-filter: blur(8px); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text); border: 1px solid rgba(167, 139, 250, 0.5);
+      padding: 0.55rem 1.25rem; border-radius: 10px; cursor: pointer; font-size: 1.05rem; font-weight: 600;
+    }
+    .toolbar button:hover { background: #243044; } .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .progress { font-size: 1.02rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #scene-ref { font-family: var(--mono); font-weight: 500; color: #c4b5fd; font-size: 0.88em; max-width: 100%; }
+  </style>
+</head>
+<body>
+  <!-- 第20回 VPN — 学習スライド（Season3：FW→WAF→VLAN の次） -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入（incident）</span>
+      <h1>在宅から社内ファイルに触りたい——でも <strong>インターネットは他人の道路</strong></h1>
+      <h2>拠点間・リモート接続では、公衆回線の上に <strong>「社内だけの通路」</strong>を仮想的に作る。それが <strong>VPN</strong></h2>
+      <p class="beginner-hint">灰色の雲＝インターネット（公衆）、紫〜水色の管＝暗号化トンネル。平文のまま流すのは危険、という比喩。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg" aria-label="VPNトンネル概略">
+          <defs>
+            <linearGradient id="vpn20_tunnel" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.9"/>
+              <stop offset="50%" stop-color="#22d3ee" stop-opacity="0.95"/>
+              <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.9"/>
+            </linearGradient>
+            <marker id="vpn20m" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#94a3b8"/></marker>
+            <filter id="vpn20glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <rect x="40" y="55" width="150" height="95" rx="12" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+          <text x="115" y="95" text-anchor="middle" fill="#a5f3fc" font-size="12" font-weight="700" font-family="sans-serif">在宅PC</text>
+          <text x="115" y="118" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">リモート利用者</text>
+          <rect x="670" y="55" width="150" height="95" rx="12" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="745" y="95" text-anchor="middle" fill="#7dd3fc" font-size="12" font-weight="700" font-family="sans-serif">本社LAN</text>
+          <text x="745" y="118" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">ファイルサーバ等</text>
+          <rect x="250" y="35" width="360" height="135" rx="16" fill="rgba(100,116,139,0.12)" stroke="#64748b" stroke-width="2" stroke-dasharray="8 5"/>
+          <text x="430" y="58" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="700" font-family="sans-serif">インターネット（公衆回線）</text>
+          <rect x="270" y="88" width="320" height="42" rx="21" fill="url(#vpn20_tunnel)" filter="url(#vpn20glow)" opacity="0.92"/>
+          <text x="430" y="115" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="800" font-family="sans-serif">VPN トンネル（暗号化・認証）</text>
+          <path d="M 195 102 L 268 102" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#vpn20m)"/>
+          <path d="M 592 102 L 665 102" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#vpn20m)"/>
+          <text x="430" y="195" text-anchor="middle" fill="#f87171" font-size="10" font-family="sans-serif">× 平文のまま社内宛て通信を流す → 盗聴・改ざんリスク</text>
+          <text x="430" y="218" text-anchor="middle" fill="#86efac" font-size="10" font-family="sans-serif">○ トンネル内は「論理的に閉じた通路」として扱う（試験の典型イメージ）</text>
+          <text x="430" y="242" text-anchor="middle" fill="#64748b" font-size="9.5" font-family="sans-serif">第17回 FW／第19回 VLAN と組み合わせて「境界＋経路＋分離」を語れると強い</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="位置づけ">
+      <span class="tag">第20回（opening）</span>
+      <h1>【登録セキスペ 第20回】VPN の基本 — 公衆回線の上に「私設通路」を張る</h1>
+      <h2><strong>Season 3「鉄壁のネットワーク構築編」</strong>：FW・WAF・VLAN のあと、<strong>拠点間／リモート</strong>の安全な接続</h2>
+      <p class="slide-lead"><strong>ゴール：</strong> VPN の目的、<strong>サイト間／リモートアクセス</strong>の違い、<strong>IPsec と SSL-VPN</strong> の典型像、トンネルと認証の役割を説明できる。</p>
+      <div class="diagram">
+        <svg viewBox="0 0 780 175" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="vpn20op" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#64748b"/></marker></defs>
+          <rect x="30" y="42" width="130" height="95" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="95" y="78" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="700" font-family="sans-serif">第17回 FW</text>
+          <text x="95" y="100" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="sans-serif">境界制御</text>
+          <rect x="175" y="42" width="130" height="95" rx="10" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+          <text x="240" y="78" text-anchor="middle" fill="#a5f3fc" font-size="10" font-weight="700" font-family="sans-serif">第19回 VLAN</text>
+          <text x="240" y="100" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="sans-serif">社内分離</text>
+          <path d="M 165 90 L 175 90" stroke="#64748b" stroke-width="2" marker-end="url(#vpn20op)"/>
+          <rect x="320" y="28" width="200" height="125" rx="12" fill="#0f172a" stroke="#a78bfa" stroke-width="2.5"/>
+          <text x="420" y="62" text-anchor="middle" fill="#c4b5fd" font-size="13" font-weight="800" font-family="sans-serif">第20回 VPN</text>
+          <text x="420" y="88" text-anchor="middle" fill="#e7edf4" font-size="10" font-family="sans-serif">公衆回線上の仮想私設網</text>
+          <text x="420" y="110" text-anchor="middle" fill="#fde68a" font-size="9" font-family="sans-serif">暗号化・認証・トンネル</text>
+          <text x="420" y="132" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="sans-serif">拠点間 / 在宅接続</text>
+          <path d="M 525 90 L 555 90" stroke="#a78bfa" stroke-width="2.5"/>
+          <polygon points="555,85 568,90 555,95" fill="#a78bfa"/>
+          <rect x="575" y="42" width="170" height="95" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="660" y="82" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="sans-serif">社内リソース</text>
+          <text x="660" y="108" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="sans-serif">遠隔から到達</text>
+        </svg>
+      </div>
+      <div class="grid-2">
+        <div class="rich-box theme-purple">
+          <div class="box-title">見どころ①</div>
+          <div class="box-desc"><strong>トンネル</strong>＝公衆回線上に論理的な私設通路を作る比喩</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">見どころ②</div>
+          <div class="box-desc">VPN は<strong>万能鍵ではない</strong>（認証情報・端末侵害・設定ミス）</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="definition" title="定義">
+      <span class="tag">定義</span>
+      <h1>VPN ＝ <strong>Virtual Private Network</strong>（仮想私設網）</h1>
+      <h2>物理的に専用線を引かなくても、公衆ネットワーク上で <strong>論理的に閉じた通信</strong>を実現する仕組み</h2>
+      <ul class="bullets">
+        <li><strong>機密性</strong>：暗号化で盗聴を困難にする（アルゴリズム・鍵管理は製品・方式による）。</li>
+        <li><strong>認証</strong>：接続相手・利用者が正当かを確認（証明書、ID/パスワード、多要素等）。</li>
+        <li><strong>整合性</strong>：改ざん検知（方式により実装の強さが異なる）。</li>
+      </ul>
+      <p class="note">試験では「VPN＝ファイアウォール」ではない。<strong>経路を安全に張る技術</strong>として、FW・IDS 等と役割分担で出題される。</p>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="tunnel" title="トンネル">
+      <span class="tag">トンネルとカプセル化</span>
+      <h1>元のパケットを <strong>別の封筒に入れて</strong>運ぶ — カプセル化</h1>
+      <h2>外側はインターネット向けのヘッダ、内側に「本来送りたかった社内通信」が入るイメージ</h2>
+      <div class="diagram">
+        <div class="encap-stack" aria-label="カプセル化の層">
+          <div class="encap-layer encap-outer">外側ヘッダ（公衆網向け・VPN ゲートウェイ間）</div>
+          <div class="encap-layer encap-mid">暗号化ペイロード（盗聴者からは中身が読めない）</div>
+          <div class="encap-layer encap-inner">元の IP パケット（社内宛ての本来データ）</div>
+        </div>
+        <svg viewBox="0 0 820 95" xmlns="http://www.w3.org/2000/svg" style="margin-top:0.5rem">
+          <text x="410" y="22" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="sans-serif">送信側 VPN 装置 ── 受信側で復号・展開 ── 社内 LAN へ配送</text>
+          <rect x="80" y="38" width="660" height="28" rx="6" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="6 4"/>
+          <text x="410" y="58" text-anchor="middle" fill="#c4b5fd" font-size="10" font-weight="600" font-family="sans-serif">トンネル区間＝第三者からは「ただの暗号化トラフィック」に見える</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="types" title="種類">
+      <span class="tag">接続の型</span>
+      <h1>試験で押さえる <strong>2 つの接続形態</strong></h1>
+      <div class="grid-2">
+        <div class="diagram" style="margin:0; zoom:1.05;">
+          <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg">
+            <text x="190" y="22" text-anchor="middle" fill="#a5f3fc" font-size="12" font-weight="800" font-family="sans-serif">サイト間 VPN（Site-to-Site）</text>
+            <rect x="25" y="45" width="120" height="70" rx="8" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+            <text x="85" y="78" text-anchor="middle" fill="#cbd5e1" font-size="10" font-family="sans-serif">拠点A</text>
+            <text x="85" y="98" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="sans-serif">VPN GW</text>
+            <rect x="235" y="45" width="120" height="70" rx="8" fill="#1e293b" stroke="#22d3ee" stroke-width="2"/>
+            <text x="295" y="78" text-anchor="middle" fill="#cbd5e1" font-size="10" font-family="sans-serif">拠点B</text>
+            <text x="295" y="98" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="sans-serif">VPN GW</text>
+            <rect x="155" y="70" width="70" height="24" rx="12" fill="url(#vpn20_tunnel)"/>
+            <text x="190" y="118" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">常時つなぐ「拠点間の橋」</text>
+            <text x="190" y="168" text-anchor="middle" fill="#fde68a" font-size="9" font-family="sans-serif">利用者は意識しにくい（裏で常時接続）</text>
+          </svg>
+        </div>
+        <div class="diagram" style="margin:0; zoom:1.05;">
+          <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg">
+            <text x="190" y="22" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="800" font-family="sans-serif">リモートアクセス VPN</text>
+            <rect x="35" y="55" width="90" height="55" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+            <text x="80" y="88" text-anchor="middle" fill="#ddd6fe" font-size="9" font-family="sans-serif">在宅PC</text>
+            <rect x="255" y="40" width="95" height="85" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="302" y="78" text-anchor="middle" fill="#7dd3fc" font-size="9" font-family="sans-serif">本社</text>
+            <text x="302" y="98" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="sans-serif">VPN  concentrator</text>
+            <path d="M 130 82 Q 190 40 250 82" fill="none" stroke="#a78bfa" stroke-width="3" stroke-dasharray="6 4"/>
+            <text x="190" y="128" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">個人が都度／常時で社内へ接続</text>
+            <text x="190" y="168" text-anchor="middle" fill="#fde68a" font-size="9" font-family="sans-serif">クライアントソフト・ブラウザ SSL-VPN 等</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="ipsec_ssl" title="方式比較">
+      <span class="tag">IPsec と SSL-VPN</span>
+      <h1>代表的な実装方式 — <strong>試験は「典型像」</strong>で選ぶ</h1>
+      <div class="diagram">
+        <table class="cmp-table">
+          <thead>
+            <tr><th scope="col">観点</th><th scope="col">IPsec VPN（典型）</th><th scope="col">SSL-VPN（典型）</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>動作層</strong></td><td>主に <strong>ネットワーク層</strong>（IP パケット単位の保護が説明されやすい）</td><td><strong>アプリケーション層</strong>（HTTPS/TLS 上。ブラウザ利用の説明が多い）</td></tr>
+            <tr><td><strong>接続イメージ</strong></td><td>拠点間・常時トンネル、専用クライアント</td><td>在宅から Web ブラウザで社内アプリへ</td></tr>
+            <tr><td><strong>試験のキーワード</strong></td><td>ESP/AH、IKE、ゲートウェイ間</td><td>TLS、証明書、ポータル型</td></tr>
+            <tr><td><strong>注意</strong></td><td colspan="2">製品により機能が重なる。選択肢の語句に合わせて<strong>主役の説明</strong>を選ぶ。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="flow-row" aria-label="IPsec 接続確立の流れ（簡略）">
+        <div class="flow-step"><b>1</b> IKE で相手認証・鍵交換</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><b>2</b> SA（セキュリティ関連）合意</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><b>3</b> IPsec で暗号化通信</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><b>4</b> トンネル上に社内トラフィック</div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="site_to_site" title="サイト間">
+      <span class="tag">サイト間トポロジ</span>
+      <h1>拠点 A と拠点 B の <strong>VPN ゲートウェイ</strong>がトンネルを張る</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 840 230" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vpn20_cloud" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#334155" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#0f172a" stop-opacity="0.1"/>
+            </linearGradient>
+          </defs>
+          <rect x="30" y="50" width="200" height="140" rx="12" fill="rgba(34,211,238,0.06)" stroke="#22d3ee" stroke-width="1.5"/>
+          <text x="130" y="72" text-anchor="middle" fill="#a5f3fc" font-size="11" font-weight="700" font-family="sans-serif">拠点 A（東京）</text>
+          <rect x="55" y="88" width="70" height="40" rx="6" fill="#1e293b" stroke="#64748b"/>
+          <text x="90" y="112" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">LAN</text>
+          <rect x="145" y="95" width="65" height="50" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
+          <text x="177" y="118" text-anchor="middle" fill="#c4b5fd" font-size="9" font-weight="700" font-family="sans-serif">VPN</text>
+          <text x="177" y="132" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="sans-serif">GW</text>
+          <rect x="610" y="50" width="200" height="140" rx="12" fill="rgba(251,146,60,0.06)" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="710" y="72" text-anchor="middle" fill="#fdba74" font-size="11" font-weight="700" font-family="sans-serif">拠点 B（大阪）</text>
+          <rect x="635" y="88" width="70" height="40" rx="6" fill="#1e293b" stroke="#64748b"/>
+          <text x="670" y="112" text-anchor="middle" fill="#cbd5e1" font-size="9" font-family="sans-serif">LAN</text>
+          <rect x="630" y="95" width="65" height="50" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
+          <text x="662" y="118" text-anchor="middle" fill="#c4b5fd" font-size="9" font-weight="700" font-family="sans-serif">VPN</text>
+          <text x="662" y="132" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="sans-serif">GW</text>
+          <ellipse cx="420" cy="120" rx="180" ry="55" fill="url(#vpn20_cloud)" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <text x="420" y="108" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">インターネット</text>
+          <rect x="250" y="108" width="340" height="24" rx="12" fill="url(#vpn20_tunnel)"/>
+          <text x="420" y="125" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="700" font-family="sans-serif">サイト間 IPsec トンネル（例）</text>
+          <line x1="210" y1="120" x2="248" y2="120" stroke="#a78bfa" stroke-width="2.5"/>
+          <line x1="592" y1="120" x2="628" y2="120" stroke="#a78bfa" stroke-width="2.5"/>
+          <text x="420" y="195" text-anchor="middle" fill="#86efac" font-size="10" font-family="sans-serif">各拠点 LAN は「同じ私設網の一部」のように扱える（ルーティング設計が重要）</text>
+          <text x="420" y="218" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">第19回 VLAN：拠点「内」分離／第20回 VPN：拠点「間」接続 — 役割が違う</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="remote_split" title="リモートとスプリット">
+      <span class="tag">リモート運用</span>
+      <h1>リモート VPN の設計論点：<strong>フルトンネル</strong> vs <strong>スプリットトンネル</strong></h1>
+      <div class="split-compare">
+        <div class="split-col split-full">
+          <h4>フルトンネル</h4>
+          <p style="margin:0 0 0.4rem; font-size:0.9em; color:var(--muted)">原則すべての通信を VPN 経由</p>
+          <div class="route-line route-vpn"></div>
+          <ul>
+            <li>社内ポリシー・ログの一元化しやすい</li>
+            <li>帯域・遅延のコストが増えがち</li>
+          </ul>
+        </div>
+        <div class="split-col split-partial">
+          <h4>スプリットトンネル</h4>
+          <p style="margin:0 0 0.4rem; font-size:0.9em; color:var(--muted)">社内宛てだけ VPN、それ以外は直</p>
+          <div class="route-line route-vpn" style="width:55%"></div>
+          <div class="route-line route-direct" style="width:40%; margin-left:58%"></div>
+          <ul>
+            <li>利便性は高いが、<strong>直インターネット経由のリスク</strong>が論点に</li>
+            <li>試験では「セキュリティと利便性のトレードオフ」で出やすい</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">近年は VPN 単体より <strong>ゼロトラスト</strong>（常に検証・最小権限）と併記されることがある。試験では「VPN＝認証さえ通れば社内は自由」は×。</p>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="risks" title="限界">
+      <span class="tag">限界と運用</span>
+      <h1>VPN は「通路を守る」——<strong>中で何が起きるか</strong>までは保証しない</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 800 195" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="35" width="720" height="130" rx="12" fill="#0f172a" stroke="#64748b"/>
+          <text x="400" y="62" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">VPN トンネル内（暗号化区間）</text>
+          <rect x="80" y="78" width="140" height="55" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+          <text x="150" y="102" text-anchor="middle" fill="#fecaca" font-size="9" font-family="sans-serif">盗まれたID</text>
+          <text x="150" y="118" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="sans-serif">正規ユーザー扱い</text>
+          <rect x="260" y="78" width="140" height="55" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+          <text x="330" y="102" text-anchor="middle" fill="#fecaca" font-size="9" font-family="sans-serif">マルウェア端末</text>
+          <text x="330" y="118" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="sans-serif">社内へ持ち込み</text>
+          <rect x="440" y="78" width="140" height="55" rx="8" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="510" y="108" text-anchor="middle" fill="#fdba74" font-size="9" font-family="sans-serif">過剰な社内到達</text>
+          <rect x="580" y="78" width="140" height="55" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="650" y="108" text-anchor="middle" fill="#fde68a" font-size="9" font-family="sans-serif">古いVPN機器</text>
+          <text x="400" y="178" text-anchor="middle" fill="#86efac" font-size="10" font-family="sans-serif">対策の方向：MFA・端末健全性・最小権限・ログ監視・パッチ管理</text>
+        </svg>
+      </div>
+      <ul class="bullets">
+        <li>VPN 接続＝社内の<strong>信頼済み端末</strong>とは限らない（ポストコロナ試験の定番論点）。</li>
+        <li>第17回 FW、第19回 VLAN と合わせて<strong>多層防御</strong>で語る。</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-i="10" data-yaml-scene="exam_traps" title="試験ひっかけ">
+      <span class="tag">試験の誤答</span>
+      <h1>短絡しやすい誤答（VPN 編）</h1>
+      <div class="grid-2">
+        <div class="rich-box theme-danger">
+          <div class="box-title">× VPN ＝ ウイルス対策</div>
+          <div class="box-desc">VPN は通信の保護・私設網化。マルウェア検知とは別カテゴリ。</div>
+        </div>
+        <div class="rich-box theme-danger">
+          <div class="box-title">× VPN があれば社内は全部安全</div>
+          <div class="box-desc">接続後の横移動・権限過多・端末侵害は別問題。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">△ IPsec と SSL-VPN を混同</div>
+          <div class="box-desc">層・利用シーン・クライアントの典型像が違う。語句に合わせて選ぶ。</div>
+        </div>
+        <div class="rich-box theme-warn">
+          <div class="box-title">△ VLAN と VPN を同一視</div>
+          <div class="box-desc">VLAN＝L2論理分割、VPN＝公衆網上の私設接続。目的が違う。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="11" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第20回まとめ：VPN は「遠くても社内のようにつなぐ」基礎技術</h1>
+      <div class="summary-pillars">
+        <div class="summary-pillar"><b>① 目的</b>公衆回線上の仮想私設網</div>
+        <div class="summary-pillar"><b>② 型</b>サイト間／リモート・IPsec／SSL</div>
+        <div class="summary-pillar"><b>③ 実務</b>認証・最小権限・多層防御</div>
+      </div>
+      <ul class="bullets">
+        <li>台本作成時は <code>s01-ep20-vpn.yaml</code> の scene id をこの HTML の <code>data-yaml-scene</code> に合わせる。</li>
+        <li>動画キャプチャ：<code>global.slidesHtml</code> に本ファイルを指定し、各 scene の <code>slideIndex</code> を 0 始まりで対応させる。</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.2rem; flex:1; min-width:0; max-width:55%;">
+      <span class="progress" id="prog">1 / 11</span>
+      <span class="progress" id="scene-ref" style="font-size:0.72rem; color:#c4b5fd; line-height:1.25; text-align:center; word-break:break-all;">台本 id: incident</span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        if (sceneRef) {
+          var sc = slides[idx].getAttribute("data-yaml-scene");
+          sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        }
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+
+      /* ブラウザで ?capture=1 のとき動画キャプチャと同じ見え方を確認 */
+      if (/[?&]capture=1/.test(location.search)) {
+        document.body.classList.add("mc-slide-capture");
+      }
+    })();
+  </script>
+</body>
+</html>
