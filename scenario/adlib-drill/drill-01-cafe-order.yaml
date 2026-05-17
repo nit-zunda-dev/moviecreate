@@ -18,9 +18,9 @@
 
 # drill-meta（レンダ後に実測して stages.ts へ）:
 
-#   setupEndSeconds / revealStartSeconds: Part1 終了時点
+#   setupEndSeconds / revealStartSeconds: 15
 
-#   youtubeVideoId:
+#   youtubeVideoId: ii50mPdVdhk
 
 #
 
