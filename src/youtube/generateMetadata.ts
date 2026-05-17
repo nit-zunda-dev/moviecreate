@@ -43,6 +43,56 @@ function formatTimestamp(sec: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+/** VOICEVOX 利用規約に沿った表記（speakerId → キャラ名） */
+const SPEAKER_ID_TO_VOICEVOX_NAME: Record<number, string> = {
+  0: "四国めたん",
+  1: "ずんだもん",
+  2: "四国めたん",
+  3: "ずんだもん",
+  6: "四国めたん",
+  7: "ずんだもん",
+  8: "春日部つむぎ",
+  9: "波音リツ",
+  10: "雨晴はう",
+  36: "四国めたん",
+  75: "ずんだもん",
+};
+
+function buildVoicevoxCreditLines(scenario: Scenario): string[] {
+  const override = scenario.youtube?.voicevoxCredits;
+  if (override && override.length > 0) {
+    return override;
+  }
+
+  const speakerIds = new Set<number>();
+  for (const char of Object.values(scenario.characters ?? {})) {
+    if (char.speakerId != null) {
+      speakerIds.add(char.speakerId);
+    }
+  }
+
+  const names = new Set<string>();
+  for (const id of speakerIds) {
+    const name = SPEAKER_ID_TO_VOICEVOX_NAME[id];
+    if (name) {
+      names.add(name);
+    }
+  }
+
+  if (names.size === 0) {
+    return [];
+  }
+
+  const sorted = [...names].sort((a, b) => a.localeCompare(b, "ja"));
+  return [
+    "▼クレジット（音声合成）",
+    "本動画では音声合成ソフトウェア VOICEVOX を使用しています。",
+    ...sorted.map((name) => `VOICEVOX:${name}`),
+    "https://voicevox.hiroshiba.jp/",
+    "",
+  ];
+}
+
 function extractEpisodeNumber(title: string): number | undefined {
   const m = title.match(/第\s*(\d{1,3})\s*回/);
   return m ? parseInt(m[1], 10) : undefined;
@@ -189,7 +239,13 @@ function buildDescription(scenario: Scenario): string {
   lines.push(`高評価・チャンネル登録・コメントが励みになります！`);
   lines.push("");
 
-  // 7) ハッシュタグ
+  // 7) VOICEVOX クレジット
+  const voicevoxCredits = buildVoicevoxCreditLines(scenario);
+  if (voicevoxCredits.length > 0) {
+    lines.push(...voicevoxCredits);
+  }
+
+  // 8) ハッシュタグ
   if (hashtags.length > 0) {
     lines.push(hashtags.join(" "));
   }

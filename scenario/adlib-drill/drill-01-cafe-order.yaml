@@ -1,0 +1,477 @@
+# =============================================================================
+
+# 英語アドリブドリル 第1問 — カフェで注文（beginner-1）
+
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-1
+
+#
+
+# 解説スライド: drill-01-cafe-order-grammar-slides.html
+
+# slideIndex ⇔ scene.id (Part2):
+
+#   0 part2_intro · 1 part2_model · 2 part2_id_like · 3 part2_can_i_have
+
+#   4 part2_vocab · 5 part2_variants · 6 part2_replay · 7 part2_outro
+
+#
+
+# drill-meta（レンダ後に実測して stages.ts へ）:
+
+#   setupEndSeconds / revealStartSeconds: Part1 終了時点
+
+#   youtubeVideoId:
+
+#
+
+# 生成:
+
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-01-cafe-order.yaml
+
+# =============================================================================
+
+title: '【英語アドリブドリル】カフェで注文｜あなたなら？'
+
+
+
+characters:
+
+  zundamon:
+
+    speakerId: 3
+
+    image: "./image/zundamon/通常.png"
+
+    position: left
+
+    subtitleColor: "#88DD44"
+
+    voice:
+
+      speedScale: 1.15
+
+      intonationScale: 1.1
+
+
+
+  metan:
+
+    speakerId: 2
+
+    image: "./image/metan/通常.png"
+
+    position: right
+
+    subtitleColor: "#FF88BB"
+
+    voice:
+
+      speedScale: 1.15
+
+      intonationScale: 1.05
+
+
+
+  barista:
+
+    speakerId: 8
+
+    subtitleColor: "#AADDFF"
+
+    voice:
+
+      speedScale: 1.05
+
+      intonationScale: 1.0
+
+
+
+global:
+
+  defaultSpeaker: "zundamon"
+
+  defaultBackground: "./image/background/background.png"
+
+  slidesHtml: "./drill-01-cafe-order-grammar-slides.html"
+
+  voice:
+
+    speedScale: 1.12
+
+    postPhonemeLength: 0.07
+
+  bgm:
+
+    default: "./bgm/パステルハウス.mp3"
+
+    volume: 0.14
+
+
+
+output:
+
+  fps: 30
+
+  width: 1280
+
+  height: 720
+
+
+
+hook:
+
+  durationMs: 5200
+
+  text: "英語で注文を聞かれて固まる"
+
+  emphasis:
+
+    - "英語"
+
+    - "固まる"
+
+  character: zundamon
+
+  face: "驚き"
+
+  flash:
+
+    color: "#ff4466"
+
+    durationMs: 220
+
+  zoom:
+
+    from: 1.0
+
+    to: 1.14
+
+  shake: true
+
+
+
+scenes:
+
+  # ---------- Part1（お題）— 黒板のみ ----------
+
+  - id: "part1_intro"
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "ニューヨークのカフェ。メニューが英語だけのこと、あるわよね。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "読めないと焦るのだ……"
+
+
+
+  - id: "part1_question"
+
+    chapter: { label: "お題" }
+
+    lines:
+
+      - type: dialogue
+
+        character: barista
+
+        text: "What can I get for you today?"
+
+        subtitle: "What can I get for you today?"
+
+        emphasis:
+
+          - "What can I get for you"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "驚き"
+
+        text: "えっ……いきなり英語なのだ！"
+
+
+
+  - id: "part1_prompt"
+
+    lines:
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "あなたなら、なんて注文するのだ？"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "ここで一度、頭の中で英語を考えてみて。答えはこのあと。"
+
+
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+
+  - id: "part2_intro"
+
+    slideIndex: 0
+
+    chapter: { label: "答え合わせ" }
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "さっきの店員さんへの返し。今日は2つの型と、サイズの単語を押さえるわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "I'd like と Can I have、覚えるのだ！"
+
+
+
+  - id: "part2_model"
+
+    slideIndex: 1
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "まず模範。トールのアイスラテなら、こう言えるわ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "I'd like a tall iced latte, please."
+
+        subtitle: "I'd like a tall iced latte, please."
+
+        emphasis:
+
+          - "I'd like"
+
+          - "tall iced latte"
+
+          - "please"
+
+
+
+  - id: "part2_id_like"
+
+    slideIndex: 2
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "I'd like は I would like の短縮。カフェでいちばん使いやすい、丁寧な入り口よ。"
+
+        subtitle: "I'd like + 名詞"
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "Give me … は強く聞こえるから、初対面の店員には I'd like が安心。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "困り"
+
+        text: "ギブ・ミーは言わないのだ……"
+
+
+
+  - id: "part2_can_i_have"
+
+    slideIndex: 3
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "友達と行くカフェなら、Can I have a tall iced latte? も自然。"
+
+        subtitle: "Can I have ~?"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "笑い"
+
+        text: "Can I get でもよく聞くのだ。短くて言いやすい。"
+
+
+
+  - id: "part2_vocab"
+
+    slideIndex: 4
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "tall はトールサイズ。iced はアイス。日本のTサイズとは違うから、単語ごと覚えて。"
+
+        subtitle: "tall / iced / grande / venti"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "ホットなら hot。店内なら for here、持ち帰りなら to go も続けられるのだ。"
+
+
+
+  - id: "part2_variants"
+
+    slideIndex: 5
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "丁寧なら please を付ける。カジュアルなら Can I get や Just a tall iced latte, thanks. もOK。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "シーンで言い分けを変えられるのだ！"
+
+
+
+  - id: "part2_replay"
+
+    slideIndex: 6
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "通常"
+
+        text: "もう一度、ゆっくり。like と latte の t は軽く、iced はド寄りの音よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "通常"
+
+        text: "I'd like a tall iced latte, please."
+
+        subtitle: "I'd like a tall iced latte, please."
+
+        emphasis:
+
+          - "I'd like"
+
+          - "tall"
+
+          - "iced"
+
+          - "latte"
+
+          - "please"
+
+
+
+  - id: "part2_outro"
+
+    slideIndex: 7
+
+    lines:
+
+      - type: dialogue
+
+        character: metan
+
+        face: "笑い"
+
+        text: "I'd like と Can I have、この2つを持ち帰って。次回は挨拶編よ。"
+
+      - type: dialogue
+
+        character: zundamon
+
+        face: "喜び"
+
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+
+
+youtube:
+
+  hashtags:
+
+    - "#英語アドリブ"
+
+    - "#英会話"
+
+    - "#英語学習"
+
+    - "#ずんだもん"
+
+    - "#四国めたん"
+
+

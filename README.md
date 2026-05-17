@@ -225,6 +225,17 @@ scenes:
 
 **1 シーン内でセリフごとに背景だけ変えたい**場合は、行に `background`（画像パス。実行ディレクトリ基準の相対パス可）を書くと、**シーンの背景より優先**されます（手動の PNG 差し替え向け）。
 
+#### 英語アドリブドリル用（CapCut + 透過レンダ）
+
+**英語アドリブドリル**（`scenario/adlib-drill/`）では、場面イラストは **CapCut** で [いらすとや](https://www.irasutoya.com/) を配置します。moviecreate は **音声・立ち絵・字幕・Hook** のみ担当します。
+
+```bash
+node dist/cli.js generate-video scenario/adlib-drill/drill-01-cafe-order.yaml --transparent
+# → output/*.mov（透過）を CapCut の上トラックに重ねる
+```
+
+手順は [`docs/adlib-drill-capcut-workflow.md`](./docs/adlib-drill-capcut-workflow.md)。企画は [`docs/adlib-drill-video-direction.md`](./docs/adlib-drill-video-direction.md)。
+
 ---
 
 ### 出力設定（output）
@@ -736,6 +747,7 @@ moviecreate/
 │   ├── sample.yaml
 │   └── test-video.yaml
 ├── image/                  立ち絵・背景画像（PNG）
+│   └── adlib-drill/        （任意）CapCut 用の参考カット
 ├── output/                 生成された動画・音声（.mp4 / .wav）
 ├── temp/                   一時ファイル（音声・マニフェスト）
 │   ├── voices/             セリフごとの WAV

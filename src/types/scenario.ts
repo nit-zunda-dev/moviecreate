@@ -219,4 +219,6 @@ export interface YoutubeMeta {
    * - "fun"        : 楽しいデフォルメ風（明るくポップな教室・カフェ・サーバルーム）
    */
   imageStyle?: "atmospheric" | "diagram" | "metaphor" | "fun";
+  /** 概要欄の VOICEVOX クレジット（未指定時は characters の speakerId から自動生成） */
+  voicevoxCredits?: string[];
 }

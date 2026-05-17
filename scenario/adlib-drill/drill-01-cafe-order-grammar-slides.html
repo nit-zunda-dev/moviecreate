@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>英語アドリブドリル 第1問 — カフェで注文（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220;
+      --panel: #141d2e;
+      --zunda: #88dd44;
+      --metan: #ff88bb;
+      --text: #e8f0f8;
+      --muted: #8fa3bc;
+      --accent: #7dd3fc;
+      --phrase: #fef9c3;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body {
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; max-height: 720px; margin: 0 auto; }
+    .slide {
+      display: none;
+      height: 100vh;
+      max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 0.45rem;
+      overflow: hidden;
+    }
+    .slide.active { display: grid; }
+    .tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+      color: #0c1220; background: linear-gradient(90deg, var(--zunda), var(--metan));
+      padding: 0.2rem 0.55rem; border-radius: 4px;
+    }
+    h1 {
+      font-size: 1.5rem; font-weight: 800; line-height: 1.22;
+      color: var(--phrase);
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lead {
+      font-size: 1.05rem; line-height: 1.35; color: var(--muted); font-weight: 500;
+    }
+    .lead strong { color: var(--text); }
+    .diagram {
+      min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(136, 221, 68, 0.35);
+      padding: 0.5rem 0.75rem;
+    }
+    .diagram svg {
+      display: block; width: 100%; max-width: 1180px;
+      height: auto; max-height: min(52vh, 400px);
+    }
+    .var-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      min-height: 0; height: 100%; align-content: stretch;
+      background: var(--panel); border-radius: 14px;
+      border: 1px solid rgba(255, 136, 187, 0.35); padding: 0.5rem;
+    }
+    .var-card {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0.6rem 0.7rem; border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .var-card b { font-size: 1rem; margin-bottom: 0.25rem; }
+    .var-card.polite b { color: var(--accent); }
+    .var-card.casual b { color: var(--zunda); }
+    .var-card.size b { color: var(--warn); }
+    .var-card.alt b { color: var(--metan); }
+    .var-card span { font-size: 0.88rem; color: var(--muted); line-height: 1.35; font-family: var(--mono); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem; background: rgba(12, 18, 32, 0.95);
+      border-top: 1px solid rgba(136, 221, 68, 0.25); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid rgba(255, 136, 187, 0.45);
+      padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600;
+    }
+    .toolbar button:disabled { opacity: 0.35; }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    #scene-ref { font-size: 0.75rem; color: var(--metan); }
+    body.mc-slide-capture { overflow: hidden !important; }
+    body.mc-slide-capture html { font-size: 24px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .deck { height: 100vh !important; max-height: none !important; }
+    body.mc-slide-capture .slide {
+      display: none !important; padding: 0.85rem 2rem 0.65rem !important;
+      max-height: 100vh !important; height: 100vh !important;
+    }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture h1 { font-size: 1.6rem !important; }
+    body.mc-slide-capture .lead { font-size: 1.08rem !important; }
+    body.mc-slide-capture .diagram svg { max-height: 400px !important; }
+    body.mc-slide-capture .var-card b { font-size: 1.05rem !important; }
+    body.mc-slide-capture .var-card span { font-size: 0.95rem !important; }
+  </style>
+</head>
+<body>
+  <!-- drill-01-cafe-order.yaml Part2 slideIndex 0〜7 -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="part2_intro" title="答え合わせ">
+      <span class="tag">英語アドリブドリル · 第1問</span>
+      <h1>カフェで<em>自然に注文</em>する</h1>
+      <p class="lead">店員の <strong>What can I get for you?</strong> への返し方</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="この回の流れ">
+          <text x="450" y="42" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="sans-serif">模範フレーズ + 2つの型</text>
+          <rect x="80" y="70" width="220" height="100" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="190" y="108" text-anchor="middle" fill="#86efac" font-size="17" font-weight="800" font-family="sans-serif">① I'd like</text>
+          <text x="190" y="140" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">丁寧・定番</text>
+          <rect x="340" y="70" width="220" height="100" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="108" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="800" font-family="sans-serif">② Can I have</text>
+          <text x="450" y="140" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">カジュアル寄り</text>
+          <rect x="600" y="70" width="220" height="100" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="710" y="108" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="800" font-family="sans-serif">サイズ</text>
+          <text x="710" y="140" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">tall / iced</text>
+          <rect x="120" y="195" width="660" height="70" rx="12" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="235" text-anchor="middle" fill="#bae6fd" font-size="18" font-weight="700" font-family="monospace">I'd like a tall iced latte, please.</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="part2_model" title="模範">
+      <span class="tag">模範解答</span>
+      <h1>まずは<em>この1文</em>を覚える</h1>
+      <p class="lead">トールのアイスラテを注文する例</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 310" xmlns="http://www.w3.org/2000/svg" aria-label="模範文">
+          <text x="450" y="48" text-anchor="middle" fill="#fef9c3" font-size="26" font-weight="800" font-family="monospace">I'd like a tall iced latte, please.</text>
+          <rect x="100" y="75" width="700" height="50" rx="10" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="450" y="108" text-anchor="middle" fill="#e2e8f0" font-size="18" font-family="sans-serif">トールサイズのアイスラテをください（丁寧）</text>
+          <rect x="80" y="145" width="180" height="55" rx="8" fill="#052e16" stroke="#4ade80"/>
+          <text x="170" y="178" text-anchor="middle" fill="#86efac" font-size="15" font-weight="700" font-family="sans-serif">I'd like</text>
+          <rect x="280" y="145" width="120" height="55" rx="8" fill="#422006" stroke="#fbbf24"/>
+          <text x="340" y="178" text-anchor="middle" fill="#fde68a" font-size="15" font-weight="700" font-family="sans-serif">tall</text>
+          <rect x="420" y="145" width="120" height="55" rx="8" fill="#0c4a6e" stroke="#38bdf8"/>
+          <text x="480" y="178" text-anchor="middle" fill="#bae6fd" font-size="15" font-weight="700" font-family="sans-serif">iced</text>
+          <rect x="560" y="145" width="120" height="55" rx="8" fill="#1e293b" stroke="#fbcfe8"/>
+          <text x="620" y="178" text-anchor="middle" fill="#fbcfe8" font-size="15" font-weight="700" font-family="sans-serif">latte</text>
+          <rect x="700" y="145" width="120" height="55" rx="8" fill="#1e293b" stroke="#64748b"/>
+          <text x="760" y="178" text-anchor="middle" fill="#cbd5e1" font-size="15" font-weight="700" font-family="sans-serif">please</text>
+          <text x="450" y="250" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">語順：希望 → サイズ → 飲み方 → 種類 → お願い</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="part2_id_like" title="I'd like">
+      <span class="tag">解説 · ①</span>
+      <h1><em>I'd like</em> — 丁寧な「〜が欲しい」</h1>
+      <p class="lead">カフェ・レストランで<strong>いちばん使いやすい</strong>入り口</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="I'd like">
+          <text x="450" y="52" text-anchor="middle" fill="#fef9c3" font-size="24" font-weight="800" font-family="monospace">I'd like + 名詞</text>
+          <rect x="120" y="80" width="660" height="55" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="115" text-anchor="middle" fill="#bbf7d0" font-size="18" font-family="sans-serif">I would like の短縮。命令形より柔らかい</text>
+          <rect x="100" y="155" width="350" height="120" rx="12" fill="#1e293b" stroke="#86efac" stroke-width="2"/>
+          <text x="275" y="195" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">○ 使う場面</text>
+          <text x="275" y="225" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">初対面の店員</text>
+          <text x="275" y="250" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">はじめて行くカフェ</text>
+          <rect x="470" y="155" width="330" height="120" rx="12" fill="#450a0a" stroke="#f87171" stroke-width="2"/>
+          <text x="635" y="195" text-anchor="middle" fill="#fca5a5" font-size="17" font-weight="700" font-family="sans-serif">△ 注意</text>
+          <text x="635" y="225" text-anchor="middle" fill="#fecaca" font-size="15" font-family="sans-serif">Give me … は</text>
+          <text x="635" y="250" text-anchor="middle" fill="#fecaca" font-size="15" font-family="sans-serif">強い・失礼に聞こえる</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="part2_can_i_have" title="Can I have">
+      <span class="tag">解説 · ②</span>
+      <h1><em>Can I have</em> — カジュアルでもOK</h1>
+      <p class="lead">友達と行くカフェならこちらも自然</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="Can I have">
+          <text x="450" y="52" text-anchor="middle" fill="#fef9c3" font-size="24" font-weight="800" font-family="monospace">Can I have a tall iced latte?</text>
+          <rect x="120" y="85" width="660" height="55" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="450" y="120" text-anchor="middle" fill="#bae6fd" font-size="18" font-family="sans-serif">「もらってもいい？」→ 注文としてもよく聞く</text>
+          <rect x="150" y="165" width="280" height="100" rx="12" fill="#1e293b" stroke="#88dd44"/>
+          <text x="290" y="205" text-anchor="middle" fill="#86efac" font-size="16" font-weight="700" font-family="monospace">I'd like …, please.</text>
+          <text x="290" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">丁寧・はっきり</text>
+          <rect x="470" y="165" width="280" height="100" rx="12" fill="#1e293b" stroke="#7dd3fc"/>
+          <text x="610" y="205" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="700" font-family="monospace">Can I have …?</text>
+          <text x="610" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">カジュアル・短い</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="part2_vocab" title="サイズ">
+      <span class="tag">単語メモ</span>
+      <h1><em>tall</em> と <em>iced</em> を外さない</h1>
+      <p class="lead">スタバ英語でつまずきやすい2語</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="サイズと氷">
+          <rect x="80" y="45" width="360" height="220" rx="14" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="260" y="85" text-anchor="middle" fill="#fde68a" font-size="22" font-weight="800" font-family="sans-serif">サイズ（米系）</text>
+          <text x="260" y="125" text-anchor="middle" fill="#fef9c3" font-size="17" font-family="monospace">tall = トール（L寄り）</text>
+          <text x="260" y="155" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="monospace">grande = グランデ</text>
+          <text x="260" y="185" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="monospace">venti = ベンティ</text>
+          <text x="260" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">日本のTサイズとは違う！</text>
+          <rect x="460" y="45" width="360" height="220" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="640" y="85" text-anchor="middle" fill="#bae6fd" font-size="22" font-weight="800" font-family="sans-serif">氷・温度</text>
+          <text x="640" y="125" text-anchor="middle" fill="#fef9c3" font-size="17" font-family="monospace">iced = アイス（氷入り）</text>
+          <text x="640" y="155" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="monospace">hot = ホット</text>
+          <text x="640" y="185" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="monospace">for here / to go</text>
+          <text x="640" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">店内か持ち帰りかも続けられる</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="part2_variants" title="言い換え">
+      <span class="tag">言い換え</span>
+      <h1>シーン別の<em>言い方</em></h1>
+      <p class="lead">同じラテでも言い分けを変える</p>
+      <div class="var-grid">
+        <div class="var-card polite"><b>丁寧・定番</b><span>I'd like a tall iced latte, please.</span></div>
+        <div class="var-card casual"><b>カジュアル</b><span>Can I get a tall iced latte?</span></div>
+        <div class="var-card size"><b>サイズ確認</b><span>Can I have that in a large?</span></div>
+        <div class="var-card alt"><b>シンプル</b><span>Just a tall iced latte, thanks.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="part2_replay" title="リプレイ">
+      <span class="tag">リプレイ</span>
+      <h1>もう一度<em>ゆっくり</em></h1>
+      <p class="lead">口に馴染ませる発音の目安</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="発音">
+          <rect x="60" y="35" width="780" height="65" rx="12" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="75" text-anchor="middle" fill="#bbf7d0" font-size="20" font-weight="700" font-family="sans-serif">I'd · like · a · tall · iced · latte · please</text>
+          <rect x="100" y="120" width="700" height="130" rx="14" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="160" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">like / latte の t は軽く</text>
+          <text x="450" y="195" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">iced の ed は「ト」ではなく「ド」寄り</text>
+          <text x="450" y="230" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">please で笑顔＋ eye contact があると◎</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="part2_outro" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>次は<em>あなたが言う</em>番</h1>
+      <p class="lead">アプリでアドリブ練習 → 次回は挨拶編</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="まとめ">
+          <rect x="100" y="40" width="700" height="55" rx="10" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="75" text-anchor="middle" fill="#fef9c3" font-size="20" font-weight="800" font-family="monospace">I'd like a tall iced latte, please.</text>
+          <rect x="150" y="115" width="250" height="90" rx="12" fill="#1e293b" stroke="#88dd44"/>
+          <text x="275" y="155" text-anchor="middle" fill="#86efac" font-size="18" font-weight="800" font-family="sans-serif">I'd like</text>
+          <text x="275" y="185" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">丁寧の型</text>
+          <rect x="420" y="115" width="250" height="90" rx="12" fill="#1e293b" stroke="#38bdf8"/>
+          <text x="545" y="155" text-anchor="middle" fill="#7dd3fc" font-size="18" font-weight="800" font-family="sans-serif">Can I have</text>
+          <text x="545" y="185" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">カジュアルの型</text>
+          <rect x="120" y="220" width="660" height="45" rx="10" fill="#422006" stroke="#fbbf24"/>
+          <text x="450" y="250" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="600" font-family="sans-serif">チャンネル登録 &amp; アプリで再チャレンジ</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="text-align:center;">
+      <span class="progress" id="prog">1 / 8</span><br />
+      <span id="scene-ref"></span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        var sc = slides[idx].getAttribute("data-yaml-scene");
+        sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>
