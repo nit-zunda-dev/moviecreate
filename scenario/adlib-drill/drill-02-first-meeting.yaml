@@ -1,0 +1,218 @@
+# =============================================================================
+# 英語アドリブドリル 第2問 — 初対面の挨拶（beginner-2）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-2
+#
+# 解説スライド: drill-02-first-meeting-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_nice_to_meet · 3 part2_im_from
+#   4 part2_im_here_to · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して stages.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 26
+#   youtubeVideoId: （公開後）
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-02-first-meeting.yaml
+# =============================================================================
+title: '【英語アドリブドリル】初対面の挨拶｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  sarah:
+    speakerId: 10
+    subtitleColor: "#DDAAFF"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-02-first-meeting-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "語学学校の初日。隣の席の人が英語で話しかけてくる、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "名前は聞かれたのに、返す英語が出てこないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: sarah
+        text: "Hi! I don't think we've met. I'm Sarah."
+        subtitle: "Hi! I don't think we've met. I'm Sarah."
+        emphasis:
+          - "I don't think we've met"
+          - "I'm Sarah"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……いきなり自己紹介なのだ！"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて自己紹介するのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Nice to meet you から始めて、出身と目的も添えてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの Sarah への返し。今日は3つのかたまりで自己紹介を組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Nice to meet you と I'm from と I'm here to、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。名前を返して、出身と目的まで一言ずつ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Nice to meet you, Sarah! I'm Yuki from Japan. I'm here to study English."
+        subtitle: "Nice to meet you, Sarah! I'm Yuki from Japan. I'm here to study English."
+        emphasis:
+          - "Nice to meet you"
+          - "I'm Yuki from Japan"
+          - "I'm here to study English"
+
+  - id: "part2_nice_to_meet"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Nice to meet you は初対面の定番。相手の名前を入れると、ちゃんと聞いてた感が出るわ。"
+        subtitle: "Nice to meet you, [名前]!"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Pleased to meet you も同じ意味なのだ。堅い場面向き。"
+
+  - id: "part2_im_from"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I'm from は出身の紹介。国だけでも、都市まで言ってもOK。"
+        subtitle: "I'm from Japan. / I'm from Tokyo."
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I come from も使えるのだ。会話では I'm from の方が短くて言いやすい。"
+
+  - id: "part2_im_here_to"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I'm here to は目的。study English、work、travel など動詞の原形を続けるわ。"
+        subtitle: "I'm here to + 動詞"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "for study English は文法的にミスなのだ…… to のあとは動詞！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "カジュアルなら Hi, I'm Yuki. Nice to meet you! だけでも通じる。余裕があれば from と here to を足して。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "短くても、長くても、自分のペースで言えばいいのだ！"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。meet you は口を開いて、from Japan はくっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Nice to meet you, Sarah! I'm Yuki from Japan. I'm here to study English."
+        subtitle: "Nice to meet you, Sarah! I'm Yuki from Japan. I'm here to study English."
+        emphasis:
+          - "Nice to meet you"
+          - "from Japan"
+          - "here to study"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Nice to meet you、I'm from、I'm here to。この3つを持ち帰って。次回は道案内編よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#自己紹介"
+    - "#ずんだもん"
+    - "#四国めたん"

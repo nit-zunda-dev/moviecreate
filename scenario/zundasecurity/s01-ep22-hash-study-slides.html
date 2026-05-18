@@ -1,0 +1,440 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>第22回 ハッシュ関数 — 解説スライド（動画向け）</title>
+  <style>
+    :root {
+      --bg: #0c1018;
+      --panel: #151d2e;
+      --gold: #fbbf24;
+      --cyan: #38bdf8;
+      --violet: #a78bfa;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --ok: #4ade80;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body {
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; max-height: 720px; margin: 0 auto; }
+
+    .slide {
+      display: none;
+      height: 100vh;
+      max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 0.45rem;
+      overflow: hidden;
+    }
+    .slide.active { display: grid; }
+
+    .tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;
+      color: #0c1018; background: linear-gradient(90deg, var(--gold), var(--cyan));
+      padding: 0.2rem 0.55rem; border-radius: 4px;
+    }
+    h1 {
+      font-size: 1.55rem; font-weight: 800; line-height: 1.22;
+      color: #fde68a;
+    }
+    h1 em { font-style: normal; color: var(--cyan); }
+    .lead {
+      font-size: 1.05rem; line-height: 1.35; color: var(--muted); font-weight: 500;
+    }
+    .lead strong { color: var(--text); }
+
+    .diagram {
+      min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      padding: 0.5rem 0.75rem;
+    }
+    .diagram svg {
+      display: block; width: 100%; max-width: 1180px;
+      height: auto; max-height: min(52vh, 380px);
+    }
+
+    .fig-caption {
+      font-size: 0.95rem; font-weight: 600; color: var(--cyan);
+      text-align: center; line-height: 1.3;
+    }
+
+    .trap-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      min-height: 0; height: 100%; align-content: stretch;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      padding: 0.5rem;
+    }
+    .trap {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0.65rem 0.75rem; border-radius: 12px;
+      background: rgba(248, 113, 113, 0.08); border: 2px solid rgba(248, 113, 113, 0.45);
+    }
+    .trap b { font-size: 1.05rem; color: var(--danger); margin-bottom: 0.25rem; }
+    .trap span { font-size: 0.92rem; color: var(--muted); line-height: 1.35; }
+
+    .sum-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;
+      min-height: 0;
+    }
+    .sum-card {
+      text-align: center; padding: 0.75rem 0.5rem; border-radius: 12px;
+      background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.4);
+      font-size: 1rem; font-weight: 600; line-height: 1.35;
+    }
+    .sum-card i {
+      display: block; font-style: normal; font-size: 0.78rem; font-weight: 800;
+      color: var(--gold); margin-bottom: 0.3rem;
+    }
+
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem; background: rgba(12, 16, 24, 0.95);
+      border-top: 1px solid rgba(167, 139, 250, 0.25); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600;
+    }
+    .toolbar button:disabled { opacity: 0.35; }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    #scene-ref { font-size: 0.75rem; color: var(--violet); }
+
+    body.mc-slide-capture { overflow: hidden !important; }
+    body.mc-slide-capture html { font-size: 24px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .deck { height: 100vh !important; max-height: none !important; }
+    body.mc-slide-capture .slide {
+      display: none !important; padding: 0.85rem 2rem 0.65rem !important;
+      max-height: 100vh !important; height: 100vh !important;
+    }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture h1 { font-size: 1.65rem !important; }
+    body.mc-slide-capture .lead { font-size: 1.08rem !important; }
+    body.mc-slide-capture .diagram svg { max-height: 400px !important; }
+    body.mc-slide-capture .fig-caption { font-size: 1rem !important; }
+    body.mc-slide-capture .trap b { font-size: 1.08rem !important; }
+    body.mc-slide-capture .trap span { font-size: 0.95rem !important; }
+    body.mc-slide-capture .trap-grid { padding: 0.45rem !important; }
+  </style>
+</head>
+<body>
+  <!-- 第22回 ハッシュ関数 — study スライド（動画 1280×720 想定）
+       slideIndex 0〜10（全11枚） -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="incident" title="導入">
+      <span class="tag">導入 · Season4</span>
+      <h1>配布ファイルの<em>チェックサム不一致</em>——改ざん？</h1>
+      <p class="lead">ダウンロードしたインストーラのハッシュ値が公式と違う——<strong>完全性</strong>の話</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="チェックサム不一致">
+          <rect x="60" y="40" width="320" height="240" rx="14" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+          <text x="220" y="80" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="800" font-family="sans-serif">setup_v2.1.exe</text>
+          <rect x="100" y="110" width="240" height="55" rx="8" fill="#0f172a" stroke="#38bdf8"/>
+          <text x="220" y="145" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="700" font-family="sans-serif">計算したハッシュ</text>
+          <text x="220" y="195" text-anchor="middle" fill="#f87171" font-size="18" font-weight="800" font-family="sans-serif">a3f9…8c2d</text>
+          <rect x="520" y="40" width="320" height="240" rx="14" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+          <text x="680" y="80" text-anchor="middle" fill="#86efac" font-size="20" font-weight="800" font-family="sans-serif">公式サイト掲載</text>
+          <rect x="560" y="110" width="240" height="55" rx="8" fill="#052e16" stroke="#4ade80"/>
+          <text x="680" y="145" text-anchor="middle" fill="#86efac" font-size="16" font-weight="700" font-family="sans-serif">公開ハッシュ</text>
+          <text x="680" y="195" text-anchor="middle" fill="#4ade80" font-size="18" font-weight="800" font-family="sans-serif">b71e…4f01</text>
+          <text x="450" y="175" text-anchor="middle" fill="#f87171" font-size="42" font-weight="800" font-family="sans-serif">≠</text>
+          <rect x="180" y="255" width="540" height="50" rx="10" fill="#450a0a" stroke="#f87171" stroke-width="2"/>
+          <text x="450" y="288" text-anchor="middle" fill="#fecaca" font-size="17" font-weight="700" font-family="sans-serif">→ 第22回：ハッシュで「中身が変わっていないか」を検知</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="opening" title="ゴール">
+      <span class="tag">第22回</span>
+      <h1>第22回 <em>ハッシュ関数</em>——データの「指紋」で完全性を守る</h1>
+      <p class="lead">Season4（暗号と認証）の続き。第21回 PKI の次は<strong>改ざん検知の要</strong></p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="学習ロードマップ">
+          <rect x="40" y="120" width="200" height="90" rx="12" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+          <text x="140" y="158" text-anchor="middle" fill="#94a3b8" font-size="16" font-weight="700" font-family="sans-serif">第21回</text>
+          <text x="140" y="188" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">PKI·証明書</text>
+          <path d="M 250 165 L 310 165" stroke="#fbbf24" stroke-width="4" marker-end="url(#ep22ar)"/>
+          <rect x="320" y="95" width="260" height="140" rx="14" fill="#0f172a" stroke="#fbbf24" stroke-width="3"/>
+          <text x="450" y="140" text-anchor="middle" fill="#fde68a" font-size="22" font-weight="800" font-family="sans-serif">第22回 ハッシュ</text>
+          <text x="450" y="175" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">完全性·パスワード保存</text>
+          <text x="450" y="210" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">HMAC·アルゴリズム選定</text>
+          <path d="M 590 165 L 650 165" stroke="#38bdf8" stroke-width="4"/>
+          <rect x="660" y="120" width="200" height="90" rx="12" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="760" y="158" text-anchor="middle" fill="#7dd3fc" font-size="16" font-weight="700" font-family="sans-serif">次回以降</text>
+          <text x="760" y="188" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">MAC·SAML</text>
+          <text x="450" y="285" text-anchor="middle" fill="#38bdf8" font-size="16" font-weight="600" font-family="sans-serif">覚える軸：①定義　②性質　③用途（完全性·署名·保存）</text>
+          <defs>
+            <marker id="ep22ar" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#fbbf24"/></marker>
+          </defs>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="what_is_hash" title="定義">
+      <span class="tag">定義</span>
+      <h1>ハッシュ関数 <em>H(M)</em>＝任意長データの固定長「指紋」</h1>
+      <p class="lead">同じ入力なら同じ出力／少し変えると出力は激変（後述）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="ハッシュ関数の定義">
+          <rect x="60" y="110" width="200" height="100" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="160" y="155" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" font-family="sans-serif">メッセージ M</text>
+          <text x="160" y="185" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">（任意の長さ）</text>
+          <path d="M 270 160 L 330 160" stroke="#38bdf8" stroke-width="4"/>
+          <polygon points="325,155 340,160 325,165" fill="#38bdf8"/>
+          <rect x="350" y="85" width="200" height="150" rx="14" fill="#0c4a6e" stroke="#38bdf8" stroke-width="3"/>
+          <text x="450" y="130" text-anchor="middle" fill="#bae6fd" font-size="22" font-weight="800" font-family="sans-serif">H( )</text>
+          <text x="450" y="165" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">ハッシュ関数</text>
+          <text x="450" y="210" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">一方向·固定長</text>
+          <path d="M 560 160 L 620 160" stroke="#fbbf24" stroke-width="4"/>
+          <polygon points="615,155 630,160 615,165" fill="#fbbf24"/>
+          <rect x="640" y="110" width="200" height="100" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="740" y="150" text-anchor="middle" fill="#fde68a" font-size="18" font-weight="800" font-family="sans-serif">ダイジェスト</text>
+          <text x="740" y="185" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">H(M) 固定長</text>
+          <text x="450" y="285" text-anchor="middle" fill="#a78bfa" font-size="17" font-weight="600" font-family="sans-serif">指紋のイメージ：内容を短い値で代表（復元はしない）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="properties" title="性質">
+      <span class="tag">性質</span>
+      <h1>試験の三柱：<em>一方向性</em>・衝突耐性・アバランチ効果</h1>
+      <p class="lead">「元に戻せない」「同じ指紋を作りにくい」「1ビット変化で出力が激変」</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" aria-label="ハッシュの性質">
+          <rect x="40" y="40" width="260" height="250" rx="14" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+          <text x="170" y="85" text-anchor="middle" fill="#fca5a5" font-size="20" font-weight="800" font-family="sans-serif">一方向性</text>
+          <text x="170" y="125" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">H(M) から M を</text>
+          <text x="170" y="155" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">実質復元できない</text>
+          <text x="170" y="200" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">× 暗号化ではない</text>
+          <rect x="320" y="40" width="260" height="250" rx="14" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="85" text-anchor="middle" fill="#fde68a" font-size="20" font-weight="800" font-family="sans-serif">衝突耐性</text>
+          <text x="450" y="125" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">別の M′ で同じ</text>
+          <text x="450" y="155" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">H(M) を作りにくい</text>
+          <text x="450" y="200" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">MD5·SHA-1 は危険</text>
+          <rect x="600" y="40" width="260" height="250" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="730" y="85" text-anchor="middle" fill="#7dd3fc" font-size="20" font-weight="800" font-family="sans-serif">アバランチ</text>
+          <text x="730" y="125" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">M を1ビット変えると</text>
+          <text x="730" y="155" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">H(M) は激変</text>
+          <text x="730" y="200" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">改ざん検知に効く</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="integrity_flow" title="完全性">
+      <span class="tag">完全性</span>
+      <h1>公式に<em>公開されたハッシュ</em>と照合——ダウンロードの定番</h1>
+      <p class="lead">配布元の信頼できる経路でハッシュ値を取得し、手元で H(ファイル) を計算</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="完全性の確認フロー">
+          <rect x="50" y="50" width="180" height="90" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="140" y="90" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="sans-serif">ファイル取得</text>
+          <text x="140" y="118" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">setup.exe</text>
+          <path d="M 240 95 L 300 95" stroke="#38bdf8" stroke-width="3" marker-end="url(#ep22ar2)"/>
+          <rect x="310" y="50" width="200" height="90" rx="12" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="410" y="90" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">H(ファイル) 計算</text>
+          <text x="410" y="118" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">sha256sum 等</text>
+          <rect x="560" y="50" width="180" height="90" rx="12" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="650" y="90" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">公開ハッシュ</text>
+          <text x="650" y="118" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">公式サイト</text>
+          <path d="M 520 95 L 560 95" stroke="#fbbf24" stroke-width="3"/>
+          <rect x="200" y="175" width="500" height="110" rx="14" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
+          <text x="450" y="215" text-anchor="middle" fill="#c4b5fd" font-size="20" font-weight="800" font-family="sans-serif">一致 → 途中で改ざんされていない可能性が高い</text>
+          <text x="450" y="255" text-anchor="middle" fill="#f87171" font-size="17" font-weight="700" font-family="sans-serif">不一致 → 再取得·配布元確認（導入のインシデント）</text>
+          <defs>
+            <marker id="ep22ar2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0,10 3,0 6" fill="#38bdf8"/></marker>
+          </defs>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="link_signature" title="署名との関係">
+      <span class="tag">第21回との接続</span>
+      <h1>デジタル署名は<em>ハッシュに秘密鍵</em>——大きなデータを直接署名しない</h1>
+      <p class="lead">第21回：H(M) を秘密鍵で署名 → 受信者は公開鍵で検証</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="署名とハッシュ">
+          <rect x="60" y="100" width="140" height="90" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="130" y="140" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="sans-serif">データ M</text>
+          <path d="M 210 145 L 260 145" stroke="#38bdf8" stroke-width="3"/>
+          <rect x="270" y="115" width="120" height="70" rx="10" fill="#0c4a6e" stroke="#38bdf8"/>
+          <text x="330" y="155" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="700" font-family="sans-serif">H(M)</text>
+          <path d="M 400 145 L 450 145" stroke="#fbbf24" stroke-width="3"/>
+          <rect x="460" y="105" width="180" height="80" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="550" y="140" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="700" font-family="sans-serif">秘密鍵で署名</text>
+          <text x="550" y="168" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">（第21回）</text>
+          <path d="M 650 145 L 700 145" stroke="#4ade80" stroke-width="3"/>
+          <rect x="710" y="100" width="130" height="90" rx="12" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+          <text x="775" y="145" text-anchor="middle" fill="#86efac" font-size="16" font-weight="700" font-family="sans-serif">署名 S</text>
+          <rect x="150" y="220" width="600" height="65" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="258" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">ハッシュ＝改ざん検知　署名＝ハッシュへの本人の印</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="password_storage" title="パスワード">
+      <span class="tag">パスワード保存</span>
+      <h1>平文保存は禁止——<em>ソルト＋bcrypt</em>など遅いハッシュ</h1>
+      <p class="lead">同じパスワードでもソルトでハッシュ値が変わる／総当たりを遅くする</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" aria-label="ソルトとbcrypt">
+          <rect x="80" y="60" width="160" height="70" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="160" y="105" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="sans-serif">パスワード</text>
+          <text x="280" y="105" text-anchor="middle" fill="#fde68a" font-size="28" font-weight="800" font-family="sans-serif">+</text>
+          <rect x="340" y="60" width="160" height="70" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="420" y="95" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">ソルト</text>
+          <text x="420" y="118" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">ランダム·保存</text>
+          <path d="M 510 95 L 560 95" stroke="#38bdf8" stroke-width="3"/>
+          <rect x="570" y="45" width="250" height="100" rx="12" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="695" y="85" text-anchor="middle" fill="#bae6fd" font-size="18" font-weight="800" font-family="sans-serif">bcrypt / Argon2</text>
+          <text x="695" y="115" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">意図的に計算コスト大</text>
+          <rect x="120" y="180" width="660" height="120" rx="14" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
+          <text x="450" y="220" text-anchor="middle" fill="#f87171" font-size="18" font-weight="800" font-family="sans-serif">× MD5·SHA-256 だけでパスワード保存</text>
+          <text x="450" y="255" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="sans-serif">高速ハッシュは総当たり向き／専用 KDF を使う</text>
+          <text x="450" y="285" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">DB にはハッシュ＋ソルトを保存（平文・可逆暗号化は別問題）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="algorithms" title="アルゴリズム">
+      <span class="tag">アルゴリズム</span>
+      <h1><em>MD5 は非推奨</em>——実務は SHA-256、将来は SHA-3 も</h1>
+      <p class="lead">用途と脅威モデルで選ぶ（試験は「今どれを使うか」）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" aria-label="ハッシュアルゴリズム">
+          <rect x="40" y="50" width="250" height="240" rx="14" fill="#450a0a" stroke="#f87171" stroke-width="2"/>
+          <text x="165" y="95" text-anchor="middle" fill="#fca5a5" font-size="22" font-weight="800" font-family="sans-serif">MD5 / SHA-1</text>
+          <text x="165" y="140" text-anchor="middle" fill="#fecaca" font-size="16" font-family="sans-serif">衝突攻撃·非推奨</text>
+          <text x="165" y="175" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">レガシー·試験の罠</text>
+          <text x="165" y="250" text-anchor="middle" fill="#f87171" font-size="17" font-weight="700" font-family="sans-serif">新規では使わない</text>
+          <rect x="325" y="50" width="250" height="240" rx="14" fill="#052e16" stroke="#4ade80" stroke-width="3"/>
+          <text x="450" y="95" text-anchor="middle" fill="#86efac" font-size="22" font-weight="800" font-family="sans-serif">SHA-256</text>
+          <text x="450" y="140" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="sans-serif">SHA-2 ファミリ</text>
+          <text x="450" y="175" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">TLS·ファイル検証の定番</text>
+          <text x="450" y="250" text-anchor="middle" fill="#4ade80" font-size="17" font-weight="700" font-family="sans-serif">現行の標準</text>
+          <rect x="610" y="50" width="250" height="240" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="735" y="95" text-anchor="middle" fill="#7dd3fc" font-size="22" font-weight="800" font-family="sans-serif">SHA-3</text>
+          <text x="735" y="140" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="sans-serif">別設計（スポンジ）</text>
+          <text x="735" y="175" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">SHA-2 とは別系統</text>
+          <text x="735" y="250" text-anchor="middle" fill="#38bdf8" font-size="17" font-weight="700" font-family="sans-serif">選択肢として知る</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="9" data-yaml-scene="hmac" title="HMAC">
+      <span class="tag">HMAC</span>
+      <h1><em>鍵付きハッシュ</em>——改ざん検知＋共有秘密で正当性</h1>
+      <p class="lead">HMAC(K, M)＝ハッシュと秘密鍵 K。API 署名·メッセージ認証の基礎</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="HMAC">
+          <rect x="50" y="120" width="150" height="80" rx="12" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="125" y="155" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">秘密鍵 K</text>
+          <text x="125" y="182" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">共有</text>
+          <rect x="230" y="120" width="150" height="80" rx="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="305" y="165" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="sans-serif">メッセージ M</text>
+          <path d="M 390 160 L 440 160" stroke="#38bdf8" stroke-width="4"/>
+          <rect x="450" y="90" width="200" height="140" rx="14" fill="#0c4a6e" stroke="#38bdf8" stroke-width="3"/>
+          <text x="550" y="135" text-anchor="middle" fill="#bae6fd" font-size="20" font-weight="800" font-family="sans-serif">HMAC</text>
+          <text x="550" y="170" text-anchor="middle" fill="#e2e8f0" font-size="15" font-family="sans-serif">鍵＋ハッシュ</text>
+          <text x="550" y="205" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">SHA-256 等と組合せ</text>
+          <path d="M 660 160 L 710 160" stroke="#fbbf24" stroke-width="4"/>
+          <rect x="720" y="120" width="130" height="80" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="785" y="165" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="700" font-family="sans-serif">タグ</text>
+          <rect x="120" y="235" width="660" height="55" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="270" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">受信側も同じ K で再計算 → 一致すれば改ざんなし（次回 MAC と整理）</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="10" data-yaml-scene="exam_traps" title="試験">
+      <span class="tag">試験ひっかけ</span>
+      <h1>短絡しやすい<em>誤答</em>（ハッシュ編）</h1>
+      <p class="lead">「暗号化か？」「復元できるか？」を必ず確認</p>
+      <div class="trap-grid">
+        <div class="trap"><b>× ハッシュ＝暗号化</b><span>一方向。<strong>復号して元データに戻せない</strong></span></div>
+        <div class="trap"><b>× MD5 でパスワード保存</b><span>衝突·高速。<strong>bcrypt＋ソルト</strong>が正解</span></div>
+        <div class="trap"><b>× ハッシュだけで署名</b><span>改ざんは分かるが<strong>誰が書いたか</strong>は別（秘密鍵署名）</span></div>
+        <div class="trap"><b>× HMAC に鍵不要</b><span>通常ハッシュと違い<strong>共有秘密鍵 K</strong>が要る</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="11" data-yaml-scene="summary" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>第22回：<em>ハッシュ</em>で完全性を守り、署名·保存と組み合わせる</h1>
+      <p class="lead">Season4 継続——次回は MAC と SAML（認証連携）</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="まとめ">
+          <rect x="40" y="30" width="250" height="130" rx="14" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="165" y="70" text-anchor="middle" fill="#fde68a" font-size="20" font-weight="800" font-family="sans-serif">① 定義</text>
+          <text x="165" y="105" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">H(M) 指紋</text>
+          <text x="165" y="135" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">一方向·衝突耐性</text>
+          <rect x="325" y="30" width="250" height="130" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="450" y="70" text-anchor="middle" fill="#7dd3fc" font-size="20" font-weight="800" font-family="sans-serif">② 用途</text>
+          <text x="450" y="105" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">完全性·署名</text>
+          <text x="450" y="135" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">ソルト＋bcrypt</text>
+          <rect x="610" y="30" width="250" height="130" rx="14" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+          <text x="735" y="70" text-anchor="middle" fill="#86efac" font-size="20" font-weight="800" font-family="sans-serif">③ 実装</text>
+          <text x="735" y="105" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">SHA-256·HMAC</text>
+          <text x="735" y="135" text-anchor="middle" fill="#94a3b8" font-size="15" font-family="sans-serif">MD5 は使わない</text>
+          <rect x="120" y="190" width="660" height="65" rx="12" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="230" text-anchor="middle" fill="#fde68a" font-size="18" font-weight="700" font-family="sans-serif">次回：MAC（メッセージ認証コード）· SAML（フェデレーション認証）</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="text-align:center;">
+      <span class="progress" id="prog">1 / 11</span><br />
+      <span id="scene-ref"></span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        var sc = slides[idx].getAttribute("data-yaml-scene");
+        sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>
