@@ -1,0 +1,218 @@
+# =============================================================================
+# 英語アドリブドリル 第3問 — 道を尋ねられた（beginner-3）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-3
+#
+# 解説スライド: drill-03-giving-directions-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_go_straight · 3 part2_turn
+#   4 part2_right_over_there · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して stages.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 31（メタデータ推定 0:32 から -1s）
+#   youtubeVideoId: BmESAC8gpf0
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-03-giving-directions.yaml
+# =============================================================================
+title: '【英語アドリブドリル】道を尋ねられた｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  tourist:
+    speakerId: 11
+    subtitleColor: "#FFD27D"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-03-giving-directions-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "渋谷駅前。地図アプリを見てる観光客に話しかけられること、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "英語で聞かれると、急に道がわからなくなるのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: tourist
+        text: "Excuse me, how can I get to Shibuya Crossing?"
+        subtitle: "Excuse me, how can I get to Shibuya Crossing?"
+        emphasis:
+          - "how can I get to"
+          - "Shibuya Crossing"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……スクランブル交差点まで案内するのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて道案内するのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "まっすぐ・曲がる・指し示す。3つの動きで伝えてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの観光客への返し。今日は3つのかたまりで道案内を組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Go straight と Turn left/right と It's right over there、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。まっすぐの距離、曲がる場所、最後に指し示し。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Sure! Go straight for about two minutes, then turn left at the corner. It's right over there."
+        subtitle: "Sure! Go straight for about two minutes, then turn left at the corner. It's right over there."
+        emphasis:
+          - "Go straight"
+          - "turn left at the corner"
+          - "right over there"
+
+  - id: "part2_go_straight"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Go straight は「まっすぐ進んで」。距離は for two minutes や for two blocks みたいに足すと親切。"
+        subtitle: "Go straight for ~"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Go to straight は言わないのだ。straight は副詞だから、to はいらない。"
+
+  - id: "part2_turn"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Turn left / Turn right で「左に・右に曲がる」。曲がる場所は at the corner、at the convenience store と続けるわ。"
+        subtitle: "Turn left / right at ~"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Turn to left も言わないのだ。Turn のあとは left / right だけでOK。"
+
+  - id: "part2_right_over_there"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "It's right over there は「すぐそこにあるよ」。この right は「右」じゃなくて「すぐ」の意味よ。"
+        subtitle: "It's right over there."
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "ターンの right と、強調の right。同じ単語で意味が違うのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "丁寧なら Sure! や Of course! を最初に。短く言うなら Just go straight. It's over there. だけでも通じる。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "わからない時は Sorry, I'm not from here. でセーフなのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。straight の str、turn の r、right の r をくっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Sure! Go straight for about two minutes, then turn left at the corner. It's right over there."
+        subtitle: "Sure! Go straight for about two minutes, then turn left at the corner. It's right over there."
+        emphasis:
+          - "Go straight"
+          - "turn left"
+          - "right over there"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Go straight、Turn left/right、It's right over there。この3つを持ち帰って。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#道案内"
+    - "#ずんだもん"
+    - "#四国めたん"

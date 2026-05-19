@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第23回 MACとSAML — Reveal（動画キャプチャ用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.9em; }
+    .reveal .slides section { padding: 0.2em 0.35em; }
+    .reveal .slides h3 { font-size: 1.2em; line-height: 1.25; margin-bottom: 0.35em; color: #fde68a; }
+    .tag {
+      display: inline-block; font-size: 0.85em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0c1018; background: linear-gradient(90deg, #fbbf24, #38bdf8);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.35em;
+    }
+    .ph { font-size: 0.95em; color: #94a3b8; line-height: 1.45; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.95em; line-height: 1.45; color: #cbd5e1; margin: 0.35em 0 0; padding-left: 1.05em; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4em; font-size: 0.9em; margin: 0.4em 0; line-height: 1.38; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <span class="tag">導入</span>
+        <h3>SSOで誰でも管理者 — <strong style="color:#38bdf8">SAML署名検証</strong>漏れ</h3>
+        <p class="ph">アサーションをそのまま信用してログインを通した結果。<strong>送信者認証</strong>の話。</p>
+      </section>
+      <section>
+        <span class="tag">第23回</span>
+        <h3>MAC · デジタル署名 · <strong>SAML</strong>（フェデレーション認証）</h3>
+        <ul class="slide-bullets">
+          <li><strong>MAC</strong>：共有鍵で作る短いタグ（HMAC/CMAC/GMAC）</li>
+          <li><strong>vs 署名</strong>：否認防止は署名のみ</li>
+          <li><strong>SAML</strong>：SP·IdP·ブラウザの三者モデル</li>
+        </ul>
+      </section>
+      <section>
+        <span class="tag">MAC定義</span>
+        <h3>共有鍵 K で <strong>固定長タグ T = MAC(K, M)</strong></h3>
+        <p class="ph">受信側も同じ K で再計算 → 一致なら改ざんなし＋送り手は K を知る正規参加者。</p>
+      </section>
+      <section>
+        <span class="tag">MAC種類</span>
+        <h3><strong>HMAC・CMAC・GMAC</strong> — 基ベースが違うだけで仲間</h3>
+        <p class="ph">HMAC＝ハッシュ／CMAC＝ブロック暗号／GMAC＝GCMの認証部分。<strong>HMACはMACの一実装</strong>。</p>
+      </section>
+      <section>
+        <span class="tag">MAC vs 署名</span>
+        <h3>共有鍵か <strong>公開鍵ペアか</strong> ── 否認防止の有無</h3>
+        <p class="ph">MACは高速で二者間向き。署名は公開鍵で誰でも検証でき、契約・コード署名で必須。</p>
+      </section>
+      <section>
+        <span class="tag">フェデレーション</span>
+        <h3>IdPに認証を委ねて <strong>1回のログインで複数SP</strong></h3>
+        <p class="ph">代表規格は <strong>SAML</strong>（XML）と OIDC（JSON）。退職時に IdP 側で一括失効できる。</p>
+      </section>
+      <section>
+        <span class="tag">SAML三者</span>
+        <h3>SP · <strong>User Agent</strong> · IdP</h3>
+        <p class="ph">ブラウザがリダイレクトでアサーションを運ぶ。SPとIdPが直接通信しないのが基本。</p>
+      </section>
+      <section>
+        <span class="tag">SAMLフロー</span>
+        <h3>SP-Initiated SSO の <strong>5ステップ</strong></h3>
+        <p class="ph">SPアクセス → AuthnRequest → IdP認証 → 署名付きアサーション → SP検証。</p>
+      </section>
+      <section>
+        <span class="tag">SAML攻撃</span>
+        <h3>署名検証漏れと <strong>XML署名ラッピング</strong></h3>
+        <p class="ph">「署名がある」だけでは不十分。<strong>署名対象・Audience・期限</strong>まで必ず検証。</p>
+      </section>
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>MAC で「メッセージ」、SAML で「アイデンティティ」</h3>
+        <div class="sum-p3">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(251,191,36,0.4);"><b style="color:#fde68a;">①</b><br>MAC</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(56,189,248,0.4);"><b style="color:#7dd3fc;">②</b><br>vs 署名</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(74,222,128,0.4);"><b style="color:#86efac;">③</b><br>SAML</div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>Reveal.initialize({ hash: false, controls: false, progress: false, slideNumber: false, width: 1280, height: 720 });</script>
+</body>
+</html>
