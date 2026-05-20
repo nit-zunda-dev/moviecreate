@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>第24回 FIDOと多要素認証 — Reveal（動画キャプチャ用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css" id="theme" />
+  <style>
+    .reveal section { text-align: left; overflow: visible; }
+    .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+    .reveal .slides { font-size: 0.9em; }
+    .reveal .slides section { padding: 0.2em 0.35em; }
+    .reveal .slides h3 { font-size: 1.2em; line-height: 1.25; margin-bottom: 0.35em; color: #fde68a; }
+    .tag {
+      display: inline-block; font-size: 0.85em; font-weight: 800; letter-spacing: 0.06em;
+      color: #0c1018; background: linear-gradient(90deg, #fbbf24, #38bdf8);
+      padding: 0.2em 0.5em; border-radius: 4px; margin-bottom: 0.35em;
+    }
+    .ph { font-size: 0.95em; color: #94a3b8; line-height: 1.45; }
+    .ph strong { color: #e2e8f0; }
+    .slide-bullets { font-size: 0.95em; line-height: 1.45; color: #cbd5e1; margin: 0.35em 0 0; padding-left: 1.05em; }
+    .sum-p3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4em; font-size: 0.9em; margin: 0.4em 0; line-height: 1.38; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <span class="tag">導入</span>
+        <h3>SMS 2FA 突破 — <strong style="color:#38bdf8">フィッシング</strong>の限界</h3>
+        <p class="ph">ユーザーが偽サイトにコードを入力 → 攻撃者も同じ OTP を利用。<strong>知識＋SMS</strong>だけでは不十分。</p>
+      </section>
+      <section>
+        <span class="tag">第24回</span>
+        <h3>多要素認証 · <strong>FIDO</strong> · WebAuthn · パスキー</h3>
+        <ul class="slide-bullets">
+          <li><strong>要素</strong>：知識·所持·生体の組み合わせ</li>
+          <li><strong>MFA</strong>：TOTP·プッシュ·SMS（弱点あり）</li>
+          <li><strong>FIDO</strong>：秘密鍵は端末内、ドメイン紐づけ</li>
+        </ul>
+      </section>
+      <section>
+        <span class="tag">3要素</span>
+        <h3><strong>知識·所持·生体</strong> — 異カテゴリの組み合わせ</h3>
+        <p class="ph">× パスワード2回 ＝ 多要素ではない。パスワード＋SMS は「知識＋所持（電話）」。</p>
+      </section>
+      <section>
+        <span class="tag">OTP</span>
+        <h3><strong>TOTP</strong>（30秒）· HOTP · プッシュ承認</h3>
+        <p class="ph">TOTP は時刻同期。リアルタイムフィッシングではコードも奪われうる。</p>
+      </section>
+      <section>
+        <span class="tag">弱点</span>
+        <h3>SMS OTP：<strong>SIMスワップ</strong>とフィッシング</h3>
+        <p class="ph">「届いたコードを打つ」方式はユーザーが攻撃者に見せる構造。最強ではない。</p>
+      </section>
+      <section>
+        <span class="tag">FIDO</span>
+        <h3><strong>WebAuthn</strong> + CTAP — パスワードレス</h3>
+        <p class="ph">FIDO2＝WebAuthn＋CTAP。パスキー＝同期可能な FIDO 認証情報。</p>
+      </section>
+      <section>
+        <span class="tag">三者</span>
+        <h3>RP · <strong>Client</strong> · Authenticator</h3>
+        <p class="ph">秘密鍵は Authenticator 内のみ。サーバ（RP）には<strong>公開鍵</strong>だけ保存。</p>
+      </section>
+      <section>
+        <span class="tag">フロー</span>
+        <h3>チャレンジ応答 — <strong>登録</strong>と<strong>認証</strong></h3>
+        <p class="ph">RPが challenge → Authenticator が署名 → RP が公開鍵で検証。ドメイン（origin）を縛る。</p>
+      </section>
+      <section>
+        <span class="tag">パスキー</span>
+        <h3>プラットフォーム / <strong>ローミング</strong> + 同期</h3>
+        <p class="ph">端末内蔵 vs USB/NFC。生体·PIN で解除。利便性とフィッシング耐性のバランス。</p>
+      </section>
+      <section>
+        <span class="tag">まとめ</span>
+        <h3>Season4 完結 — 本人確認の最前線</h3>
+        <div class="sum-p3">
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(251,191,36,0.4);"><b style="color:#fde68a;">①</b><br>要素</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(56,189,248,0.4);"><b style="color:#7dd3fc;">②</b><br>FIDO</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:0.45em; border:1px solid rgba(74,222,128,0.4);"><b style="color:#86efac;">③</b><br>次Season5</div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script>Reveal.initialize({ hash: false, controls: false, progress: false, slideNumber: false, width: 1280, height: 720 });</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+title: "【登録セキスペ 第24回｜Season4】FIDOと多要素認証—パスワードレスで「なりすまし」を断つのだ！"
+
+# =============================================================================
+# Season 4 第4回（最終）：FIDO / WebAuthn / パスキー と多要素認証（MFA）
+# - 詳細図: s01-ep24-fido-mfa-study-slides.html ← global.slidesHtml
+# - 要約版 Reveal: s01-ep24-fido-mfa-reveal-slides.html
+# -----------------------------------------------------------------------------
+# 台本 id (scenes)         | slideIndex | study スライド
+# -------------------------|------------|------------------
+# incident                 | 0          | 導入（フィッシングで2FA突破）
+# opening                  | 1          | 第24回・Season4完結
+# auth_factors             | 2          | 知識・所持・生体の3要素
+# mfa_basics               | 3          | MFA/2FAとOTPの種類
+# otp_weakness             | 4          | SMS OTPの弱点・フィッシング
+# fido_overview            | 5          | FIDO·WebAuthn·パスキー
+# fido_actors              | 6          | RP·Client·Authenticator
+# webauthn_flow            | 7          | 登録と認証のチャレンジ応答
+# passkeys                 | 8          | プラットフォーム/ローミング
+# exam_traps               | 9          | 試験の誤答
+# summary                  | 10         | まとめ・Season5予告
+# =============================================================================
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./s01-ep24-fido-mfa-study-slides.html"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+  endScreen:
+    enabled: true
+    durationMs: 7000
+    subscribeText: "チャンネル登録で次回も見逃さない！"
+    nextEpisode:
+      title: "次回：Season5—ISMSと組織のセキュリティマネジメント"
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5000
+  text: "SMSの認証コード、犯人の画面にも届いたのだ……"
+  emphasis:
+    - "SMS"
+    - "犯人の画面"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.18
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "incident"
+    slideIndex: 0
+    chapter:
+      label: "導入：フィッシングで2要素認証を突破された"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "パスワードにSMSの6桁コードまで入れたのに、クラウドの管理画面が乗っ取られたのだ……。犯人は同じ認証コードを見ていたのだ！"
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "それは『知識だけ』に頼った認証の限界ね。第23回のSAMLの次、Season4最終回は多要素認証とFIDO——パスワードレスの世界を仕上げるわ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "opening"
+    slideIndex: 1
+    chapter:
+      label: "第24回の地図：FIDOと多要素認証"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ゴールは三つ。認証要素の整理とMFAの種類、SMS OTPの弱点、FIDOとWebAuthnとパスキーの仕組み。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "SAMLの次は『本人確認の最終兵器』なのだ！ Season4、暗号と認証の締めくくりなのだ！"
+        se: "./se/callout_pop.mp3"
+
+  - id: "auth_factors"
+    slideIndex: 2
+    chapter:
+      label: "認証の3要素：知識・所持・生体"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "多要素認証って、パスワードを2回入れることなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "違うわ。認証要素は大きく三つ——知識（パスワードやPIN）、所持（スマホやセキュリティキー）、生体（指紋や顔）。異なるカテゴリを組み合わせるのが多要素認証よ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "mfa_basics"
+    slideIndex: 3
+    chapter:
+      label: "MFAとOTP：TOTP・HOTP・プッシュ"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "2FAは要素が2つ、MFAは2つ以上。ワンタイムパスワードにはTOTP（Google Authenticator系）とHOTP、さらにアプリのプッシュ承認があるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "TOTPは30秒ごとに変わる6桁、サーバと時刻がズレると失敗するのだ！ 試験では『SMS＝最強』みたいなひっかけが出るのだ！"
+        se: "./se/callout_pop.mp3"
+
+  - id: "otp_weakness"
+    slideIndex: 4
+    chapter:
+      label: "SMS OTPとフィッシングの限界"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "SMSで届くコード、なんで危ないのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "SIMスワップで番号を奪われる、フィッシングサイトにユーザーがコードを入力してしまう——いずれも『知識＋SMS』は結局ユーザーがコードを見せてしまう構造。リアルタイムフィッシングではTOTPも奪われるの。"
+        se: "./se/warn_buzz.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "だから導入の犯人も同じ6桁を見ていたのだ……。『届いたコードを打つ』方式には限界があるのだ！"
+        emphasis: ["届いたコードを打つ", "限界"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "fido_overview"
+    slideIndex: 5
+    chapter:
+      label: "FIDO：WebAuthnとパスキー"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "FIDOはパスワードに頼らない強力な認証の規格群。ブラウザ向けはWebAuthn、クライアントAPIはCTAP。Apple·Google·Microsoftが推す同期型パスキーはその実装の一形態よ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "FIDO2って聞いたことあるのだ！ パスキー＝FIDO認証情報をクラウド同期したもの、って覚えればいいのだ？"
+        se: "./se/callout_pop.mp3"
+
+  - id: "fido_actors"
+    slideIndex: 6
+    chapter:
+      label: "三者モデル：RP・Client・Authenticator"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "RPはサービス提供者、ClientはブラウザやOS、Authenticatorはセキュリティキーや端末内蔵の生体認証器。秘密鍵はAuthenticatorの中だけに閉じ込められるのが肝。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "サーバに秘密鍵を送らないのだ！ SAMLの三者と似てるけど、今度は『鍵を端末に閉じる』なのだ！"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "webauthn_flow"
+    slideIndex: 7
+    chapter:
+      label: "WebAuthn：チャレンジ応答で登録と認証"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "実際の流れを教えてほしいのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "登録時：RPがチャレンジを発行→Authenticatorが鍵ペアを生成し公開鍵と署名を返す→RPが公開鍵を保存。認証時：新しいチャレンジ→Authenticatorが秘密鍵で署名→RPが公開鍵で検証。パスワードは不要。"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "フィッシングサイトは本物のドメインと違うから、Authenticatorが署名を拒否するのだ！ ドメイン紐づけが効くのだ！"
+        emphasis: ["ドメイン紐づけ"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "passkeys"
+    slideIndex: 8
+    chapter:
+      label: "パスキー：プラットフォームとローミング"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "プラットフォーム認証器は端末内蔵、ローミング認証器はUSBやNFCのキー。パスキーは端末間で同期され、生体やPINで解除する——利便性とフィッシング耐性のバランスよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "同期すると端末を失くしたときも怖いのだ……。でもパスワードより漏洩リスクは下がるのだ！"
+        se: "./se/callout_pop.mp3"
+
+  - id: "exam_traps"
+    slideIndex: 9
+    chapter:
+      label: "試験で狙われる誤答"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "SMS＝最強、FIDO＝パスワードをサーバ保存、生体データをサーバ送信——全部ひっかけなのだ！"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "その通り。SMSは補助に留める。FIDOの秘密鍵はAuthenticator内。生体は端末内で照合し、サーバには公開鍵だけ。あと『多要素＝パスワード2回』も×よ。"
+        se: "./se/callout_pop.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "要素の種類·鍵の置き場所·フィッシング耐性——この3点で選ぶのだ！"
+        emphasis: ["要素の種類", "鍵の置き場所", "フィッシング耐性"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "summary"
+    slideIndex: 10
+    chapter:
+      label: "まとめ：Season4完結—本人確認の最前線"
+    bgm: "./bgm/outro_warm.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まとめよ。認証は知識·所持·生体の組み合わせ。SMS OTPには限界。FIDOは秘密鍵を端末に閉じ、WebAuthnのチャレンジ応答でドメインを縛る。Season4はここまで。"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "次回からSeason5——ISMSと組織のセキュリティマネジメントに入るわ。"
+        se: "./se/correct_bell.mp3"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "管理画面はパスキーに切り替えるのだ！ チャンネル登録と高評価、Season4完走よろしくなのだ！"
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "mfa-factors"
+    title: "認証の3要素を30秒で"
+    pickLines:
+      - { sceneId: "auth_factors", from: 0, to: 1 }
+      - { sceneId: "mfa_basics", from: 0, to: 1 }
+    overlayCaption: "⚡ 知識·所持·生体"
+    cta: "👇 本編で全体像を確認"
+
+  - id: "fido-passkey"
+    title: "FIDOとパスキーの要点"
+    pickScenes: ["webauthn_flow", "summary"]
+    overlayCaption: "🔐 パスワードレス"
+    cta: "本編で完全マスター（概要欄）"
+
+youtube:
+  imageStyle: "diagram"
+  audience:
+    - "情報処理安全確保支援士の受験者"
+    - "認証設計·ゼロトラスト·パスキー導入を学ぶエンジニア"
+  hookKeywords:
+    - "FIDO"
+    - "多要素認証"
+    - "WebAuthn"
+    - "パスキー"
+    - "TOTP"
+  hashtags:
+    - "#情報処理安全確保支援士"
+    - "#セキスペ"
+    - "#FIDO"
+    - "#多要素認証"
+    - "#ずんだもん"
+  relatedEpisodes:
+    - { ep: 23, title: "MACとSAML" }
+    - { ep: 22, title: "ハッシュ関数" }
+    - { ep: 21, title: "PKIと証明書" }
+  titleHints:
+    - { style: "shock" }
+    - { style: "howto" }
+    - { style: "exam" }
