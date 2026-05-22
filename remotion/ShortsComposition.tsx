@@ -22,18 +22,25 @@ interface Props {
   manifest: VideoManifest;
 }
 
+/** 下部字幕エリアの高さ（フレーム比） */
+const SHORTS_SUBTITLE_HEIGHT_RATIO = 0.36;
+/** 字幕直上の立ち絵帯の高さ（フレーム比） */
+const SHORTS_CHARACTER_STRIP_RATIO = 0.14;
+/** 立ち絵スプライトの高さ（立ち絵帯に対する比率） */
+const SHORTS_CHARACTER_HEIGHT_FRAC = 0.92;
+
 /**
  * Shorts（縦長 1080×1920）専用 Composition。
  *
- * レイアウト構造（縦に 3 段）:
+ * レイアウト構造（縦に 4 段）:
  *   ┌─────────────────────┐
- *   │ overlayCaption       │ ← 上部 12%（任意・固定大テロップ）
+ *   │ overlayCaption       │ ← 上部 12%（任意）
  *   ├─────────────────────┤
- *   │                      │
- *   │   立ち絵（中央大）    │ ← 中央 48%（active line の character）
- *   │                      │
+ *   │   図解・背景（広い）  │ ← 残り領域
  *   ├─────────────────────┤
- *   │   字幕（大フォント）  │ ← 下部 40%
+ *   │ 立ち絵（小・左右）    │ ← 字幕直上 14%
+ *   ├─────────────────────┤
+ *   │   字幕（大フォント）  │ ← 下部 36%
  *   └─────────────────────┘
  *
  * 全画面オーバーレイ:
@@ -60,11 +67,10 @@ export const ShortsComposition: React.FC<Props> = ({ manifest }) => {
   const totalFrames = Math.max(1, Math.round((manifest.totalDurationMs / 1000) * fps));
   const ctaStartFrame = Math.max(0, totalFrames - ctaFrames);
 
-  // 縦長の 3 段レイアウト（割合）
   const captionH = manifest.shorts?.overlayCaption ? Math.round(height * 0.12) : 0;
-  const subtitleH = Math.round(height * 0.4);
-  const characterTop = captionH;
-  const characterH = height - captionH - subtitleH;
+  const subtitleH = Math.round(height * SHORTS_SUBTITLE_HEIGHT_RATIO);
+  const characterStripH = Math.round(height * SHORTS_CHARACTER_STRIP_RATIO);
+  const characterTop = height - subtitleH - characterStripH;
 
   const activeLine = manifest.lines.find(
     (l) => l.startMs <= currentMs && currentMs < l.startMs + l.durationMs,
@@ -85,13 +91,13 @@ export const ShortsComposition: React.FC<Props> = ({ manifest }) => {
         <ShortsOverlayCaption text={manifest.shorts.overlayCaption} width={width} height={captionH} />
       )}
 
-      {/* === 中央: 立ち絵（active line の character）=== */}
-      <ShortsCharacter
+      {/* === 字幕直上: ずんだもん・めたん（小さく左右）=== */}
+      <ShortsCharacterBar
         manifest={manifest}
         currentMs={currentMs}
         top={characterTop}
         width={width}
-        height={characterH}
+        height={characterStripH}
       />
 
       {/* === 下部: 字幕（大フォント）=== */}
@@ -179,8 +185,8 @@ const ShortsOverlayCaption: React.FC<{ text: string; width: number; height: numb
   );
 };
 
-/** 中央に大きく立ち絵を表示。active line の character を優先、無ければ最初に登場する character */
-const ShortsCharacter: React.FC<{
+/** 字幕直上に小さく左右配置。発話中キャラのみ口パク・強調 */
+const ShortsCharacterBar: React.FC<{
   manifest: VideoManifest;
   currentMs: number;
   top: number;
@@ -191,21 +197,64 @@ const ShortsCharacter: React.FC<{
   const activeLine = manifest.lines.find(
     (l) => l.startMs <= currentMs && currentMs < l.startMs + l.durationMs,
   );
-  const charName = activeLine?.character;
-  if (!charName) return null;
-  const charConfig = manifest.characters[charName];
-  if (!charConfig) return null;
-  const imageFile = activeLine?.imageFile ?? charConfig.defaultImageFile;
-  if (!imageFile) return null;
+  const activeCharacter = activeLine?.character;
+  const entries = Object.entries(manifest.characters);
+  if (entries.length === 0) return null;
 
-  const lipOpen = activeLine
-    ? sampleLipOpenness(activeLine.lipKeyframes, currentMs - activeLine.startMs)
-    : 0;
-  const wobble = Math.sin(frame * 0.11) * lipOpen * 6;
-  const lipScale = 1 + lipOpen * 0.038;
+  const imgHeight = Math.round(height * SHORTS_CHARACTER_HEIGHT_FRAC);
+  const sideSlotW = Math.round(width * 0.44);
 
-  // 高さに合わせて立ち絵を中央寄せ
-  const imgHeight = Math.round(height * 0.95);
+  const sprites = entries.map(([charName, charConfig]) => {
+    const defaultImg = charConfig.defaultImageFile;
+    if (!defaultImg) return null;
+    const isActive = activeCharacter === charName;
+    const imageFile = isActive && activeLine?.imageFile ? activeLine.imageFile : defaultImg;
+    const lipOpen =
+      isActive && activeLine
+        ? sampleLipOpenness(activeLine.lipKeyframes, currentMs - activeLine.startMs)
+        : 0;
+    const wobble = isActive ? Math.sin(frame * 0.11) * lipOpen * 4 : 0;
+    const lipScale = 1 + lipOpen * 0.032;
+    const pos = charConfig.position ?? "left";
+    const alignSelf = pos === "right" ? "flex-end" : "flex-start";
+    const paddingSide = pos === "right" ? { paddingRight: 12 } : { paddingLeft: 12 };
+
+    return (
+      <div
+        key={charName}
+        style={{
+          flex: `0 0 ${sideSlotW}px`,
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: alignSelf === "flex-end" ? "flex-end" : "flex-start",
+          opacity: isActive ? 1 : 0.82,
+          ...paddingSide,
+        }}
+      >
+        <div
+          style={{
+            transform: `translateY(${wobble}px) scale(${lipScale})`,
+            transformOrigin: "bottom center",
+            filter: isActive
+              ? "drop-shadow(0 2px 8px rgba(0,0,0,0.55))"
+              : "drop-shadow(0 1px 4px rgba(0,0,0,0.35))",
+          }}
+        >
+          <Img
+            src={staticFile(imageFile)}
+            style={{
+              height: imgHeight,
+              width: "auto",
+              maxWidth: sideSlotW,
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </div>
+      </div>
+    );
+  });
+
   return (
     <div
       style={{
@@ -216,30 +265,14 @@ const ShortsCharacter: React.FC<{
         height,
         zIndex: 2,
         display: "flex",
+        flexDirection: "row",
         alignItems: "flex-end",
-        justifyContent: "center",
-        overflow: "hidden",
+        justifyContent: "space-between",
+        pointerEvents: "none",
+        overflow: "visible",
       }}
     >
-      <div
-        style={{
-          transform: `translateY(${wobble}px) scale(${lipScale})`,
-          transformOrigin: "bottom center",
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "center",
-        }}
-      >
-        <Img
-          src={staticFile(imageFile)}
-          style={{
-            height: imgHeight,
-            width: "auto",
-            objectFit: "contain",
-            maxWidth: "95%",
-          }}
-        />
-      </div>
+      {sprites}
     </div>
   );
 };
