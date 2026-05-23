@@ -8,7 +8,7 @@
 #   4 part2_confirmation · 5 part2_variants · 6 part2_replay · 7 part2_outro
 #
 # drill-meta（レンダ後に実測して stages.ts へ）:
-#   setupEndSeconds / revealStartSeconds: 39
+#   setupEndSeconds / revealStartSeconds: 34
 #   youtubeVideoId: vpl3bvpg2Ck
 #
 # 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
