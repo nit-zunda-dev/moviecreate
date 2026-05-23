@@ -1,0 +1,245 @@
+# =============================================================================
+# 英語アドリブドリル 第4問 — ホテルでトラブル（intermediate-1）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = intermediate-1
+#
+# 解説スライド: drill-04-hotel-trouble-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_i_have_reservation · 3 part2_could_you_check
+#   4 part2_confirmation · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して stages.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 39
+#   youtubeVideoId: vpl3bvpg2Ck
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-04-hotel-trouble.yaml
+# =============================================================================
+title: '【英語アドリブドリル】ホテルでトラブル｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  clerk:
+    speakerId: 8
+    subtitleColor: "#AADDFF"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-04-hotel-trouble-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ハワイのホテルでチェックイン。長いフライトのあと、疲れてるときに限ってトラブル、あるわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "予約したはずなのに、記録がないと言われたのだ……パニックなのだ。"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: clerk
+        text: "I'm sorry, I don't see a reservation under that name."
+        subtitle: "I'm sorry, I don't see a reservation under that name."
+        speechText: "アイム、ソーリー。アイ、ドント、シー、ア・レザベーション、アンダー、ザット、ネーム。"
+        voice:
+          speedScale: 0.98
+          postPhonemeLength: 0.12
+        emphasis:
+          - "don't see a reservation"
+          - "under that name"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……ないって言われたのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて状況を説明して対応を求めるのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "予約があること、もう一度確認してほしいこと、証拠も示す。3つを頭に入れてから答えて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきのフロントへの返し。今日は3つのかたまりで、冷静にトラブルを説明するわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I have a reservation と Could you check again と confirmation email、覚えるのだ！"
+        speechText: "アイ・ハブ・ア・レザベーションと、クッド・ユー・チェック・アゲインと、コンファメーション・イーメイル、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。予約名を伝えて、再確認をお願いし、メールも見せる。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone."
+        subtitle: "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone."
+        speechText: "アイ・ハブ・ア・レザベーション、アンダー・ザ・ネーム・タナカ。クッド・ユー・プリーズ・チェック・アゲイン？アイ・オールソー・ハブ・ア・コンファメーション・イーメイル・オン・マイ・フォン。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "I have a reservation"
+          - "under the name Tanaka"
+          - "Could you please check again"
+          - "confirmation email"
+
+  - id: "part2_i_have_reservation"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I have a reservation は「予約があります」。under the name で予約名をはっきり伝えるわ。"
+        subtitle: "I have a reservation under the name ~"
+        speechText: "アイ・ハブ・ア・レザベーションは、予約があります。アンダー・ザ・ネームで、予約名をはっきり伝えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I reserved は通じるけど、フロントでは I have a reservation の方が自然なのだ。"
+        speechText: "アイ・リザーブドは通じるけど、フロントでは、アイ・ハブ・ア・レザベーションの方が自然なのだ。"
+
+  - id: "part2_could_you_check"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Could you please check again? は丁寧にお願い。怒鳴らずに、もう一度システムを見てほしい、と伝える。"
+        subtitle: "Could you please check again?"
+        speechText: "クッド・ユー・プリーズ・チェック・アゲイン？は、丁寧にお願い。怒鳴らずに、もう一度システムを見てほしい、と伝える。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "This is unacceptable は強すぎるのだ……まずは please check again から。"
+        speechText: "ディス・イズ・アンアクセプタブルは、強すぎるのだ……まずは、プリーズ・チェック・アゲインから。"
+
+  - id: "part2_confirmation"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I also have a confirmation email on my phone. で証拠を示す。also は「それに」、on my phone でスマホにあると伝える。"
+        subtitle: "confirmation email on my phone"
+        speechText: "アイ・オールソー・ハブ・ア・コンファメーション・イーメイル・オン・マイ・フォン、で証拠を示す。オールソーは、それに、オン・マイ・フォンで、スマホにあると伝える。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "booking number や confirmation number を言うのも効くのだ。"
+        speechText: "ブッキング・ナンバーや、コンファメーション・ナンバーを言うのも効くのだ。"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら I booked a room under Tanaka. Could you look it up again? でもOK。落ち着いて話すのがいちばん大事。"
+        speechText: "短く言うなら、アイ・ブックト・ア・ルーム・アンダー・タナカ。クッド・ユー・ルック・イット・アップ・アゲイン？でもオーケー。落ち着いて話すのがいちばん大事。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "慌てずに、事実→お願い→証拠の順で言えばいいのだ！"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。reservation の re、check again の ch、confirmation の firm をはっきり。"
+        speechText: "もう一度、ゆっくり。レザベーションの re、チェック・アゲインの ch、コンファメーションの firm をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone."
+        subtitle: "I have a reservation under the name Tanaka. Could you please check again? I also have a confirmation email on my phone."
+        speechText: "アイ・ハブ・ア・レザベーション、アンダー・ザ・ネーム・タナカ。クッド・ユー・プリーズ・チェック・アゲイン？アイ・オールソー・ハブ・ア・コンファメーション・イーメイル・オン・マイ・フォン。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "reservation"
+          - "under the name"
+          - "check again"
+          - "confirmation email"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "I have a reservation、Could you please check again、confirmation email。この3つを持ち帰って。アプリの中級編でも練習してね。"
+        speechText: "アイ・ハブ・ア・レザベーション、クッド・ユー・プリーズ・チェック・アゲイン、コンファメーション・イーメイル。この3つを持ち帰って。アプリの中級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#ホテル英語"
+    - "#旅行英語"
+    - "#ずんだもん"
+    - "#四国めたん"

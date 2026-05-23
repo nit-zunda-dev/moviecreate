@@ -5,6 +5,8 @@ export type LineType = "dialogue" | "narration" | "subtitle_only";
 export interface Line {
   type: LineType;
   text?: string;
+  /** VOICEVOX 合成用。英語はカタカナ等で書き、表示は subtitle に英語を置く */
+  speechText?: string;
   subtitle?: string;
   speaker?: SpeakerName;
   character?: string;

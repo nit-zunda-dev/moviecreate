@@ -29,6 +29,11 @@ export function resolveSpeakerIdForLine(scenario: Scenario, line: Line): number 
   return config.defaultSpeakerId;
 }
 
+export function resolveUtteranceText(line: Line): string | undefined {
+  const utterance = (line.speechText ?? line.text)?.trim();
+  return utterance || undefined;
+}
+
 /** global → character → line の順で VoiceParam をマージする。後の方が優先。 */
 export function mergeVoiceParam(scenario: Scenario, line: Line): VoiceParam | undefined {
   const globalVoice = scenario.global?.voice;
@@ -53,7 +58,8 @@ export async function synthesizeLine(
   index: number,
   line: Line,
 ): Promise<string | null> {
-  if (!line.text) {
+  const utterance = resolveUtteranceText(line);
+  if (!utterance) {
     return null;
   }
   const { tempDir } = getBasePaths();
@@ -64,7 +70,7 @@ export async function synthesizeLine(
   const voiceParam = mergeVoiceParam(scenario, line);
 
   const { absPath } = await synthesizeToFile({
-    text: line.text,
+    text: utterance,
     speakerId,
     outPath,
     voiceParam,
@@ -89,7 +95,8 @@ export async function synthesizeLineWithTiming(
   index: number,
   line: Line,
 ): Promise<LineTimingResult | null> {
-  if (!line.text) {
+  const utterance = resolveUtteranceText(line);
+  if (!utterance) {
     return null;
   }
   const { tempDir } = getBasePaths();
@@ -100,7 +107,7 @@ export async function synthesizeLineWithTiming(
   const voiceParam = mergeVoiceParam(scenario, line);
 
   const { absPath } = await synthesizeToFile({
-    text: line.text,
+    text: utterance,
     speakerId,
     outPath,
     voiceParam,

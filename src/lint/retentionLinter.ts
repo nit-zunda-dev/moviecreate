@@ -32,7 +32,7 @@ export interface LintReport {
 const SECONDS_PER_CHAR = 0.18;
 
 function estimateLineSeconds(line: Line): number {
-  const text = line.text ?? "";
+  const text = line.speechText ?? line.text ?? "";
   return text.length * SECONDS_PER_CHAR;
 }
 
