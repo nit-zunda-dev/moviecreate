@@ -1,0 +1,322 @@
+title: "【登録セキスペ】Check! Q1–Q15：PDCAとISMS"
+
+# 教科書 Check! Q1–Q15（PDCA／ISMS）Shorts 専用
+# - 本編なし。generate-shorts のみで縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 4000
+  text: "PDCAのCって、CheckじゃなくてControlなのだ！？"
+  emphasis:
+    - "PDCA"
+    - "Check"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q1_pdca"
+    chapter:
+      label: "Q1：PDCAとは"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q1】PDCAって、何の略なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Plan・Do・Check・Act——計画、実行、評価、改善の継続サイクルよ。ISMSの骨格ね。"
+        emphasis: ["Plan", "Do", "Check", "Act"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q2_pdca_steps"
+    chapter:
+      label: "Q2：PDCA各ステップ"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "【Q2】PDCAの各段階、何をするのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Planは方針とリスクアセスメント、Doは運用、Checkは監視と内部監査、Actは改善——四つセットで覚えるわ。"
+        emphasis: ["Plan", "Do", "Check", "Act"]
+        se: "./se/callout_pop.mp3"
+
+  - id: "q3_isms_std"
+    chapter:
+      label: "Q3：ISMS規格の概要"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q3】ISMSの規格、どう構成されてるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "27000は用語、27001は要求事項、27002は管理策の実装指針——この三つが試験の定番よ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q4_controls"
+    chapter:
+      label: "Q4：管理策の項目数"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q4】ISMSの管理策、全部でいくつなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "付属書Aは114項目——2022版は93。試験は問題文の版を確認。数だけ暗記しないでね。"
+        emphasis: ["114項目", "93"]
+        se: "./se/warn_buzz.mp3"
+
+  - id: "q5_audit_steps"
+    chapter:
+      label: "Q5：適合性評価の審査"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q5】ISMSの審査、どんな流れなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "文書審査→第一段階→第二段階→認証決定。現場は第二段階、書類は文書審査——順番が試験に出るわ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q6_after_cert"
+    chapter:
+      label: "Q6：認証取得後"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "【Q6】認証取ったら終わりなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "違うわ。定期サーベイランス監査、再認証、変更の届出、継続的改善——PDCAは止まらないの。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "q7_establish_flow"
+    chapter:
+      label: "Q7：ISMS確立までの流れ"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q7】ISMSを立ち上げる流れは？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "準備→範囲定義→リスクアセスメント→リスク対応→適用宣言書→運用→内部監査→マネジメントレビュー→認証。"
+        se: "./se/callout_pop.mp3"
+
+  - id: "q8_scope"
+    chapter:
+      label: "Q8：適用範囲と境界"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q8】適用範囲と境界、何の観点で示すのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "組織の目的、資産、プロセス、場所、関係者、技術——何を ISMS の外に置くかまで明示するわ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q9_risk_assess"
+    chapter:
+      label: "Q9：リスク分析及び評価"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q9】リスク分析及び評価でやることは？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "資産の特定、脅威と脆弱性の把握、リスクの算定と評価——ここが管理策選定の土台よ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q10_risk_treatment"
+    chapter:
+      label: "Q10：リスク対応と管理策"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "【Q10】管理策はどう決めるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "リスク対応を選ぶ——回避・移転・低減・受容。低減なら付属書Aから管理策を選び、適用宣言書に書くわ。"
+        emphasis: ["回避", "移転", "低減", "受容"]
+        se: "./se/callout_pop.mp3"
+
+  - id: "q11_soa"
+    chapter:
+      label: "Q11：適用宣言書"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q11】適用宣言書、何が書いてあるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "選んだ管理策、適用の有無、除外理由、実装状況——監査で必ず見られる文書よ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q12_operate"
+    chapter:
+      label: "Q12：導入・運用段階"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q12】導入と運用、主な作業は？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "管理策の実装、教育訓練、記録管理、日常運用、インシデント対応——Doの中身を回し続ける段階ね。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "q13_penetration"
+    chapter:
+      label: "Q13：ISMSの浸透"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "【Q13】現場に ISMS を浸透させるには？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "経営のコミットメント、全員教育、ルールの周知、意識調査——『形だけ ISMS』を防ぐわ。"
+        se: "./se/callout_pop.mp3"
+
+  - id: "q14_records"
+    chapter:
+      label: "Q14：記録の重要性"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q14】記録、なぜ大事なのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "運用の証拠、トレーサビリティ、監査の根拠。保管期間・保護・アクセス管理までセットで管理するの。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q15_internal_audit"
+    chapter:
+      label: "Q15：内部監査の目的"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q15】内部監査の目的は？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ISMSが要求事項どおり運用されているか確認し、不適合と改善機会を見つける——Checkの要よ。"
+        emphasis: ["内部監査"]
+        se: "./se/correct_bell.mp3"
+
+shorts:
+  - id: "check-q1-q2"
+    title: "Check! Q1–Q2：PDCAとは"
+    pickScenes: ["q1_pdca", "q2_pdca_steps"]
+    overlayCaption: "📘 Check! Q1–Q2"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q3-q4"
+    title: "Check! Q3–Q4：ISMS規格と管理策114項目"
+    pickScenes: ["q3_isms_std", "q4_controls"]
+    overlayCaption: "📘 Check! Q3–Q4"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q5-q6"
+    title: "Check! Q5–Q6：審査ステップと認証後"
+    pickScenes: ["q5_audit_steps", "q6_after_cert"]
+    overlayCaption: "📘 Check! Q5–Q6"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q7-q8"
+    title: "Check! Q7–Q8：ISMS確立と適用範囲"
+    pickScenes: ["q7_establish_flow", "q8_scope"]
+    overlayCaption: "📘 Check! Q7–Q8"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q9-q10"
+    title: "Check! Q9–Q10：リスク評価と管理策決定"
+    pickScenes: ["q9_risk_assess", "q10_risk_treatment"]
+    overlayCaption: "📘 Check! Q9–Q10"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q11-q12"
+    title: "Check! Q11–Q12：適用宣言書と運用"
+    pickScenes: ["q11_soa", "q12_operate"]
+    overlayCaption: "📘 Check! Q11–Q12"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q13-q15"
+    title: "Check! Q13–Q15：浸透・記録・内部監査"
+    pickScenes: ["q13_penetration", "q14_records", "q15_internal_audit"]
+    overlayCaption: "📘 Check! Q13–Q15"
+    cta: "👇 本編でISMS15問まとめ"
+
+  - id: "check-q1-q4"
+    title: "Check! Q1–Q4：PDCAとISMS基礎"
+    pickScenes: ["q1_pdca", "q2_pdca_steps", "q3_isms_std", "q4_controls"]
+    overlayCaption: "📘 Check! Q1–Q4"
+    cta: "👇 続きは概要欄から"
