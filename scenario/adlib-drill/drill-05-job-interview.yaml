@@ -1,0 +1,245 @@
+# =============================================================================
+# 英語アドリブドリル 第5問 — 英語面接（intermediate-2）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = intermediate-2
+#
+# 解説スライド: drill-05-job-interview-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_in_my_previous_role · 3 part2_i_was_responsible_for
+#   4 part2_as_a_result · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して intermediate.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 39（チャプター「答え合わせ」0:39）
+#   youtubeVideoId: DISMBVDzWgM
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-05-job-interview.yaml
+# =============================================================================
+title: '【英語アドリブドリル】英語面接｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  interviewer:
+    speakerId: 13
+    subtitleColor: "#AADDFF"
+    voice:
+      speedScale: 0.98
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-05-job-interview-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "外資系企業の面接。英語で行動面接の質問が飛んでくる、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "Tell me about a time... って聞かれると、頭が真っ白になるのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: interviewer
+        text: "Tell me about a time you overcame a difficult challenge at work."
+        subtitle: "Tell me about a time you overcame a difficult challenge at work."
+        speechText: "テル・ミー・アバウt・ア・タイム、ユー・オーバーカムド・ア・ディフィカルト・チャレンジ・アット・ワーク。"
+        voice:
+          speedScale: 0.95
+          postPhonemeLength: 0.12
+        emphasis:
+          - "Tell me about a time"
+          - "overcame a difficult challenge"
+          - "at work"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……仕事で乗り越えた経験を1分以内に話すのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて答えるのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "前職・担当・結果。3つのかたまりで1分以内に組み立ててみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの面接への返し。今日は3つのかたまりで、行動面接を組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "In my previous role と I was responsible for と As a result、覚えるのだ！"
+        speechText: "イン・マイ・プリヴィアス・ロールと、アイ・ワズ・レスポンシブル・フォーと、アズ・ア・リザルト、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。前職の状況、担当したこと、困難と対応、結果まで一気に。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "In my previous role, I was responsible for a major product launch. We faced a tight deadline, but I coordinated the team and we delivered on time. As a result, sales exceeded our target by fifteen percent."
+        subtitle: "In my previous role, I was responsible for a major product launch. We faced a tight deadline, but I coordinated the team and we delivered on time. As a result, sales exceeded our target by fifteen percent."
+        speechText: "イン・マイ・プリヴィアス・ロール、アイ・ワズ・レスポンシブル・フォー、ア・メイジャー・プロダクト・ローンチ。ウィー・フェイスド・ア・タイト・デッドライン、バット、アイ・コーディネイテッド・ザ・チーム・アンド、ウィー・デリヴァード・オン・タイム。アズ・ア・リザルト、セールズ・イクシーデッド・アワ・ターゲット・バイ・フィフティーン・パーセント。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "In my previous role"
+          - "I was responsible for"
+          - "As a result"
+
+  - id: "part2_in_my_previous_role"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "In my previous role は「前職では」。When I worked at ~ や At my last company でも同じ役割よ。"
+        subtitle: "In my previous role / At my last company"
+        speechText: "イン・マイ・プリヴィアス・ロールは、前職では。ウェン・アイ・ワークト・アット、や、アット・マイ・ラスト・カンパニーでも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "まず背景を1文で置くのだ。In my previous role で STAR の S から入る。"
+        speechText: "まず背景を1文で置くのだ。イン・マイ・プリヴィアス・ロールで、スターの S から入る。"
+
+  - id: "part2_i_was_responsible_for"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I was responsible for は「〜を担当していた」。My role was to ~ や I led ~ でもOK。困難は We faced ~、but I ~ で行動を入れる。"
+        subtitle: "I was responsible for ~ / We faced ~, but I ~"
+        speechText: "アイ・ワズ・レスポンシブル・フォーは、を担当していた。マイ・ロール・ワズ・トゥ、や、アイ・レッド、でもオーケー。困難は、ウィー・フェイスド、バット・アイ、で行動を入れる。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "coordinated the team みたいに、自分が何をしたかをはっきり言うのだ。"
+        speechText: "コーディネイテッド・ザ・チームみたいに、自分が何をしたかをはっきり言うのだ。"
+
+  - id: "part2_as_a_result"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "As a result は「その結果」。So ~ や Because of this ~ でも締められる。数字があれば exceeded our target by fifteen percent のように入れる。"
+        subtitle: "As a result, ~ / So ~"
+        speechText: "アズ・ア・リザルトは、その結果。ソー、や、ビコーズ・オブ・ディス、でも締められる。数字があれば、イクシーデッド・アワ・ターゲット・バイ・フィフティーン・パーセントのように入れる。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "結果に数字を入れると、面接官の目に留まるのだ！"
+        speechText: "結果に数字を入れると、面接官の目に留まるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら At my last company, I led a project under a tight deadline. We delivered on time, so sales beat our target. でもOK。1分以内がルールよ。"
+        speechText: "短く言うなら、アット・マイ・ラスト・カンパニー、アイ・レッド・ア・プロジェクト・アンダー・ア・タイト・デッドライン。ウィー・デリヴァード・オン・タイム、ソー、セールズ・ビート・アワ・ターゲット。でもオーケー。1分以内がルールよ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "経験が思い浮かばない時は、学校のプロジェクトでも練習できるのだ。"
+        speechText: "経験が思い浮かばない時は、学校のプロジェクトでも練習できるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。previous の pre、responsible の re、result の zult をはっきり。"
+        speechText: "もう一度、ゆっくり。プリヴィアスの pre、レスポンシブルの re、リザルトの zult をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "In my previous role, I was responsible for a major product launch. We faced a tight deadline, but I coordinated the team and we delivered on time. As a result, sales exceeded our target by fifteen percent."
+        subtitle: "In my previous role, I was responsible for a major product launch. We faced a tight deadline, but I coordinated the team and we delivered on time. As a result, sales exceeded our target by fifteen percent."
+        speechText: "イン・マイ・プリヴィアス・ロール、アイ・ワズ・レスポンシブル・フォー、ア・メイジャー・プロダクト・ローンチ。ウィー・フェイスド・ア・タイト・デッドライン、バット、アイ・コーディネイテッド・ザ・チーム・アンド、ウィー・デリヴァード・オン・タイム。アズ・ア・リザルト、セールズ・イクシーデッド・アワ・ターゲット・バイ・フィフティーン・パーセント。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "In my previous role"
+          - "I was responsible for"
+          - "As a result"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "In my previous role、I was responsible for、As a result。この3つを持ち帰って。アプリの中級編でも練習してね。"
+        speechText: "イン・マイ・プリヴィアス・ロール、アイ・ワズ・レスポンシブル・フォー、アズ・ア・リザルト。この3つを持ち帰って。アプリの中級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#英語面接"
+    - "#転職英語"
+    - "#ずんだもん"
+    - "#四国めたん"
