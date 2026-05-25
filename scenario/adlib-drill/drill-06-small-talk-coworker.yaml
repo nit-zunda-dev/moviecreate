@@ -1,0 +1,243 @@
+# =============================================================================
+# 英語アドリブドリル 第6問 — 海外の同僚と雑談（intermediate-3）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = intermediate-3
+#
+# 解説スライド: drill-06-small-talk-coworker-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_it_was_pretty_good · 3 part2_i_ended_up
+#   4 part2_how_about_you · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して intermediate.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 38（チャプター「答え合わせ」0:38）
+#   youtubeVideoId: QcqDlY0GEmc
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-06-small-talk-coworker.yaml
+# =============================================================================
+title: '【英語アドリブドリル】海外の同僚と雑談｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  coworker:
+    speakerId: 10
+    subtitleColor: "#DDAAFF"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-06-small-talk-coworker-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "リモート会議の前、海外支社の同僚が雑談を始めてくる。英語で週末の話、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "How was your weekend? って聞かれると、急に頭が真っ白になるのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: coworker
+        text: "How was your weekend?"
+        subtitle: "How was your weekend?"
+        speechText: "ハウ・ワズ・ユア・ウィークエンド？"
+        voice:
+          speedScale: 1.0
+          postPhonemeLength: 0.12
+        emphasis:
+          - "How was your weekend"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……週末どうだったか、英語で話すのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、週末の出来事をなんて話すのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "まず良かったと伝えて、具体的に何をしたか、最後に How about you? で返す。3つを頭に入れてから答えて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの雑談への返し。今日は3つのかたまりで、週末の話を自然につなぐわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "It was pretty good と I ended up going hiking と How about you?、覚えるのだ！"
+        speechText: "イット・ワズ・プリティ・グッドと、アイ・エンデッド・アップ・ゴーイング・ハイキングと、ハウ・アバウt・ユー？、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。感謝と評価、週末の出来事、天気の一言、相手への返しまで。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?"
+        subtitle: "It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?"
+        speechText: "イット・ワズ・プリティ・グッド、サンクス！アイ・エンデッド・アップ・ゴーイング・ハイキング、ウィズ・サム・フレンズ・オン・サタデー。ザ・ウェザー・ワズ・パーフェクト。ハウ・アバウt・ユー？"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "It was pretty good"
+          - "I ended up going hiking"
+          - "How about you"
+
+  - id: "part2_it_was_pretty_good"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "It was pretty good は「なかなか良かったよ」。thanks! を足すと丁寧。It was great や Not bad でも同じ役割よ。"
+        subtitle: "It was pretty good, thanks!"
+        speechText: "イット・ワズ・プリティ・グッドは、なかなか良かったよ。サンクスを足すと丁寧。イット・ワズ・グレイトや、ノット・バッドでも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "いきなり詳細から入らず、まず一言で雰囲気を伝えるのだ。"
+        speechText: "いきなり詳細から入らず、まず一言で雰囲気を伝えるのだ。"
+
+  - id: "part2_i_ended_up"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I ended up ~ing は「結局〜することになった」。予定外でも自然。with some friends on Saturday で誰と・いつを足す。"
+        subtitle: "I ended up going hiking with some friends on Saturday."
+        speechText: "アイ・エンデッド・アップ、は、結局、することになった。予定外でも自然。ウィズ・サム・フレンズ・オン・サタデーで、誰と・いつを足す。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ended up watching Netflix や ended up staying home でもOKなのだ。"
+        speechText: "エンデッド・アップ・ウォッチング・ネットフリックスや、エンデッド・アップ・ステイイング・ホームでもオーケーなのだ。"
+
+  - id: "part2_how_about_you"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "The weather was perfect. で一言添えると会話が広がる。How about you? は「あなたは？」で相手に話題を返す定番。"
+        subtitle: "The weather was perfect. / How about you?"
+        speechText: "ザ・ウェザー・ワズ・パーフェクト、で一言添えると会話が広がる。ハウ・アバウt・ユー？は、あなたは？で、相手に話題を返す定番。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "What about you? や How was yours? でも同じ意味なのだ！"
+        speechText: "ホワット・アバウt・ユー？や、ハウ・ワズ・ユアズ？でも同じ意味なのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら Pretty good! I went to the beach on Sunday. How about you? でもOK。忙しい会議前は短めで十分よ。"
+        speechText: "短く言うなら、プリティ・グッド！アイ・ウェント・トゥ・ザ・ビーチ・オン・サンデー。ハウ・アバウt・ユー？でもオーケー。忙しい会議前は短めで十分よ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "週末何もしてない時は、I mostly relaxed at home. でも恥ずかしくないのだ。"
+        speechText: "週末何もしてない時は、アイ・モストリー・リラックスド・アット・ホーム、でも恥ずかしくないのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。pretty の pre、ended up の ded、hiking の king をはっきり。"
+        speechText: "もう一度、ゆっくり。プリティの pre、エンデッド・アップの ded、ハイキングの king をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?"
+        subtitle: "It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?"
+        speechText: "イット・ワズ・プリティ・グッド、サンクス！アイ・エンデッド・アップ・ゴーイング・ハイキング、ウィズ・サム・フレンズ・オン・サタデー。ザ・ウェザー・ワズ・パーフェクト。ハウ・アバウt・ユー？"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "pretty good"
+          - "ended up"
+          - "How about you"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "It was pretty good、I ended up ~ing、How about you?。この3つを持ち帰って。アプリの中級編でも練習してね。"
+        speechText: "イット・ワズ・プリティ・グッド、アイ・エンデッド・アップ、ハウ・アバウt・ユー？。この3つを持ち帰って。アプリの中級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#ビジネス英語"
+    - "#雑談英語"
+    - "#ずんだもん"
+    - "#四国めたん"

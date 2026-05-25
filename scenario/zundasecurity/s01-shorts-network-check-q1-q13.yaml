@@ -1,0 +1,324 @@
+title: "【登録セキスペ】Check! Q1–Q13：ネットワーク基礎＋TCP四択"
+
+# 教科書 Check! Q1–Q13（IPv4/TCP/メール/DNS/HTTP/VLAN）＋確認問題 Shorts 専用
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 4000
+  text: "TCPヘッダにTTLがあると思ってたのだ…… IPと混同してない！？"
+  emphasis:
+    - "TCPヘッダ"
+    - "TTL"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q1_ipv4_header"
+    chapter:
+      label: "Q1：IPv4ヘッダ"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q1】IPv4ヘッダ、何が入ってるのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "送信元・宛先IP、TTL、プロトコル番号、総長、識別とフラグ——L3の制御情報がここよ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q2_ipv4_issues"
+    chapter:
+      label: "Q2：IPv4の問題点"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "【Q2】IPv4の問題点は？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "アドレス枯渇、NAT依存、ルーティングテーブル肥大、IP自体に認証がない——だからIPv6へ。"
+        se: "./se/warn_buzz.mp3"
+
+  - id: "q3_ipv6"
+    chapter:
+      label: "Q3：IPv6の特徴"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q3】IPv6の特徴は？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "128ビットアドレス、ヘッダ簡素化、拡張ヘッダ、IPsec組込み——ブロードキャストは使わないわ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q4_tcp_header"
+    chapter:
+      label: "Q4：TCPヘッダ"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q4】TCPヘッダの主な情報は？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "送信元・宛先ポート、シーケンス番号、ACK番号、ウィンドウサイズ、フラグ——IPヘッダと混同しないの。"
+        emphasis: ["ポート", "シーケンス", "ACK"]
+        se: "./se/callout_pop.mp3"
+
+  - id: "q5_tcp_handshake"
+    chapter:
+      label: "Q5：3ウェイハンドシェイク"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q5】TCPの3ウェイハンドシェイク、説明するのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "SYN→SYN-ACK→ACK。接続確立の合図。SYNフラッドはここを悪用する攻撃よ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q6_udp"
+    chapter:
+      label: "Q6：UDPの特徴"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q6】UDPってどんなプロトコルなのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "コネクションレス、オーバーヘッド小、順序・再送なし——DNSやストリーミング向き。信頼性はアプリ任せ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "q7_mail_agents"
+    chapter:
+      label: "Q7：MUA〜MRA"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "【Q7】MUA、MSA、MTA…… 頭文字だらけなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "MUAはユーザ操作、MSAは送信受付、MTAはサーバ間転送、MDAはメールボックス配信、MRAはPOP/IMAP取得よ。"
+        se: "./se/callout_pop.mp3"
+
+  - id: "q8_mail_header"
+    chapter:
+      label: "Q8：メールヘッダ"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q8】メールヘッダの項目は？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "From、To、Subject、Date、Message-ID、Received——Receivedは経路追跡、改ざん調査の手がかりになるわ。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q9_dns"
+    chapter:
+      label: "Q9：DNS関連"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q9】リゾルバ、コンテンツサーバ、オープンリゾルバって？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "リゾルバは問合せ代行、コンテンツサーバは権威DNS、オープンリゾルバは外部からも応答——増幅攻撃に悪用されるわ。"
+        se: "./se/warn_buzz.mp3"
+
+  - id: "q10_http_methods"
+    chapter:
+      label: "Q10：GETとPOST"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q10】GETとPOSTの違いは？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "GETはURLにパラメータ、キャッシュ向き、冪等。POSTはボディ送信、フォーム送信向き——パスワードはPOSTよ。"
+        emphasis: ["GET", "POST"]
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "q11_cookie"
+    chapter:
+      label: "Q11：Cookie属性"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q11】Cookieの属性、何を設定するのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Secure、HttpOnly、SameSite、Domain、Path、有効期限——HttpOnlyでJS窃取を防ぎ、SameSiteでCSRFを抑えるわ。"
+        emphasis: ["HttpOnly", "SameSite", "Secure"]
+        se: "./se/callout_pop.mp3"
+
+  - id: "q12_vlan"
+    chapter:
+      label: "Q12：VLANのメリット"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "【Q12】VLANを組むメリットは？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ブロードキャストドメイン分割、セグメント化でセキュリティ向上、部署や用途で柔軟にグルーピング——第19回の本編ともつながるわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "q13_router_l3sw"
+    chapter:
+      label: "Q13：ルータとL3スイッチ"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "【Q13】ルータとレイヤ3スイッチ、違うのだ？"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ルータはWAN接続や多機能ルーティング向き。L3スイッチは社内で高速スイッチングしつつルーティング——役割と速度が違うの。"
+        se: "./se/emphasis_chime.mp3"
+
+  - id: "practice_tcp_header"
+    chapter:
+      label: "確認問題：TCPヘッダ（R6春 午前Ⅱ 問18）"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "問題——TCPヘッダに含まれる情報はどれか。ア宛先ポート、イ送信元IP、ウTTL、エプロトコル番号。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "イとウとエはIPヘッダのやつなのだ…… 正解はア、宛先ポートなのだ！"
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "その通り。ポート・シーケンス・ACKはTCP、IP・TTL・プロトコルはIP——層を間違えないのが合格ラインよ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "practice_tcp_trap"
+    chapter:
+      label: "ひっかけ整理：TCP vs IPヘッダ"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "イ送信元IP、ウTTL、エプロトコル番号——全部L3のIPヘッダ。TCPはL4、ポートとシーケンスが本命。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "L3とL4、ヘッダの中身ごと覚えるのだ！"
+        emphasis: ["TCP", "IP"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "check-q1-q3"
+    title: "Check! Q1–Q3：IPv4とIPv6"
+    pickScenes: ["q1_ipv4_header", "q2_ipv4_issues", "q3_ipv6"]
+    overlayCaption: "📘 Check! Q1–Q3"
+    cta: "👇 本編で13問まとめ"
+
+  - id: "check-q4-q6"
+    title: "Check! Q4–Q6：TCPとUDP"
+    pickScenes: ["q4_tcp_header", "q5_tcp_handshake", "q6_udp"]
+    overlayCaption: "📘 Check! Q4–Q6"
+    cta: "👇 本編で13問まとめ"
+
+  - id: "check-q7-q8"
+    title: "Check! Q7–Q8：メールの仕組み"
+    pickScenes: ["q7_mail_agents", "q8_mail_header"]
+    overlayCaption: "📘 Check! Q7–Q8"
+    cta: "👇 本編で13問まとめ"
+
+  - id: "check-q9"
+    title: "Check! Q9：DNSリゾルバ"
+    pickScenes: ["q9_dns"]
+    overlayCaption: "📘 Check! Q9"
+    cta: "👇 本編で13問まとめ"
+
+  - id: "check-q10-q11"
+    title: "Check! Q10–Q11：GET/POSTとCookie"
+    pickScenes: ["q10_http_methods", "q11_cookie"]
+    overlayCaption: "📘 Check! Q10–Q11"
+    cta: "👇 本編で13問まとめ"
+
+  - id: "check-q12-q13"
+    title: "Check! Q12–Q13：VLANとL3スイッチ"
+    pickScenes: ["q12_vlan", "q13_router_l3sw"]
+    overlayCaption: "📘 Check! Q12–Q13"
+    cta: "👇 本編で13問まとめ"
+
+  - id: "tcp-header-quiz"
+    title: "TCPヘッダ四択の正解（R6春 問18）"
+    pickScenes: ["practice_tcp_header", "practice_tcp_trap"]
+    overlayCaption: "📝 確認問題"
+    cta: "本編でネットワーク13問"
+
+  - id: "check-q4-q5"
+    title: "Check! Q4–Q5：TCPヘッダと3ウェイ"
+    pickScenes: ["q4_tcp_header", "q5_tcp_handshake"]
+    overlayCaption: "📘 Check! Q4–Q5"
+    cta: "👇 確認問題も概要欄"

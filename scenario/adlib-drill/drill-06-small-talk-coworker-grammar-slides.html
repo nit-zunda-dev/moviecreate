@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>英語アドリブドリル 第6問 — 海外の同僚と雑談（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220;
+      --panel: #141d2e;
+      --zunda: #88dd44;
+      --metan: #ff88bb;
+      --text: #e8f0f8;
+      --muted: #8fa3bc;
+      --accent: #7dd3fc;
+      --phrase: #fef9c3;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body {
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; max-height: 720px; margin: 0 auto; }
+    .slide {
+      display: none;
+      height: 100vh;
+      max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 0.45rem;
+      overflow: hidden;
+    }
+    .slide.active { display: grid; }
+    .tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+      color: #0c1220; background: linear-gradient(90deg, var(--zunda), var(--metan));
+      padding: 0.2rem 0.55rem; border-radius: 4px;
+    }
+    h1 {
+      font-size: 1.5rem; font-weight: 800; line-height: 1.22;
+      color: var(--phrase);
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lead {
+      font-size: 1.05rem; line-height: 1.35; color: var(--muted); font-weight: 500;
+    }
+    .lead strong { color: var(--text); }
+    .diagram {
+      min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(136, 221, 68, 0.35);
+      padding: 0.5rem 0.75rem;
+    }
+    .diagram svg {
+      display: block; width: 100%; max-width: 1180px;
+      height: auto; max-height: min(52vh, 400px);
+    }
+    .var-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      min-height: 0; height: 100%; align-content: stretch;
+      background: var(--panel); border-radius: 14px;
+      border: 1px solid rgba(255, 136, 187, 0.35); padding: 0.5rem;
+    }
+    .var-card {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0.6rem 0.7rem; border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .var-card b { font-size: 1rem; margin-bottom: 0.25rem; }
+    .var-card.open b { color: var(--accent); }
+    .var-card.detail b { color: var(--zunda); }
+    .var-card.extra b { color: var(--warn); }
+    .var-card.return b { color: var(--metan); }
+    .var-card span { font-size: 0.88rem; color: var(--muted); line-height: 1.35; font-family: var(--mono); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem; background: rgba(12, 18, 32, 0.95);
+      border-top: 1px solid rgba(136, 221, 68, 0.25); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid rgba(255, 136, 187, 0.45);
+      padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600;
+    }
+    .toolbar button:disabled { opacity: 0.35; }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    #scene-ref { font-size: 0.75rem; color: var(--metan); }
+    body.mc-slide-capture { overflow: hidden !important; }
+    body.mc-slide-capture html { font-size: 24px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .deck { height: 100vh !important; max-height: none !important; }
+    body.mc-slide-capture .slide {
+      display: none !important; padding: 0.85rem 2rem 0.65rem !important;
+      max-height: 100vh !important; height: 100vh !important;
+    }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture h1 { font-size: 1.6rem !important; }
+    body.mc-slide-capture .lead { font-size: 1.08rem !important; }
+    body.mc-slide-capture .diagram svg { max-height: 400px !important; }
+    body.mc-slide-capture .var-card b { font-size: 1.05rem !important; }
+    body.mc-slide-capture .var-card span { font-size: 0.95rem !important; }
+  </style>
+</head>
+<body>
+  <!-- drill-06-small-talk-coworker.yaml Part2 slideIndex 0〜7 -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="part2_intro" title="答え合わせ">
+      <span class="tag">英語アドリブドリル · 第6問</span>
+      <h1>海外の同僚と<em>週末の雑談</em></h1>
+      <p class="lead">同僚の <strong>How was your weekend?</strong> への返し方</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="この回の流れ">
+          <text x="450" y="42" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="sans-serif">模範フレーズ + 3つのかたまり</text>
+          <rect x="60" y="70" width="240" height="100" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="180" y="108" text-anchor="middle" fill="#86efac" font-size="15" font-weight="800" font-family="sans-serif">① It was pretty good</text>
+          <text x="180" y="140" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">なかなか良かった</text>
+          <rect x="330" y="70" width="240" height="100" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="108" text-anchor="middle" fill="#bae6fd" font-size="15" font-weight="800" font-family="sans-serif">② I ended up ~ing</text>
+          <text x="450" y="140" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">結局〜した</text>
+          <rect x="600" y="70" width="240" height="100" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="720" y="108" text-anchor="middle" fill="#fde68a" font-size="15" font-weight="800" font-family="sans-serif">③ How about you?</text>
+          <text x="720" y="140" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">あなたは？</text>
+          <rect x="40" y="195" width="820" height="70" rx="12" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="220" text-anchor="middle" fill="#bae6fd" font-size="12" font-weight="700" font-family="monospace">It was pretty good, thanks! I ended up going hiking with some friends on Saturday.</text>
+          <text x="450" y="248" text-anchor="middle" fill="#bae6fd" font-size="12" font-weight="700" font-family="monospace">The weather was perfect. How about you?</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="part2_model" title="模範">
+      <span class="tag">模範解答</span>
+      <h1>まずは<em>この4文</em>を覚える</h1>
+      <p class="lead">評価 → 出来事 → 一言添え → 相手へ返す</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 310" xmlns="http://www.w3.org/2000/svg" aria-label="模範文">
+          <text x="450" y="38" text-anchor="middle" fill="#fef9c3" font-size="15" font-weight="800" font-family="monospace">It was pretty good, thanks!</text>
+          <text x="450" y="64" text-anchor="middle" fill="#bae6fd" font-size="15" font-weight="800" font-family="monospace">I ended up going hiking with some friends on Saturday.</text>
+          <text x="450" y="90" text-anchor="middle" fill="#fde68a" font-size="15" font-weight="800" font-family="monospace">The weather was perfect. How about you?</text>
+          <rect x="80" y="110" width="200" height="55" rx="8" fill="#052e16" stroke="#4ade80"/>
+          <text x="180" y="143" text-anchor="middle" fill="#86efac" font-size="14" font-weight="700" font-family="sans-serif">評価</text>
+          <rect x="300" y="110" width="200" height="55" rx="8" fill="#0c4a6e" stroke="#38bdf8"/>
+          <text x="400" y="143" text-anchor="middle" fill="#bae6fd" font-size="14" font-weight="700" font-family="sans-serif">出来事</text>
+          <rect x="520" y="110" width="200" height="55" rx="8" fill="#422006" stroke="#fbbf24"/>
+          <text x="620" y="143" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="700" font-family="sans-serif">返す</text>
+          <text x="450" y="210" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">会議前の雑談は短くてOK</text>
+          <text x="450" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">on Saturday で「いつ」を入れる</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="part2_it_was_pretty_good" title="It was pretty good">
+      <span class="tag">解説 · ①</span>
+      <h1><em>It was pretty good</em> — なかなか良かった</h1>
+      <p class="lead"><strong>まず一言</strong>で雰囲気を伝える</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="It was pretty good">
+          <text x="450" y="52" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">It was pretty good, thanks!</text>
+          <rect x="120" y="80" width="660" height="55" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="115" text-anchor="middle" fill="#bbf7d0" font-size="18" font-family="sans-serif">なかなか良かったよ、ありがとう</text>
+          <rect x="100" y="155" width="350" height="120" rx="12" fill="#1e293b" stroke="#86efac" stroke-width="2"/>
+          <text x="275" y="195" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">言い換え</text>
+          <text x="275" y="225" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="monospace">It was great</text>
+          <text x="275" y="252" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="monospace">Not bad, thanks</text>
+          <rect x="470" y="155" width="330" height="120" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="635" y="195" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">ポイント</text>
+          <text x="635" y="225" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">いきなり詳細から入らない</text>
+          <text x="635" y="252" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">thanks! で丁寧に</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="part2_i_ended_up" title="I ended up">
+      <span class="tag">解説 · ②</span>
+      <h1><em>I ended up ~ing</em> — 結局〜した</h1>
+      <p class="lead"><strong>週末の出来事</strong>を具体的に</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="I ended up">
+          <text x="450" y="48" text-anchor="middle" fill="#fef9c3" font-size="20" font-weight="800" font-family="monospace">I ended up going hiking with some friends on Saturday.</text>
+          <rect x="120" y="72" width="660" height="55" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="450" y="105" text-anchor="middle" fill="#bae6fd" font-size="18" font-family="sans-serif">土曜に友人とハイキングに行った</text>
+          <rect x="80" y="165" width="370" height="110" rx="12" fill="#1e293b" stroke="#86efac" stroke-width="2"/>
+          <text x="265" y="200" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">言い換え</text>
+          <text x="265" y="230" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">I went hiking</text>
+          <text x="265" y="255" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">I stayed home and ~</text>
+          <rect x="470" y="165" width="350" height="110" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="645" y="200" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">足すと良い</text>
+          <text x="645" y="230" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">with some friends</text>
+          <text x="645" y="255" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">on Saturday / on Sunday</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="part2_how_about_you" title="How about you">
+      <span class="tag">解説 · ③</span>
+      <h1><em>How about you?</em> — あなたは？</h1>
+      <p class="lead"><strong>相手に話題を返す</strong>定番</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="How about you">
+          <text x="450" y="52" text-anchor="middle" fill="#fef9c3" font-size="20" font-weight="800" font-family="monospace">The weather was perfect. How about you?</text>
+          <rect x="120" y="80" width="660" height="55" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="115" text-anchor="middle" fill="#fde68a" font-size="18" font-family="sans-serif">天気も最高だった。あなたは？</text>
+          <rect x="100" y="155" width="350" height="120" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="275" y="195" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">言い換え</text>
+          <text x="275" y="225" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">What about you?</text>
+          <text x="275" y="252" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">How was yours?</text>
+          <rect x="470" y="155" width="330" height="120" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="635" y="195" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">一言添え</text>
+          <text x="635" y="225" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">The weather was ~</text>
+          <text x="635" y="252" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">会話が続きやすい</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="part2_variants" title="言い換え">
+      <span class="tag">言い換え</span>
+      <h1>トーンを<em>調整</em>する</h1>
+      <p class="lead">評価 → 出来事 → 返す、の骨格は同じ</p>
+      <div class="var-grid">
+        <div class="var-card open"><b>フル</b><span>It was pretty good, thanks! I ended up going hiking with some friends on Saturday. The weather was perfect. How about you?</span></div>
+        <div class="var-card detail"><b>短く</b><span>Pretty good! I went to the beach on Sunday. How about you?</span></div>
+        <div class="var-card extra"><b>家でゆっくり</b><span>It was relaxing. I mostly stayed home and watched a movie. How about you?</span></div>
+        <div class="var-card return"><b>予定変更</b><span>It was good! I ended up meeting an old friend for coffee. How was your weekend?</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="part2_replay" title="リプレイ">
+      <span class="tag">リプレイ</span>
+      <h1>もう一度<em>ゆっくり</em></h1>
+      <p class="lead">口に馴染ませる発音の目安</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="発音">
+          <rect x="40" y="35" width="820" height="65" rx="12" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="75" text-anchor="middle" fill="#bbf7d0" font-size="16" font-weight="700" font-family="sans-serif">pret · ty · good · end · ed · up · hi · king · per · fect</text>
+          <rect x="100" y="120" width="700" height="130" rx="14" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="160" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">How about you? の bout をはっきり</text>
+          <text x="450" y="195" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">with some friends はつなげて言ってOK</text>
+          <text x="450" y="230" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">thanks! は短くサンクスでOK</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="part2_outro" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>次は<em>あなたが言う</em>番</h1>
+      <p class="lead">アプリ中級編「海外の同僚と雑談」でも練習</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="まとめ">
+          <rect x="80" y="40" width="740" height="55" rx="10" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="75" text-anchor="middle" fill="#fef9c3" font-size="16" font-weight="800" font-family="monospace">It was pretty good · I ended up ~ing · How about you?</text>
+          <rect x="120" y="115" width="220" height="90" rx="12" fill="#1e293b" stroke="#88dd44"/>
+          <text x="230" y="155" text-anchor="middle" fill="#86efac" font-size="17" font-weight="800" font-family="sans-serif">評価</text>
+          <rect x="360" y="115" width="180" height="90" rx="12" fill="#1e293b" stroke="#38bdf8"/>
+          <text x="450" y="155" text-anchor="middle" fill="#7dd3fc" font-size="17" font-weight="800" font-family="sans-serif">出来事</text>
+          <rect x="560" y="115" width="220" height="90" rx="12" fill="#1e293b" stroke="#fbbf24"/>
+          <text x="670" y="155" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="800" font-family="sans-serif">返す</text>
+          <rect x="120" y="220" width="660" height="45" rx="10" fill="#422006" stroke="#fbbf24"/>
+          <text x="450" y="250" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="600" font-family="sans-serif">チャンネル登録 &amp; アプリで再チャレンジ</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="text-align:center;">
+      <span class="progress" id="prog">1 / 8</span><br />
+      <span id="scene-ref"></span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        var sc = slides[idx].getAttribute("data-yaml-scene");
+        sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>
