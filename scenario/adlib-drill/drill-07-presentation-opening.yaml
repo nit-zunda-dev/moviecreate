@@ -1,0 +1,246 @@
+# =============================================================================
+# 英語アドリブドリル 第7問 — プレゼン冒頭（advanced-1）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = advanced-1
+#
+# 解説スライド: drill-07-presentation-opening-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_imagine_a_world · 3 part2_today_i_want
+#   4 part2_but_first_let_me_ask · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して advanced.ts へ）:
+#   setupEndSeconds / revealStartSeconds: （レンダ後に実測）
+#   youtubeVideoId: （公開後）
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-07-presentation-opening.yaml
+# =============================================================================
+title: '【英語アドリブドリル】プレゼン冒頭｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  host:
+    speakerId: 13
+    subtitleColor: "#AADDFF"
+    voice:
+      speedScale: 0.98
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-07-presentation-opening-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "国際カンファレンスの壇上。日本の働き方改革について、聴衆を引き込む60秒のオープニング、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "司会に名前を呼ばれたのに、英語の冒頭が思い浮かばないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: host
+        text: "Please welcome our next speaker. You have sixty seconds for your opening on Japan's work-style reform."
+        subtitle: "Please welcome our next speaker. You have sixty seconds for your opening on Japan's work-style reform."
+        speechText: "プリーズ・ウェルカム・アワ・ネクスト・スピーカー。ユー・ハヴ・シクスティ・セカンズ・フォー・ユア・オープニング・オン・ジャパンズ・ワークスタイル・リフォーム。"
+        voice:
+          speedScale: 0.95
+          postPhonemeLength: 0.12
+        emphasis:
+          - "sixty seconds"
+          - "work-style reform"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……60秒で聴衆の心をつかむ英語、急に言えって言われたのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんてオープニングを話すのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Imagine で理想の世界を描いて、Today I want to talk about でテーマを宣言。余裕があれば But first, let me ask you で聴衆に問いかけて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきのプレゼン冒頭。今日は3つのかたまりで、聴衆を引き込むオープニングを組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Imagine a world where と Today I want to talk about と But first, let me ask you、覚えるのだ！"
+        speechText: "イマジン・ア・ワールド・ウェアと、トゥデイ・アイ・ウォント・トゥ・トーク・アバウtと、バット・ファースト、レット・ミー・アスク・ユー、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。理想のビジョンから入って、テーマと「なぜ今ここで話すのか」まで一気に。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Imagine a world where every employee leaves work on time, feeling energized. Today I want to talk about Japan's work-style reform—and why it matters not just for Japan, but for all of us in this room."
+        subtitle: "Imagine a world where every employee leaves work on time, feeling energized. Today I want to talk about Japan's work-style reform—and why it matters not just for Japan, but for all of us in this room."
+        speechText: "イマジン・ア・ワールド・ウェア、エブリ・エンプロイイー・リーヴズ・ワーク・オン・タイム、フィーリング・エナジャイズド。トゥデイ・アイ・ウォント・トゥ・トーク・アバウt・ジャパンズ・ワークスタイル・リフォーム、アンド・ワイ・イット・マターズ・ノット・ジャスト・フォー・ジャパン、バット・フォー・オール・オブ・アス・イン・ディス・ルーム。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "Imagine a world where"
+          - "Today I want to talk about"
+          - "all of us in this room"
+
+  - id: "part2_imagine_a_world"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Imagine a world where は「〜な世界を想像して」。聴衆の頭に映像を浮かべさせるフック。Picture a future where ~ や What if ~ でも同じ役割よ。"
+        subtitle: "Imagine a world where ~ / Picture a future where ~"
+        speechText: "イマジン・ア・ワールド・ウェアは、な世界を想像して。聴衆の頭に映像を浮かべさせるフック。ピクチャー・ア・フューチャー・ウェア、や、ワット・イフ、でも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "leaves work on time, feeling energized で、働き方改革の「理想像」が伝わるのだ。"
+        speechText: "リーヴズ・ワーク・オン・タイム、フィーリング・エナジャイズドで、働き方改革の理想像が伝わるのだ。"
+
+  - id: "part2_today_i_want"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Today I want to talk about はテーマ宣言の定番。and why it matters で「なぜ重要か」を足す。not just for Japan, but for all of us in this room で聴衆全員に刺さる。"
+        subtitle: "Today I want to talk about ~ / and why it matters"
+        speechText: "トゥデイ・アイ・ウォント・トゥ・トーク・アバウtは、テーマ宣言の定番。アンド・ワイ・イット・マターズで、なぜ重要かを足す。ノット・ジャスト・フォー・ジャパン、バット・フォー・オール・オブ・アス・イン・ディス・ルームで、聴衆全員に刺さる。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "In this talk, I will discuss より Today I want to talk about の方が、会話に近くて聞きやすいのだ。"
+        speechText: "イン・ディス・トーク、アイ・ウィル・ディスカスより、トゥデイ・アイ・ウォント・トゥ・トーク・アバウtの方が、会話に近くて聞きやすいのだ。"
+
+  - id: "part2_but_first_let_me_ask"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "But first, let me ask you は聴衆への問いかけ。手を挙げさせたり、うなずきを促したりできる。模範の2文だけでもOK。余裕があれば足すわ。"
+        subtitle: "But first, let me ask you: ~"
+        speechText: "バット・ファースト、レット・ミー・アスク・ユーは、聴衆への問いかけ。手を挙げさせたり、うなずきを促したりできる。模範の2文だけでもオーケー。余裕があれば足すわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "But first, let me ask you: when was the last time you left the office feeling truly energized? みたいに、自分のテーマにつなげるのだ！"
+        subtitle: "But first, let me ask you: when was the last time you left the office feeling truly energized?"
+        speechText: "バット・ファースト、レット・ミー・アスク・ユー。ウェン・ワズ・ザ・ラスト・タイム、ユー・レフト・ザ・オフィス、フィーリング・トゥーリー・エナジャイズド？みたいに、自分のテーマにつなげるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら Imagine everyone going home on time. Today, Japan's work-style reform—and why it matters to you. でもOK。60秒以内がルールよ。"
+        speechText: "短く言うなら、イマジン・エブリワン・ゴーイング・ホーム・オン・タイム。トゥデイ、ジャパンズ・ワークスタイル・リフォーム、アンド・ワイ・イット・マターズ・トゥ・ユー。でもオーケー。60秒以内がルールよ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "緊張したら、Imagine と Today の2文だけ覚えておけば、なんとかなるのだ。"
+        speechText: "緊張したら、イマジンとトゥデイの2文だけ覚えておけば、なんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。Imagine の ma、reform の form、matters の z をはっきり。"
+        speechText: "もう一度、ゆっくり。イマジンの ma、リフォームの form、マターズの z をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Imagine a world where every employee leaves work on time, feeling energized. Today I want to talk about Japan's work-style reform—and why it matters not just for Japan, but for all of us in this room."
+        subtitle: "Imagine a world where every employee leaves work on time, feeling energized. Today I want to talk about Japan's work-style reform—and why it matters not just for Japan, but for all of us in this room."
+        speechText: "イマジン・ア・ワールド・ウェア、エブリ・エンプロイイー・リーヴズ・ワーク・オン・タイム、フィーリング・エナジャイズド。トゥデイ・アイ・ウォント・トゥ・トーク・アバウt・ジャパンズ・ワークスタイル・リフォーム、アンド・ワイ・イット・マターズ・ノット・ジャスト・フォー・ジャパン、バット・フォー・オール・オブ・アス・イン・ディス・ルーム。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "Imagine a world where"
+          - "work-style reform"
+          - "all of us in this room"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Imagine a world where、Today I want to talk about、But first, let me ask you。この3つを持ち帰って。アプリの上級編でも練習してね。"
+        speechText: "イマジン・ア・ワールド・ウェア、トゥデイ・アイ・ウォント・トゥ・トーク・アバウt、バット・ファースト、レット・ミー・アスク・ユー。この3つを持ち帰って。アプリの上級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#プレゼン英語"
+    - "#ビジネス英語"
+    - "#英語プレゼン"
+    - "#ずんだもん"
+    - "#四国めたん"
