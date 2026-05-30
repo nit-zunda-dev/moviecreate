@@ -7,9 +7,10 @@
 #   0 part2_intro · 1 part2_model · 2 part2_i_understand_your_point · 3 part2_with_all_due_respect
 #   4 part2_may_i_suggest · 5 part2_variants · 6 part2_replay · 7 part2_outro
 #
-# drill-meta（レンダ後に実測して advanced.ts へ）:
-#   setupEndSeconds / revealStartSeconds: （レンダ後に実測）
-#   youtubeVideoId: （公開後）
+# drill-meta（advanced.ts へ反映済み）:
+#   setupEndSeconds / revealStartSeconds: 41（チャプター「答え合わせ」0:41）
+#   youtubeVideoId: iTdwCbAlQaw
+#   https://youtu.be/iTdwCbAlQaw
 #
 # 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
 #
