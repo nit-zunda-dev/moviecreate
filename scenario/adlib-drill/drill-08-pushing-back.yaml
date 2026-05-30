@@ -1,0 +1,246 @@
+# =============================================================================
+# 英語アドリブドリル 第8問 — 上司に反論する（advanced-2）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = advanced-2
+#
+# 解説スライド: drill-08-pushing-back-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_i_understand_your_point · 3 part2_with_all_due_respect
+#   4 part2_may_i_suggest · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して advanced.ts へ）:
+#   setupEndSeconds / revealStartSeconds: （レンダ後に実測）
+#   youtubeVideoId: （公開後）
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-08-pushing-back.yaml
+# =============================================================================
+title: '【英語アドリブドリル】上司に反論する｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  boss:
+    speakerId: 13
+    subtitleColor: "#AADDFF"
+    voice:
+      speedScale: 0.98
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-08-pushing-back-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "外国人上司が日本市場の研修予算を丸ごとカットしようとする。失礼にならない範囲で反対する、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "Yes, boss... って言いそうになるのに、英語で反論の言い方が思い浮かばないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: boss
+        text: "I'm proposing we cut the entire training budget for the Japanese market."
+        subtitle: "I'm proposing we cut the entire training budget for the Japanese market."
+        speechText: "アイム・プロポージング・ウィー・カット・ジ・エンタイア・トレーニング・バジェット・フォー・ザ・ジャパニーズ・マーケット。"
+        voice:
+          speedScale: 0.95
+          postPhonemeLength: 0.12
+        emphasis:
+          - "cut the entire training budget"
+          - "Japanese market"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……日本向けの研修を全部なくすのだ！？ でも英語でどう反論すればいいのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、失礼にならずにどう反対意見を述べるのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "理解 → 敬意 → 代替案。3つのかたまりで組み立ててみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの上司への返し。今日は3つのかたまりで、失礼にならない反論を組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I understand your point, however と With all due respect と May I suggest an alternative、覚えるのだ！"
+        speechText: "アイ・アンダスタンド・ユア・ポイント、ハウエバーと、ウィズ・オール・デュー・リスペクトと、メイ・アイ・サジェスト・アン・オルタナティブ、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。上司の意図を認めてから、敬意を添えて懸念を述べ、代替案で締める。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?"
+        subtitle: "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?"
+        speechText: "アイ・アンダスタンド・ユア・ポイント・アバウt・ザ・バジェット。ハウエバー、ウィズ・オール・デュー・リスペクト、カッティング・オール・トレーニング・フォー・ザ・ジャパニーズ・マーケット・クッド・ハート・アワ・グロース。メイ・アイ・サジェスト・ウィー・キープ・ア・スモーラー・パイロット・プログラム・インステッド？"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "I understand your point"
+          - "with all due respect"
+          - "May I suggest"
+
+  - id: "part2_i_understand_your_point"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I understand your point, however は「おっしゃることはわかります。ただ」。I see where you're coming from, but ~ や I hear you, however ~ でも同じ役割よ。"
+        subtitle: "I understand your point, however ~"
+        speechText: "アイ・アンダスタンド・ユア・ポイント、ハウエバーは、おっしゃることはわかります。ただ。アイ・シー・ウェア・ユーア・カミング・フロム、バット、や、アイ・ヒア・ユー、ハウエバー、でも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "about the budget で、予算の話だとわかっていると伝えるのだ。いきなり No は言わない。"
+        speechText: "アバウt・ザ・バジェットで、予算の話だとわかっていると伝えるのだ。いきなりノーは言わない。"
+
+  - id: "part2_with_all_due_respect"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "With all due respect は「失礼を承知で」。上司への敬意を示しながら、意見の食い違いを伝える。could hurt our growth でリスクを述べる。"
+        subtitle: "With all due respect, ~ could hurt our growth"
+        speechText: "ウィズ・オール・デュー・リスペクトは、失礼を承知で。上司への敬意を示しながら、意見の食い違いを伝える。クッド・ハート・アワ・グロースでリスクを述べる。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "cutting all training for the Japanese market は、日本市場の研修を全部カットする、と具体的に言うのだ。"
+        speechText: "カッティング・オール・トレーニング・フォー・ザ・ジャパニーズ・マーケットは、日本市場の研修を全部カットする、と具体的に言うのだ。"
+
+  - id: "part2_may_i_suggest"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "May I suggest an alternative は「別案を提案してもよろしいでしょうか」。否定だけで終わらせず、smaller pilot program のように前向きな案で締めるわ。"
+        subtitle: "May I suggest ~ / instead?"
+        speechText: "メイ・アイ・サジェスト・アン・オルタナティブは、別案を提案してもよろしいでしょうか。否定だけで終わらせず、スモーラー・パイロット・プログラムのように前向きな案で締めるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "May I suggest we keep a smaller pilot program instead? みたいに、規模を小さくする代替案が伝わるのだ！"
+        subtitle: "May I suggest we keep a smaller pilot program instead?"
+        speechText: "メイ・アイ・サジェスト・ウィー・キープ・ア・スモーラー・パイロット・プログラム・インステッド？みたいに、規模を小さくする代替案が伝わるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら I hear you on the budget. But cutting all Japan training could hurt growth. Could we try a small pilot? でもOK。敬意を忘れないで。"
+        speechText: "短く言うなら、アイ・ヒア・ユー・オン・ザ・バジェット。バット、カッティング・オール・ジャパン・トレーニング・クッド・ハート・グロース。クッド・ウィー・トライ・ア・スモール・パイロット？でもオーケー。敬意を忘れないで。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "緊張したら、I understand your point, however と May I suggest の2文だけ覚えておけば、なんとかなるのだ。"
+        speechText: "緊張したら、アイ・アンダスタンド・ユア・ポイント、ハウエバーと、メイ・アイ・サジェストの2文だけ覚えておけば、なんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。respect の spect、pilot の lot、instead の stead をはっきり。"
+        speechText: "もう一度、ゆっくり。リスペクトの spect、パイロットの lot、インステッドの stead をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?"
+        subtitle: "I understand your point about the budget. However, with all due respect, cutting all training for the Japanese market could hurt our growth. May I suggest we keep a smaller pilot program instead?"
+        speechText: "アイ・アンダスタンド・ユア・ポイント・アバウt・ザ・バジェット。ハウエバー、ウィズ・オール・デュー・リスペクト、カッティング・オール・トレーニング・フォー・ザ・ジャパニーズ・マーケット・クッド・ハート・アワ・グロース。メイ・アイ・サジェスト・ウィー・キープ・ア・スモーラー・パイロット・プログラム・インステッド？"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "I understand your point"
+          - "with all due respect"
+          - "May I suggest"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "I understand your point, however、With all due respect、May I suggest an alternative。この3つを持ち帰って。アプリの上級編でも練習してね。"
+        speechText: "アイ・アンダスタンド・ユア・ポイント、ハウエバー、ウィズ・オール・デュー・リスペクト、メイ・アイ・サジェスト・アン・オルタナティブ。この3つを持ち帰って。アプリの上級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#ビジネス英語"
+    - "#英語上司"
+    - "#プッシングバック"
+    - "#ずんだもん"
+    - "#四国めたん"
