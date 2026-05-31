@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>英語アドリブドリル 第9問 — クレーム対応（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220;
+      --panel: #141d2e;
+      --zunda: #88dd44;
+      --metan: #ff88bb;
+      --text: #e8f0f8;
+      --muted: #8fa3bc;
+      --accent: #7dd3fc;
+      --phrase: #fef9c3;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --hot: #fb923c;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body {
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font); overflow: hidden;
+    }
+    .deck { height: 100vh; max-height: 720px; margin: 0 auto; }
+    .slide {
+      display: none;
+      height: 100vh;
+      max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 0.45rem;
+      overflow: hidden;
+    }
+    .slide.active { display: grid; }
+    .tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+      color: #0c1220; background: linear-gradient(90deg, var(--zunda), var(--metan));
+      padding: 0.2rem 0.55rem; border-radius: 4px;
+    }
+    h1 {
+      font-size: 1.5rem; font-weight: 800; line-height: 1.22;
+      color: var(--phrase);
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lead {
+      font-size: 1.05rem; line-height: 1.35; color: var(--muted); font-weight: 500;
+    }
+    .lead strong { color: var(--text); }
+    .diagram {
+      min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--panel);
+      border-radius: 14px;
+      border: 1px solid rgba(136, 221, 68, 0.35);
+      padding: 0.5rem 0.75rem;
+    }
+    .diagram svg {
+      display: block; width: 100%; max-width: 1180px;
+      height: auto; max-height: min(52vh, 400px);
+    }
+    .var-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      min-height: 0; height: 100%; align-content: stretch;
+      background: var(--panel); border-radius: 14px;
+      border: 1px solid rgba(255, 136, 187, 0.35); padding: 0.5rem;
+    }
+    .var-card {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0.6rem 0.7rem; border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .var-card b { font-size: 1rem; margin-bottom: 0.25rem; }
+    .var-card.apologize b { color: var(--warn); }
+    .var-card.empathy b { color: var(--hot); }
+    .var-card.solve b { color: var(--zunda); }
+    .var-card.short b { color: var(--metan); }
+    .var-card span { font-size: 0.88rem; color: var(--muted); line-height: 1.35; font-family: var(--mono); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem; background: rgba(12, 18, 32, 0.95);
+      border-top: 1px solid rgba(136, 221, 68, 0.25); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid rgba(255, 136, 187, 0.45);
+      padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600;
+    }
+    .toolbar button:disabled { opacity: 0.35; }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    #scene-ref { font-size: 0.75rem; color: var(--metan); }
+    body.mc-slide-capture { overflow: hidden !important; }
+    body.mc-slide-capture html { font-size: 24px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .deck { height: 100vh !important; max-height: none !important; }
+    body.mc-slide-capture .slide {
+      display: none !important; padding: 0.85rem 2rem 0.65rem !important;
+      max-height: 100vh !important; height: 100vh !important;
+    }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture h1 { font-size: 1.6rem !important; }
+    body.mc-slide-capture .lead { font-size: 1.08rem !important; }
+    body.mc-slide-capture .diagram svg { max-height: 400px !important; }
+    body.mc-slide-capture .var-card b { font-size: 1.05rem !important; }
+    body.mc-slide-capture .var-card span { font-size: 0.95rem !important; }
+  </style>
+</head>
+<body>
+  <!-- drill-09-handling-complaint.yaml Part2 slideIndex 0〜7 -->
+  <div class="deck" id="deck">
+
+    <section class="slide active" data-i="1" data-yaml-scene="part2_intro" title="答え合わせ">
+      <span class="tag">英語アドリブドリル · 第9問</span>
+      <h1>怒るお客様に<em>謝罪と解決策</em>を伝える</h1>
+      <p class="lead">This is the worst service I have ever received! への<strong>カスタマーサポート対応</strong></p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="この回の流れ">
+          <text x="450" y="42" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="sans-serif">模範フレーズ + 3つのかたまり</text>
+          <rect x="60" y="70" width="240" height="100" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="180" y="100" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="800" font-family="sans-serif">① I sincerely</text>
+          <text x="180" y="122" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="800" font-family="sans-serif">apologize</text>
+          <text x="180" y="150" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">心から謝罪</text>
+          <rect x="330" y="70" width="240" height="100" rx="12" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="450" y="100" text-anchor="middle" fill="#fdba74" font-size="13" font-weight="800" font-family="sans-serif">② I completely understand</text>
+          <text x="450" y="122" text-anchor="middle" fill="#fdba74" font-size="13" font-weight="800" font-family="sans-serif">your frustration</text>
+          <text x="450" y="150" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">怒りに共感</text>
+          <rect x="600" y="70" width="240" height="100" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="720" y="100" text-anchor="middle" fill="#86efac" font-size="14" font-weight="800" font-family="sans-serif">③ Let me make</text>
+          <text x="720" y="122" text-anchor="middle" fill="#86efac" font-size="14" font-weight="800" font-family="sans-serif">this right</text>
+          <text x="720" y="150" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">解決策を提示</text>
+          <rect x="40" y="195" width="820" height="70" rx="12" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="218" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="700" font-family="monospace">I sincerely apologize for the experience you've had. I completely understand your frustration.</text>
+          <text x="450" y="248" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="700" font-family="monospace">Let me make this right—I'd like to offer you a full refund and priority support going forward.</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="2" data-yaml-scene="part2_model" title="模範">
+      <span class="tag">模範解答</span>
+      <h1>まずは<em>この3文</em>を覚える</h1>
+      <p class="lead">謝罪 → 共感 → 具体策</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-label="模範文">
+          <text x="450" y="36" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="800" font-family="monospace">I sincerely apologize for the experience you've had.</text>
+          <text x="450" y="62" text-anchor="middle" fill="#fdba74" font-size="13" font-weight="800" font-family="monospace">I completely understand your frustration.</text>
+          <text x="450" y="88" text-anchor="middle" fill="#86efac" font-size="13" font-weight="800" font-family="monospace">Let me make this right—I'd like to offer you a full refund and priority support going forward.</text>
+          <rect x="80" y="105" width="200" height="55" rx="8" fill="#422006" stroke="#fbbf24"/>
+          <text x="180" y="138" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="700" font-family="sans-serif">謝罪</text>
+          <rect x="310" y="105" width="200" height="55" rx="8" fill="#431407" stroke="#fb923c"/>
+          <text x="410" y="138" text-anchor="middle" fill="#fdba74" font-size="14" font-weight="700" font-family="sans-serif">共感</text>
+          <rect x="540" y="105" width="200" height="55" rx="8" fill="#052e16" stroke="#4ade80"/>
+          <text x="640" y="138" text-anchor="middle" fill="#86efac" font-size="14" font-weight="700" font-family="sans-serif">解決</text>
+          <text x="450" y="200" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">謝るだけで終わらせず、具体的な対応を示す</text>
+          <text x="450" y="230" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">full refund = 全額返金 · priority support = 優先サポート</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="3" data-yaml-scene="part2_i_sincerely_apologize" title="I sincerely apologize">
+      <span class="tag">解説 · ①</span>
+      <h1><em>I sincerely apologize</em> — 心から謝罪</h1>
+      <p class="lead"><strong>I'm sorry より誠意</strong>が伝わるビジネス表現</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="I sincerely apologize">
+          <text x="450" y="48" text-anchor="middle" fill="#fef9c3" font-size="17" font-weight="800" font-family="monospace">I sincerely apologize for the experience you've had.</text>
+          <rect x="120" y="72" width="660" height="55" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="105" text-anchor="middle" fill="#fde68a" font-size="17" font-family="sans-serif">この度のご経験、心よりお詫び申し上げます</text>
+          <rect x="100" y="145" width="350" height="130" rx="12" fill="#1e293b" stroke="#86efac" stroke-width="2"/>
+          <text x="275" y="185" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">言い換え</text>
+          <text x="275" y="215" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">I'm truly sorry for ~</text>
+          <text x="275" y="245" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">Please accept my apologies for ~</text>
+          <rect x="470" y="145" width="330" height="130" rx="12" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+          <text x="635" y="185" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="700" font-family="sans-serif">ポイント</text>
+          <text x="635" y="215" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">for the experience you've had</text>
+          <text x="635" y="245" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">今回の件だと具体化</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="4" data-yaml-scene="part2_understand_frustration" title="I completely understand your frustration">
+      <span class="tag">解説 · ②</span>
+      <h1><em>I completely understand your frustration</em> — 共感</h1>
+      <p class="lead"><strong>相手の怒りを認め</strong>、対立を和らげる</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="understand frustration">
+          <text x="450" y="44" text-anchor="middle" fill="#fef9c3" font-size="17" font-weight="800" font-family="monospace">I completely understand your frustration.</text>
+          <rect x="120" y="68" width="660" height="50" rx="10" fill="#431407" stroke="#fb923c" stroke-width="2"/>
+          <text x="450" y="100" text-anchor="middle" fill="#fdba74" font-size="16" font-family="sans-serif">お怒りのお気持ち、十分に理解しております</text>
+          <rect x="80" y="135" width="370" height="120" rx="12" fill="#1e293b" stroke="#86efac" stroke-width="2"/>
+          <text x="265" y="175" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">言い換え</text>
+          <text x="265" y="205" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">I can see why you're upset.</text>
+          <text x="265" y="232" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">That must have been very frustrating.</text>
+          <rect x="470" y="135" width="350" height="120" rx="12" fill="#1e293b" stroke="#fb923c" stroke-width="2"/>
+          <text x="645" y="175" text-anchor="middle" fill="#fdba74" font-size="17" font-weight="700" font-family="sans-serif">completely</text>
+          <text x="645" y="205" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">「十分に」理解していると強調</text>
+          <text x="645" y="232" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">But you shouldn't ~ はNG</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="5" data-yaml-scene="part2_let_me_make_this_right" title="Let me make this right">
+      <span class="tag">解説 · ③</span>
+      <h1><em>Let me make this right</em> — 解決策</h1>
+      <p class="lead">謝罪のあと、<strong>具体的なリカバリー</strong>を提示</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" aria-label="Let me make this right">
+          <text x="450" y="44" text-anchor="middle" fill="#fef9c3" font-size="14" font-weight="800" font-family="monospace">Let me make this right—I'd like to offer you a full refund and priority support going forward.</text>
+          <rect x="120" y="68" width="660" height="50" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="100" text-anchor="middle" fill="#bbf7d0" font-size="16" font-family="sans-serif">責任を持って解決します—全額返金と優先サポートをご提案します</text>
+          <rect x="100" y="145" width="350" height="125" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="275" y="185" text-anchor="middle" fill="#86efac" font-size="17" font-weight="700" font-family="sans-serif">言い換え</text>
+          <text x="275" y="215" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">I'll arrange a full refund right away.</text>
+          <text x="275" y="245" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">Here's what I can do for you: ~</text>
+          <rect x="470" y="145" width="330" height="125" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="645" y="185" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">make this right</text>
+          <text x="645" y="215" text-anchor="middle" fill="#cbd5e1" font-size="15" font-family="sans-serif">「正しい状態に戻す」</text>
+          <text x="645" y="245" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">going forward = 今後</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="6" data-yaml-scene="part2_variants" title="言い換え">
+      <span class="tag">言い換え</span>
+      <h1>短さと<em>緊張度</em>で調整</h1>
+      <p class="lead">謝罪 → 共感 → 解決の骨格は同じ</p>
+      <div class="var-grid">
+        <div class="var-card apologize"><b>フル（模範）</b><span>I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward.</span></div>
+        <div class="var-card empathy"><b>共感を短く</b><span>I'm so sorry this happened. I understand why you're upset.</span></div>
+        <div class="var-card solve"><b>解決を短く</b><span>Let me make this right. I'll arrange a full refund right away.</span></div>
+        <div class="var-card short"><b>最低限</b><span>I sincerely apologize. Let me make this right with a full refund.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-i="7" data-yaml-scene="part2_replay" title="リプレイ">
+      <span class="tag">リプレイ</span>
+      <h1>もう一度<em>ゆっくり</em></h1>
+      <p class="lead">口に馴染ませる発音の目安</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="発音">
+          <rect x="40" y="35" width="820" height="65" rx="12" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="75" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="700" font-family="sans-serif">sin · cer · ly · frus · tra · tion · re · fund · pri · or · i · ty</text>
+          <rect x="100" y="120" width="700" height="130" rx="14" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="160" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="sans-serif">sincerely は sin-SEER-lee</text>
+          <text x="450" y="195" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">frustration の frus- をはっきり</text>
+          <text x="450" y="230" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">Let me make this right の前で一拍置いてもOK</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-i="8" data-yaml-scene="part2_outro" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>次は<em>あなたが言う</em>番</h1>
+      <p class="lead">アプリ上級編「クレーム対応（英語）」でも練習</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" aria-label="まとめ">
+          <rect x="80" y="40" width="740" height="55" rx="10" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="75" text-anchor="middle" fill="#fef9c3" font-size="13" font-weight="800" font-family="monospace">I sincerely apologize · I completely understand your frustration · Let me make this right</text>
+          <rect x="120" y="115" width="220" height="90" rx="12" fill="#1e293b" stroke="#fbbf24"/>
+          <text x="230" y="155" text-anchor="middle" fill="#fde68a" font-size="17" font-weight="800" font-family="sans-serif">謝罪</text>
+          <rect x="360" y="115" width="180" height="90" rx="12" fill="#1e293b" stroke="#fb923c"/>
+          <text x="450" y="155" text-anchor="middle" fill="#fdba74" font-size="17" font-weight="800" font-family="sans-serif">共感</text>
+          <rect x="560" y="115" width="220" height="90" rx="12" fill="#1e293b" stroke="#88dd44"/>
+          <text x="670" y="155" text-anchor="middle" fill="#86efac" font-size="17" font-weight="800" font-family="sans-serif">解決</text>
+          <rect x="120" y="220" width="660" height="45" rx="10" fill="#422006" stroke="#fbbf24"/>
+          <text x="450" y="250" text-anchor="middle" fill="#fde68a" font-size="16" font-weight="600" font-family="sans-serif">チャンネル登録 &amp; アプリで再チャレンジ</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="text-align:center;">
+      <span class="progress" id="prog">1 / 8</span><br />
+      <span id="scene-ref"></span>
+    </div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0;
+      var prog = document.getElementById("prog");
+      var sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev");
+      var btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        var sc = slides[idx].getAttribute("data-yaml-scene");
+        sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>

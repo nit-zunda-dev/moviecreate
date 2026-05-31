@@ -1,0 +1,248 @@
+# =============================================================================
+# 英語アドリブドリル 第9問 — クレーム対応（advanced-3）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = advanced-3
+#
+# 解説スライド: drill-09-handling-complaint-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_i_sincerely_apologize · 3 part2_understand_frustration
+#   4 part2_let_me_make_this_right · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して advanced.ts へ）:
+#   setupEndSeconds / revealStartSeconds: TBD
+#   youtubeVideoId: TBD
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-09-handling-complaint.yaml
+# =============================================================================
+title: '【英語アドリブドリル】クレーム対応｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  customer:
+    speakerId: 11
+    subtitleColor: "#FFAA66"
+    voice:
+      speedScale: 1.08
+      intonationScale: 1.15
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-09-handling-complaint-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "カスタマーサポートで、怒っている海外のお客様。謝罪と解決策を英語で、って言われたことあるわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "I'm sorry しか言えないのに、怒ってる相手にはそれじゃ足りないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: customer
+        text: "This is the worst service I have ever received!"
+        subtitle: "This is the worst service I have ever received!"
+        speechText: "ディス・イズ・ザ・ワースト・サービス・アイ・ハブ・エヴァー・リシーブド！"
+        voice:
+          speedScale: 1.05
+          intonationScale: 1.2
+          postPhonemeLength: 0.12
+        emphasis:
+          - "worst service"
+          - "ever received"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "うわ……今までで一番ひどいって言われたのだ！？ 英語でどう謝って、どう解決するのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、丁寧に謝罪して、どんな解決策を提示するのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "謝罪 → 共感 → 解決策。3つのかたまりで組み立ててみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきのクレームへの返し。今日は3つのかたまりで、落ち着いて対応するわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I sincerely apologize と I completely understand your frustration と Let me make this right、覚えるのだ！"
+        speechText: "アイ・シンシアリー・アポロジャイズと、アイ・コンプリートリー・アンダスタンド・ユア・フラストレーションと、レット・ミー・メイク・ディス・ライト、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。心から謝罪し、怒りに共感して、具体的な解決策を提示する。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward."
+        subtitle: "I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward."
+        speechText: "アイ・シンシアリー・アポロジャイズ・フォー・ジ・エクスペリエンス・ユーヴ・ハッド。アイ・コンプリートリー・アンダスタンド・ユア・フラストレーション。レット・ミー・メイク・ディス・ライト。アイド・ライク・トゥ・オファー・ユー・ア・フル・リファンド・アンド・プライオリティ・サポート・ゴーイング・フォーワード。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "I sincerely apologize"
+          - "I completely understand your frustration"
+          - "Let me make this right"
+          - "full refund"
+
+  - id: "part2_i_sincerely_apologize"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I sincerely apologize for the experience you've had は「この度のご経験、心よりお詫び申し上げます」。I'm truly sorry for ~ や Please accept my apologies for ~ でも同じ役割よ。"
+        subtitle: "I sincerely apologize for the experience you've had"
+        speechText: "アイ・シンシアリー・アポロジャイズ・フォー・ジ・エクスペリエンス・ユーヴ・ハッドは、この度のご経験、心よりお詫び申し上げます。アイム・トゥーリー・ソーリー・フォー、や、プリーズ・アクセプト・マイ・アポロジャイズ・フォー、でも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "for the experience you've had で、今回の件だとわかるのだ。I'm sorry だけより、誠意が伝わる。"
+        speechText: "フォー・ジ・エクスペリエンス・ユーヴ・ハッドで、今回の件だとわかるのだ。アイム・ソーリーだけより、誠意が伝わる。"
+
+  - id: "part2_understand_frustration"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I completely understand your frustration は「お怒りはごもっともです」。I can see why you're upset や That must have been very frustrating でも共感を示せるわ。"
+        subtitle: "I completely understand your frustration"
+        speechText: "アイ・コンプリートリー・アンダスタンド・ユア・フラストレーションは、お怒りはごもっともです。アイ・キャン・シー・ワイ・ユーア・アップセット、や、ザット・マスト・ハブ・ビーン・ベリー・フラストレーティング、でも共感を示せるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "completely で「十分に理解している」と強調するのだ。相手の気持ちを否定しないのが大事。"
+        speechText: "コンプリートリーで、十分に理解していると強調するのだ。相手の気持ちを否定しないのが大事。"
+
+  - id: "part2_let_me_make_this_right"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Let me make this right は「私が責任を持って解決します」。I'd like to offer you a full refund and priority support going forward で、全額返金と今後の優先サポートという具体策を示す。"
+        subtitle: "Let me make this right — full refund / priority support"
+        speechText: "レット・ミー・メイク・ディス・ライトは、私が責任を持って解決します。アイド・ライク・トゥ・オファー・ユー・ア・フル・リファンド・アンド・プライオリティ・サポート・ゴーイング・フォーワードで、全額返金と今後の優先サポートという具体策を示す。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "make this right で「正しい状態に戻す」ニュアンス。謝るだけで終わらせないのだ！"
+        speechText: "メイク・ディス・ライトで、正しい状態に戻すニュアンス。謝るだけで終わらせないのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら I'm so sorry this happened. I understand why you're upset. I'll arrange a full refund right away. でもOK。具体策を必ず添えて。"
+        speechText: "短く言うなら、アイム・ソー・ソーリー・ディス・ハプンド。アイ・アンダスタンド・ワイ・ユーア・アップセット。アイル・アレンジ・ア・フル・リファンド・ライト・アウェイ。でもオーケー。具体策を必ず添えて。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "緊張したら、I sincerely apologize と Let me make this right の2文だけ覚えておけば、なんとかなるのだ。"
+        speechText: "緊張したら、アイ・シンシアリー・アポロジャイズと、レット・ミー・メイク・ディス・ライトの2文だけ覚えておけば、なんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。sincerely の sin、frustration の frus、refund の fund をはっきり。"
+        speechText: "もう一度、ゆっくり。シンシアリーの sin、フラストレーションの frus、リファンドの fund をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward."
+        subtitle: "I sincerely apologize for the experience you've had. I completely understand your frustration. Let me make this right—I'd like to offer you a full refund and priority support going forward."
+        speechText: "アイ・シンシアリー・アポロジャイズ・フォー・ジ・エクスペリエンス・ユーヴ・ハッド。アイ・コンプリートリー・アンダスタンド・ユア・フラストレーション。レット・ミー・メイク・ディス・ライト。アイド・ライク・トゥ・オファー・ユー・ア・フル・リファンド・アンド・プライオリティ・サポート・ゴーイング・フォーワード。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "I sincerely apologize"
+          - "I completely understand your frustration"
+          - "Let me make this right"
+          - "full refund"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "I sincerely apologize、I completely understand your frustration、Let me make this right。この3つを持ち帰って。アプリの上級編でも練習してね。"
+        speechText: "アイ・シンシアリー・アポロジャイズ、アイ・コンプリートリー・アンダスタンド・ユア・フラストレーション、レット・ミー・メイク・ディス・ライト。この3つを持ち帰って。アプリの上級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#ビジネス英語"
+    - "#クレーム対応"
+    - "#カスタマーサポート"
+    - "#ずんだもん"
+    - "#四国めたん"
