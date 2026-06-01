@@ -1,0 +1,248 @@
+# =============================================================================
+# 英語アドリブドリル 第10問 — 徳川家康にSNSを説明（legendary-1）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = legendary-1
+#
+# 解説スライド: drill-10-explain-sns-to-ieyasu-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_town_square · 3 part2_imagine_messenger
+#   4 part2_everyone_can_hear · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（legendary.ts へ反映済み）:
+#   setupEndSeconds / revealStartSeconds: 54（チャプター「答え合わせ」0:54）
+#   youtubeVideoId: U0vpMY-zTmo
+#   https://youtu.be/U0vpMY-zTmo
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-10-explain-sns-to-ieyasu.yaml
+# =============================================================================
+title: '【英語アドリブドリル】徳川家康にSNSを説明｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  ieyasu:
+    speakerId: 13
+    subtitleColor: "#D4A574"
+    voice:
+      speedScale: 0.95
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-10-explain-sns-to-ieyasu-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "タイムスリップしてきた徳川家康。スマホのTwitter、英語で説明しろって言われたら、どうする？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "アルゴリズムとかAPIとか、家康には通じないのだ……江戸の比喩で説明する英語が思い浮かばないのだ。"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: ieyasu
+        text: "What is this Twitter you speak of? Explain it to me plainly, as if I were a lord of Edo."
+        subtitle: "What is this Twitter you speak of? Explain it to me plainly, as if I were a lord of Edo."
+        speechText: "ワット・イズ・ディス・ツイッター・ユー・スピーク・オブ？エクスプレイン・イット・トゥ・ミー・プレインリー、アズ・イフ・アイ・ウェア・ア・ロード・オブ・エド。"
+        voice:
+          speedScale: 0.92
+          postPhonemeLength: 0.12
+        emphasis:
+          - "Twitter"
+          - "lord of Edo"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "家康公にTwitterを説明しろって！？ 英語で、しかも分かりやすく、急に言えって言われたのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、家康にも分かるように、Twitterとは何かを英語で説明するのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "江戸の広場、伝令、みんなに届く—この3つの比喩で組み立ててみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの家康への説明。今日は3つの比喩で、難しいITを英語で噛み砕くわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "It's like a town square where と Imagine a messenger that と Everyone can hear what you say、覚えるのだ！"
+        speechText: "イッツ・ライク・ア・タウン・スクエア・ウェアと、イマジン・ア・メッセンジャー・ザットと、エブリワン・キャン・ヒア・ワット・ユー・セイ、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。江戸の広場に例えて、短い文を伝令が一瞬で届ける—と説明する。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly."
+        subtitle: "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly."
+        speechText: "シンク・オブ・イット・ライク・ア・タウン・スクエア・イン・エド、バット・エブリワン・イン・ジャパン・キャン・ヒア・ユー・アット・ワンス。ユー・センド・ショート・メッセージズ、アンド・ア・メッセンジャー・キャリーズ・ゼム・トゥ・サウザンズ・オブ・ピープル・インスタントリー。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "town square in Edo"
+          - "everyone in Japan can hear you at once"
+          - "short messages"
+          - "thousands of people instantly"
+
+  - id: "part2_town_square"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "It's like a town square where ~ は「〜のような広場のようなもの」。Think of it like a town square in Edo, but everyone in Japan can hear you at once で、江戸の広場に例えるわ。"
+        subtitle: "It's like a town square where ~ / Think of it like ~"
+        speechText: "イッツ・ライク・ア・タウン・スクエア・ウェアは、広場のようなもの。シンク・オブ・イット・ライク・ア・タウン・スクエア・イン・エド、バット・エブリワン・イン・ジャパン・キャン・ヒア・ユー・アット・ワンスで、江戸の広場に例えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "but everyone in Japan can hear you at once で、全国の人が同時に聞こえる、と家康にも伝わるのだ。"
+        speechText: "バット・エブリワン・イン・ジャパン・キャン・ヒア・ユー・アット・ワンスで、全国の人が同時に聞こえる、と家康にも伝わるのだ。"
+
+  - id: "part2_imagine_messenger"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Imagine a messenger that ~ は「〜のような伝令を想像して」。You send short messages, and a messenger carries them to thousands of people instantly で、短い文を伝令が一瞬で届けるイメージよ。"
+        subtitle: "Imagine a messenger that ~ / You send short messages"
+        speechText: "イマジン・ア・メッセンジャー・ザットは、伝令を想像して。ユー・センド・ショート・メッセージズ、アンド・ア・メッセンジャー・キャリーズ・ゼム・トゥ・サウザンズ・オブ・ピープル・インスタントリーで、短い文を伝令が一瞬で届けるイメージよ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "short messages がTwitterの140文字みたいな短さ。instantly で「瞬時に」が家康にも分かりやすいのだ。"
+        speechText: "ショート・メッセージズが、ツイッターの140文字みたいな短さ。インスタントリーで、瞬時に、が家康にも分かりやすいのだ。"
+
+  - id: "part2_everyone_can_hear"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Everyone can hear what you say は「あなたの言葉を誰もが聞ける」。広場で大声を出すと、周り全員に届く—その感覚を英語で言うの。"
+        subtitle: "Everyone can hear what you say"
+        speechText: "エブリワン・キャン・ヒア・ワット・ユー・セイは、あなたの言葉を誰もが聞ける。広場で大声を出すと、周り全員に届く、その感覚を英語で言うの。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "everyone in Japan can hear you at once と組み合わせると、SNSの拡散が家康にもイメージできるのだ！"
+        speechText: "エブリワン・イン・ジャパン・キャン・ヒア・ユー・アット・ワンスと組み合わせると、エスエヌエスの拡散が家康にもイメージできるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら It's like Edo's town square, but your words reach all of Japan at once. Short messages fly to thousands instantly. でもOK。専門用語は避けて。"
+        speechText: "短く言うなら、イッツ・ライク・エドーズ・タウン・スクエア、バット・ユア・ワーズ・リーチ・オール・オブ・ジャパン・アット・ワンス。ショート・メッセージズ・フライ・トゥ・サウザンズ・インスタントリー。でもオーケー。専門用語は避けて。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "緊張したら、Think of it like a town square in Edo だけ覚えて、あとは身振り手振りでもなんとかなるのだ。"
+        speechText: "緊張したら、シンク・オブ・イット・ライク・ア・タウン・スクエア・イン・エドだけ覚えて、あとは身振り手振りでもなんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。Edo の e、messenger の sen、instantly の stant をはっきり。"
+        speechText: "もう一度、ゆっくり。エドの e、メッセンジャーの sen、インスタントリーの stant をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly."
+        subtitle: "Think of it like a town square in Edo, but everyone in Japan can hear you at once. You send short messages, and a messenger carries them to thousands of people instantly."
+        speechText: "シンク・オブ・イット・ライク・ア・タウン・スクエア・イン・エド、バット・エブリワン・イン・ジャパン・キャン・ヒア・ユー・アット・ワンス。ユー・センド・ショート・メッセージズ、アンド・ア・メッセンジャー・キャリーズ・ゼム・トゥ・サウザンズ・オブ・ピープル・インスタントリー。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "town square in Edo"
+          - "everyone in Japan"
+          - "short messages"
+          - "instantly"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "It's like a town square where、Imagine a messenger that、Everyone can hear what you say。この3つを持ち帰って。アプリの超人級編でも練習してね。"
+        speechText: "イッツ・ライク・ア・タウン・スクエア・ウェア、イマジン・ア・メッセンジャー・ザット、エブリワン・キャン・ヒア・ワット・ユー・セイ。この3つを持ち帰って。アプリの超人級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#SNS"
+    - "#Twitter"
+    - "#徳川家康"
+    - "#ずんだもん"
+    - "#四国めたん"
