@@ -1,0 +1,250 @@
+# =============================================================================
+# 英語アドリブドリル 第11問 — 国連でスピーチ（legendary-2）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = legendary-2
+#
+# 解説スライド: drill-11-un-speech-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_distinguished_delegates · 3 part2_time_for_action
+#   4 part2_future_generations · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（legendary.ts へ反映済み）:
+#   setupEndSeconds / revealStartSeconds: 56（チャプター「答え合わせ」0:56）
+#   youtubeVideoId: InwJE-7j3JY
+#   https://youtu.be/InwJE-7j3JY
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-11-un-speech.yaml
+# =============================================================================
+title: '【英語アドリブドリル】国連でスピーチ｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  chairman:
+    speakerId: 13
+    subtitleColor: "#6EE7B7"
+    voice:
+      speedScale: 0.95
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-11-un-speech-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "国連気候変動会議。日本代表として壇上に立って、60秒で各国に即時行動を訴えるスピーチ、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "議長に指名されたのに、格式ある英語のスピーチが思い浮かばないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: chairman
+        text: "The floor is yours, Japan. You have sixty seconds. Distinguished delegates are listening—please address the need for immediate climate action."
+        subtitle: "The floor is yours, Japan. You have sixty seconds. Distinguished delegates are listening—please address the need for immediate climate action."
+        speechText: "ザ・フロア・イズ・ユアーズ、ジャパン。ユー・ハヴ・シクスティ・セカンズ。ディスティングウィッシュド・デリゲイツ・アー・リスニング、プリーズ・アドレス・ザ・ニード・フォー・イミーディエット・クライメイト・アクション。"
+        voice:
+          speedScale: 0.92
+          postPhonemeLength: 0.12
+        emphasis:
+          - "sixty seconds"
+          - "Distinguished delegates"
+          - "immediate climate action"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "国連で60秒スピーチ！？ 格式と説得力のある英語、急に言えって言われたのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、日本代表として、各国の即時行動を訴える60秒スピーチを英語で話すのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Distinguished delegates で始めて、The time for action is now で緊急性を、We owe it to future generations で未来への責任を。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの国連スピーチ。今日は3つのかたまりで、格式と説得力のある60秒を組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Distinguished delegates と The time for action is now と We owe it to future generations、覚えるのだ！"
+        speechText: "ディスティングウィッシュド・デリゲイツと、ザ・タイム・フォー・アクション・イズ・ナウと、ウィ・オウ・イット・トゥ・フューチャー・ジェネレーションズ、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。挨拶→今すぐ行動→日本のコミット→未来世代への責任、の流れよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today."
+        subtitle: "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today."
+        speechText: "ディスティングウィッシュド・デリゲイツ、ザ・タイム・フォー・アクション・イズ・ナウ。ジャパン・コミッツ・トゥ・ボルダー・イミッションズ・カッツ・ディス・ディケイド。ウィ・オウ・イット・トゥ・フューチャー・ジェネレーションズ・トゥ・アクト・トゥゲザー、ノット・トゥモロー、バット・トゥデイ。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "Distinguished delegates"
+          - "the time for action is now"
+          - "bolder emissions cuts"
+          - "future generations"
+          - "not tomorrow, but today"
+
+  - id: "part2_distinguished_delegates"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Distinguished delegates は国連・外交の定番挨拶。「尊敬する代表各位」—格式を一発で出すわ。Honorable delegates や Esteemed colleagues でも同じ役割よ。"
+        subtitle: "Distinguished delegates / Honorable delegates"
+        speechText: "ディスティングウィッシュド・デリゲイツは、国連・外交の定番挨拶。尊敬する代表各位、格式を一発で出すわ。オナラブル・デリゲイツ、や、エスティームド・コリーグズ、でも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "冒頭の Distinguished delegates で、国連の壇上に立っている感じが出るのだ。"
+        speechText: "冒頭の、ディスティングウィッシュド・デリゲイツで、国連の壇上に立っている感じが出るのだ。"
+
+  - id: "part2_time_for_action"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "The time for action is now は「今こそ行動の時」。Japan commits to bolder emissions cuts this decade で、日本の具体的コミットを宣言するの。"
+        subtitle: "The time for action is now / Japan commits to ~"
+        speechText: "ザ・タイム・フォー・アクション・イズ・ナウは、今こそ行動の時。ジャパン・コミッツ・トゥ・ボルダー・イミッションズ・カッツ・ディス・ディケイドで、日本の具体的コミットを宣言するの。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "bolder emissions cuts this decade で「この10年でより大胆な削減」—数字がなくても、方向性は伝わるのだ。"
+        speechText: "ボルダー・イミッションズ・カッツ・ディス・ディケイドで、この10年でより大胆な削減。数字がなくても、方向性は伝わるのだ。"
+
+  - id: "part2_future_generations"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "We owe it to future generations to ~ は「未来の世代に対する責任として〜すべき」。act together—not tomorrow, but today で、協力と「今日」を強調。"
+        subtitle: "We owe it to future generations to ~ / not tomorrow, but today"
+        speechText: "ウィ・オウ・イット・トゥ・フューチャー・ジェネレーションズ・トゥは、未来の世代に対する責任としてすべき。アクト・トゥゲザー、ノット・トゥモロー、バット・トゥデイで、協力と今日を強調。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "not tomorrow, but today の対比が、即時行動の訴えを締めくくるのだ！"
+        speechText: "ノット・トゥモロー、バット・トゥデイの対比が、即時行動の訴えを締めくくるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら Distinguished delegates, we must act now. Japan will lead with bolder cuts. Our children are counting on us—today. でもOK。60秒以内がルールよ。"
+        speechText: "短く言うなら、ディスティングウィッシュド・デリゲイツ、ウィ・マスト・アクト・ナウ。ジャパン・ウィル・リード・ウィズ・ボルダー・カッツ。アワ・チルドレン・アー・カウンティング・オン・アス、トゥデイ。でもオーケー。60秒以内がルールよ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "緊張したら、Distinguished delegates と The time for action is now の2文だけ覚えておけば、なんとかなるのだ。"
+        speechText: "緊張したら、ディスティングウィッシュド・デリゲイツと、ザ・タイム・フォー・アクション・イズ・ナウの2文だけ覚えておけば、なんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。Distinguished の guish、generations の ra、together の gether をはっきり。"
+        speechText: "もう一度、ゆっくり。ディスティングウィッシュドの guish、ジェネレーションズの ra、トゥゲザーの gether をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today."
+        subtitle: "Distinguished delegates, the time for action is now. Japan commits to bolder emissions cuts this decade. We owe it to future generations to act together—not tomorrow, but today."
+        speechText: "ディスティングウィッシュド・デリゲイツ、ザ・タイム・フォー・アクション・イズ・ナウ。ジャパン・コミッツ・トゥ・ボルダー・イミッションズ・カッツ・ディス・ディケイド。ウィ・オウ・イット・トゥ・フューチャー・ジェネレーションズ・トゥ・アクト・トゥゲザー、ノット・トゥモロー、バット・トゥデイ。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "Distinguished delegates"
+          - "the time for action is now"
+          - "future generations"
+          - "not tomorrow, but today"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Distinguished delegates、The time for action is now、We owe it to future generations。この3つを持ち帰って。アプリの超人級編でも練習してね。"
+        speechText: "ディスティングウィッシュド・デリゲイツ、ザ・タイム・フォー・アクション・イズ・ナウ、ウィ・オウ・イット・トゥ・フューチャー・ジェネレーションズ。この3つを持ち帰って。アプリの超人級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#国連"
+    - "#スピーチ"
+    - "#気候変動"
+    - "#ずんだもん"
+    - "#四国めたん"
