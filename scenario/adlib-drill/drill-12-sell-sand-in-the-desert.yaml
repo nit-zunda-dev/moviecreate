@@ -1,0 +1,250 @@
+# =============================================================================
+# 英語アドリブドリル 第12問 — 砂漠で砂を売る（legendary-3）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = legendary-3
+#
+# 解説スライド: drill-12-sell-sand-in-the-desert-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_not_just_any_sand · 3 part2_what_makes_special
+#   4 part2_first_in_tribe · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（レンダ後に実測して legendary.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 57（チャプター「答え合わせ」0:57）
+#   youtubeVideoId: （公開後）
+#
+# 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
+#
+# 生成:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-12-sell-sand-in-the-desert.yaml
+# =============================================================================
+title: '【英語アドリブドリル】砂漠で砂を売る｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  nomad:
+    speakerId: 13
+    subtitleColor: "#F59E0B"
+    voice:
+      speedScale: 0.95
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-12-sell-sand-in-the-desert-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "砂漠のテントの前。訪問販売員として、砂だらけの土地の遊牧民に「プレミアム砂」を売りつける営業トーク、あるあるよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "砂漠で砂を売るなんて無理ゲームなのに、英語で説得力あるトークが思い浮かばないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: nomad
+        text: "We have sand everywhere. Why should I buy sand from you? Convince me—in English."
+        subtitle: "We have sand everywhere. Why should I buy sand from you? Convince me—in English."
+        speechText: "ウィ・ハヴ・サンド・エブリウェア。ワイ・シュッド・アイ・バイ・サンド・フロム・ユー？コンヴィンス・ミー、イン・イングリッシュ。"
+        voice:
+          speedScale: 0.92
+          postPhonemeLength: 0.12
+        emphasis:
+          - "sand everywhere"
+          - "buy sand from you"
+          - "Convince me"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "砂なんか山ほどあるのに、プレミアム砂を買えって！？ 英語で急に言えって言われたのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、遊牧民に「プレミアム砂」を買わせる、説得力ある英語の営業トークを話すのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "This isn't just any sand で差別化して、What makes this special is で理由を、You'd be the first in your tribe to で希少性を。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの砂漠の営業トーク。今日は3つのかたまりで、砂を売る説得力を組み立てるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "This isn't just any sand と What makes this special is と You'd be the first in your tribe to、覚えるのだ！"
+        speechText: "ディス・イズント・ジャスト・エニィ・サンドと、ワット・メイクス・ディス・スペシャル・イズと、ユード・ビー・ザ・ファースト・イン・ユア・トライブ・トゥ、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。特別な砂→理由→部族で初めて、の流れよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure."
+        subtitle: "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure."
+        speechText: "ディス・イズント・ジャスト・エニィ・サンド、イッツ・プレミアム・デザート・サンド、フィルタード・フォー・ザ・ファイネスト・グレイン。ワット・メイクス・イット・スペシャル・イズ・ザ・ミネラル・ブレンド。ユード・ビー・ザ・ファースト・イン・ユア・トライブ・トゥ・オウン・サンド・ディス・ピュア。"
+        voice:
+          speedScale: 1.0
+          intonationScale: 1.05
+        emphasis:
+          - "This isn't just any sand"
+          - "premium desert sand"
+          - "What makes it special is"
+          - "the first in your tribe"
+          - "sand this pure"
+
+  - id: "part2_not_just_any_sand"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "This isn't just any sand は「ただの砂じゃない」。it's premium desert sand, filtered for the finest grain で、プレミアム・最高級の粒に例えるの。"
+        subtitle: "This isn't just any sand / premium desert sand"
+        speechText: "ディス・イズント・ジャスト・エニィ・サンドは、ただの砂じゃない。イッツ・プレミアム・デザート・サンド、フィルタード・フォー・ザ・ファイネスト・グレインで、プレミアム・最高級の粒に例えるの。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "砂漠にいる相手だからこそ、any sand との対比が効くのだ。filtered for the finest grain で「厳選された粒」が伝わるのだ。"
+        speechText: "砂漠にいる相手だからこそ、エニィ・サンドとの対比が効くのだ。フィルタード・フォー・ザ・ファイネスト・グレインで、厳選された粒が伝わるのだ。"
+
+  - id: "part2_what_makes_special"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "What makes it special is ~ は「特別なのは〜だ」。the mineral blend で具体的な理由を一言。The reason it's different is ~ でも同じ役割よ。"
+        subtitle: "What makes it special is ~ / The reason it's different is ~"
+        speechText: "ワット・メイクス・イット・スペシャル・イズは、特別なのはだ。ザ・ミネラル・ブレンドで具体的な理由を一言。ザ・リーズン・イッツ・ディファレント・イズ、でも同じ役割よ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "mineral blend が分からなくても、「特別なミネラル配合」くらいの雰囲気で営業できるのだ。"
+        speechText: "ミネラル・ブレンドが分からなくても、特別なミネラル配合くらいの雰囲気で営業できるのだ。"
+
+  - id: "part2_first_in_tribe"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "You'd be the first in your tribe to ~ は「あなたの部族で初めて〜できる人」。own sand this pure で希少性とステータスを押すわ。"
+        subtitle: "You'd be the first in your tribe to ~ / own sand this pure"
+        speechText: "ユード・ビー・ザ・ファースト・イン・ユア・トライブ・トゥは、あなたの部族で初めてできる人。オウン・サンド・ディス・ピュアで希少性とステータスを押すわ。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "first in your tribe は営業の定番。周りより先に手に入れる優越感が、砂を買う理由になるのだ！"
+        speechText: "ファースト・イン・ユア・トライブは営業の定番。周りより先に手に入れる優越感が、砂を買う理由になるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら This isn't ordinary sand—it's the finest desert sand you'll ever touch. What makes it special is the blend. You'd be the first in your tribe to own it. でもOK。"
+        speechText: "短く言うなら、ディス・イズント・オーディナリー・サンド、イッツ・ザ・ファイネスト・デザート・サンド・ユール・エバー・タッチ。ワット・メイクス・イット・スペシャル・イズ・ザ・ブレンド。ユード・ビー・ザ・ファースト・イン・ユア・トライブ・トゥ・オウン・イット。でもオーケー。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "緊張したら、This isn't just any sand と What makes this special is の2文だけ覚えておけば、なんとかなるのだ。"
+        speechText: "緊張したら、ディス・イズント・ジャスト・エニィ・サンドと、ワット・メイクス・ディス・スペシャル・イズの2文だけ覚えておけば、なんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。isn't の znt、premium の mi、filtered の ter、tribe の tra をはっきり。"
+        speechText: "もう一度、ゆっくり。イズントの znt、プレミアムの mi、フィルタードの ter、トライブの tra をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure."
+        subtitle: "This isn't just any sand—it's premium desert sand, filtered for the finest grain. What makes it special is the mineral blend. You'd be the first in your tribe to own sand this pure."
+        speechText: "ディス・イズント・ジャスト・エニィ・サンド、イッツ・プレミアム・デザート・サンド、フィルタード・フォー・ザ・ファイネスト・グレイン。ワット・メイクス・イット・スペシャル・イズ・ザ・ミネラル・ブレンド。ユード・ビー・ザ・ファースト・イン・ユア・トライブ・トゥ・オウン・サンド・ディス・ピュア。"
+        voice:
+          speedScale: 0.95
+          intonationScale: 1.05
+        emphasis:
+          - "This isn't just any sand"
+          - "premium desert sand"
+          - "What makes it special is"
+          - "first in your tribe"
+          - "this pure"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "This isn't just any sand、What makes this special is、You'd be the first in your tribe to。この3つを持ち帰って。アプリの超人級編でも練習してね。"
+        speechText: "ディス・イズント・ジャスト・エニィ・サンド、ワット・メイクス・ディス・スペシャル・イズ、ユード・ビー・ザ・ファースト・イン・ユア・トライブ・トゥ。この3つを持ち帰って。アプリの超人級編でも練習してね。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#営業英語"
+    - "#砂漠"
+    - "#セールストーク"
+    - "#ずんだもん"
+    - "#四国めたん"

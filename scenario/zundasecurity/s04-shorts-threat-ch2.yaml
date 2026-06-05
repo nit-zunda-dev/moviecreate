@@ -1,0 +1,449 @@
+title: "【登録セキスペ】Check! Q1–Q13・確認問題：脅威と攻撃情報"
+
+# 教科書 第2章 Check! + 確認問題（R6秋/R4春 午前Ⅱ）Shorts 専用
+# - 本編なし。generate-shorts のみで縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.25
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.2
+    postPhonemeLength: 0.08
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 4000
+  text: "MITRE ATT&CKとKill Chain、STIX—— 名前が似てるだけで別物なのだ！"
+  emphasis:
+    - "MITRE ATT&CK"
+    - "Kill Chain"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "practice_mitre_attack"
+    chapter:
+      label: "確認問題：MITRE ATT&CK（R6 秋 午前Ⅱ 問3）"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "問題——さまざまなサイバー攻撃の手法を分類するナレッジベースはどれか。アCVSS、イMITRE ATT&CK、ウSTIX・TAXII、エCyber Kill Chain。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "CVSSは脆弱性の深刻度、STIXは脅威情報の形式、Kill Chainは攻撃の段階モデル…… 攻撃手法を分類するのはイ、MITRE ATT&CKなのだ！"
+        emphasis: ["MITRE ATT&CK", "CVSS"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解はイ。非営利MITREが開発。14のTacticsとTechniques、Sub-Techniquesで攻撃者の戦術・技法を体系化した知識ベースよ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "practice_killchain_recon"
+    chapter:
+      label: "確認問題：Kill Chain 偵察（R4 春 午前Ⅱ 問5）"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "問題——Cyber Kill Chainの7段階のうち、Reconnaissanceに分類されるのはどれか。ア非公開の社内ポータル情報の入手、イ公開SNSから対象の関係・趣味を推測、ウスピアフィッシングメール送信、エボット感染PCから内部へ拡散。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "偵察は攻撃前の情報収集…… 公開情報から標的を探るのはイ！ ウはDelivery、エはInstallation以降なのだ！"
+        emphasis: ["Reconnaissance", "公開SNS"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解はイ。7段階は偵察、武器化、配送、悪用、インストール、C2、目的達成。偵察は公開情報の収集が典型よ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q1_threat_class"
+    chapter:
+      label: "Check! Q1：情報セキュリティにおける脅威の分類"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q1——情報セキュリティにおける脅威はどのように分類できるか。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "自然災害、障害、ヒューマン脅威—— 大きく三つに分けるのが基本なのだ！ 災害は地震・台風、障害はHW・SW・NW、ヒューマンは内部不正や外部攻撃なのだ！"
+        emphasis: ["自然災害", "障害", "ヒューマン"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。試験ではこの三分類の下に、影響と対策をセットで問われるわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q2_disaster_impact"
+    chapter:
+      label: "Check! Q2：災害が情報資産に与える影響"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q2——災害が情報資産に与える影響は。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "施設・機器の物理的損壊、停電・通信断、データの消失・破損—— 可用性と完全性が同時に揺らぐのだ！"
+        emphasis: ["可用性", "完全性"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。BCP・DRの文脈では、業務継続不能と復旧コストもセットで答えられるようにして。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q3_disaster_counter"
+    chapter:
+      label: "Check! Q3：災害の主な対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q3——災害に対する主な対策は。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "BCPとDR計画、データ・システムのバックアップ、冗長化、遠隔地バックアップサイト—— 復旧手順を事前に決めるのだ！"
+        emphasis: ["BCP", "バックアップ"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。訓練・見直しまで含めて述べると午後の記述にも使えるわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q4_failure_types"
+    chapter:
+      label: "Check! Q4：障害の種類"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q4——障害にはどのような種類があるか。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ハードウェア障害、ソフトウェア障害、ネットワーク障害—— サーバ停止、バグ、ケーブル断など、原因別に整理するのだ！"
+        emphasis: ["ハードウェア", "ソフトウェア", "ネットワーク"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。可用性リスクの代表。監視と冗長化の話につなげて覚えて。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q5_failure_impact"
+    chapter:
+      label: "Check! Q5：障害が情報資産に与える影響"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q5——障害が情報資産に与える影響は。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "システム停止で業務が止まる、データが読めない、サービス品質が落ちる—— 可用性の低下が中心なのだ！"
+        emphasis: ["可用性"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。SLA違反や機会損失まで広げて答えられるとベストよ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q6_failure_counter"
+    chapter:
+      label: "Check! Q6：障害の主な対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q6——障害に対する主な対策は。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "冗長構成、監視・障害検知、定期保守・パッチ、フェイルオーバー—— 止まらない・早く気づく・早く直す、の三層なのだ！"
+        emphasis: ["冗長", "監視"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。MTTRを短くする運用設計もセットで。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q7_human_threats"
+    chapter:
+      label: "Check! Q7：ヒューマン脅威の種類"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q7——ヒューマン脅威にはどのような種類があるか。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "内部不正、ミス・過失、外部の攻撃者—— 悪意あり・なし・外部、の軸で分けるのだ！ ソーシャルエンジニアリングも外部ヒューマンなのだ！"
+        emphasis: ["内部不正", "ミス", "外部"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。内部脅威は権限の強いユーザーほどインパクトが大きいわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q8_human_impact"
+    chapter:
+      label: "Check! Q8：ヒューマンが情報資産に与える影響"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q8——ヒューマンが情報資産に与える影響は。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "情報漏洩、改ざん、可用性の損害—— 機密性・完全性・可用性、全部のCIAが狙われるのだ！"
+        emphasis: ["機密性", "完全性", "可用性"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。意図的な不正と偶発的ミス、どちらも同じ資産にダメージを与えるわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q9_human_counter"
+    chapter:
+      label: "Check! Q9：ヒューマン脅威の主な対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q9——ヒューマン脅威に対する主な対策は。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "教育・訓練、アクセス制御・最小権限、ログ監視・職務分離—— 人を信じ切らず、技術と運用で守るのだ！"
+        emphasis: ["教育", "アクセス制御", "ログ監視"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。インシデント対応手順と通報ルートもセットで。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q10_j_csip"
+    chapter:
+      label: "Check! Q10：J-CSIP"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q10——J-CSIPについて説明せよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Japan Cybersecurity Information Partnership、日本版のサイバー攻撃情報共有の枠組みなのだ！ 政府・産業界・セキュリティベンダが協力して脅威情報を共有するのだ！"
+        emphasis: ["J-CSIP", "情報共有"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。国内のインシデント対応力向上が目的。STIXやTAXIIと組み合わせて語られることもあるわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q11_stix"
+    chapter:
+      label: "Check! Q11：STIX"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q11——STIXについて説明せよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Structured Threat Information Expression、脅威情報を構造化して記述・共有するための形式なのだ！ TAXIIとセットで自動交換するのだ！"
+        emphasis: ["STIX", "TAXII"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。MITRE ATT&CKは攻撃手法の分類、STIXは情報の書式——役割が違うわ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q12_kill_chain"
+    chapter:
+      label: "Check! Q12：Cyber Kill Chain 7段階"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q12——Cyber Kill Chainの7段階を挙げよ。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "偵察、武器化、配送、悪用、インストール、C2、目的達成—— リコンの次はウェポン、デリバリー…… 頭文字で覚えるのだ！"
+        emphasis: ["偵察", "武器化", "配送"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。各段階で防御ポイントが違う。偵察は公開情報の収集が典型よ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "check_q13_mitre_intel"
+    chapter:
+      label: "Check! Q13：MITRE ATT&CKと脅威インテリジェンス"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Check Q13——MITRE ATT&CKと脅威インテリジェンスについて説明せよ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ATT&CKは14 TacticsとTechniquesで攻撃を分類、脅威インテリジェンスは収集・分析・共有して防御に活かす—— ログやIOCと組み合わせるのだ！"
+        emphasis: ["MITRE ATT&CK", "脅威インテリジェンス"]
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "正解。SOCやCSIRTがATT&CKマトリクスで検知ルールを設計する例が頻出よ。"
+        se: "./se/correct_bell.mp3"
+
+  - id: "trap_frameworks"
+    chapter:
+      label: "ひっかけ整理：CVSS・ATT&CK・STIX・Kill Chain"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "CVSS＝脆弱性の深刻度スコア。MITRE ATT&CK＝攻撃手法の分類。STIX・TAXII＝脅威情報の形式と交換。Kill Chain＝攻撃の7段階モデル—— 全部別物よ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ナレッジベース＝ATT&CK、7段階＝Kill Chain、書式＝STIX—— 三つ、役割で覚えるのだ！"
+        emphasis: ["ATT&CK", "Kill Chain", "STIX"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "mitre-quiz"
+    title: "MITRE ATT&CK四択の正解（R6秋 問3）"
+    pickScenes: ["practice_mitre_attack", "trap_frameworks"]
+    overlayCaption: "📝 確認問題"
+    cta: "👇 Check! Q12–Q13もショートで"
+
+  - id: "killchain-quiz"
+    title: "Kill Chain偵察の正解（R4春 問5）"
+    pickScenes: ["practice_killchain_recon", "check_q12_kill_chain"]
+    overlayCaption: "📝 確認問題"
+    cta: "👇 Check! Q12で7段階復習"
+
+  - id: "threat-q1"
+    title: "Check! Q1：脅威の三分類"
+    pickScenes: ["check_q1_threat_class"]
+    overlayCaption: "📝 Check! Q1"
+    cta: "👇 Q2–Q3は災害"
+
+  - id: "threat-q2"
+    title: "Check! Q2：災害の影響"
+    pickScenes: ["check_q2_disaster_impact"]
+    overlayCaption: "📝 Check! Q2"
+    cta: "👇 Q3は災害対策"
+
+  - id: "threat-q3"
+    title: "Check! Q3：災害の対策"
+    pickScenes: ["check_q3_disaster_counter"]
+    overlayCaption: "📝 Check! Q3"
+    cta: "👇 Q4–Q6は障害"
+
+  - id: "threat-q4"
+    title: "Check! Q4：障害の種類"
+    pickScenes: ["check_q4_failure_types"]
+    overlayCaption: "📝 Check! Q4"
+    cta: "👇 Q5・Q6もショートで"
+
+  - id: "threat-q5"
+    title: "Check! Q5：障害の影響"
+    pickScenes: ["check_q5_failure_impact"]
+    overlayCaption: "📝 Check! Q5"
+    cta: "👇 Q6は障害対策"
+
+  - id: "threat-q6"
+    title: "Check! Q6：障害の対策"
+    pickScenes: ["check_q6_failure_counter"]
+    overlayCaption: "📝 Check! Q6"
+    cta: "👇 Q7–Q9はヒューマン"
+
+  - id: "threat-q7"
+    title: "Check! Q7：ヒューマン脅威の種類"
+    pickScenes: ["check_q7_human_threats"]
+    overlayCaption: "📝 Check! Q7"
+    cta: "👇 Q8・Q9もショートで"
+
+  - id: "threat-q8"
+    title: "Check! Q8：ヒューマンの影響"
+    pickScenes: ["check_q8_human_impact"]
+    overlayCaption: "📝 Check! Q8"
+    cta: "👇 Q9はヒューマン対策"
+
+  - id: "threat-q9"
+    title: "Check! Q9：ヒューマン脅威の対策"
+    pickScenes: ["check_q9_human_counter"]
+    overlayCaption: "📝 Check! Q9"
+    cta: "👇 Q10–Q13は攻撃情報"
+
+  - id: "threat-q10"
+    title: "Check! Q10：J-CSIP"
+    pickScenes: ["check_q10_j_csip"]
+    overlayCaption: "📝 Check! Q10"
+    cta: "👇 Q11はSTIX"
+
+  - id: "threat-q11"
+    title: "Check! Q11：STIX"
+    pickScenes: ["check_q11_stix"]
+    overlayCaption: "📝 Check! Q11"
+    cta: "👇 Q12はKill Chain"
+
+  - id: "threat-q12"
+    title: "Check! Q12：Kill Chain 7段階"
+    pickScenes: ["check_q12_kill_chain"]
+    overlayCaption: "📝 Check! Q12"
+    cta: "👇 確認問題もショートで"
+
+  - id: "threat-q13"
+    title: "Check! Q13：MITRE ATT&CK"
+    pickScenes: ["check_q13_mitre_intel", "trap_frameworks"]
+    overlayCaption: "📝 Check! Q13"
+    cta: "👇 R6秋 問3もショートで"
