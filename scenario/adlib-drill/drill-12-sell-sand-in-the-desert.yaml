@@ -7,9 +7,10 @@
 #   0 part2_intro · 1 part2_model · 2 part2_not_just_any_sand · 3 part2_what_makes_special
 #   4 part2_first_in_tribe · 5 part2_variants · 6 part2_replay · 7 part2_outro
 #
-# drill-meta（レンダ後に実測して legendary.ts へ）:
+# drill-meta（legendary.ts へ反映済み）:
 #   setupEndSeconds / revealStartSeconds: 57（チャプター「答え合わせ」0:57）
-#   youtubeVideoId: （公開後）
+#   youtubeVideoId: u40ccJLhs2k
+#   https://youtu.be/u40ccJLhs2k
 #
 # 英語例文: text/subtitle=表示・speechText=VOICEVOX用カタカナ読み
 #
