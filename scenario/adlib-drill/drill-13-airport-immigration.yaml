@@ -1,0 +1,241 @@
+# =============================================================================
+# 英語アドリブドリル 第13問 — 空港の入国審査（beginner-4）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-4
+#
+# 解説スライド: drill-13-airport-immigration-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_im_here_for · 3 part2_ill_stay
+#   4 part2_im_visiting · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（YouTube 公開後に実測して beginner.ts へ）:
+#   setupEndSeconds / revealStartSeconds: 37（メタデータ推定 0:37、公開前に再計測推奨）
+#   youtubeVideoId: （YouTube 登録後に記入）
+#   背景: image/background/background.png（黒板・全編共通）
+#
+# 生成（黒板背景込み MP4 → そのまま YouTube 可）:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-13-airport-immigration.yaml
+# =============================================================================
+title: '【英語アドリブドリル】空港の入国審査｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  officer:
+    speakerId: 13
+    subtitleColor: "#AADDFF"
+    voice:
+      speedScale: 1.0
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-13-airport-immigration-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5200
+  text: "入国審査で英語が出てこない"
+  emphasis:
+    - "入国審査"
+    - "英語"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff4466"
+    durationMs: 220
+  zoom:
+    from: 1.0
+    to: 1.14
+  shake: true
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ロサンゼルスの空港。入国審査のカウンターで、英語だけの質問が飛んでくること、あるわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "パスポートは出せるのに、目的を英語で説明できないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: officer
+        text: "What's the purpose of your visit?"
+        subtitle: "What's the purpose of your visit?"
+        emphasis:
+          - "purpose of your visit"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……観光目的と、どれくらい滞在するか、英語で言うのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて答えるのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "目的と滞在期間を、短い文で2つ伝えてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ・導入" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの入国審査官への返し。今日は3つの短い文で、目的・期間・行き先を伝えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I'm here for と I'll stay for と I'm visiting、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    chapter: { label: "模範解答" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。観光2週間、ロサンゼルスとサンフランシスコを回る例よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I'm here for tourism. I'll stay for two weeks. I'm visiting Los Angeles and San Francisco."
+        subtitle: "I'm here for tourism. I'll stay for two weeks. I'm visiting Los Angeles and San Francisco."
+        emphasis:
+          - "I'm here for tourism"
+          - "I'll stay for two weeks"
+          - "I'm visiting"
+
+  - id: "part2_im_here_for"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I'm here for は「〜目的で来ました」。tourism のほか、business や visiting family も定番よ。"
+        subtitle: "I'm here for ~"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "For tourism だけだと短すぎるのだ。I'm here for で、ちゃんと一文にする。"
+
+  - id: "part2_ill_stay"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I'll stay for two weeks は「2週間滞在します」。I'll は I will の短縮で、未来の予定を伝えるわ。"
+        subtitle: "I'll stay for ~"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I stay two weeks だと、今ここにいる感じになるのだ。I'll を付ける！"
+
+  - id: "part2_im_visiting"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I'm visiting Los Angeles and San Francisco で、行き先を足すと親切。聞かれなくても、余裕があれば添えて。"
+        subtitle: "I'm visiting ~"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "都市名は発音が難しいのだ……サンフランシスコは San Fran でも通じるって聞いた！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら、I'm here for tourism. Two weeks. でも通じる。ビジネスなら I'm here for a business meeting."
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "わからない時は、Sorry, could you repeat that? で時間を稼ぐのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。tourism の t、weeks の w、Francisco の cis をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I'm here for tourism. I'll stay for two weeks. I'm visiting Los Angeles and San Francisco."
+        subtitle: "I'm here for tourism. I'll stay for two weeks. I'm visiting Los Angeles and San Francisco."
+        emphasis:
+          - "I'm here for"
+          - "tourism"
+          - "two weeks"
+          - "Los Angeles"
+          - "San Francisco"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "I'm here for、I'll stay for、I'm visiting。この3つを持ち帰って。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  titleHints:
+    - "shock"
+    - "howto"
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#空港英語"
+    - "#入国審査"
+    - "#ずんだもん"
+    - "#四国めたん"

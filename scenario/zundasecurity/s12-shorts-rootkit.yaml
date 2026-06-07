@@ -1,0 +1,122 @@
+title: "【登録セキスペ】ルートキットの特徴"
+
+# 「ルートキットの特徴」確認問題 Shorts 専用（R3 秋・午前II 問14）
+# - generate-shorts --ids rootkit-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "ルートキットの正解は「隠す」—— root取得ツールじゃない、試験で間違えやすいのだ！"
+  emphasis:
+    - "ルートキット"
+    - "隠す"
+    - "侵入後"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "question_answer"
+    chapter:
+      label: "問題：ルートキットの特徴"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "問題——ルートキットの特徴はどれ？ アからエの四択よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "正解はア！ OSに不正組み込みしたツールの存在を隠す—— キーワードは隠すなのだ！"
+        emphasis: ["隠す", "ア"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "why_correct"
+    chapter:
+      label: "理由：侵入後に存在を隠蔽"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ルートキットは何をするの？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "侵入成功、権限取得、ルートキット導入、存在を隠蔽、不正活動を継続—— プロセスやファイル、通信、ログの痕跡を隠すのだ！"
+        emphasis: ["存在を隠蔽", "不正活動"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "wrong_patterns"
+    chapter:
+      label: "ひっかけ：イ・ウ・エがダメな理由"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "イ・ウ・エはなぜ不正解？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "イはカーネル脆弱性の分析、ウは感染チェック—— アンチウイルスの仕事、エは外部からのポート調査—— ポートスキャンなのだ！"
+        emphasis: ["アンチウイルス", "ポートスキャン"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "ルートキット＝侵入後に存在を隠すツール—— rootを取る道具じゃない、隠すと覚えるのだ！"
+        emphasis: ["侵入後", "隠す"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "rootkit-full"
+    title: "ルートキットの特徴"
+    pickScenes: ["question_answer", "why_correct", "wrong_patterns", "summary_exam"]
+    overlayCaption: "🕵️ ルートキット"
+    cta: "👇 関連動画は概要欄"

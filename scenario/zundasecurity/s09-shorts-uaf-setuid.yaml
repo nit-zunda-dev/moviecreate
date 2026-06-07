@@ -1,0 +1,122 @@
+title: "【登録セキスペ】Use-After-Freeとsetuid/setgidの解説"
+
+# 「Use-After-Free と setuid/setgid の解説図解」Shorts 専用
+# - generate-shorts --ids uaf-setuid-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "free後のメモリ再利用がUAF、setuidは必要な権限だけ借りる—— 試験頻出なのだ！"
+  emphasis:
+    - "UAF"
+    - "setuid"
+    - "権限"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q5_use_after_free"
+    chapter:
+      label: "Q5：Use-After-Freeを悪用した攻撃の特徴"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q5——Use-After-Freeを悪用した攻撃の特徴は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "free後もダングリングポインタで参照する脆弱性なのだ！ 解放領域に攻撃者データを再配置して、実行制御を奪われるのだ！"
+        emphasis: ["ダングリングポインタ", "実行制御"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q6_setuid_setgid"
+    chapter:
+      label: "Q6：setuid/setgid属性とは何か"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q6——setuidとsetgid、何のための属性？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "setuidは所有者権限、setgidはグループ権限で実行—— passwdのように、一般ユーザーが必要な処理だけ高権限で動かす仕組みなのだ！"
+        emphasis: ["setuid", "passwd"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q6_setuid_risk"
+    chapter:
+      label: "Q6補足：setuid rootのリスク"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "setuid rootに脆弱性があると？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "権限昇格につながるのだ！ 最小権限・入力検証・安全な実装—— 与える権限は必要最小限にするのだ！"
+        emphasis: ["権限昇格", "最小権限"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "UAFは解放後の再利用、setuidは必要な権限だけ借りる—— メモリ安全と権限の両方をセットで覚えるのだ！"
+        emphasis: ["UAF", "setuid"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "uaf-setuid-full"
+    title: "Use-After-Freeとsetuid/setgidの解説"
+    pickScenes: ["q5_use_after_free", "q6_setuid_setgid", "q6_setuid_risk", "summary_exam"]
+    overlayCaption: "🔐 UAF/setuid"
+    cta: "👇 関連動画は概要欄"

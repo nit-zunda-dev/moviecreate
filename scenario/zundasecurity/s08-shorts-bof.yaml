@@ -1,0 +1,122 @@
+title: "【登録セキスペ】バッファオーバーフロー（BOF）の仕組みと対策"
+
+# 「BOF（バッファオーバーフロー）の解説図解」Shorts 専用
+# - generate-shorts --ids bof-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "C/C++の境界チェックなしがBOFを生む—— 管理者権限まで奪われる試験頻出なのだ！"
+  emphasis:
+    - "BOF"
+    - "境界チェック"
+    - "管理者権限"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q3_cpp_features"
+    chapter:
+      label: "Q3：C/C++の特徴とBOF成立の理由"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q3——C/C++のどんな特徴がBOF攻撃を成立させる？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "メモリ直接操作、配列の境界チェックなし、文字列コピーで長さ未確認—— 入力が溢れて戻りアドレスまで上書きされるのだ！"
+        emphasis: ["境界チェック", "戻りアドレス"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q4_admin_privilege"
+    chapter:
+      label: "Q4：なぜ管理者権限が奪われるのか"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q4——BOFでなぜ管理者権限まで奪われる？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "戻りアドレス改ざんで攻撃コードへ分岐！ 対象が管理者権限で動いていれば、悪意あるコードも同じ権限で実行されるのだ！"
+        emphasis: ["戻りアドレス改ざん", "管理者権限"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "countermeasures"
+    chapter:
+      label: "対策の基本：四つの防御"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "対策の基本は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "境界チェック、安全な関数、ASLR・DEP・スタックカナリア、最小権限の原則—— 四つセットで覚えるのだ！"
+        emphasis: ["ASLR", "最小権限"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "C/C++は速いが安全は手動、BOFは戻りアドレス改ざんで権限奪取—— 対策四つで守るのだ！"
+        emphasis: ["BOF", "対策四つ"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "bof-full"
+    title: "バッファオーバーフロー（BOF）の仕組みと対策"
+    pickScenes: ["q3_cpp_features", "q4_admin_privilege", "countermeasures", "summary_exam"]
+    overlayCaption: "💥 BOF"
+    cta: "👇 関連動画は概要欄"

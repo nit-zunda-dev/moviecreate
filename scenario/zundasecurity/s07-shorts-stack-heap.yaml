@@ -1,0 +1,140 @@
+title: "【登録セキスペ】スタック領域とヒープ領域の違い"
+
+# 「スタック領域とヒープ領域の解説図解」Shorts 専用
+# - generate-shorts で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "スタックはLIFOで自動解放、ヒープは動的確保—— 試験頻出のメモリ領域なのだ！"
+  emphasis:
+    - "LIFO"
+    - "スタック"
+    - "ヒープ"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q1_stack_lifo"
+    chapter:
+      label: "Q1：スタック領域のデータ構造"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q1——スタック領域のデータ構造はどんな特徴？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "LIFO、後入れ先出しなのだ！ 関数呼び出しで引数や局所変数が積まれ、終われば自動で解放されるのだ！"
+        emphasis: ["LIFO", "自動解放"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q2_stack_vs_heap"
+    chapter:
+      label: "Q2：スタックとヒープの違い"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q2——スタックとヒープ、何が違う？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "スタックは自動管理で高速、ヒープは動的確保で明示的に解放—— 注意はスタックオーバーフローとメモリリークなのだ！"
+        emphasis: ["スタックオーバーフロー", "メモリリーク"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q2_memory_layout"
+    chapter:
+      label: "Q2補足：メモリ配置（高アドレス→低アドレス）"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "メモリ上ではどう並ぶ？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "高アドレス側からスタックが下へ、低アドレス側からヒープが上へ伸びる—— 真ん中が空き領域なのだ！"
+        emphasis: ["高アドレス", "低アドレス"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "スタック＝LIFOと自動解放、ヒープ＝動的確保と明示管理—— この対比で覚えるのだ！"
+        emphasis: ["LIFO", "動的確保"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "stack-heap-full"
+    title: "スタック領域とヒープ領域の違い"
+    pickScenes: ["q1_stack_lifo", "q2_stack_vs_heap", "q2_memory_layout", "summary_exam"]
+    overlayCaption: "🧠 スタック/ヒープ"
+    cta: "👇 関連動画は概要欄"
+
+  - id: "stack-heap-q1"
+    title: "Q1：スタックはLIFO"
+    pickScenes: ["q1_stack_lifo"]
+    overlayCaption: "🧠 Q1 LIFO"
+    cta: "👇 Q2もショートで"
+
+  - id: "stack-heap-q2"
+    title: "Q2：スタックとヒープの比較"
+    pickScenes: ["q2_stack_vs_heap", "q2_memory_layout"]
+    overlayCaption: "🧠 Q2 比較"
+    cta: "👇 まとめもショートで"
+
+  - id: "stack-heap-summary"
+    title: "まとめ：試験のポイント"
+    pickScenes: ["summary_exam"]
+    overlayCaption: "🧠 まとめ"
+    cta: "👇 関連動画は概要欄"
