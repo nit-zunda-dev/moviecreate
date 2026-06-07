@@ -7,9 +7,10 @@
 #   0 part2_intro · 1 part2_model · 2 part2_im_here_for · 3 part2_ill_stay
 #   4 part2_im_visiting · 5 part2_variants · 6 part2_replay · 7 part2_outro
 #
-# drill-meta（YouTube 公開後に実測して beginner.ts へ）:
-#   setupEndSeconds / revealStartSeconds: 37（メタデータ推定 0:37、公開前に再計測推奨）
-#   youtubeVideoId: （YouTube 登録後に記入）
+# drill-meta（ENGLISH_AD-LIB_DRILL packages/content/src/stages/beginner.ts）:
+#   setupEndSeconds / revealStartSeconds: 30.3
+#   youtubeVideoId: c4yakFGsaV8
+#   https://youtu.be/c4yakFGsaV8
 #   背景: image/background/background.png（黒板・全編共通）
 #
 # 生成（黒板背景込み MP4 → そのまま YouTube 可）:
