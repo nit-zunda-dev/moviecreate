@@ -1,0 +1,142 @@
+title: "【登録セキスペ】Pass the Hash攻撃の仕組み"
+
+# 「Pass the Hash の解説図解」Shorts 専用
+# - generate-shorts --ids pass-the-hash-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "Pass the Hashは平文PW不要—— 盗んだハッシュ値をそのまま認証に使う試験頻出なのだ！"
+  emphasis:
+    - "Pass the Hash"
+    - "ハッシュ値"
+    - "平文PW不要"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q7_definition"
+    chapter:
+      label: "Q7：Pass the Hashとは"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q7——Pass the Hash攻撃とは何？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "パスワードそのものではなくハッシュ値で認証を通す攻撃なのだ！ PCやメモリからNTLMハッシュを窃取、平文PWを知らなくても不正ログインできるのだ！"
+        emphasis: ["ハッシュ値", "NTLM"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "question_answer"
+    chapter:
+      label: "確認問題：正解はどれ？"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "確認問題——Pass the Hashに当てはまるのはどれ？ アからエの四択よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "正解はイ！ パスワードのハッシュ値だけでログインできる仕組みを悪用する—— ハッシュをそのまま使い回すのが本質なのだ！"
+        emphasis: ["イ", "使い回す"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "why_correct"
+    chapter:
+      label: "理由：なぜイが正解か"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "なぜイが正解？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "通常はPWをハッシュ化して認証—— 攻撃者は盗んだハッシュをそのまま認証サーバへ送る、Windowsでは認証用ハッシュが悪用されるのだ！"
+        emphasis: ["そのまま", "認証サーバ"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "wrong_patterns"
+    chapter:
+      label: "ひっかけ：ア・ウ・エがダメな理由"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ア・ウ・エはなぜ不正解？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "アはハッシュから平文PWを復元—— パスワードクラック、ウはIDを総当たり—— 本質ではない、エは平文保存の悪用—— ハッシュ再利用じゃないのだ！"
+        emphasis: ["パスワードクラック", "平文保存"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Pass the Hash＝平文PW不要、盗んだハッシュで認証突破—— MFA、権限最小化、LSASS保護、横展開監視で守るのだ！"
+        emphasis: ["平文PW不要", "MFA"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "pass-the-hash-full"
+    title: "Pass the Hash攻撃の仕組み"
+    pickScenes:
+      - "q7_definition"
+      - "question_answer"
+      - "why_correct"
+      - "wrong_patterns"
+      - "summary_exam"
+    overlayCaption: "🔑 Pass the Hash"
+    cta: "👇 関連動画は概要欄"

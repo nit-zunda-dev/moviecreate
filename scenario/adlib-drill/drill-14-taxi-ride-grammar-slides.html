@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>英語アドリブドリル 第14問 — タクシーに乗る（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220; --panel: #141d2e; --zunda: #88dd44; --metan: #ff88bb;
+      --text: #e8f0f8; --muted: #8fa3bc; --accent: #7dd3fc; --phrase: #fef9c3;
+      --font: "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; }
+    .deck { height: 100vh; max-height: 720px; margin: 0 auto; }
+    .slide {
+      display: none; height: 100vh; max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem; grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 0.45rem; overflow: hidden;
+    }
+    .slide.active { display: grid; }
+    .tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+      color: #0c1220; background: linear-gradient(90deg, var(--zunda), var(--metan));
+      padding: 0.2rem 0.55rem; border-radius: 4px;
+    }
+    h1 { font-size: 1.5rem; font-weight: 800; line-height: 1.22; color: var(--phrase); }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lead { font-size: 1.05rem; line-height: 1.35; color: var(--muted); font-weight: 500; }
+    .lead strong { color: var(--text); }
+    .diagram {
+      min-height: 0; display: flex; align-items: center; justify-content: center;
+      background: var(--panel); border-radius: 14px;
+      border: 1px solid rgba(136, 221, 68, 0.35); padding: 0.5rem 0.75rem;
+    }
+    .diagram svg { display: block; width: 100%; max-width: 1180px; height: auto; max-height: min(52vh, 400px); }
+    .var-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; min-height: 0; height: 100%;
+      background: var(--panel); border-radius: 14px;
+      border: 1px solid rgba(255, 136, 187, 0.35); padding: 0.5rem;
+    }
+    .var-card {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0.6rem 0.7rem; border-radius: 12px; background: rgba(15, 23, 42, 0.55);
+    }
+    .var-card b { font-size: 1rem; margin-bottom: 0.25rem; }
+    .var-card.take b { color: var(--accent); }
+    .var-card.go b { color: var(--zunda); }
+    .var-card.short b { color: #fbbf24; }
+    .var-card.escape b { color: var(--metan); }
+    .var-card span { font-size: 0.88rem; color: var(--muted); line-height: 1.35; font-family: var(--mono); }
+    .toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem; background: rgba(12, 18, 32, 0.95);
+      border-top: 1px solid rgba(136, 221, 68, 0.25); z-index: 10;
+    }
+    .toolbar button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid rgba(255, 136, 187, 0.45);
+      padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600;
+    }
+    .toolbar button:disabled { opacity: 0.35; }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    #scene-ref { font-size: 0.75rem; color: var(--metan); }
+    body.mc-slide-capture { overflow: hidden !important; }
+    body.mc-slide-capture html { font-size: 24px !important; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .deck { height: 100vh !important; max-height: none !important; }
+    body.mc-slide-capture .slide { display: none !important; padding: 0.85rem 2rem 0.65rem !important; max-height: 100vh !important; height: 100vh !important; }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture h1 { font-size: 1.6rem !important; }
+    body.mc-slide-capture .lead { font-size: 1.08rem !important; }
+    body.mc-slide-capture .diagram svg { max-height: 400px !important; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <section class="slide active" data-yaml-scene="part2_intro" title="答え合わせ">
+      <span class="tag">英語アドリブドリル · 第14問</span>
+      <h1>タクシーで<em>目的地を伝える</em></h1>
+      <p class="lead">運転手の <strong>Where to?</strong> への返し方</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="42" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="sans-serif">模範フレーズ + 2つの型</text>
+          <rect x="120" y="80" width="300" height="90" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="270" y="118" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="800" font-family="sans-serif">Could you take me to</text>
+          <text x="270" y="148" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">〜まで連れて行って</text>
+          <rect x="480" y="80" width="300" height="90" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="630" y="118" text-anchor="middle" fill="#86efac" font-size="16" font-weight="800" font-family="sans-serif">I'd like to go to</text>
+          <text x="630" y="148" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">〜に行きたい</text>
+          <rect x="40" y="195" width="820" height="70" rx="12" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="450" y="235" text-anchor="middle" fill="#bae6fd" font-size="15" font-weight="700" font-family="monospace">Could you take me to Times Square, please?</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_model" title="模範">
+      <span class="tag">模範解答</span>
+      <h1>まずは<em>この1文</em>を覚える</h1>
+      <p class="lead">丁寧なお願い + 地名 + please</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">Could you take me to Times Square, please?</text>
+          <rect x="80" y="90" width="240" height="55" rx="8" fill="#0c4a6e" stroke="#38bdf8"/>
+          <text x="200" y="123" text-anchor="middle" fill="#bae6fd" font-size="14" font-weight="700" font-family="sans-serif">お願いの型</text>
+          <rect x="340" y="90" width="220" height="55" rx="8" fill="#422006" stroke="#fbbf24"/>
+          <text x="450" y="123" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="700" font-family="sans-serif">目的地</text>
+          <rect x="580" y="90" width="240" height="55" rx="8" fill="#052e16" stroke="#4ade80"/>
+          <text x="700" y="123" text-anchor="middle" fill="#86efac" font-size="14" font-weight="700" font-family="sans-serif">please</text>
+          <text x="450" y="200" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">Where to? への最短の丁寧な返し</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_could_you_take" title="Could you take me to">
+      <span class="tag">解説 · ①</span>
+      <h1><em>Could you take me to</em></h1>
+      <p class="lead">タクシーでいちばん自然なお願い</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">Could you take me to ~?</text>
+          <rect x="120" y="85" width="660" height="50" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="450" y="118" text-anchor="middle" fill="#bae6fd" font-size="17" font-family="sans-serif">〜まで連れて行ってください</text>
+          <rect x="80" y="155" width="350" height="100" rx="12" fill="#1e293b" stroke="#86efac"/>
+          <text x="255" y="195" text-anchor="middle" fill="#86efac" font-size="15" font-weight="700">○ 例</text>
+          <text x="255" y="225" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="monospace">the airport / my hotel</text>
+          <rect x="470" y="155" width="350" height="100" rx="12" fill="#450a0a" stroke="#f87171"/>
+          <text x="645" y="195" text-anchor="middle" fill="#fca5a5" font-size="15" font-weight="700">△ ミス</text>
+          <text x="645" y="225" text-anchor="middle" fill="#fecaca" font-size="14" font-family="monospace">Take me Times Square</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_id_like_to_go" title="I'd like to go to">
+      <span class="tag">解説 · ②</span>
+      <h1><em>I'd like to go to</em></h1>
+      <p class="lead">カフェの I'd like と同じ型</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">I'd like to go to Times Square.</text>
+          <rect x="120" y="85" width="660" height="50" rx="10" fill="#052e16" stroke="#4ade80" stroke-width="2"/>
+          <text x="450" y="118" text-anchor="middle" fill="#bbf7d0" font-size="17" font-family="sans-serif">〜に行きたいです</text>
+          <rect x="150" y="155" width="600" height="90" rx="12" fill="#450a0a" stroke="#f87171"/>
+          <text x="450" y="195" text-anchor="middle" fill="#fca5a5" font-size="15" font-weight="700">go のあとに to を忘れない</text>
+          <text x="450" y="225" text-anchor="middle" fill="#fecaca" font-size="14" font-family="monospace">I'd like to go Times Square ✗</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_please" title="please">
+      <span class="tag">解説 · ③</span>
+      <h1><em>please</em> で丁寧に</h1>
+      <p class="lead">文末に付けるだけで印象が変わる</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">Times Square, please.</text>
+          <rect x="120" y="85" width="660" height="50" rx="10" fill="#422006" stroke="#fbbf24" stroke-width="2"/>
+          <text x="450" y="118" text-anchor="middle" fill="#fde68a" font-size="17" font-family="sans-serif">短くても通じる最小セット</text>
+          <text x="450" y="190" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">Could you take me to のあとに please を足すのがおすすめ</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_variants" title="言い換え">
+      <span class="tag">言い換え</span>
+      <h1>場面で<em>使い分け</em></h1>
+      <div class="var-grid">
+        <div class="var-card take"><b>丁寧（おすすめ）</b><span>Could you take me to Times Square, please?</span></div>
+        <div class="var-card go"><b>I'd like 型</b><span>I'd like to go to Times Square, please.</span></div>
+        <div class="var-card short"><b>超シンプル</b><span>Times Square, please.</span></div>
+        <div class="var-card escape"><b>住所を見せる</b><span>Could you take me to this address?</span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_replay" title="リプレイ">
+      <span class="tag">リプレイ</span>
+      <h1>もう一度<em>ゆっくり</em></h1>
+      <div class="diagram">
+        <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="40" width="820" height="55" rx="12" fill="#1e3a5f" stroke="#7dd3fc"/>
+          <text x="450" y="75" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="700" font-family="monospace">Could you take me to Times Square, please?</text>
+          <text x="450" y="150" text-anchor="middle" fill="#e2e8f0" font-size="16" font-family="sans-serif">Could · take · Times · Square · please</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" data-yaml-scene="part2_outro" title="まとめ">
+      <span class="tag">まとめ</span>
+      <h1>次は<em>あなたが言う</em>番</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+          <rect x="40" y="50" width="820" height="55" rx="10" fill="#1e3a5f" stroke="#7dd3fc"/>
+          <text x="450" y="85" text-anchor="middle" fill="#fef9c3" font-size="16" font-weight="800" font-family="monospace">Could you take me to · I'd like to go to · please</text>
+          <text x="450" y="160" text-anchor="middle" fill="#fde68a" font-size="16" font-family="sans-serif">チャンネル登録 &amp; アプリで再チャレンジ</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <div style="text-align:center;"><span class="progress" id="prog">1 / 8</span><br /><span id="scene-ref"></span></div>
+    <button type="button" id="next">次へ →</button>
+  </div>
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var idx = 0, prog = document.getElementById("prog"), sceneRef = document.getElementById("scene-ref");
+      var btnPrev = document.getElementById("prev"), btnNext = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        var sc = slides[idx].getAttribute("data-yaml-scene");
+        sceneRef.textContent = sc ? "台本 id: " + sc : "";
+        btnPrev.disabled = idx === 0; btnNext.disabled = idx === slides.length - 1;
+      }
+      btnPrev.addEventListener("click", function () { show(idx - 1); });
+      btnNext.addEventListener("click", function () { show(idx + 1); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      });
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>

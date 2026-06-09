@@ -1,0 +1,239 @@
+# =============================================================================
+# 英語アドリブドリル 第14問 — タクシーに乗る（beginner-5）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-5
+#
+# 解説スライド: drill-14-taxi-ride-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_could_you_take · 3 part2_id_like_to_go
+#   4 part2_please · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（ENGLISH_AD-LIB_DRILL packages/content/src/stages/beginner.ts）:
+#   setupEndSeconds / revealStartSeconds: 24.5
+#   youtubeVideoId: uVlqeeHH1q0
+#   https://youtu.be/uVlqeeHH1q0
+#   背景: image/background/background.png（黒板・全編共通）
+#
+# 生成（黒板背景込み MP4 → そのまま YouTube 可）:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-14-taxi-ride.yaml
+# =============================================================================
+title: '【英語アドリブドリル】タクシーに乗る｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  driver:
+    speakerId: 8
+    subtitleColor: "#FFD27D"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-14-taxi-ride-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5200
+  text: "タクシーで行き先が言えない"
+  emphasis:
+    - "タクシー"
+    - "行き先"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff4466"
+    durationMs: 220
+  zoom:
+    from: 1.0
+    to: 1.14
+  shake: true
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ニューヨークの街角。手を挙げて止めたタクシーに乗り込んだら、いきなり英語なのよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "行き先の看板は読めるのに、口から出てこないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: driver
+        text: "Where to?"
+        subtitle: "Where to?"
+        emphasis:
+          - "Where to"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……タイムズスクエアまで、英語で伝えるのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて言うのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "目的地をはっきり、丁寧に伝えてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ・導入" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの運転手さんへの返し。今日は2つの型と、please を押さえるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Could you take me to と I'd like to go to、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    chapter: { label: "模範解答" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。タイムズスクエアまでお願いするなら、こう言えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Could you take me to Times Square, please?"
+        subtitle: "Could you take me to Times Square, please?"
+        emphasis:
+          - "Could you take me to"
+          - "Times Square"
+          - "please"
+
+  - id: "part2_could_you_take"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Could you take me to は「〜まで連れて行ってください」。タクシーでいちばん自然なお願いの型よ。"
+        subtitle: "Could you take me to ~?"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Take me to だけだとぶっきらぼうなのだ。Could you を付けて丁寧に。"
+
+  - id: "part2_id_like_to_go"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I'd like to go to も定番。カフェの I'd like と同じ I'd like の型が使えるわ。"
+        subtitle: "I'd like to go to ~"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I'd like to go Times Square は to がいるのだ！go to でセット。"
+
+  - id: "part2_please"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "please を文末に付けると、ぐっと丁寧。短く言うなら Times Square, please. だけでも通じる。"
+        subtitle: "~, please."
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "地名＋please だけでもオーケーなのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "ホテルなら Could you take me to the Hilton on 42nd Street, please? のように番地まで言えると親切。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "わからない時は、Could you take me to this address? でスマホを見せるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。Could の d、Times の t、Square の squ をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Could you take me to Times Square, please?"
+        subtitle: "Could you take me to Times Square, please?"
+        emphasis:
+          - "Could you take me to"
+          - "Times Square"
+          - "please"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "Could you take me to と I'd like to go to、この2つを持ち帰って。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  titleHints:
+    - "shock"
+    - "howto"
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#タクシー英語"
+    - "#ずんだもん"
+    - "#四国めたん"
