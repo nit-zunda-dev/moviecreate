@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>英語アドリブドリル 第15問 — レストランで席を聞く（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220; --panel: #141d2e; --zunda: #88dd44; --metan: #ff88bb;
+      --text: #e8f0f8; --muted: #8fa3bc; --accent: #7dd3fc; --phrase: #fef9c3;
+      --font: "Segoe UI", "Hiragino Sans", Meiryo, sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; }
+    .deck { height: 100vh; max-height: 720px; }
+    .slide {
+      display: none; height: 100vh; max-height: 720px;
+      padding: 1rem 2.25rem 0.85rem; grid-template-rows: auto auto minmax(0, 1fr); gap: 0.45rem;
+    }
+    .slide.active { display: grid; }
+    .tag { display: inline-block; font-size: 0.72rem; font-weight: 800; color: #0c1220; background: linear-gradient(90deg, var(--zunda), var(--metan)); padding: 0.2rem 0.55rem; border-radius: 4px; }
+    h1 { font-size: 1.5rem; font-weight: 800; color: var(--phrase); }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lead { font-size: 1.05rem; color: var(--muted); }
+    .lead strong { color: var(--text); }
+    .diagram { min-height: 0; display: flex; align-items: center; justify-content: center; background: var(--panel); border-radius: 14px; border: 1px solid rgba(136,221,68,.35); padding: .5rem; }
+    .diagram svg { width: 100%; max-width: 1180px; max-height: min(52vh,400px); }
+    .var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; background: var(--panel); border-radius: 14px; padding: .5rem; border: 1px solid rgba(255,136,187,.35); }
+    .var-card { padding: .6rem .7rem; border-radius: 12px; background: rgba(15,23,42,.55); }
+    .var-card b { display: block; margin-bottom: .25rem; }
+    .var-card span { font-size: .88rem; color: var(--muted); font-family: var(--mono); }
+    .var-card.no b { color: var(--accent); } .var-card.table b { color: var(--zunda); }
+    .var-card.yes b { color: #fbbf24; } .var-card.alt b { color: var(--metan); }
+    .toolbar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: .5rem 1.5rem; background: rgba(12,18,32,.95); }
+    .toolbar button { background: var(--panel); color: var(--text); border: 1px solid rgba(255,136,187,.45); padding: .4rem 1rem; border-radius: 8px; cursor: pointer; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture .slide { display: none !important; height: 100vh !important; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <section class="slide active" data-yaml-scene="part2_intro">
+      <span class="tag">英語アドリブドリル · 第15問</span>
+      <h1>レストランで<em>席を伝える</em></h1>
+      <p class="lead">ホストの <strong>Do you have a reservation?</strong> への返し方</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="40" text-anchor="middle" fill="#fef9c3" font-size="20" font-weight="800" font-family="sans-serif">2つのかたまり</text>
+          <rect x="100" y="70" width="300" height="80" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="250" y="105" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="800" font-family="sans-serif">No, we don't</text>
+          <text x="250" y="132" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">予約なし</text>
+          <rect x="500" y="70" width="300" height="80" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="650" y="105" text-anchor="middle" fill="#86efac" font-size="16" font-weight="800" font-family="sans-serif">Table for two</text>
+          <text x="650" y="132" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">人数</text>
+          <rect x="40" y="175" width="820" height="60" rx="12" fill="#1e3a5f" stroke="#7dd3fc"/>
+          <text x="450" y="212" text-anchor="middle" fill="#bae6fd" font-size="15" font-weight="700" font-family="monospace">No, we don't. Table for two, please.</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_model">
+      <span class="tag">模範解答</span>
+      <h1>まずは<em>この2文</em></h1>
+      <p class="lead">予約なし → 人数 → please</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">No, we don't. Table for two, please.</text>
+          <text x="450" y="150" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">カフェの注文とは別。席と人数がポイント</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_table_for">
+      <span class="tag">解説 · ①</span>
+      <h1><em>Table for ~</em></h1>
+      <p class="lead">2人なら Table for two</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">Table for two, please.</text>
+          <text x="450" y="130" text-anchor="middle" fill="#fca5a5" font-size="15" font-family="monospace">Table of two ✗ → for を使う</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_no_reservation">
+      <span class="tag">解説 · ②</span>
+      <h1><em>No, we don't</em></h1>
+      <p class="lead">予約がないときの定番</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="20" font-weight="800" font-family="monospace">We don't have a reservation.</text>
+          <text x="450" y="130" text-anchor="middle" fill="#86efac" font-size="15" font-family="sans-serif">同じ意味の言い換え</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_how_many">
+      <span class="tag">解説 · ③</span>
+      <h1><em>How many in your party?</em></h1>
+      <p class="lead">別の聞き方にも対応</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="55" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">Two, please.</text>
+          <text x="450" y="130" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="sans-serif">party = 一緒に来た人数</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_variants">
+      <span class="tag">言い換え</span>
+      <h1>場面で<em>使い分け</em></h1>
+      <div class="var-grid">
+        <div class="var-card no"><b>予約なし・2人</b><span>No, we don't. Table for two, please.</span></div>
+        <div class="var-card yes"><b>予約あり</b><span>Yes, under the name Suzuki.</span></div>
+        <div class="var-card table"><b>席の希望</b><span>A table by the window, please.</span></div>
+        <div class="var-card alt"><b>超シンプル</b><span>Just two. No reservation.</span></div>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_replay">
+      <span class="tag">リプレイ</span>
+      <h1>もう一度<em>ゆっくり</em></h1>
+      <div class="diagram">
+        <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="80" text-anchor="middle" fill="#bae6fd" font-size="18" font-weight="700" font-family="monospace">No, we don't. Table for two, please.</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_outro">
+      <span class="tag">まとめ</span>
+      <h1>次は<em>あなたが言う</em>番</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="80" text-anchor="middle" fill="#fef9c3" font-size="16" font-weight="800" font-family="monospace">No, we don't · Table for two · please</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <span id="prog">1 / 8</span>
+    <button type="button" id="next">次へ →</button>
+  </div>
+  <script>
+    (function () {
+      var slides = [].slice.call(document.querySelectorAll(".slide")), idx = 0;
+      var prog = document.getElementById("prog"), prev = document.getElementById("prev"), next = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        prev.disabled = idx === 0; next.disabled = idx === slides.length - 1;
+      }
+      prev.onclick = function () { show(idx - 1); };
+      next.onclick = function () { show(idx + 1); };
+      document.onkeydown = function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      };
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>

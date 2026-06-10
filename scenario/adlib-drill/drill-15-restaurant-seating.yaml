@@ -1,0 +1,239 @@
+# =============================================================================
+# 英語アドリブドリル 第15問 — レストランで席を聞く（beginner-6）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-6
+#
+# 解説スライド: drill-15-restaurant-seating-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_table_for · 3 part2_no_reservation
+#   4 part2_how_many · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（ENGLISH_AD-LIB_DRILL packages/content/src/stages/beginner.ts）:
+#   setupEndSeconds / revealStartSeconds: 27
+#   youtubeVideoId: Fb5U_zYLusw
+#   https://youtu.be/Fb5U_zYLusw
+#   背景: image/background/background.png（黒板・全編共通）
+#
+# 生成（黒板背景込み MP4 → そのまま YouTube 可）:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-15-restaurant-seating.yaml
+# =============================================================================
+title: '【英語アドリブドリル】レストランで席を聞く｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  host:
+    speakerId: 8
+    subtitleColor: "#FFB4A2"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-15-restaurant-seating-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5200
+  text: "レストランで予約を聞かれて固まる"
+  emphasis:
+    - "レストラン"
+    - "予約"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff4466"
+    durationMs: 220
+  zoom:
+    from: 1.0
+    to: 1.14
+  shake: true
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ロンドンのレストラン。予約なしで入店したら、受付で英語の質問が飛んでくること、あるわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "メニューは読めるのに、予約の有無が言えないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: host
+        text: "Do you have a reservation?"
+        subtitle: "Do you have a reservation?"
+        emphasis:
+          - "Do you have a reservation"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……2人で、予約なしだと英語で伝えるのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて答えるのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "予約なしと人数を、短い文で伝えてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ・導入" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきのホストへの返し。今日は2つのかたまりで、予約なしと人数を伝えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "No, we don't と Table for two、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    chapter: { label: "模範解答" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。予約なしで2人なら、こう言えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "No, we don't. Table for two, please."
+        subtitle: "No, we don't. Table for two, please."
+        emphasis:
+          - "No, we don't"
+          - "Table for two"
+          - "please"
+
+  - id: "part2_table_for"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Table for two は「2人分のテーブルお願いします」。three や four に変えれば人数対応よ。"
+        subtitle: "Table for ~"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Table of two は言わないのだ。for を使う！"
+
+  - id: "part2_no_reservation"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "No, we don't は予約がないときの定番。We don't have a reservation でも同じ意味よ。"
+        subtitle: "No, we don't. / We don't have a reservation."
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "No reservation だけだと短すぎるのだ。ちゃんと文にする！"
+
+  - id: "part2_how_many"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "店によっては How many in your party? と聞かれる。Two, please. だけでも通じるわ。"
+        subtitle: "How many in your party?"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "party はパーティーじゃなくて、一緒の人数って意味なのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "予約があるなら Yes, under the name Suzuki. 窓際希望なら A table by the window, please. も使える。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "わからない時は、Just two people. No reservation. でなんとかなるのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。reservation の res、Table for two の for をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "No, we don't. Table for two, please."
+        subtitle: "No, we don't. Table for two, please."
+        emphasis:
+          - "No, we don't"
+          - "Table for two"
+          - "please"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "No, we don't と Table for two、この2つを持ち帰って。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  titleHints:
+    - "shock"
+    - "howto"
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#レストラン英語"
+    - "#ずんだもん"
+    - "#四国めたん"
