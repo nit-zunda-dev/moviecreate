@@ -1,0 +1,239 @@
+# =============================================================================
+# 英語アドリブドリル 第16問 — お土産店で買い物（beginner-7）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-7
+#
+# 解説スライド: drill-16-souvenir-shopping-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_how_much · 3 part2_do_you_have
+#   4 part2_sizes · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（ENGLISH_AD-LIB_DRILL packages/content/src/stages/beginner.ts）:
+#   setupEndSeconds / revealStartSeconds: 27
+#   youtubeVideoId: ub8VU_RXzJs
+#   https://youtu.be/ub8VU_RXzJs
+#   背景: image/background/background.png（黒板・全編共通）
+#
+# 生成（黒板背景込み MP4 → そのまま YouTube 可）:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-16-souvenir-shopping.yaml
+# =============================================================================
+title: '【英語アドリブドリル】お土産店で買い物｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  clerk:
+    speakerId: 10
+    subtitleColor: "#C9A0FF"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-16-souvenir-shopping-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5200
+  text: "お土産店で値段が聞けない"
+  emphasis:
+    - "お土産店"
+    - "値段"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff4466"
+    durationMs: 220
+  zoom:
+    from: 1.0
+    to: 1.14
+  shake: true
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "ロンドンのお土産店。Tシャツを手に取ったら、店員さんが英語で声をかけてくること、あるわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "気に入ったのに、値段とサイズの聞き方が出てこないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: clerk
+        text: "Can I help you?"
+        subtitle: "Can I help you?"
+        emphasis:
+          - "Can I help you"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……このTシャツ、いくらで M サイズあるのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて聞くのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "値段とサイズを、短い文で2つ聞いてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ・導入" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの店員さんへの返し。今日は2つの質問で、値段とサイズを聞くわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "How much is this と Do you have it in、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    chapter: { label: "模範解答" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。Tシャツの値段と medium サイズを聞く例よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Yes. How much is this T-shirt? Do you have it in medium?"
+        subtitle: "Yes. How much is this T-shirt? Do you have it in medium?"
+        emphasis:
+          - "How much is this"
+          - "T-shirt"
+          - "Do you have it in medium"
+
+  - id: "part2_how_much"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "How much is this は「これはいくら？」。this のあとに T-shirt や mug など商品名を足すわ。"
+        subtitle: "How much is this ~?"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "How much this T-shirt だと is がいるのだ。is を忘れない！"
+
+  - id: "part2_do_you_have"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Do you have it in medium? は「Mサイズはありますか？」。in のあとにサイズや色を入れるのよ。"
+        subtitle: "Do you have it in ~?"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "Do you have medium だけだと it in が抜けるのだ。セットで覚える！"
+
+  - id: "part2_sizes"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "small / medium / large が定番。服なら medium、大きめなら large に変えればOK。"
+        subtitle: "small · medium · large"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "S M L だけ言っても通じることもあるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら How much? と medium, please? でも通じる。色なら Do you have it in blue?"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "Just looking. だけだと、値段は聞けないのだ……"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。How much の much、T-shirt の sh、medium の di をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "Yes. How much is this T-shirt? Do you have it in medium?"
+        subtitle: "Yes. How much is this T-shirt? Do you have it in medium?"
+        emphasis:
+          - "How much is this"
+          - "T-shirt"
+          - "medium"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "How much is this と Do you have it in、この2つを持ち帰って。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  titleHints:
+    - "shock"
+    - "howto"
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#買い物英語"
+    - "#ずんだもん"
+    - "#四国めたん"

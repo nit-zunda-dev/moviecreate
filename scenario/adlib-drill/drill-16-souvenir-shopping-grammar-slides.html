@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=720" />
+  <title>英語アドリブドリル 第16問 — お土産店で買い物（解説スライド）</title>
+  <style>
+    :root {
+      --bg: #0c1220; --panel: #141d2e; --zunda: #88dd44; --metan: #ff88bb;
+      --text: #e8f0f8; --muted: #8fa3bc; --accent: #7dd3fc; --phrase: #fef9c3;
+      --font: "Segoe UI", "Hiragino Sans", Meiryo, sans-serif;
+      --mono: ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 22px; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; }
+    .deck { height: 100vh; max-height: 720px; }
+    .slide { display: none; height: 100vh; max-height: 720px; padding: 1rem 2.25rem 0.85rem; grid-template-rows: auto auto minmax(0,1fr); gap: .45rem; }
+    .slide.active { display: grid; }
+    .tag { display: inline-block; font-size: .72rem; font-weight: 800; color: #0c1220; background: linear-gradient(90deg,var(--zunda),var(--metan)); padding: .2rem .55rem; border-radius: 4px; }
+    h1 { font-size: 1.5rem; font-weight: 800; color: var(--phrase); }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lead { font-size: 1.05rem; color: var(--muted); }
+    .lead strong { color: var(--text); }
+    .diagram { min-height: 0; display: flex; align-items: center; justify-content: center; background: var(--panel); border-radius: 14px; border: 1px solid rgba(136,221,68,.35); padding: .5rem; }
+    .diagram svg { width: 100%; max-width: 1180px; max-height: min(52vh,400px); }
+    .var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; background: var(--panel); border-radius: 14px; padding: .5rem; border: 1px solid rgba(255,136,187,.35); }
+    .var-card { padding: .6rem .7rem; border-radius: 12px; background: rgba(15,23,42,.55); }
+    .var-card b { display: block; margin-bottom: .25rem; }
+    .var-card span { font-size: .88rem; color: var(--muted); font-family: var(--mono); }
+    .var-card.price b { color: var(--accent); } .var-card.size b { color: var(--zunda); }
+    .var-card.short b { color: #fbbf24; } .var-card.color b { color: var(--metan); }
+    .toolbar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: .5rem 1.5rem; background: rgba(12,18,32,.95); }
+    .toolbar button { background: var(--panel); color: var(--text); border: 1px solid rgba(255,136,187,.45); padding: .4rem 1rem; border-radius: 8px; cursor: pointer; }
+    body.mc-slide-capture .toolbar { display: none !important; }
+    body.mc-slide-capture .slide.active { display: grid !important; }
+    body.mc-slide-capture .slide { display: none !important; height: 100vh !important; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <section class="slide active" data-yaml-scene="part2_intro">
+      <span class="tag">英語アドリブドリル · 第16問</span>
+      <h1>お土産店で<em>値段とサイズ</em>を聞く</h1>
+      <p class="lead">店員の <strong>Can I help you?</strong> への返し方</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="40" text-anchor="middle" fill="#fef9c3" font-size="20" font-weight="800" font-family="sans-serif">2つの質問</text>
+          <rect x="100" y="70" width="300" height="80" rx="12" fill="#1e293b" stroke="#7dd3fc" stroke-width="2"/>
+          <text x="250" y="105" text-anchor="middle" fill="#bae6fd" font-size="16" font-weight="800" font-family="sans-serif">How much is this</text>
+          <text x="250" y="132" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">値段</text>
+          <rect x="500" y="70" width="300" height="80" rx="12" fill="#1e293b" stroke="#88dd44" stroke-width="2"/>
+          <text x="650" y="105" text-anchor="middle" fill="#86efac" font-size="16" font-weight="800" font-family="sans-serif">Do you have it in</text>
+          <text x="650" y="132" text-anchor="middle" fill="#cbd5e1" font-size="14" font-family="sans-serif">サイズ</text>
+          <rect x="40" y="175" width="820" height="60" rx="12" fill="#1e3a5f" stroke="#7dd3fc"/>
+          <text x="450" y="212" text-anchor="middle" fill="#bae6fd" font-size="14" font-weight="700" font-family="monospace">Yes. How much is this T-shirt? Do you have it in medium?</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_model">
+      <span class="tag">模範解答</span>
+      <h1>まずは<em>この2文</em></h1>
+      <p class="lead">Yes → 値段 → サイズ</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="50" text-anchor="middle" fill="#fef9c3" font-size="18" font-weight="800" font-family="monospace">Yes. How much is this T-shirt?</text>
+          <text x="450" y="85" text-anchor="middle" fill="#86efac" font-size="18" font-weight="800" font-family="monospace">Do you have it in medium?</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_how_much">
+      <span class="tag">解説 · ①</span>
+      <h1><em>How much is this ~?</em></h1>
+      <p class="lead">商品名を this のあとに</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="60" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">How much is this mug?</text>
+          <text x="450" y="130" text-anchor="middle" fill="#fca5a5" font-size="15" font-family="monospace">How much this mug ✗ → is を入れる</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_do_you_have">
+      <span class="tag">解説 · ②</span>
+      <h1><em>Do you have it in ~?</em></h1>
+      <p class="lead">it in をセットで</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="60" text-anchor="middle" fill="#fef9c3" font-size="22" font-weight="800" font-family="monospace">Do you have it in medium?</text>
+          <text x="450" y="130" text-anchor="middle" fill="#86efac" font-size="15" font-family="sans-serif">Do you have medium ✗</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_sizes">
+      <span class="tag">解説 · ③</span>
+      <h1><em>small / medium / large</em></h1>
+      <p class="lead">S · M · L の言い方</p>
+      <div class="diagram">
+        <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="80" text-anchor="middle" fill="#fde68a" font-size="20" font-weight="800" font-family="monospace">small · medium · large</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_variants">
+      <span class="tag">言い換え</span>
+      <h1>場面で<em>使い分け</em></h1>
+      <div class="var-grid">
+        <div class="var-card price"><b>フル</b><span>Yes. How much is this T-shirt? Do you have it in medium?</span></div>
+        <div class="var-card short"><b>超シンプル</b><span>How much? Medium, please?</span></div>
+        <div class="var-card size"><b>大きいサイズ</b><span>Do you have it in large?</span></div>
+        <div class="var-card color"><b>色を聞く</b><span>Do you have it in blue?</span></div>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_replay">
+      <span class="tag">リプレイ</span>
+      <h1>もう一度<em>ゆっくり</em></h1>
+      <div class="diagram">
+        <svg viewBox="0 0 900 180" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="80" text-anchor="middle" fill="#bae6fd" font-size="17" font-weight="700" font-family="monospace">Yes. How much is this T-shirt? Do you have it in medium?</text>
+        </svg>
+      </div>
+    </section>
+    <section class="slide" data-yaml-scene="part2_outro">
+      <span class="tag">まとめ</span>
+      <h1>次は<em>あなたが言う</em>番</h1>
+      <div class="diagram">
+        <svg viewBox="0 0 900 180" xmlns="http://www.w3.org/2000/svg">
+          <text x="450" y="80" text-anchor="middle" fill="#fef9c3" font-size="16" font-weight="800" font-family="monospace">How much is this · Do you have it in</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+  <div class="toolbar">
+    <button type="button" id="prev">← 前へ</button>
+    <span id="prog">1 / 8</span>
+    <button type="button" id="next">次へ →</button>
+  </div>
+  <script>
+    (function () {
+      var slides = [].slice.call(document.querySelectorAll(".slide")), idx = 0;
+      var prog = document.getElementById("prog"), prev = document.getElementById("prev"), next = document.getElementById("next");
+      function show(i) {
+        idx = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        prog.textContent = idx + 1 + " / " + slides.length;
+        prev.disabled = idx === 0; next.disabled = idx === slides.length - 1;
+      }
+      prev.onclick = function () { show(idx - 1); };
+      next.onclick = function () { show(idx + 1); };
+      document.onkeydown = function (e) {
+        if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(idx + 1); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+      };
+      show(0);
+      if (/[?&]capture=1/.test(location.search)) document.body.classList.add("mc-slide-capture");
+    })();
+  </script>
+</body>
+</html>
