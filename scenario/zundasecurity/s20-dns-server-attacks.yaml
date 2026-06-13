@@ -1,0 +1,143 @@
+title: "【登録セキスペ】DNSサーバーに対する攻撃と対策"
+
+# 「DNSサーバーに対する攻撃と対策」解説動画
+# - generate-video で横長 MP4（黒板背景のみ）を出力
+# - generate-shorts --ids dns-server-full で縦長 Shorts も出力可
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "DNSはインターネットの電話帳—— 攻撃されると偽サイトへ誘導され、サービス停止も起きる試験頻出なのだ！"
+  emphasis:
+    - "DNS"
+    - "電話帳"
+    - "偽サイト"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "definition"
+    chapter:
+      label: "DNSサーバーとは"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず前提——DNSサーバーは何をしているの？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ドメイン名をIPアドレスに変換する名前解決の仕組みなのだ！ インターネットの電話帳と言われる—— ここが攻撃されると全体の通信が乱れるのだ！"
+        emphasis: ["名前解決", "電話帳"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q1_attack_types"
+    chapter:
+      label: "Q1：攻撃の種類"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q1——DNSサーバーに対する攻撃の種類は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "DDoSで応答不能にする、DNSキャッシュポイズニングで偽情報を入れる、DNSリフレクションで攻撃トラフィックを増幅する、不正なゾーン転送で内部構成を調べる—— 四つセットで覚えるのだ！"
+        emphasis: ["DDoS", "キャッシュポイズニング", "リフレクション"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q2_cache_poisoning"
+    chapter:
+      label: "Q2：キャッシュポイズニングの影響"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q2——DNSキャッシュポイズニングの影響は？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "汚染されたキャッシュが偽のIPを返すのだ！ 正しいサイトに届かず、フィッシングやマルウェア配布、情報漏洩、サービス停止につながる—— 名前解決の改ざんがポイントなのだ！"
+        emphasis: ["偽のIP", "名前解決の改ざん"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q3_countermeasures"
+    chapter:
+      label: "Q3：主な対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q3——DNSサーバーへの主な対策は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "予防はDNSSEC、ソフト更新、再帰クエリ制限、ゾーン転送制限—— 緩和はRRLやDDoS対策サービス、冗長化—— 監視はログと異常検知、キャッシュ内容の確認なのだ！"
+        emphasis: ["DNSSEC", "RRL", "監視"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "DNSは電話帳、攻撃で名前解決が乱れる—— DNSSEC・アクセス制御・監視の三つで守る流れで覚えるのだ！"
+        emphasis: ["DNSSEC", "アクセス制御", "監視"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "dns-server-full"
+    title: "DNSサーバーに対する攻撃と対策"
+    pickScenes:
+      - "definition"
+      - "q1_attack_types"
+      - "q2_cache_poisoning"
+      - "q3_countermeasures"
+      - "summary_exam"
+    overlayCaption: "🌐 DNS攻撃と対策"
+    cta: "👇 関連動画は概要欄"

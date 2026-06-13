@@ -1,0 +1,142 @@
+title: "【登録セキスペ】セッションフィクセーションとは"
+
+# 「セッションフィクセーションとは」Shorts 専用
+# - generate-shorts --ids session-fixation-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "ログイン前に固定したセッションIDがそのまま使われる—— セッション固定化の攻撃・脆弱性・対策が試験頻出なのだ！"
+  emphasis:
+    - "セッション固定化"
+    - "セッションID"
+    - "ログイン前"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "definition"
+    chapter:
+      label: "セッションフィクセーションとは"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず定義から——セッションフィクセーションとは何？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "攻撃者が事前に知っているセッションIDを被害者に使わせ、ログイン後も同じIDでなりすます攻撃なのだ！ 攻撃の流れ・成立条件・対策をセットで覚えるのだ！"
+        emphasis: ["セッションID", "なりすます"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q5_attack_method"
+    chapter:
+      label: "Q5：攻撃手法"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q5——セッション固定化はどんな攻撃手法？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "攻撃者が既知のIDを用意し、URLやCookieで被害者に固定させるのだ！ 被害者がログインしてもIDはそのまま—— 攻撃者が同じIDでなりすまし成功なのだ！"
+        emphasis: ["ログイン前のID", "なりすまし"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q6_vulnerabilities"
+    chapter:
+      label: "Q6：脆弱性と成立条件"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q6——成立する脆弱性と条件は？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "ログイン後にIDを再発行しない、URLでIDを受け付ける、Cookie操作、弱いセッション管理、XSSの悪用—— 認証前後でセッションを切り替えない実装が根本なのだ！"
+        emphasis: ["ID再発行しない", "認証前後"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q7_countermeasures"
+    chapter:
+      label: "Q7：主な対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q7——セッション固定化への主な対策は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "ログイン時に必ずID再発行、重要操作時も再発行、URLにIDを載せない、旧セッション無効化、Secure・HttpOnly・SameSite—— 試験では認証後のID再発行が最重要なのだ！"
+        emphasis: ["ID再発行", "最重要"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "固定されたIDのままログインすると乗っ取られる—— 対策の肝はログイン後のセッションID再発行なのだ！"
+        emphasis: ["セッションID再発行", "ログイン後"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "session-fixation-full"
+    title: "セッションフィクセーションとは"
+    pickScenes:
+      - "definition"
+      - "q5_attack_method"
+      - "q6_vulnerabilities"
+      - "q7_countermeasures"
+      - "summary_exam"
+    overlayCaption: "📌 セッション固定化"
+    cta: "👇 関連動画は概要欄"

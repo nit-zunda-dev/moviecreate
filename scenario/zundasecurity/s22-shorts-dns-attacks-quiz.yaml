@@ -1,0 +1,127 @@
+title: "【登録セキスペ】DNS攻撃の確認問題まとめ"
+
+# 「DNS攻撃の確認問題 まとめ図解」Shorts 専用
+# - generate-shorts --ids dns-attacks-quiz-full で縦長 MP4 を出力
+# - 背景: 黒板のみ（scene.background は指定しない）
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "DNS水責め・カミンスキー・キャッシュポイズニング—— 3問セットで試験頻出なのだ！"
+  emphasis:
+    - "DNS水責め"
+    - "カミンスキー"
+    - "キャッシュポイズニング"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "q1_water_torture"
+    chapter:
+      label: "Q1：DNS水責め攻撃"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q1——DNS水責め攻撃の適切な手法と目的は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "正解はイ！ オープンリゾルバへ対象ドメインのランダムサブドメインを大量問い合わせ—— キャッシュミスを繰り返し、権威DNSサーバを過負荷にするのだ！ 標的は権威DNSサーバなのだ！"
+        emphasis: ["イ", "オープンリゾルバ", "権威DNSサーバ"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q2_kaminsky"
+    chapter:
+      label: "Q2：カミンスキー攻撃の対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q2——カミンスキー攻撃に有効な対策は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "正解はエ！ カミンスキー攻撃はキャッシュポイズニングの一種—— 攻撃者はトランザクションIDと送信元ポートを当てるのだ！ 送信元ポートのランダム化で偽応答の成功率を下げるのだ！"
+        emphasis: ["エ", "送信元ポート", "ランダム化"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q3_cache_poisoning"
+    chapter:
+      label: "Q3：キャッシュポイズニングの影響"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q3——DNSキャッシュポイズニングの直接的な結果は？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "正解はウ！ キャッシュに誤った名前解決情報が入ると、社内利用者が意図と異なるWebサーバへ誘導されるのだ！ サーバファイル改ざんやメール宛先変更ではないのだ！"
+        emphasis: ["ウ", "異なるWebサーバ", "名前解決"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "オープンリゾルバ対策、送信元ポートとトランザクションIDのランダム化、公開DNSと社内DNSの分離—— 3点セットで覚えるのだ！"
+        emphasis: ["ランダム化", "DNSの分離", "3点セット"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "dns-attacks-quiz-full"
+    title: "DNS攻撃の確認問題まとめ"
+    pickScenes:
+      - "q1_water_torture"
+      - "q2_kaminsky"
+      - "q3_cache_poisoning"
+      - "summary_exam"
+    overlayCaption: "🌐 DNS攻撃3問"
+    cta: "👇 関連動画は概要欄"

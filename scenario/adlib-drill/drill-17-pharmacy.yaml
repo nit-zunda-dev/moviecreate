@@ -1,0 +1,239 @@
+# =============================================================================
+# 英語アドリブドリル 第17問 — 薬局で体調を説明（beginner-8）
+# アプリ: ENGLISH_AD-LIB_DRILL / Question.id = beginner-8
+#
+# 解説スライド: drill-17-pharmacy-grammar-slides.html
+# slideIndex ⇔ scene.id (Part2):
+#   0 part2_intro · 1 part2_model · 2 part2_i_have · 3 part2_do_you_have
+#   4 part2_symptoms · 5 part2_variants · 6 part2_replay · 7 part2_outro
+#
+# drill-meta（ENGLISH_AD-LIB_DRILL packages/content/src/stages/beginner.ts）:
+#   setupEndSeconds / revealStartSeconds: 29
+#   youtubeVideoId: LrmJDzZ00K4
+#   https://youtu.be/LrmJDzZ00K4
+#   背景: image/background/background.png（黒板・全編共通）
+#
+# 生成（黒板背景込み MP4 → そのまま YouTube 可）:
+#   node dist/cli.js generate-video scenario/adlib-drill/drill-17-pharmacy.yaml
+# =============================================================================
+title: '【英語アドリブドリル】薬局で体調を説明｜あなたなら？'
+
+characters:
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.1
+
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.15
+      intonationScale: 1.05
+
+  pharmacist:
+    speakerId: 8
+    subtitleColor: "#AADDFF"
+    voice:
+      speedScale: 1.05
+      intonationScale: 1.0
+
+global:
+  defaultSpeaker: "zundamon"
+  defaultBackground: "./image/background/background.png"
+  slidesHtml: "./drill-17-pharmacy-grammar-slides.html"
+  voice:
+    speedScale: 1.12
+    postPhonemeLength: 0.07
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.14
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 5200
+  text: "海外で体調不良、薬局で説明できない"
+  emphasis:
+    - "体調不良"
+    - "薬局"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff4466"
+    durationMs: 220
+  zoom:
+    from: 1.0
+    to: 1.14
+  shake: true
+
+scenes:
+  # ---------- Part1（お題）----------
+  - id: "part1_intro"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "海外旅行中、頭が痛くなって薬局に入ったら、店員さんが英語で聞いてくること、あるわよね。"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "痛いのはわかるのに、症状を英語で説明できないのだ……"
+
+  - id: "part1_question"
+    chapter: { label: "お題" }
+    lines:
+      - type: dialogue
+        character: pharmacist
+        text: "How can I help you?"
+        subtitle: "How can I help you?"
+        emphasis:
+          - "How can I help you"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "えっ……頭痛だと伝えて、薬を探す英語が出てこないのだ！？"
+
+  - id: "part1_prompt"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "あなたなら、なんて言うのだ？"
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "症状と、欲しい薬を短い文で2つ伝えてみて。答えはこのあと。"
+
+  # ---------- Part2（答え合わせ + 解説スライド）----------
+  - id: "part2_intro"
+    slideIndex: 0
+    chapter: { label: "答え合わせ・導入" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "さっきの薬剤師への返し。今日は2つの文で、症状と薬のリクエストを伝えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "I have a headache と Do you have something for、覚えるのだ！"
+
+  - id: "part2_model"
+    slideIndex: 1
+    chapter: { label: "模範解答" }
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず模範。頭痛なら、こう言えるわ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I have a headache. Do you have something for headaches?"
+        subtitle: "I have a headache. Do you have something for headaches?"
+        emphasis:
+          - "I have a headache"
+          - "Do you have something for"
+          - "headaches"
+
+  - id: "part2_i_have"
+    slideIndex: 2
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "I have a headache は「頭痛がします」。have のあとに症状名を置く定番の型よ。"
+        subtitle: "I have a ~"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I am a headache だと、自分が頭痛そのものになるのだ……have を使う！"
+
+  - id: "part2_do_you_have"
+    slideIndex: 3
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Do you have something for headaches? は「頭痛薬はありますか？」。for のあとに症状を入れるわ。"
+        subtitle: "Do you have something for ~?"
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "something for headache だと s が抜けるのだ。headaches と複数形が自然！"
+
+  - id: "part2_symptoms"
+    slideIndex: 4
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "a sore throat、a stomachache、a fever も同じ型。I have a sore throat. Do you have something for sore throats?"
+        subtitle: "sore throat · stomachache · fever"
+      - type: dialogue
+        character: zundamon
+        face: "驚き"
+        text: "症状を変えるだけで、同じパターンで言えるのだ！"
+
+  - id: "part2_variants"
+    slideIndex: 5
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "短く言うなら I have a headache. だけでも通じる。丁寧なら Could I have something for headaches, please?"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "アレルギーがある時は I'm allergic to ~ も覚えておくのだ。"
+
+  - id: "part2_replay"
+    slideIndex: 6
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "もう一度、ゆっくり。headache の ache、something の thing、headaches の s をはっきり。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "I have a headache. Do you have something for headaches?"
+        subtitle: "I have a headache. Do you have something for headaches?"
+        emphasis:
+          - "I have a headache"
+          - "something for"
+          - "headaches"
+
+  - id: "part2_outro"
+    slideIndex: 7
+    lines:
+      - type: dialogue
+        character: metan
+        face: "笑い"
+        text: "I have a と Do you have something for、この2つを持ち帰って。"
+      - type: dialogue
+        character: zundamon
+        face: "喜び"
+        text: "アプリでもう一度アドリブしてみるのだ！チャンネル登録もお願いするのだ！"
+
+youtube:
+  titleHints:
+    - "shock"
+    - "howto"
+  hashtags:
+    - "#英語アドリブ"
+    - "#英会話"
+    - "#英語学習"
+    - "#薬局英語"
+    - "#ずんだもん"
+    - "#四国めたん"

@@ -1,0 +1,142 @@
+title: "【登録セキスペ】Man-in-the-middle攻撃とは"
+
+# 「Man-in-the-middle攻撃とは」Shorts 専用
+# - generate-shorts --ids mitm-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "MITMは通信の途中に入り、双方になりすまして盗聴・改ざんする—— 証明書なし公開鍵交換の試験頻出攻撃なのだ！"
+  emphasis:
+    - "MITM"
+    - "なりすまし"
+    - "盗聴・改ざん"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "question_answer"
+    chapter:
+      label: "確認問題：正解はどれ？"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "確認問題——証明書なしで公開鍵交換するとき、相手になりすまして通信を傍受する攻撃はどれ？ アからエの四択よ。"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "正解はア！ Man-in-the-middle攻撃—— 中間者攻撃のことなのだ！"
+        emphasis: ["ア", "Man-in-the-middle"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "why_correct"
+    chapter:
+      label: "理由：なぜアが正解か"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "なぜアが正解？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "証明書がないと公開鍵の本人確認ができないのだ！ 攻撃者が中間に入り、利用者にはサーバ、サーバには利用者になりすまして盗聴・改ざんするのだ！"
+        emphasis: ["証明書がない", "中間に入り"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "wrong_patterns"
+    chapter:
+      label: "ひっかけ：イ・ウ・エがダメな理由"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "イ・ウ・エはなぜ不正解？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "イはwar driving—— 無線LANを車で探索、ウはトロイの木馬—— 正規ソフトを装うマルウェア、エはブルートフォース—— 全組合せの総当たりなのだ！ いずれも中間でのなりすましではないのだ！"
+        emphasis: ["war driving", "トロイの木馬", "ブルートフォース"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "countermeasures"
+    chapter:
+      label: "主な対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "MITMへの主な対策は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "デジタル証明書で公開鍵を検証、TLSやHTTPSの正しい利用、証明書警告を無視しない、公開鍵ピンニング—— 相手確認ができれば中間者は割り込めないのだ！"
+        emphasis: ["デジタル証明書", "HTTPS", "相手確認"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "証明書なし公開鍵交換は相手確認不能—— MITMは中間で双方になりすまし、盗聴・改ざんする攻撃として覚えるのだ！"
+        emphasis: ["相手確認不能", "MITM"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "mitm-full"
+    title: "Man-in-the-middle攻撃とは"
+    pickScenes:
+      - "question_answer"
+      - "why_correct"
+      - "wrong_patterns"
+      - "countermeasures"
+      - "summary_exam"
+    overlayCaption: "🕵️ MITM攻撃"
+    cta: "👇 関連動画は概要欄"

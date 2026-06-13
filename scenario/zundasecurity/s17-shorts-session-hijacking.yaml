@@ -1,0 +1,158 @@
+title: "【登録セキスペ】セッションハイジャックのチェック解説"
+
+# 「セッションハイジャックのチェック解説」Shorts 専用
+# - generate-shorts --ids session-hijacking-full で縦長 MP4 を出力
+
+characters:
+  metan:
+    speakerId: 2
+    image: "./image/metan/通常.png"
+    position: right
+    subtitleColor: "#FF88BB"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.05
+
+  zundamon:
+    speakerId: 3
+    image: "./image/zundamon/通常.png"
+    position: left
+    subtitleColor: "#88DD44"
+    voice:
+      speedScale: 1.3
+      intonationScale: 1.1
+
+global:
+  defaultSpeaker: "zundamon"
+  voice:
+    speedScale: 1.25
+    postPhonemeLength: 0.05
+  defaultBackground: "./image/background/background.png"
+  bgm:
+    default: "./bgm/パステルハウス.mp3"
+    volume: 0.12
+
+output:
+  fps: 30
+  width: 1280
+  height: 720
+
+hook:
+  durationMs: 3500
+  text: "セッションハイジャックはセッションIDを奪ってなりすまし—— 手法・原因・対策が試験頻出なのだ！"
+  emphasis:
+    - "セッションハイジャック"
+    - "セッションID"
+    - "なりすまし"
+  character: zundamon
+  face: "驚き"
+  flash:
+    color: "#ff2244"
+    durationMs: 250
+  zoom:
+    from: 1.00
+    to: 1.15
+  shake: true
+  bgm: "./bgm/intro_tense.mp3"
+  se: "./se/hook_impact.mp3"
+
+scenes:
+  - id: "definition"
+    chapter:
+      label: "セッションハイジャックとは"
+    bgm: "./bgm/main_serious.mp3"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "まず定義から——セッションハイジャックとは何？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "攻撃者がセッションIDを盗み、本人になりすまして不正アクセスする攻撃なのだ！ 通信の盗聴や推測でIDを入手し、なりすましアクセスするのが基本パターンなのだ！"
+        emphasis: ["セッションID", "なりすまし"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q1_methods"
+    chapter:
+      label: "Q1：セッションハイジャックの手法"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q1——セッションハイジャックにはどんな手法がある？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "盗聴でIDを拾うスニッフィング、総当たりで推測、セッション固定化、予測しやすいIDの不適切管理—— いずれも正規IDを入手してなりすますのだ！"
+        emphasis: ["スニッフィング", "セッション固定化"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q2_vulnerabilities"
+    chapter:
+      label: "Q2：成立する脆弱性"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q2——Webサーバとクライアント間で成立する脆弱性は？"
+      - type: dialogue
+        character: zundamon
+        face: "困り"
+        text: "HTTPの平文通信、短く予測可能なセッションID、セッション固定化、CookieのSecureやHttpOnly未設定、XSSによる盗聴—— IDが漏れる実装・設定ミスが原因なのだ！"
+        emphasis: ["HTTP", "Secure/HttpOnly", "XSS"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q3_web_countermeasures"
+    chapter:
+      label: "Q3：Webサーバ側の対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q3——Webサーバとクライアント間の対策は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "HTTPSで暗号化、長くランダムなセッションID、定期的なID再生成、CookieにSecureとHttpOnly、XSS対策、タイムアウト設定—— 漏れと悪用の両方を防ぐのだ！"
+        emphasis: ["HTTPS", "ID再生成", "タイムアウト"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "q4_auth_countermeasures"
+    chapter:
+      label: "Q4：認証サーバ側の対策"
+    lines:
+      - type: dialogue
+        character: metan
+        face: "通常"
+        text: "Q4——認証サーバとクライアント間の対策は？"
+      - type: dialogue
+        character: zundamon
+        face: "通常"
+        text: "HTTPSとHSTS、多要素認証、セッション寿命の短縮とログイン後のID再生成、リスクベース認証と異常検知—— 奪われても使えない状態を作るのだ！"
+        emphasis: ["多要素認証", "ID再生成", "異常検知"]
+        se: "./se/correct_bell.mp3"
+
+  - id: "summary_exam"
+    chapter:
+      label: "まとめ：試験のポイント"
+    lines:
+      - type: dialogue
+        character: zundamon
+        face: "笑い"
+        text: "手法・脆弱性・Web対策・認証対策の4点セット—— セッションIDを守り、奪われても無効化する流れで覚えるのだ！"
+        emphasis: ["4点セット", "セッションID"]
+        se: "./se/callout_pop.mp3"
+
+shorts:
+  - id: "session-hijacking-full"
+    title: "セッションハイジャックのチェック解説"
+    pickScenes:
+      - "definition"
+      - "q1_methods"
+      - "q2_vulnerabilities"
+      - "q3_web_countermeasures"
+      - "q4_auth_countermeasures"
+      - "summary_exam"
+    overlayCaption: "🔐 セッションハイジャック"
+    cta: "👇 関連動画は概要欄"
